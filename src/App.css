@@ -1,0 +1,110 @@
+@import './../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
+html, body, #partEditor {
+  touch-action: none !important;
+}
+
+
+:root {
+  --red: rgb(255, 51, 40);
+  --green: rgb(42, 199, 94);
+  --blue: rgb(71, 209, 204);
+  --white: rgb(255, 255, 255);
+  --gray-progress: rgb(234, 234, 238);
+  --gray-main: rgb(244, 244, 247);
+  --gray-button: rgb(249, 223, 226);
+  --gray-button-bottom: rgb(231, 231, 233);
+}
+
+
+.darkTheme {
+  --red: rgb(255, 51, 40);
+  --green: rgb(42, 199, 94);
+  --blue: rgb(71, 209, 204);
+  --white: rgb(255, 255, 255);
+  --gray-progress: rgb(234, 234, 238);
+  --gray-main: rgb(244, 244, 247);
+  --gray-button: rgb(249, 223, 226);
+  --gray-button-bottom: rgb(231, 231, 233);
+}
+
+
+.lightTheme {
+  --red: rgb(255, 51, 40);
+  --green: rgb(42, 199, 94);
+  --blue: rgb(71, 209, 204);
+  --white: rgb(255, 255, 255);
+  --gray-progress: rgb(234, 234, 238);
+  --gray-main: rgb(244, 244, 247);
+  --gray-button: rgb(249, 223, 226);
+  --gray-button-bottom: rgb(231, 231, 233);
+
+}
+
+
+
+#App {
+  width:  100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#main {
+  background-color: var(--color);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: var(--white);
+}
+
+#NavBar {
+  width: 100%;
+  height: 66.6px;
+  background-color: blue;
+}
+
+#ProgressBar {
+  height: 66.6px;
+  background-color: red;
+}
+
+#BarContainer {
+  height: calc( 100% - 66.6px);
+  width: 100%;
+}
+
+#MidBarContainer {
+  width: 100%;
+}
+
+#LeftCentralBarContainer {
+  width: 100%;
+  height: 100%;
+}
+
+#dLine, 
+.dLine {
+  border-top: 5px solid var(--gray-progress);
+  width: 100%;
+  height: 2px;
+}
+
+#CentralBar {
+  width:100%;
+  background-color: peru;
+}
+
+#LeftBar {
+  width: 100px;
+  background-color: pink;
+}
+
+#RightBar {
+  width: 166.5px;
+  height: calc( 1080px- 165px);
+  background-color: yellow ;
+}
