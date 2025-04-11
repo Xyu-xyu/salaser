@@ -1,3 +1,4 @@
+import  SwiperPlan  from "./swiperPlan";
 const CentralBar = () => {
 
 	return (
@@ -5,6 +6,10 @@ const CentralBar = () => {
 		<div  
             id="CentralBar"
             >
+                <div id="SwiperContainer">
+                    <SwiperPlan />
+                </div>
+                
         </div>
         )
     };

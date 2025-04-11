@@ -1,6 +1,5 @@
 @import './../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
-
 @font-face {
   font-weight: 400;
   font-family: "Moderat";
@@ -19,7 +18,7 @@
 
 }
 
-html, body, #partEditor {
+html, body {
   touch-action: none !important;
   font-family: "Moderat",sans-serif;
 }
@@ -85,9 +84,9 @@ html, body, #partEditor {
   width: 100%;
 }
 
-#MidBarContainer {
+/* #MidBarContainer {
   width: 100%;
-}
+} */
 
 #LeftCentralBarContainer {
   width: 100%;
@@ -102,9 +101,20 @@ html, body, #partEditor {
 }
 
 #CentralBar {
-  width:100%;
+  width: 1642px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+ 
 /*   background-color: peru;
  */}
+
+#SwiperContainer {
+  width:  1600px;
+  height: 800px;
+  display: flex;
+  align-items: center;
+}
 
 #LeftBar {
   width: 100px;
@@ -119,4 +129,22 @@ html, body, #partEditor {
   background-color: var(--white) ;
   border: 1px solid var(--white) ;
   border-top-left-radius: 10px;
+}
+
+.swiper {
+  width: 100%;
+  padding-top: 400px;
+  padding-bottom: 50px;
+}
+
+.swiper-slide {
+  background-position: center;
+  background-size: cover;
+  width: 800px;
+  height: 800px;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
 }
