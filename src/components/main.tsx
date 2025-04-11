@@ -1,6 +1,6 @@
 import CentralBar from "./centralBar";
 import NavBar from "./navbar";
-import ProgressBar from "./progressBar";
+import ProgressBarContainer from "./progressBarContainer";
 import RightBar from "./rightBar";
 import LeftBar from "./leftBar";
 
@@ -12,7 +12,7 @@ const Main = () => {
 			<div className="dLine w-100" id="dLine"></div>
 				<div className="d-flex flex-row w-100" id="BarContainer">
 					<div className="d-flex flex-column" id="MidBarContainer">
-						<ProgressBar />
+						<ProgressBarContainer />
 						<div className="d-flex" id="LeftCentralBarContainer">
 							<LeftBar />
 							<CentralBar />

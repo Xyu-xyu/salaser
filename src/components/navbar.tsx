@@ -1,10 +1,16 @@
+import IosToggle from "./iosToggle";
+
 const NavBar = () => {
 
 	return (
 		
 		<div  
-            id="NavBar"
+            id="NavBar"            
             >
+                <div>
+                    <IosToggle />
+                </div>
+            
         </div>
         )
     };

@@ -5,7 +5,7 @@ function App() {
 
   return (
     <>
-      <div id="App">
+      <div id="App" className='themeLight'>
         <Main />
       </div>
       
