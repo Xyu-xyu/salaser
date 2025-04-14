@@ -23,8 +23,6 @@ html, body {
   font-family: "Moderat",sans-serif;
 }
 
-
-
 .darkTheme {
   --red: rgb(255, 51, 40);
   --green: rgb(42, 199, 94);
@@ -35,7 +33,6 @@ html, body {
   --grey-button: rgb(249, 223, 226);
   --grey-button-bottom: rgb(231, 231, 233);
 }
-
 
 .lightTheme {
   --red: rgb(255, 51, 40);
@@ -84,9 +81,9 @@ html, body {
   width: 100%;
 }
 
-/* #MidBarContainer {
-  width: 100%;
-} */
+#MidBarContainer {
+  width: 91%;
+} 
 
 #LeftCentralBarContainer {
   width: 100%;
@@ -101,39 +98,48 @@ html, body {
 }
 
 #CentralBar {
-  width: 1642px;
+  /* width: 1642px; */
+  width: 85.52%;
   justify-content: center;
   align-items: center;
   display: flex;
- 
-/*   background-color: peru;
- */}
+}
 
 #SwiperContainer {
-  width:  1600px;
-  height: 800px;
+  min-height: 800px;
+  min-width: 800px;
+  max-width:   1600px;
+  max-height: 800px;
   display: flex;
   align-items: center;
 }
 
 #LeftBar {
-  width: 100px;
+/*   width: 100px; */
+  width: 5.2%;
+  height: 98%;
   background-color: var(--grey-progress);
   border: 1px solid var(--grey-progress);
   border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+
+
 }
 
 #RightBar {
-  width: 166.5px;
-  height: calc( 1080px- 165px);
+/*   width: 166.5px; */
+  width: 9%;
+  height: 98%;
   background-color: var(--white) ;
   border: 1px solid var(--white) ;
   border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+
 }
 
 .swiper {
   width: 100%;
-  padding-top: 400px;
+  padding-top: 50px;
   padding-bottom: 50px;
 }
 
@@ -147,4 +153,44 @@ html, body {
 .swiper-slide img {
   display: block;
   width: 100%;
+}
+
+.planCard {
+  width: 600px;
+  height: fit-content;
+  max-height: 800px;  
+  border: 2px solid var(--grey-progress);
+  border-radius: 10px;
+  padding: 1em;
+  background-color: var(--white);
+}
+
+
+.planCard_header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1em;
+}
+
+.planCard_body_img{
+  padding: 25px;
+  border: 2px solid var(--grey-progress);
+  border-radius: 10px;
+  background-color: var(--grey-main);
+  width: 456px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+
+.swipeButtons {
+  position: absolute!important;
+  justify-content: center!important;
+  margin-top: 1.5rem!important;
+  top: 69%;
+  left: 45%;
+  z-index: 10;
 }

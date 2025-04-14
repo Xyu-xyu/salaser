@@ -36,7 +36,7 @@ const ProgressBarContainer = () => {
 
 
 	return (
-		<div id="ProgressBarContainer" className="m-0 p-0" style={{ position: 'relative' }}>
+		<div id="ProgressBarContainer" className="m-0 mb-3 p-0" style={{ position: 'relative' }}>
 			<ProgressBar
 				striped
 				variant="info"
