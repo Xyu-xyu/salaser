@@ -1,4 +1,4 @@
-import IosToggle from "./iosToggle";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 const NavBar = () => {
 
@@ -6,10 +6,17 @@ const NavBar = () => {
 		
 		<div  
             id="NavBar"            
-            >
-                <div>
-                    <IosToggle />
+            ><div>
+            <button className="w-100">
+                <div className="d-flex align-items-center justify-content-center">
+                     <Icon icon="fluent:circle-12-regular" 
+                        width="36" 
+                        height="36" 
+                        style={{ color: 'white' }}
+                        className='ms-1' />
                 </div>
+            </button>
+        </div>            
             
         </div>
         )

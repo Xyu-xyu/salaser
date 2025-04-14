@@ -10,6 +10,7 @@
   --red: rgb(255, 51, 40);
   --green: rgb(42, 199, 94);
   --blue: rgb(71, 209, 204);
+  --violet: rgb(93, 83, 247);
   --white: rgb(255, 255, 255);
   --grey-progress: rgb(234, 234, 238);
   --grey-main: rgb(244, 244, 247);
@@ -122,7 +123,10 @@ html, body {
   border: 1px solid var(--grey-progress);
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 
 }
 
@@ -193,4 +197,75 @@ html, body {
   top: 69%;
   left: 45%;
   z-index: 10;
+}
+
+#RightBar div {
+  margin:3%;
+}
+
+#RightBar button {
+  background-color: var(--grey-progress);
+  border: 1px solid var(--grey-progress);
+  border-radius: 5px;
+  width: 100%;
+  height: 50px;
+  color: black;
+  transition: background-color 0.2s ease;
+}
+
+#RightBar button:active,
+#RightBar button:focus:active {
+  background-color: var(--grey-main) !important;
+}
+
+
+
+/* Чтобы dropdown-items тянулись на всю ширину */
+#RightBar .dropdown-menu {
+  width: 100%;
+}
+
+
+#LeftBar div {
+  /* margin:5%; */
+  width: 94%;
+  height: auto;
+  
+}
+
+#LeftBar button {
+  background-color: var(--violet);
+  border: 1px solid var(--violet);
+  border-radius: 5px;
+  width: 60px;
+  height: 60px;
+  color: white;
+}
+
+
+
+#Navbar div {
+  margin: 3%;
+}
+
+#Navbar button {
+  border-radius: 5px;
+  color: black;
+}
+
+.violet_button {
+  background-color: var(--violet) !important;
+  border: 1px solid var(--violet) !important;
+}
+
+.grey_button {
+  background-color: var(--grey-progress) !important;
+  border: 1px solid var(--grey-progress) !important;
+}
+
+.swipeButtons {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  flex-direction: column;
 }

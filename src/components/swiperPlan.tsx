@@ -4,11 +4,12 @@ import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 import PlanCard from './planCard';
+import IosToggle from './iosToggle';
 
 // import required modules
 import { EffectCoverflow, Pagination } from 'swiper/modules';
 import { Swiper as SwiperClass } from 'swiper/types';
-
+ 
 
 export default function SwiperPlan() {
 	let arr = Array.from({ length: 10 })
@@ -60,6 +61,7 @@ export default function SwiperPlan() {
 							className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
 						>▶</button>
 					</div>
+					<IosToggle />
 				</div>
 			</Swiper>
 		</>
