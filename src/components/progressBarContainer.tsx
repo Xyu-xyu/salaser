@@ -52,7 +52,7 @@ const ProgressBarContainer = () => {
 					top: '50%',
 					left: '50%',
 					transform: 'translate(-50%, -33%)',
-					color: 'rgb(117, 117, 117);', 
+					color: 'rgb(117, 117, 117)', 
 					fontSize: "20px"
 				}}
 			>

@@ -6,6 +6,27 @@
   src: url('./assets/fonts/Moderat-Medium.ttf');
 }
 
+
+@media (orientation: portrait) {
+  .navigation-bar {
+    flex-direction: column;
+  }
+  #CentralBar {
+      width: 907px;
+  }
+}
+
+@media (orientation: landscape) {
+  .navigation-bar {
+    flex-direction: row;
+  }
+
+  #CentralBar {
+    width: 85%;
+}
+}
+
+
 :root {
   --red: rgb(255, 51, 40);
   --green: rgb(42, 199, 94);
@@ -16,6 +37,7 @@
   --grey-main: rgb(244, 244, 247);
   --grey-button: rgb(249, 223, 226);
   --grey-button-bottom: rgb(231, 231, 233);
+  --grey-nav: rgb(223, 223, 226 )
 
 }
 
@@ -24,28 +46,6 @@ html, body {
   font-family: "Moderat",sans-serif;
 }
 
-.darkTheme {
-  --red: rgb(255, 51, 40);
-  --green: rgb(42, 199, 94);
-  --blue: rgb(71, 209, 204);
-  --white: rgb(255, 255, 255);
-  --grey-progress: rgb(234, 234, 238);
-  --grey-main: rgb(244, 244, 247);
-  --grey-button: rgb(249, 223, 226);
-  --grey-button-bottom: rgb(231, 231, 233);
-}
-
-.lightTheme {
-  --red: rgb(255, 51, 40);
-  --green: rgb(42, 199, 94);
-  --blue: rgb(71, 209, 204);
-  --white: rgb(255, 255, 255);
-  --grey-progress: rgb(234, 234, 238);
-  --grey-main: rgb(244, 244, 247);
-  --grey-button: rgb(249, 223, 226);
-  --grey-button-bottom: rgb(231, 231, 233);
-
-}
 
 #App {
   width:  100vw;
@@ -62,14 +62,6 @@ html, body {
   flex-direction: column;
   justify-content: flex-start;
   background-color: var(--grey-main);
-}
-
-#NavBar {
-  width: 100%;
-  height: 66.6px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;  
 }
 
 #ProgressBarContainer {
@@ -99,8 +91,6 @@ html, body {
 }
 
 #CentralBar {
-  /* width: 1642px; */
-  width: 85.52%;
   justify-content: center;
   align-items: center;
   display: flex;
@@ -116,11 +106,11 @@ html, body {
 }
 
 #LeftBar {
-/*   width: 100px; */
   width: 5.2%;
+  min-width: 80px;
   height: 98%;
-  background-color: var(--grey-progress);
-  border: 1px solid var(--grey-progress);
+  background-color: var(--white);
+  border: 1px solid var(--white);
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   display: flex;
@@ -194,8 +184,8 @@ html, body {
   position: absolute!important;
   justify-content: center!important;
   margin-top: 1.5rem!important;
-  top: 69%;
-  left: 45%;
+  bottom: 6%;
+  /* left: 45%; */
   z-index: 10;
 }
 
@@ -228,7 +218,6 @@ html, body {
 
 #LeftBar div {
   /* margin:5%; */
-  width: 94%;
   height: auto;
   
 }
@@ -237,20 +226,31 @@ html, body {
   background-color: var(--violet);
   border: 1px solid var(--violet);
   border-radius: 5px;
-  width: 60px;
+  width: 78px;
   height: 60px;
   color: white;
 }
 
-
-
-#Navbar div {
-  margin: 3%;
+.swipeButtons {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  flex-direction: column;
 }
 
-#Navbar button {
+#NavBar {
+  width: 100%;
+  height: 66.6px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;  
+}
+
+.navbar_button {
   border-radius: 5px;
   color: black;
+  width: 58px;
+  height: 58px;
 }
 
 .violet_button {
@@ -259,13 +259,18 @@ html, body {
 }
 
 .grey_button {
-  background-color: var(--grey-progress) !important;
-  border: 1px solid var(--grey-progress) !important;
+  background-color: var(--grey-nav) !important;
+  border: 1px solid var(--grey-nav) !important;
 }
 
-.swipeButtons {
-  display: flex;
-  align-items: center;
-  justify-content: left;
-  flex-direction: column;
+/* #longButton {
+  width: 1291px;
+} */
+
+.swipeButtons button {
+  border-radius: 5px;
+  color: black;
+  width: 58px;
+  height: 58px;
+
 }
