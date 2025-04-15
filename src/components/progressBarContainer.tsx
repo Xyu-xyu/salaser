@@ -51,12 +51,12 @@ const ProgressBarContainer = () => {
 					position: 'absolute',
 					top: '50%',
 					left: '50%',
-					transform: 'translate(-50%, -33%)',
+					transform: 'translate(-40%, -33%)',
 					color: 'rgb(117, 117, 117)', 
 					fontSize: "20px"
 				}}
 			>
-				{progress}%
+				Current work 06.08 1,5мм-01 2 mm Steel {progress}%
 			</div>
 		</div>
 	);

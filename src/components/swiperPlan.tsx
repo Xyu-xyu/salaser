@@ -3,13 +3,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import PlanCard from './planCard';
-import IosToggle from './iosToggle';
 import 'swiper/css/scrollbar';
 import { EffectCoverflow, Scrollbar } from 'swiper/modules';
 import { Swiper as SwiperClass } from 'swiper/types';
-
-
- 
  
 
 export default function SwiperPlan() {
@@ -50,7 +46,7 @@ export default function SwiperPlan() {
       coverflowEffect={{
         rotate: isVertical ? 0 : 0,
         stretch: isVertical ? 0 : 0,
-        depth: 1000,
+        depth: 750,
         modifier: isVertical ? 1: 0.8,
         slideShadows: false,
       }}
@@ -85,7 +81,6 @@ export default function SwiperPlan() {
 							className="mx-1   grey_button"
 						>▶</button>
 					</div>
-					<IosToggle />
 				</div>
 			</Swiper>
 		</>
