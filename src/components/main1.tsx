@@ -1,101 +1,103 @@
-/* import CentralBar from "./centralBar";
-import NavBar from "./navbar";
-import ProgressBarContainer from "./progressBarContainer";
-import RightBar from "./rightBar";
-import LeftBar from "./leftBar";
- */
 import { useState } from "react";
 import CardExample from "../bootstrap/card";
-import List from "../bootstrap/list";
-import Spinners from "../bootstrap/spinners";
+//import List from "../bootstrap/list";
+//import Spinners from "../bootstrap/spinners";
 import BasicTable from "../bootstrap/table";
 import BasicToast from "../bootstrap/toast";
 import Example from "../bootstrap/xxx";
 import BasicTabs from "./../bootstrap/tabs";
-import ProgressBarContainer from "./progressBarContainer";
+//import ProgressBarContainer from "./progressBarContainer";
 import MyKnob from "../bootstrap/knob";
 import CustomKnob from "../bootstrap/knob1";
+import { observer } from "mobx-react-lite";
+import viewStore from "../store/viewStore";
 
 
 
-const Main1 = () => {
+const Main1 = observer(() => {
 
 	const [value, setValue] = useState(50);
+	const { knobMode } = viewStore
 
 
 	return (
-		<main id="main1" className="h-100 overflow-hidden dashboard">	
-		
-			<div className=" h-60 d-flex"> 
-				
-				<div className="col-8 h-100">
-					<embed className='w-100 h-100 p-3'
-					src="http://127.0.0.1/editor.html?filename=12301.ncp"
-				/>
-				</div>
-				<div className="d-flex flex-column">
-					<div className="col-12 h-60 p-3">
-						<div className=" vidget col-12 h-100">
-							<Example />
+		<main id="main1" className="h-100 overflow-hidden d-flex">	
+			{ knobMode  && <div className="h-100 overflow-hidden" >
+				<h1>HHH</h1>
+			</div>}
+			<div className="h-100 overflow-hidden">		
+				<div className="d-flex h-60"> 
+					
+					<div className="col-8 h-100">
+						<embed className='w-100 h-100 p-3'
+						src="http://127.0.0.1/editor.html?filename=12301.ncp"
+					/>
+					</div>
+					<div className="d-flex flex-column w-100">
+						<div className="col-12 h-60 p-3">
+							<div className=" vidget col-12 h-100">
+								<Example />
+							</div>
+						</div>
+						<div className=" col-12 h-40 p-3">
+							<div className=" vidget  col-12 h-100">
+								<BasicTable />
+							</div>
 						</div>
 					</div>
-					<div className=" col-12 h-40 p-3">
-						<div className=" vidget  col-12 h-100">
-							<BasicTable />
-						</div>
-					</div>
-				</div>
-			</div>	
+				</div>	
 
-			<div className="d-flex h-30">
-				<div className="d-flex flex-column  h-100 col-4 ">
-					<div className="col-12 h-50 p-3">
-						<div className="vidget col-12 h-100 d-flex align-items-center justify-content-center">
-						<CustomKnob value={value} onChange={setValue} />
-						</div>
-					</div>	
-					<div className="col-12 h-50 p-3">
+				<div className="d-flex h-30">
+					<div className="d-flex flex-column  h-100 col-4 ">
+						<div className="col-12 h-50 p-3">
+							<div className="vidget col-12 h-100 d-flex align-items-center justify-content-center">
+							<CustomKnob value={value} onChange={setValue} />
+							</div>
+						</div>	
+						<div className="col-12 h-50 p-3">
+							<div className="vidget col-12 h-100">
+								<CardExample />
+							</div>
+						</div>					
+					</div>
+
+					<div className="d-flex flex-column  h-100 col-4 ">
+						<div className="col-12 h-100 p-3">
+							<div className="vidget col-12 h-100">
+								<div className="w-100 h-100 d-flex align-items-center justify-content-center">
+									<MyKnob />
+								</div>
+
+							</div>
+						</div>				
+					</div>
+
+					<div className="d-flex flex-column h-100 col-4 ">
+						<div className="col-12 h-60 p-3">
+							<div className="vidget col-12 h-100">
+								<BasicTable />
+							</div>
+						</div>	
+						<div className="col-12 h-40 p-3">
+							<div className="vidget col-12 h-100">
+								<BasicToast />
+							</div>
+						</div>	
+						
+					</div>						
+				</div>
+
+				<div className="d-flex row h-15 p-3">
+					<div className="col-12 h-100">
 						<div className="vidget col-12 h-100">
-							<CardExample />
+							<BasicTabs />
 						</div>
 					</div>					
 				</div>
-
-				<div className="d-flex flex-column  h-100 col-4 ">
-					<div className="col-12 h-100 p-3">
-						<div className="vidget col-12 h-100">
-							<div className="w-100 h-100 d-flex align-items-center justify-content-center">
-								<MyKnob />
-							</div>
-
-						</div>
-					</div>				
-				</div>
-
-				<div className="d-flex flex-column h-100 col-4 ">
-					<div className="col-12 h-60 p-3">
-						<div className="vidget col-12 h-100">
-							<BasicTable />
-						</div>
-					</div>	
-					<div className="col-12 h-40 p-3">
-						<div className="vidget col-12 h-100">
-							<BasicToast />
-						</div>
-					</div>	
-					
-				</div>						
 			</div>
 
-			<div className="d-flex row h-15 p-3">
-				<div className="col-12 h-100">
-					<div className="vidget col-12 h-100">
-						<BasicTabs />
-					</div>
-				</div>					
-			</div>
 		</main>
 	);
-};
+});
 
 export default Main1;
