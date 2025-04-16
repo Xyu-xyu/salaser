@@ -37,7 +37,18 @@
   --grey-main: rgb(244, 244, 247);
   --grey-button: rgb(249, 223, 226);
   --grey-button-bottom: rgb(231, 231, 233);
-  --grey-nav: rgb(223, 223, 226 )
+  --grey-nav: rgb(223, 223, 226 );
+
+  --color: #ffffff;        
+  --paleColor: #cccccc;    
+  --transColor:none;
+  --mainBg: #383838;
+  --mainBg1: #282828;
+  --darkBg:#171717;
+  --gridColorStroke:#FFFFFF;;
+  --gridColorFill:#333333;
+
+  
 
 }
 
@@ -272,5 +283,58 @@ html, body {
   color: black;
   width: 58px;
   height: 58px;
-
 }
+
+.h-80 {
+  height: 80% !important;
+}
+
+.h-70 {
+  height: 70% !important;
+}
+
+.h-60 {
+  height: 60% !important;
+}
+
+.h-40 {
+  height: 40% !important;
+}
+
+.h-33 {
+  height: 33.3% !important;
+}
+
+.h-30 {
+  height: 30% !important;
+}
+
+.h-20 {
+  height: 20% !important;
+}
+
+.h-15 {
+  height: 15% !important;
+}
+
+.h-10 {
+  height: 10% !important;
+}
+
+
+#main1 {
+  /* background-color: var(--gridColorFill); */
+  background-color: var(--mainBg);
+}
+
+
+.vidget {
+  
+  background-color: var(--gridColorFill);
+  border: 1px solid  var(--mainBg);
+  border-radius: 10px;
+  border-top-left-radius: 0;
+  overflow: hidden;  
+  
+ }
+

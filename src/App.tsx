@@ -1,5 +1,6 @@
 import './../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js';
 import Main from './components/main'
+import Main1 from './components/main1'
 import { observer } from "mobx-react-lite";
 import IosToggle from './components/iosToggle.js';
 import viewStore from './store/viewStore.js';
@@ -13,7 +14,7 @@ const App = observer(() => {
     <>
       <div id="App" className='themeLight'>
         <IosToggle></IosToggle>
-        {mode === 'main' ? <Main /> : ''}
+        {mode === 'main' ? <Main /> : <Main1 />}
       </div>
 
     </>

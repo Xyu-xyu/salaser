@@ -20,7 +20,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Добавлено для поддержки кастомных деклараций */
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
   "include": ["src"]
 }
