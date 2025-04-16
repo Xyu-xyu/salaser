@@ -22,9 +22,19 @@ const Main1 = observer(() => {
 
 	return (
 		<main id="main1" className="h-100 overflow-hidden d-flex">	
-			{ knobMode  && <div className="h-100 overflow-hidden" >
-				<h1>HHH</h1>
-			</div>}
+			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible' : ''}`}>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>			
+
+			</div>
+
 			<div className="h-100 overflow-hidden">		
 				<div className="d-flex h-60"> 
 					

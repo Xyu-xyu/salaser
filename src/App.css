@@ -322,19 +322,32 @@ html, body {
 }
 
 
+.h-125 {  height: 12.5% !important;
+}
+
+
 #main1 {
-  /* background-color: var(--gridColorFill); */
   background-color: var(--mainBg);
 }
 
 
-.vidget {
-  
+.vidget {  
   background-color: var(--gridColorFill);
   border: 1px solid  var(--mainBg);
   border-radius: 10px;
   border-top-left-radius: 0;
   overflow: hidden;  
-  
  }
 
+ .fade-toggle {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap; /* предотвращает перенос */
+  transition: opacity 1s ease, width 1s ease;
+}
+
+.fade-toggle.visible {
+  opacity: 1;
+  width: 100px !important; /* или фиксированная ширина, если нужно */
+}
