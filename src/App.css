@@ -349,7 +349,7 @@ html, body {
 
 .fade-toggle.visible {
   opacity: 1;
-  width: 100px !important; /* или фиксированная ширина, если нужно */
+  width: 200px !important; /* или фиксированная ширина, если нужно */
 }
 
 

@@ -7,8 +7,9 @@ import BasicToast from "../bootstrap/toast";
 import Example from "../bootstrap/xxx";
 import BasicTabs from "./../bootstrap/tabs";
 //import ProgressBarContainer from "./progressBarContainer";
-import MyKnob from "../bootstrap/knob";
+//import MyKnob from "../bootstrap/knob";
 import CustomKnob from "./customKnob";
+import CustomKnob1 from "./customKnob1";
 import { observer } from "mobx-react-lite";
 import viewStore from "../store/viewStore";
 
@@ -23,15 +24,15 @@ const Main1 = observer(() => {
 	return (
 		<main id="main1" className="h-100 overflow-hidden d-flex">	
 			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible' : ''}`}>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>			
+				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"><CustomKnob1 /></div>
 
 			</div>
 
@@ -75,7 +76,7 @@ const Main1 = observer(() => {
 						<div className="col-12 h-100 p-3">
 							<div className="vidget col-12 h-100">
 								<div className="w-100 h-100 d-flex align-items-center justify-content-center">
-									<MyKnob />
+									<CustomKnob1 />
 								</div>
 
 							</div>
