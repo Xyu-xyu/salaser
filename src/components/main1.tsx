@@ -1,4 +1,4 @@
-import { useState } from "react";
+//import { useState } from "react";
 import CardExample from "../bootstrap/card";
 //import List from "../bootstrap/list";
 //import Spinners from "../bootstrap/spinners";
@@ -8,7 +8,7 @@ import Example from "../bootstrap/xxx";
 import BasicTabs from "./../bootstrap/tabs";
 //import ProgressBarContainer from "./progressBarContainer";
 import MyKnob from "../bootstrap/knob";
-import CustomKnob from "../bootstrap/knob1";
+import CustomKnob from "./customKnob";
 import { observer } from "mobx-react-lite";
 import viewStore from "../store/viewStore";
 
@@ -16,7 +16,7 @@ import viewStore from "../store/viewStore";
 
 const Main1 = observer(() => {
 
-	const [value, setValue] = useState(50);
+	//const [value, setValue] = useState(50);
 	const { knobMode } = viewStore
 
 
@@ -61,7 +61,7 @@ const Main1 = observer(() => {
 					<div className="d-flex flex-column  h-100 col-4 ">
 						<div className="col-12 h-50 p-3">
 							<div className="vidget col-12 h-100 d-flex align-items-center justify-content-center">
-							<CustomKnob value={value} onChange={setValue} />
+							<CustomKnob />
 							</div>
 						</div>	
 						<div className="col-12 h-50 p-3">

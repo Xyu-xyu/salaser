@@ -6,7 +6,7 @@ function CardExample() {
   return (
     <div className="d-flex justify-content-around" style={{ backgroundColor: '#343a40', padding: '20px' }}>
       <Card style={{ width: '18rem', backgroundColor: '#495057', color: '#ffffff' }}>
-        <Card.Img variant="top" src="" />
+        
         <Card.Body>
           <Card.Title style={{ color: '#ffffff' }}>Card Title</Card.Title>
           <Card.Text style={{ color: '#ffffff' }}>
@@ -18,7 +18,7 @@ function CardExample() {
       </Card>
 
       <Card style={{ width: '18rem', backgroundColor: '#495057', color: '#ffffff' }}>
-        <Card.Img variant="top" src="" />
+        
         <Card.Body>
           <Placeholder as={Card.Title} animation="glow" style={{ color: '#ffffff' }}>
             <Placeholder xs={6} />
