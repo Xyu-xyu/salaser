@@ -194,7 +194,7 @@ const CustomKnob1 = observer(() => {
 									x1="50"
 									y1="5"
 									x2="50"
-									y2={5 + length}
+									y2={2 + length}
 									stroke={stroke}
 									strokeWidth={isMajor ? 0.75 : 0.5}
 									transform={`rotate(${i} 50 50)`}

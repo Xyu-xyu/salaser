@@ -10,6 +10,7 @@ import BasicTabs from "./../bootstrap/tabs";
 //import MyKnob from "../bootstrap/knob";
 import CustomKnob from "./customKnob";
 import CustomKnob1 from "./customKnob1";
+import CustomKnob2 from "./customKnob2";
 import { observer } from "mobx-react-lite";
 import viewStore from "../store/viewStore";
 
@@ -83,8 +84,8 @@ const Main1 = observer(() => {
 
 					<div className="d-flex flex-column h-100 col-4 ">
 						<div className="col-12 h-60 p-3">
-							<div className="vidget col-12 h-100">
-								<BasicTable />
+							<div className="vidget col-12 h-100 knob_body">
+								<CustomKnob2 />
 							</div>
 						</div>	
 						<div className="col-12 h-40 p-3">

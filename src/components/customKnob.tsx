@@ -35,8 +35,8 @@ const CustomKnob = observer(() => {
 
 	const getPath = () => {
 		const { min, max, val } = knob;
-		const r1 = 45;
-		const r2 = 44;
+		const r1 = 37.5;
+		const r2 = 38.5;
 		const cx = 50;
 		const cy = 50;
 	
@@ -105,13 +105,13 @@ const CustomKnob = observer(() => {
 						cx="50"
 						cy="50"
 						r="45"
-						fill={knob.val === knob.max ? "orangered" : "url(#circleGradient)"}
+						fill={"url(#circleGradient)"}
 						stroke="gray"
 						strokeWidth="1"
 						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
 					/>
 
-					<circle
+					{/* <circle
 						cx="50"
 						cy="50"
 						r="30"
@@ -119,7 +119,7 @@ const CustomKnob = observer(() => {
 						stroke="gray"
 						strokeWidth="1"
 						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
-					/>
+					/> */}
 
 					<path
 					d={`${knobPath[0]}`}
@@ -151,10 +151,9 @@ const CustomKnob = observer(() => {
 					</g> */}
 
 
-					<text x="50" y="60" textAnchor="middle" fontSize="25" fill="orangered">
-						{knobs[0].val}
+					<text x="50" y="60" textAnchor="middle" fontSize="20"  className='segments14' fill="orangered">
+						{knobs[0].val === knob.max ? 'max' : knobs[0].val}
 					</text>
-
 				</svg>
 
 				<div className='d-flex'>
