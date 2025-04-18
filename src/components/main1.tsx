@@ -17,22 +17,20 @@ import viewStore from "../store/viewStore";
 
 const Main1 = observer(() => {
 
-	//const [value, setValue] = useState(50);
 	const { knobMode } = viewStore
-
 
 	return (
 		<main id="main1" className="h-100 overflow-hidden d-flex">	
 			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible' : ''}`}>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
-				<div className="h-125 col-12"><CustomKnob1 /></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
+				<div className="h-125 col-12"></div>
 
 			</div>
 

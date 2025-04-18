@@ -1,35 +1,29 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import { Icon } from '@iconify/react/dist/iconify.js';
 
 
 const CustomKnob1 = observer(() => {
-	const { knobs, knob1 } = viewStore
+	const { knobs, knobPath } = viewStore
 	const knob = knobs[0]
 	const step = knob.step
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
 	const handleMouseDown = (callback: () => void) => {
 		callback(); // Первый вызов сразу
-		intervalRef.current = setInterval(callback, 200); // Повторяем каждую 100мс
+		intervalRef.current = setInterval(callback, 50); // Повторяем каждую 100мс
 	};
 
 	const handleMouseUp = () => {
 		if (intervalRef.current) clearInterval(intervalRef.current);
 	};
 
-	/* 	useEffect(() => {
-			console.log ("useEffect000  "+ knob.val)
-			viewStore.setKnob1(getPath())
-		}, [])
-	 */
+
 	useEffect(() => {
-		console.log("useEffect  " + knob.val)
 		let path = getPath()
-		console.log(path)
-		viewStore.setKnob1(path)
+		viewStore.setKnobPath(1, path)
 	}, [knob.val])
 
 	const increase = () => {
@@ -91,18 +85,53 @@ const CustomKnob1 = observer(() => {
 		`;
 	};
 
-	const startMove  = ()=> {
+	const [isDragging, setIsDragging] = useState(false);
 
+	const center = { x: 50, y: 50 }; // центр круга в координатах viewBox
+
+	const startMove = () => {
+		//console.log('start')
+		setIsDragging(true);
 	}
-
 	const endMove = () => {
-		
-	}
+		setIsDragging(false);
+		//console.log('end')
 
+	}
+	const rect = document.getElementById("svgChart1")?.getBoundingClientRect();
+
+	const move = (e: React.PointerEvent<SVGElement>) => {
+
+		if (!rect) return;
+		if (!isDragging) return;
+
+
+		const x = e.clientX - rect.left;
+		const y = e.clientY - rect.top;
+
+		// Переводим в координаты viewBox (100x100)
+		const svgX = (x / rect.width) * 100;
+		const svgY = (y / rect.height) * 100;
+
+		// Вычисляем угол
+		const dx = svgX - center.x;
+		const dy = svgY - center.y;
+		let angle = Math.atan2(dy, dx) * (180 / Math.PI); // в градусы
+		angle = (angle + 360 + 270) % 360; // 0° сверху
+
+		// Конвертация угла в значение knob
+		const newValue = Math.round((angle / 360) * (knob.max - knob.min) + knob.min);
+		if ( Math.abs(newValue - knob.val ) >= knob.step){
+			viewStore.setVal(0, newValue);
+		}
+		
+	};
 
 	return (
 		<div className='col-12 h-100 d-flex align-items-center justify-content-center py-2'>
-			<div className='col-12 h-100 d-flex flex-column align-items-center justify-content-evenly'>
+			<div className='col-12 h-100 d-flex flex-column align-items-center justify-content-evenly'
+				
+			>
 
 				<Button
 					variant="outline-secondary"
@@ -113,7 +142,13 @@ const CustomKnob1 = observer(() => {
 				>
 					<Icon icon="fluent:triangle-12-filled" width="24" height="24" style={{ color: 'white' }} />
 				</Button>
-				<svg id="svgChart" version="1.1" width="100%" height="50%" viewBox="0 0 100 100" overflow="hidden">
+				<svg id="svgChart1" className="svgChart" version="1.1" width="100%" height="50%" viewBox="0 0 100 100" overflow="hidden"
+									onPointerDown={startMove}
+									onPointerUp={endMove}
+									onPointerLeave={endMove}
+									onPointerCancel={endMove}
+									onPointerMove={ move }
+					>
 					<defs>
 						<radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
 							<stop offset="0%" stopColor="#ffffff" />
@@ -128,7 +163,7 @@ const CustomKnob1 = observer(() => {
 						stroke="gray"
 						strokeWidth="1"
 						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
-					/>
+				/>
 					<circle
 						cx="50"
 						cy="50"
@@ -139,34 +174,33 @@ const CustomKnob1 = observer(() => {
 						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
 					/>
 					<path
-						d={`${knob1}`}
+						d={`${knobPath[1]}`}
 						fill="limegreen"
 						stroke="limegreen"
 						strokeWidth="2"
-						style={{ filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))" }}
-						onPointerDown={ startMove }
-						onPointerUp={ endMove }
-						onPointerLeave={ endMove }
-						onPointerCancel={ endMove }
+						style={{
+							filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",
+							transition: "none"
+						  }}				  
 					/>
 					<g id="ticks">
-					{Array.from({ length: 360 }).map((_, i) => {
-						const isMajor = i % 10 === 0;
-						const length = isMajor ? 6 : 3;
-						const stroke = isMajor ? "#333" : "#aaa";
-						return (
-						<line
-							key={i}
-							x1="50"
-							y1="5"
-							x2="50"
-							y2={5 + length}
-							stroke={stroke}
-							strokeWidth={isMajor ? 0.75 : 0.5}
-							transform={`rotate(${i} 50 50)`}
-						/>
-						);
-					})}
+						{Array.from({ length: 360 }).map((_, i) => {
+							const isMajor = i % 10 === 0;
+							const length = isMajor ? 6 : 3;
+							const stroke = isMajor ? "#333" : "#aaa";
+							return (
+								<line
+									key={i}
+									x1="50"
+									y1="5"
+									x2="50"
+									y2={5 + length}
+									stroke={stroke}
+									strokeWidth={isMajor ? 0.75 : 0.5}
+									transform={`rotate(${i} 50 50)`}
+								/>
+							);
+						})}
 					</g>
 					<text x="50" y="60" textAnchor="middle" fontSize="25" fill="white">
 						{knobs[0].val}

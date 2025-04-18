@@ -4,30 +4,23 @@ import { useEffect, useRef } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 
 const CustomKnob = observer(() => {
-	const { knobs, knob1 } = viewStore
+	const { knobs, knobPath } = viewStore
 	const knob = knobs[0]
 	const step = knob.step
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
 	const handleMouseDown = (callback: () => void) => {
 		callback(); // Первый вызов сразу
-		intervalRef.current = setInterval(callback, 200); // Повторяем каждую 100мс
+		intervalRef.current = setInterval(callback, 50); // Повторяем каждую 100мс
 	};
 
 	const handleMouseUp = () => {
 		if (intervalRef.current) clearInterval(intervalRef.current);
 	};
 
-/* 	useEffect(() => {
-		console.log ("useEffect000  "+ knob.val)
-		viewStore.setKnob1(getPath())
-	}, [])
- */
 	useEffect(() => {
-		console.log ("useEffect  "+ knob.val)
-		let path = getPath()
-		console.log ( path )
-		viewStore.setKnob1(path)
+ 		let path = getPath()
+		viewStore.setKnobPath( 0, path)
 	}, [knob.val])
 
 	const increase = () => {
@@ -42,8 +35,8 @@ const CustomKnob = observer(() => {
 
 	const getPath = () => {
 		const { min, max, val } = knob;
-		const r1 = 35;
-		const r2 = 42;
+		const r1 = 45;
+		const r2 = 44;
 		const cx = 50;
 		const cy = 50;
 	
@@ -92,7 +85,7 @@ const CustomKnob = observer(() => {
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
-			<div className='col-12 col-md-6 h-100 d-flex align-items-center justify-content-center'>
+			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
 				<Button
 					variant="outline-secondary"
 					onPointerDown={() => handleMouseDown(decrease)}
@@ -101,7 +94,7 @@ const CustomKnob = observer(() => {
 				>
 				◀
 				</Button>
-				<svg id="svgChart" version="1.1" width="100%" height="100%" viewBox="0 0 100 100" overflow="hidden">
+				<svg id="svgChart"  className="svgChart" version="1.1" width="100%" height="100%" viewBox="0 0 100 100" overflow="hidden">
 					<defs>
 						<radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
 							<stop offset="0%" stopColor="#ffffff" />
@@ -129,13 +122,15 @@ const CustomKnob = observer(() => {
 					/>
 
 					<path
-					d={`${knob1}`}
+					d={`${knobPath[0]}`}
 					fill="orangered"
 					stroke="orangered"
 					strokeWidth="2"
-					style={{ filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))" }}
-					/>
-					<g id="ticks">
+					style={{
+						filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",
+						transition: "none"
+					  }}					/>
+				{/* 	<g id="ticks">
 					{Array.from({ length: 360 }).map((_, i) => {
 						const isMajor = i % 10 === 0;
 						const length = isMajor ? 6 : 3;
@@ -153,7 +148,7 @@ const CustomKnob = observer(() => {
 						/>
 						);
 					})}
-					</g>
+					</g> */}
 
 
 					<text x="50" y="60" textAnchor="middle" fontSize="25" fill="orangered">
