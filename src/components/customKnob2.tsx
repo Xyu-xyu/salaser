@@ -50,6 +50,9 @@ const MousewheelKnob: React.FC = () => {
     <div className=''>
       <div className="knob-surround">
         <div id="knob" className="knob" ref={knobRef}></div>
+        <div id="prev">
+          <span id="current" className='segments14'>0%</span>
+        </div>
         <span className="min">Min</span>
         <span className="max">Max</span>
         <div className="ticks">
@@ -58,9 +61,6 @@ const MousewheelKnob: React.FC = () => {
           ))}
         </div>
       </div>
-      <p>
-        Current value: <span id="current">0%</span>
-      </p>
     </div>
   );
 };

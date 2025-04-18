@@ -1,6 +1,15 @@
 /* Импорт шрифта */
 @import url('https://fonts.googleapis.com/css?family=Varela+Round|Open+Sans:300');
 
+#prev {
+  margin-top: 70px !important;
+}
+
+#current {
+  font-size: 40px;
+  color: #a8d8f8;
+  
+}
 
 h1 {
   font-weight: normal;
