@@ -58,7 +58,7 @@ const Main1 = observer(() => {
 					<div className="d-flex flex-column  h-100 col-4 ">
 						<div className="col-12 h-50 p-3">
 							<div className="vidget col-12 h-100 d-flex align-items-center justify-content-center">
-							<CustomKnob />
+						
 							</div>
 						</div>	
 						<div className="col-12 h-50 p-3">

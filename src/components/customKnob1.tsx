@@ -1,13 +1,17 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 
 const CustomKnob = observer(() => {
+	const svgRef = useRef<SVGSVGElement>(null);
 	const { knobs, knobPath } = viewStore
+	const [isDragging, setIsDragging] = useState(false);
 	const knob = knobs[1]
 	const step = knob.step
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const center = { x: 50, y: 50 };
+	const rect = svgRef.current?.getBoundingClientRect();
 
 	const handleMouseDown = (callback: () => void) => {
 		callback(); // Первый вызов сразу
@@ -17,6 +21,57 @@ const CustomKnob = observer(() => {
 	const handleMouseUp = () => {
 		if (intervalRef.current) clearInterval(intervalRef.current);
 	};
+
+	const startMove = () => setIsDragging(true)
+	const endMove = () => setIsDragging(false);
+
+	const move = (e: React.PointerEvent<SVGElement>) => {
+		if (!rect || !isDragging) return;
+	
+		const x = e.clientX - rect.left;
+		const y = e.clientY - rect.top;
+	
+		// Координаты в системе viewBox
+		const svgX = (x / rect.width) * 100;
+		const svgY = (y / rect.height) * 100;
+	
+		const dx = svgX - center.x;
+		const dy = svgY - center.y;
+	
+		let angle = Math.atan2(dy, dx) * (180 / Math.PI); // угол в градусах
+		angle = (angle + 360) % 360;
+	
+		// Приводим угол к диапазону [0, 270] начиная от 225°
+		let normalizedAngle = (angle - 225 + 360) % 360;
+	
+		//if (normalizedAngle > 270) return; // игнорируем вне сектора
+	
+		// Масштабируем в значение
+		const { min, max, step, val } = knob;
+		const newValue = Math.round((normalizedAngle / 270) * (max - min) + min);
+	
+		if (Math.abs(newValue - val) >= step && newValue % step === 0 && newValue <= max && newValue >= min) {
+			viewStore.setVal(1, newValue);
+		}
+	};
+
+	useEffect(() => {
+		const svg = svgRef.current;
+		if (!svg) return;
+	
+		const handleWheel = (e: WheelEvent) => {
+			e.preventDefault();
+			const delta = e.deltaY < 0 ? 1 : -1;
+			const newVal = knob.val + delta * knob.step;
+	
+			if (newVal >= knob.min && newVal <= knob.max) {
+				viewStore.setVal(1, newVal);
+			}
+		};
+	
+		svg.addEventListener('wheel', handleWheel);
+		return () => svg.removeEventListener('wheel', handleWheel);
+	}, [knob]);
 
 	useEffect(() => {
 		let path = getPath()
@@ -88,7 +143,17 @@ const CustomKnob = observer(() => {
 				>
 					◀
 				</Button>
-				<svg id="svgChart" className="svgChart" version="1.1" width="100%" height="100%" viewBox="0 0 100 100" overflow="hidden">
+				<svg id="svgChart" 
+					className="svgChart" version="1.1" 
+					width="100%" height="100%" 
+					viewBox="0 0 100 100" overflow="hidden"
+					onPointerDown={startMove}
+					onPointerUp={endMove}
+					onPointerLeave={endMove}
+					onPointerCancel={endMove}
+					onPointerMove={ move }
+					ref={svgRef}
+					>
 					<defs>
 						<radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
 							<stop offset="0%" stopColor="#ffffff" />
@@ -180,7 +245,7 @@ const CustomKnob = observer(() => {
 						}}
 					/>
 					<text x="80" y="60" text-anchor="end" fontSize="20" className='segments14' fill="orangered">
-						{knob.val === knob.max ? 'min' : (knob.val - Math.round(knob.val) === 0 ? knob.val + '.0' : knob.val)}
+						{knob.val === knob.max ? 'max' : (knob.val - Math.round(knob.val) === 0 ? knob.val + '.0' : knob.val)}
 					</text>
 				</svg>
 
