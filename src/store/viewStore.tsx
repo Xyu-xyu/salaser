@@ -5,6 +5,7 @@ export interface KnobData {
   val: number;
   step: number;
   m: string;
+  name: string;
 }
 
 
@@ -13,8 +14,9 @@ class ViewStore {
     knobMode:Boolean= false
     knobPath:Array<String>=['M0 0', 'M0 0']
     knobs: KnobData[] = [
-        { min: 0, max: 100, val: 50, step: 1, m: '%' },
-        { min: -60, max: 0, val: -20, step: 0.5, m: 'dB' },
+        { min: 0, max: 100, val: 50, step: 1, m: '%', name: 'Percentage' },
+        { min: -60, max: 20, val: 5, step: 5, m: 'dB', name: 'Volume' },
+        { min: 0, max: 1000, val: 25, step: 10, m: 'Hz', name: 'Volume' },
        ];
 
     constructor() {

@@ -368,6 +368,7 @@ html, body {
   border-radius: 10px;
   border-top-left-radius: 0;
   overflow: hidden;  
+  color: aliceblue;
  }
 
  .fade-toggle {

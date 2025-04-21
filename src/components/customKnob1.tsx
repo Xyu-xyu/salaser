@@ -19,8 +19,8 @@ const CustomKnob = observer(() => {
 	};
 
 	useEffect(() => {
- 		let path = getPath()
-		viewStore.setKnobPath( 1, path)
+		let path = getPath()
+		viewStore.setKnobPath(1, path)
 	}, [knob.val])
 
 	const increase = () => {
@@ -39,40 +39,35 @@ const CustomKnob = observer(() => {
 		const r2 = 38.5;
 		const cx = 50;
 		const cy = 50;
-	
+
 		const round = (n: number) => Math.round(n * 10000) / 10000;
-	
-		// Процент заполнения и соответствующий угол
+
+		const startAngle = 225;
+		const sweepAngle = 270;
+
 		const percentage = (val - min) / (max - min);
-		const angle = 360 * percentage;
-	
-		// Вспомогательная функция для вычисления координат по углу и радиусу
+		const angle = sweepAngle * percentage;
+
 		const polarToCartesian = (radius: number, angleDeg: number) => {
-			const rad = (angleDeg + 90) * (Math.PI / 180);
+			const rad = (angleDeg - 90) * (Math.PI / 180); // SVG 0° вверх
 			return {
 				x: round(cx + radius * Math.cos(rad)),
 				y: round(cy + radius * Math.sin(rad)),
 			};
 		};
-	
-		// Начальные координаты
-		const startOuter = polarToCartesian(r2, 0);
-		const endOuter = polarToCartesian(r2, angle);
-		const startInner = polarToCartesian(r1, 0);
-		const endInner = polarToCartesian(r1, angle);
-	
-		// Определяем, нужно ли разбить внешнюю дугу
-		const arcOuter = angle > 180
-			? `A ${r2} ${r2} 0 0 1 ${polarToCartesian(r2, 180).x} ${polarToCartesian(r2, 180).y}
-			   A ${r2} ${r2} 0 0 1 ${endOuter.x} ${endOuter.y}`
-			: `A ${r2} ${r2} 0 0 1 ${endOuter.x} ${endOuter.y}`;
-	
-		const arcInner = angle > 180
-			? `A ${r1} ${r1} 0 0 0 ${polarToCartesian(r1, 180).x} ${polarToCartesian(r1, 180).y}
-			   A ${r1} ${r1} 0 0 0 ${startInner.x} ${startInner.y}`
-			: `A ${r1} ${r1} 0 0 0 ${startInner.x} ${startInner.y}`;
-	
-		// Финальный путь
+
+		const startOuter = polarToCartesian(r2, startAngle);
+		const endOuter = polarToCartesian(r2, startAngle + angle);
+		const startInner = polarToCartesian(r1, startAngle);
+		const endInner = polarToCartesian(r1, startAngle + angle);
+
+		// Определяем, нужен ли флаг large-arc (больше 180°)
+		const largeArcFlag = angle > 180 ? 1 : 0;
+
+		const arcOuter = `A ${r2} ${r2} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}`;
+		const arcInner = `A ${r1} ${r1} 0 ${largeArcFlag} 0 ${startInner.x} ${startInner.y}`;
+
+		// Возвращаем замкнутый сектор
 		return `
 			M ${startOuter.x} ${startOuter.y}
 			${arcOuter}
@@ -81,7 +76,6 @@ const CustomKnob = observer(() => {
 			Z
 		`;
 	};
-	
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
@@ -92,9 +86,9 @@ const CustomKnob = observer(() => {
 					onPointerUp={handleMouseUp}
 					onPointerLeave={handleMouseUp}
 				>
-				◀
+					◀
 				</Button>
-				<svg id="svgChart"  className="svgChart" version="1.1" width="100%" height="100%" viewBox="0 0 100 100" overflow="hidden">
+				<svg id="svgChart" className="svgChart" version="1.1" width="100%" height="100%" viewBox="0 0 100 100" overflow="hidden">
 					<defs>
 						<radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
 							<stop offset="0%" stopColor="#ffffff" />
@@ -111,38 +105,82 @@ const CustomKnob = observer(() => {
 						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
 					/>
 
-					<path
-					d={`${knobPath[1]}`}
-					fill="orangered"
-					stroke="orangered"
-					strokeWidth="2"
-					style={{
-						filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",
-						transition: "none"
-					  }}					/>
-				{/* 	<g id="ticks">
-					{Array.from({ length: 360 }).map((_, i) => {
-						const isMajor = i % 10 === 0;
-						const length = isMajor ? 6 : 3;
-						const stroke = isMajor ? "#333" : "#aaa";
+					{(() => {
+						const { min, max, step } = knob;
+						const r1 = 37.5;
+						const r2 = 38.5;
+						const cx = 50;
+						const cy = 50;
+
+						const totalSteps = Math.floor((max - min) / step);
+						const anglePerStep = 270 / totalSteps;
+						const startAngle = 225;
+						const endAngle = startAngle + 270;
+
+						const round = (n: number) => Math.round(n * 10000) / 10000;
+
+						const polarToCartesian = (radius: number, angleDeg: number) => {
+							const rad = (angleDeg - 90) * (Math.PI / 180); // SVG 0° вверх
+							return {
+								x: round(cx + radius * Math.cos(rad)),
+								y: round(cy + radius * Math.sin(rad)),
+							};
+						};
+
+						// Построение кольцевого сегмента от 225° до 135°
+						const startOuter = polarToCartesian(r2, startAngle);
+						const endOuter = polarToCartesian(r2, endAngle);
+						const startInner = polarToCartesian(r1, endAngle);
+						const endInner = polarToCartesian(r1, startAngle);
+
+						const ringPath = `
+							M ${startOuter.x} ${startOuter.y}
+							A ${r2} ${r2} 0 1 1 ${endOuter.x} ${endOuter.y}
+							L ${startInner.x} ${startInner.y}
+							A ${r1} ${r1} 0 1 0 ${endInner.x} ${endInner.y}
+							Z
+						`;
+
 						return (
-						<line
-							key={i}
-							x1="50"
-							y1="5"
-							x2="50"
-							y2={5 + length}
-							stroke={stroke}
-							strokeWidth={isMajor ? 0.75 : 0.5}
-							transform={`rotate(${i} 50 50)`}
-						/>
+							<>
+								{/* Кольцевая дуга */}
+								<path
+									d={ringPath}
+									fill="rgba(0,0,0,0.05)"
+								/>
+
+								{/* Декоративные точки */}
+								{Array.from({ length: totalSteps + 1 }).map((_, i) => {
+									const angle = startAngle + i * anglePerStep;
+									const r = (r1 + r2) / 2;
+									const pos = polarToCartesian(r, angle);
+
+									return (
+										<circle
+											key={i}
+											cx={pos.x}
+											cy={pos.y}
+											r={1}
+											fill={'#aaa'}
+										/>
+									);
+								})}
+							</>
 						);
-					})}
-					</g> */}
+					})()}
 
-
-					<text x="80" y="60" text-anchor="end" fontSize="20"  className='segments14' fill="orangered">
-						{knob.val === knob.max ? 'max' : (knob.val- Math.round(knob.val) === 0 ? knob.val+'.0' : knob.val)}
+					<path
+						d={`${knobPath[1]}`}
+						fill="orangered"
+						stroke="orangered"
+						strokeWidth="2"
+						style={{
+							filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",
+							transition: "none"
+						}}
+					/>
+					<text x="80" y="60" text-anchor="end" fontSize="20" className='segments14' fill="orangered">
+						{knob.val === knob.max ? 'min' : (knob.val - Math.round(knob.val) === 0 ? knob.val + '.0' : knob.val)}
 					</text>
 				</svg>
 
@@ -153,7 +191,7 @@ const CustomKnob = observer(() => {
 						onPointerUp={handleMouseUp}
 						onPointerLeave={handleMouseUp}
 					>
-					▶</Button>
+						▶</Button>
 				</div>
 			</div>
 

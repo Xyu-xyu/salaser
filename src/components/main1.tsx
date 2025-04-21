@@ -3,8 +3,8 @@ import CardExample from "../bootstrap/card";
 //import List from "../bootstrap/list";
 //import Spinners from "../bootstrap/spinners";
 import BasicTable from "../bootstrap/table";
-import BasicToast from "../bootstrap/toast";
-import Example from "../bootstrap/xxx";
+//import BasicToast from "../bootstrap/toast";
+//import Example from "../bootstrap/xxx";
 import BasicTabs from "./../bootstrap/tabs";
 //import ProgressBarContainer from "./progressBarContainer";
 import CustomKnob from "./customKnob1";
@@ -12,6 +12,7 @@ import CustomKnob1 from "./customKnob0";
 import CustomKnob2 from "./customKnob2";
 import { observer } from "mobx-react-lite";
 import viewStore from "../store/viewStore";
+import MyForm from "./machineForm";
 
 
 
@@ -38,19 +39,16 @@ const Main1 = observer(() => {
 				<div className="d-flex h-60"> 
 					
 					<div className="col-8 h-100">
-						<embed className='w-100 h-100 p-3'
+					{/* 	<embed className='w-100 h-100 p-3'
 						src="http://127.0.0.1/editor.html?filename=8339_geos_test.ncp"
-					/>
+					/> */}
+					<CustomKnob />
+
 					</div>
 					<div className="d-flex flex-column w-100">
-						<div className="col-12 h-60 p-3">
-							<div className=" vidget col-12 h-100">
-								<BasicTable />
-							</div>
-						</div>
-						<div className=" col-12 h-40 p-3">
-							<div className=" vidget  col-12 h-100">
-								<BasicTable />
+						<div className="col-12 h-100 p-3">
+							<div className=" vidget col-12 h-100 overflow-y-scroll">
+								<MyForm />
 							</div>
 						</div>
 					</div>
@@ -89,7 +87,7 @@ const Main1 = observer(() => {
 						</div>	
 						<div className="col-12 h-40 p-3">
 							<div className="vidget col-12 h-100">
-								<BasicToast />
+								<BasicTable />
 							</div>
 						</div>	
 						
