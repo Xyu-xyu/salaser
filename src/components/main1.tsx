@@ -40,13 +40,13 @@ const Main1 = observer(() => {
 					
 					<div className="col-8 h-100">
 						<embed className='w-100 h-100 p-3'
-						src="http://127.0.0.1/editor.html?filename=12301.ncp"
+						src="http://127.0.0.1/editor.html?filename=8339_geos_test.ncp"
 					/>
 					</div>
 					<div className="d-flex flex-column w-100">
 						<div className="col-12 h-60 p-3">
 							<div className=" vidget col-12 h-100">
-								<Example />
+								<BasicTable />
 							</div>
 						</div>
 						<div className=" col-12 h-40 p-3">

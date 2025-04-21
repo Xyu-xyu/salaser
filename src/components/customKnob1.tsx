@@ -142,7 +142,7 @@ const CustomKnob = observer(() => {
 
 
 					<text x="80" y="60" text-anchor="end" fontSize="20"  className='segments14' fill="orangered">
-						{knob.val === knob.max ? 'max' : knob.val}
+						{knob.val === knob.max ? 'max' : (knob.val- Math.round(knob.val) === 0 ? knob.val+'.0' : knob.val)}
 					</text>
 				</svg>
 
