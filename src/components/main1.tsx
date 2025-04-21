@@ -7,7 +7,6 @@ import BasicToast from "../bootstrap/toast";
 import Example from "../bootstrap/xxx";
 import BasicTabs from "./../bootstrap/tabs";
 //import ProgressBarContainer from "./progressBarContainer";
-//import MyKnob from "../bootstrap/knob";
 import CustomKnob from "./customKnob1";
 import CustomKnob1 from "./customKnob0";
 import CustomKnob2 from "./customKnob2";
