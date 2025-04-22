@@ -1,23 +1,43 @@
 import { makeAutoObservable } from "mobx";
 export interface KnobData {
-  min: number;
-  max: number;
-  val: number;
-  step: number;
-  m: string;
-  name: string;
+  minimum: number;
+  maximum: number;
+  default: number;
+  val:number;
+  //step: number;
+  title: string;
+  type: string;
 }
+
 
 
 class ViewStore {
     mode:string = 'main1'
     knobMode:Boolean= false
     knobPath:Array<String>=['M0 0', 'M0 0']
-    knobs: KnobData[] = [
-        { min: 0, max: 100, val: 50, step: 1, m: '%', name: 'Percentage' },
-        { min: -60, max: 20, val: 5, step: 5, m: 'dB', name: 'Volume' },
-        { min: 0, max: 1000, val: 25, step: 10, m: 'Hz', name: 'Volume' },
-       ];
+    knobs: KnobData[] = 
+
+[
+        {
+            "type": "number",
+            "title": "Начальная несущая частота, Hz",
+            "maximum": 100000,
+            "default": 10000,
+            "val": 10000,
+            "minimum": 100
+        },
+        {
+            "type": "number",
+            "title": "Начальная несущая частота, Hz",
+            "maximum": 100000,
+            "default": 10000.0,
+            "val": 10000.0,
+            "minimum": 100
+        }
+
+
+]
+
 
     constructor() {
         makeAutoObservable(this);
@@ -36,10 +56,13 @@ class ViewStore {
     }
     
     setVal(index: number, newVal: number) {
-        console.log ( newVal )
+        if (newVal <  this.knobs[index].minimum) newVal = this.knobs[index].minimum
+        if (newVal >  this.knobs[index].maximum) newVal = this.knobs[index].maximum
         this.knobs[index].val = newVal;
     }
 }
 
 const viewStore = new ViewStore();
 export default viewStore; 
+
+ 
