@@ -7,8 +7,7 @@
     font-family: Helvetica Neue, helvetica, arial, verdana, sans-serif;
   }
    
-  #toggles,
-  #toggles1   {
+  #toggles  {
     width: 60px;
     text-align: center;
     position: fixed;
@@ -17,7 +16,12 @@
   }
 
   #toggles1  {
+    width: 60px;
+    text-align: center;
+    position: fixed;
     right: 10%;
+    top: 10%;
+    z-index: 10;
 
   }
   

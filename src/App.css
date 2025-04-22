@@ -82,16 +82,6 @@
   color: orangered;
 }
 
-
-
-
-
-
-
-
-
-
-
 :root {
   --red: rgb(255, 51, 40);
   --green: rgb(42, 199, 94);
@@ -112,16 +102,13 @@
   --darkBg:#171717;
   --gridColorStroke:#FFFFFF;;
   --gridColorFill:#333333;
-
-  
-
+  --knobMainText: orangered;
 }
 
 html, body {
   touch-action: none !important;
   font-family: "Moderat",sans-serif;
 }
-
 
 #App {
   width:  100vw;
@@ -415,7 +402,7 @@ html, body {
 
 .fade-toggle.visible {
   opacity: 1;
-  width: 200px !important; /* или фиксированная ширина, если нужно */
+  width: 400px !important; /* или фиксированная ширина, если нужно */
 }
 
 

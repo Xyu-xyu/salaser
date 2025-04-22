@@ -1,18 +1,21 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useRef, useState } from 'react';
-import Button from 'react-bootstrap/esm/Button';
+//import Button from 'react-bootstrap/esm/Button';
 
-const CustomKnob = observer(() => {
+interface CustomKnobProps {
+	index: number;
+}
+
+const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-
 	const { knobs, knobPath } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
-	const knob = knobs[1]
+	const knob = knobs[index]
 	const { minimum, maximum, val, title } = knob;
 	const step = (maximum - minimum) /50
 
@@ -24,6 +27,7 @@ const CustomKnob = observer(() => {
 
 	let fontSize =  80 / Math.max( (`${minimum - step}`).length, (`${minimum + step}`).length, (`${maximum - step}`).length, (`${maximum + step}`).length )  
 	fontSize = fontSize > 22.5 ? 22.5 : fontSize
+	fontSize = fontSize < 10 ? 10 : fontSize
 
 	const handleMouseDown = (callback: () => void) => {
 		callback(); 
@@ -55,13 +59,13 @@ const CustomKnob = observer(() => {
 	
  		let normalizedAngle = (angle - 225 + 360) % 360;
 		const newValue = Math.round((normalizedAngle / 270) * (maximum - minimum) + minimum);
-		viewStore.setVal(1, newValue);
+		viewStore.setVal(index, newValue);
 		
 	};
 
 	useEffect(() => {
 		let path = getPath()
-		viewStore.setKnobPath(1, path)
+		viewStore.setKnobPath(index, path)
 		const svg = svgRef.current;
 		if (!svg) return;
 	
@@ -69,7 +73,7 @@ const CustomKnob = observer(() => {
 			e.preventDefault();
 			const delta = e.deltaY < 0 ? 1 : -1;
 			const newVal = val + delta * step;
-			viewStore.setVal(1, newVal);
+			viewStore.setVal( index, newVal);
 			
 		};
 	
@@ -80,12 +84,12 @@ const CustomKnob = observer(() => {
 
 	const increase = () => {
 		let newval = val + step
-		viewStore.setVal(1, newval);
+		viewStore.setVal(index, newval);
 	}
 
 	const decrease = () => {
 		let newval = val - step
-		viewStore.setVal(1, newval);
+		viewStore.setVal( index, newval);
 	}
 
 	const polarToCartesian = (radius: number, angleDeg: number) => {
@@ -102,6 +106,7 @@ const CustomKnob = observer(() => {
 		
 		const percentage = (val - minimum) / (maximum - minimum);
 		const angle = sweepAngle * percentage;
+		console.log (percentage, angle)
 
 		const startOuter = polarToCartesian(r2, startAngle);
 		const endOuter = polarToCartesian(r2, startAngle + angle);
@@ -115,6 +120,15 @@ const CustomKnob = observer(() => {
 		const arcInner = `A ${r1} ${r1} 0 ${largeArcFlag} 0 ${startInner.x} ${startInner.y}`;
 
 		// Возвращаем замкнутый сектор
+		console.log (`
+		M ${startOuter.x} ${startOuter.y}
+		${arcOuter}
+		L ${endInner.x} ${endInner.y}
+		${arcInner}
+		Z
+	`)
+		console.log (index)
+
 		return `
 			M ${startOuter.x} ${startOuter.y}
 			${arcOuter}
@@ -220,31 +234,40 @@ const CustomKnob = observer(() => {
 						{ getTicks() }
 
 						<path
-							d={`${knobPath[1]}`}
-							fill="orangered"
-							stroke="orangered"
+							d={`${knobPath[index]}`}
+							fill="var(--knobMainText)"
+							stroke="var(--knobMainText)"
 							strokeWidth="2"
 							style={{
 								filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",
 								transition: "none"
 							}}
 						/>
-						<text x="83" y="60" textAnchor="end" fontSize={fontSize} className='segments14' fill="orangered">
+						<text x="83" y="60" textAnchor="end" fontSize={fontSize} className='segments14' fill="var(--knobMainText)">
 							{ val === maximum ? 'max' : val}
 						</text>
 					</g>
-					<text x="0" y="-5" className='moderat' fill="orangered" fontSize={fontSize}>
-						{ title.split(', ')[0] }
-					</text>
-					<text x="30" y="85" className='moderat' fontSize={fontSize} fill="orangered">
+					{title.split(', ')[0].split(' ').map((a, i) => (
+						<text
+							key={i}
+							x="5"
+							y={-15 + i * 9}
+							className="moderat"
+							fill="var(--knobMainText)"
+							fontSize={10}
+						>
+							{a}
+						</text>
+					))}				
+					<text x="30" y="85" className='moderat' fontSize={10} fill="var(--knobMainText)">
 						{ title.split(', ')[1] }
 					</text>
-					<text x="65" y="105" textAnchor="start" className='moderat' fontSize={fontSize*.5} fill="orangered">
-						{ maximum }
+					<text x="5" y="130" textAnchor="start" className='moderat' fontSize={10} fill="var(--paleColor)">
+						max:{ maximum }
 					</text>
-					<text x="35" y="105" textAnchor="end" className='moderat' fontSize={fontSize*.5} fill="orangered">
-						{ minimum }
-					</text>
+					<text x="5" y="120" textAnchor="start" className='moderat' fontSize={10} fill="var(--paleColor)">
+						min:{ minimum }
+					</text>					
 				</svg>
 
 				{/* <div className='d-flex'>

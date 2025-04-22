@@ -8,7 +8,7 @@ import BasicTable from "../bootstrap/table";
 import BasicTabs from "./../bootstrap/tabs";
 //import ProgressBarContainer from "./progressBarContainer";
 import CustomKnob from "./customKnob1";
-import CustomKnob1 from "./customKnob0";
+//import CustomKnob1 from "./customKnob0";
 import CustomKnob2 from "./customKnob2";
 import { observer } from "mobx-react-lite";
 import viewStore from "../store/viewStore";
@@ -22,28 +22,25 @@ const Main1 = observer(() => {
 
 	return (
 		<main id="main1" className="h-100 overflow-hidden d-flex">	
-			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible' : ''}`}>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
-				<div className="h-125 col-12"></div>
+			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible' : ''} ms-3`}>
 
+			{
+				Array.from({ length: 8 }).map((_, i: number) => (
+					<div key={i} className="h-125 col-12 vidget">
+						<CustomKnob index={i} />
+					</div>
+				))
+			}
+			
 			</div>
 
 			<div className="h-100 overflow-hidden">		
 				<div className="d-flex h-60"> 
 					
 					<div className="col-8 h-100">
-					{/* 	<embed className='w-100 h-100 p-3'
+						<embed className='w-100 h-100 p-3'
 						src="http://127.0.0.1/editor.html?filename=8339_geos_test.ncp"
-					/> */}
-					<CustomKnob />
-
+					/> 
 					</div>
 					<div className="d-flex flex-column w-100">
 						<div className="col-12 h-100 p-3">
@@ -72,7 +69,7 @@ const Main1 = observer(() => {
 						<div className="col-12 h-100 p-3">
 							<div className="vidget col-12 h-100">
 								<div className="w-100 h-100 d-flex align-items-center justify-content-center">
-									<CustomKnob1 />
+									{/* <CustomKnob1 /> */}
 								</div>
 
 							</div>
