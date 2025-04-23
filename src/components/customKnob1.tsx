@@ -17,7 +17,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 
 	const knob = knobs[index]
 	const { minimum, maximum, val, title } = knob;
-	const step = (maximum - minimum) /50
+	const step = (maximum - minimum) / 50
 
 	const r1 = 37.5;
 	const r2 = 38.5;
@@ -25,12 +25,12 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 	const startAngle = 225;
 	const sweepAngle = 270;
 
-	let fontSize =  80 / Math.max( (`${minimum - step}`).length, (`${minimum + step}`).length, (`${maximum - step}`).length, (`${maximum + step}`).length )  
+	let fontSize = 80 / Math.max((`${minimum - step}`).length, (`${minimum + step}`).length, (`${maximum - step}`).length, (`${maximum + step}`).length)
 	fontSize = fontSize > 22.5 ? 22.5 : fontSize
 	fontSize = fontSize < 10 ? 10 : fontSize
 
 	const handleMouseDown = (callback: () => void) => {
-		callback(); 
+		callback();
 		intervalRef.current = setInterval(callback, 50);
 	};
 
@@ -43,53 +43,62 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 
 	const move = (e: React.PointerEvent<SVGElement>) => {
 		if (!rect || !isDragging) return;
-	
+
 		const x = e.clientX - rect.left;
 		const y = e.clientY - rect.top;
-	
+
 		// Координаты в системе viewBox
 		const svgX = (x / rect.width) * 100;
 		const svgY = (y / rect.height) * 100;
-	
+
 		const dx = svgX - center.x;
 		const dy = svgY - center.y;
-	
+
 		let angle = Math.atan2(dy, dx) * (180 / Math.PI); // угол в градусах
 		angle = (angle + 360) % 360;
-	
- 		let normalizedAngle = (angle - 225 + 360) % 360;
+
+		let normalizedAngle = (angle - 225 + 360) % 360;
 		const newValue = Math.round((normalizedAngle / 270) * (maximum - minimum) + minimum);
 		viewStore.setVal(index, newValue);
-		
+
 	};
 
 	useEffect(() => {
+
 		let path = getPath()
 		viewStore.setKnobPath(index, path)
+
+	}, [knobs[index].val]);
+
+
+	useEffect(() => {
 		const svg = svgRef.current;
 		if (!svg) return;
-	
+
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
-			const delta = e.deltaY < 0 ? 1 : -1;
-			const newVal = val + delta * step;
-			viewStore.setVal( index, newVal);
-			
+			const currentVal = viewStore.knobs[index].val;
+			const currentStep = step;
+			viewStore.setVal(index, currentVal + (e.deltaY < 0 ? 1 : -1) * currentStep);
 		};
-	
+
 		svg.addEventListener('wheel', handleWheel);
-		return () => svg.removeEventListener('wheel', handleWheel);
-	}, [val]);
+		return () => {
+			svg.removeEventListener('wheel', handleWheel);
+		};
+	}, []);
+
+
 
 
 	const increase = () => {
-		let newval = val + step
+		let newval = knobs[index].val + step
 		viewStore.setVal(index, newval);
 	}
 
 	const decrease = () => {
-		let newval = val - step
-		viewStore.setVal( index, newval);
+		let newval = knobs[index].val - step
+		viewStore.setVal(index, newval);
 	}
 
 	const polarToCartesian = (radius: number, angleDeg: number) => {
@@ -103,10 +112,9 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 	const round = (n: number) => Math.round(n * 10000) / 10000;
 
 	const getPath = () => {
-		
+
 		const percentage = (val - minimum) / (maximum - minimum);
 		const angle = sweepAngle * percentage;
-		console.log (percentage, angle)
 
 		const startOuter = polarToCartesian(r2, startAngle);
 		const endOuter = polarToCartesian(r2, startAngle + angle);
@@ -120,14 +128,6 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 		const arcInner = `A ${r1} ${r1} 0 ${largeArcFlag} 0 ${startInner.x} ${startInner.y}`;
 
 		// Возвращаем замкнутый сектор
-		console.log (`
-		M ${startOuter.x} ${startOuter.y}
-		${arcOuter}
-		L ${endInner.x} ${endInner.y}
-		${arcInner}
-		Z
-	`)
-		console.log (index)
 
 		return `
 			M ${startOuter.x} ${startOuter.y}
@@ -138,20 +138,20 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 		`;
 	};
 
-	const getTicks =() => {
-	
-			const totalSteps = Math.floor((maximum - minimum) / step);
-			const anglePerStep = 270 / totalSteps;
-			const startAngle = 225;
-			const endAngle = startAngle + 270;
+	const getTicks = () => {
 
-			// Построение кольцевого сегмента от 225° до 135°
-			const startOuter = polarToCartesian(r2, startAngle);
-			const endOuter = polarToCartesian(r2, endAngle);
-			const startInner = polarToCartesian(r1, endAngle);
-			const endInner = polarToCartesian(r1, startAngle);
+		const totalSteps = Math.floor((maximum - minimum) / step);
+		const anglePerStep = 270 / totalSteps;
+		const startAngle = 225;
+		const endAngle = startAngle + 270;
 
-			const ringPath = `
+		// Построение кольцевого сегмента от 225° до 135°
+		const startOuter = polarToCartesian(r2, startAngle);
+		const endOuter = polarToCartesian(r2, endAngle);
+		const startInner = polarToCartesian(r1, endAngle);
+		const endInner = polarToCartesian(r1, startAngle);
+
+		const ringPath = `
 				M ${startOuter.x} ${startOuter.y}
 				A ${r2} ${r2} 0 1 1 ${endOuter.x} ${endOuter.y}
 				L ${startInner.x} ${startInner.y}
@@ -159,59 +159,45 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 				Z
 			`;
 
-			return (
-				<>
-					{/* Кольцевая дуга */}
-					<path
-						d={ringPath}
-						fill="rgba(0,0,0,0.05)"
-					/>
+		return (
+			<>
+				{/* Кольцевая дуга */}
+				<path
+					d={ringPath}
+					fill="rgba(0,0,0,0.05)"
+				/>
 
-					{/* Декоративные точки */}
-					{Array.from({ length: totalSteps + 1 }).map((_, i) => {
-						const angle = startAngle + i * anglePerStep;
-						const r = (r1 + r2) / 2;
-						const pos = polarToCartesian(r, angle);
+				{/* Декоративные точки */}
+				{Array.from({ length: totalSteps + 1 }).map((_, i) => {
+					const angle = startAngle + i * anglePerStep;
+					const r = (r1 + r2) / 2;
+					const pos = polarToCartesian(r, angle);
 
-						return (
-							<circle
-								key={i}
-								cx={pos.x}
-								cy={pos.y}
-								r={1}
-								fill={'#aaa'}
-							/>
-						);
-					})}
-				</>
-			);
-		
+					return (
+						<circle
+							key={i}
+							cx={pos.x}
+							cy={pos.y}
+							r={1}
+							fill={'#aaa'}
+						/>
+					);
+				})}
+			</>
+		);
+
 
 	}
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
 			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
-				
-				
-			{/* 	<Button
-					variant="outline-secondary"
-					onPointerDown={() => handleMouseDown(decrease)}
-					onPointerUp={handleMouseUp}
-					onPointerLeave={handleMouseUp}
-				>
-					◀
-				</Button> */}
-				<svg id="svgChart" 
-					className="svgChart" version="1.1" 
-					width="100%" height="100%" 
+
+				<svg id="svgChart"
+					className="svgChart" version="1.1"
+					width="100%" height="100%"
 					viewBox="0 0 100 100" overflow="hidden"
-					onPointerDown={startMove}
-					onPointerUp={endMove}
-					onPointerLeave={endMove}
-					onPointerCancel={endMove}
-					onPointerMove={ move }
-					>
+				>
 					<defs>
 						<radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
 							<stop offset="0%" stopColor="#ffffff" />
@@ -228,10 +214,15 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 							stroke="gray"
 							strokeWidth="1"
 							filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
+							onPointerDown={startMove}
+							onPointerUp={endMove}
+							onPointerLeave={endMove}
+							onPointerCancel={endMove}
+							onPointerMove={move}
 
 						/>
 
-						{ getTicks() }
+						{getTicks()}
 
 						<path
 							d={`${knobPath[index]}`}
@@ -244,7 +235,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 							}}
 						/>
 						<text x="83" y="60" textAnchor="end" fontSize={fontSize} className='segments14' fill="var(--knobMainText)">
-							{ val === maximum ? 'max' : val}
+							{val === maximum ? 'max' : val}
 						</text>
 					</g>
 					{title.split(', ')[0].split(' ').map((a, i) => (
@@ -258,30 +249,71 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 						>
 							{a}
 						</text>
-					))}				
+					))}
 					<text x="30" y="85" className='moderat' fontSize={10} fill="var(--knobMainText)">
-						{ title.split(', ')[1] }
+						{title.split(', ')[1]}
 					</text>
 					<text x="5" y="130" textAnchor="start" className='moderat' fontSize={10} fill="var(--paleColor)">
-						max:{ maximum }
+						max:{maximum}
 					</text>
 					<text x="5" y="120" textAnchor="start" className='moderat' fontSize={10} fill="var(--paleColor)">
-						min:{ minimum }
-					</text>					
-				</svg>
+						min:{minimum}
+					</text>
 
-				{/* <div className='d-flex'>
-					<Button
-						variant="outline-secondary"
+					<circle
+						cx="15"
+						cy="95"
+						r="10"
+						fill={"url(#circleGradient)"}
+						stroke="gray"
+						strokeWidth="1"
+						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
+						onPointerDown={() => handleMouseDown(decrease)}
+						onPointerUp={handleMouseUp}
+						onPointerLeave={handleMouseUp}
+					/>
+					<text
+						x="15"
+						y="97"
+						textAnchor="middle"
+						alignmentBaseline="middle"
+						fontSize="14"
+						pointerEvents="none"
+						className='moderat'
+						fill="var(--knobMainText)"
+					>
+						-
+					</text>
+
+
+
+					<circle
+						cx="85"
+						cy="95"
+						r="10"
+						fill={"url(#circleGradient)"}
+						stroke="gray"
+						strokeWidth="1"
+						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
 						onPointerDown={() => handleMouseDown(increase)}
 						onPointerUp={handleMouseUp}
 						onPointerLeave={handleMouseUp}
+					/>
+					<text
+						x="85"
+						y="96"
+						textAnchor="middle"
+						alignmentBaseline="middle"
+						fontSize="14"
+						pointerEvents="none"
+						className='moderat'
+						fill="var(--knobMainText)"
 					>
-						▶</Button>
-				</div> */}
-				
-			</div>
+						+
+					</text>
 
+				</svg>
+			</div>
 		</div>
 	);
 });

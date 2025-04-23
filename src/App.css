@@ -22,6 +22,12 @@
   src: url('./assets/fonts/DSEG14Modern-Italic.ttf') format('truetype');
 }
 
+body {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
 .segments14 {
   font-family: 'Seg14', monospace !important;
 }
