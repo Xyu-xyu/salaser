@@ -12,12 +12,14 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-	const { knobs, knobPath } = viewStore
+	const { knobs, knobPath, knobStep } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
 	const knob = knobs[index]
-	const { minimum, maximum, val, title } = knob;
-	const step = (maximum - minimum) / 50
+	const knobStp =knobStep[index]
+	const { minimum, maximum, val, title, type } = knob;
+	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
+	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) /50 : Number(knobStp)
 
 	const r1 = 37.5;
 	const r2 = 38.5;
@@ -78,8 +80,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
 			const currentVal = viewStore.knobs[index].val;
-			const currentStep = step;
-			viewStore.setVal(index, currentVal + (e.deltaY < 0 ? 1 : -1) * currentStep);
+			viewStore.setVal(index, currentVal + (e.deltaY < 0 ? step : -step));
 		};
 
 		svg.addEventListener('wheel', handleWheel);
@@ -88,16 +89,13 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 		};
 	}, []);
 
-
-
-
 	const increase = () => {
-		let newval = knobs[index].val + step
+		let newval = knobs[index].val + stepBig
 		viewStore.setVal(index, newval);
 	}
 
 	const decrease = () => {
-		let newval = knobs[index].val - step
+		let newval = knobs[index].val - stepBig
 		viewStore.setVal(index, newval);
 	}
 
@@ -140,7 +138,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 
 	const getTicks = () => {
 
-		const totalSteps = Math.floor((maximum - minimum) / step);
+		const totalSteps = Math.floor((maximum - minimum) / stepBig);
 		const anglePerStep = 270 / totalSteps;
 		const startAngle = 225;
 		const endAngle = startAngle + 270;
@@ -235,7 +233,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 							}}
 						/>
 						<text x="83" y="60" textAnchor="end" fontSize={fontSize} className='segments14' fill="var(--knobMainText)">
-							{val === maximum ? 'max' : val}
+							{type === 'integer' ?  (Math.round(val) - val === 0 ? String(val)+'.0' : val) : val }
 						</text>
 					</g>
 					{title.split(', ')[0].split(' ').map((a, i) => (
@@ -284,8 +282,6 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 					>
 						-
 					</text>
-
-
 
 					<circle
 						cx="85"
