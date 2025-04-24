@@ -7,12 +7,13 @@ import BasicTable from "../bootstrap/table";
 //import Example from "../bootstrap/xxx";
 import BasicTabs from "./../bootstrap/tabs";
 //import ProgressBarContainer from "./progressBarContainer";
-import CustomKnob from "./customKnob1";
+import CustomKnob from "./customKnob";
 //import CustomKnob1 from "./customKnob0";
 import CustomKnob2 from "./customKnob2";
 import { observer } from "mobx-react-lite";
 import viewStore from "../store/viewStore";
 import MyForm from "./machineForm";
+import MacrosSelector from "./macrosSelector";
 
 
 
@@ -23,14 +24,18 @@ const Main1 = observer(() => {
 	return (
 		<main id="main1" className="h-100 overflow-hidden d-flex">	
 			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible' : ''} ms-3`}>
+					
+				<div key={0} className="h-125 col-12 vidget">
+					<MacrosSelector />
+				</div>
 
-			{
-				Array.from({ length: 8 }).map((_, i: number) => (
-					<div key={i} className="h-125 col-12 vidget">
-						<CustomKnob index={i} />
-					</div>
-				))
-			}
+				{
+					Array.from({ length: 7 }).map((_, i: number) => (
+						<div key={i} className="h-125 col-12 vidget">
+							<CustomKnob index={i+1} />
+						</div>
+					))
+				}
 			
 			</div>
 

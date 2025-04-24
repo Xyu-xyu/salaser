@@ -12,7 +12,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-	const { knobs, knobPath, knobStep } = viewStore
+	const { knobs, knobPath, knobStep, selectedMacros } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
 	const knob = knobs[index]
@@ -70,7 +70,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 		let path = getPath()
 		viewStore.setKnobPath(index, path)
 
-	}, [knobs[index].val]);
+	}, [knobs[index].val, selectedMacros]);
 
 
 	useEffect(() => {
@@ -87,7 +87,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 		return () => {
 			svg.removeEventListener('wheel', handleWheel);
 		};
-	}, []);
+	}, [selectedMacros]);
 
 	const increase = () => {
 		let newval = knobs[index].val + stepBig
