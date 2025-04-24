@@ -16,7 +16,6 @@ class ViewStore {
     knobPath: Array<String> = ['M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0']
     knobStep: Array<Number> = [1, 1, 0.1, 100, 0.1, 1, 1, 1, 1, 100]
     knobs: KnobData[] =
-
         [
             {
                 "type": "number",
@@ -37,8 +36,8 @@ class ViewStore {
             {
                 "type": "integer",
                 "title": "Давление газа, бар",
-                "maximum": 35,//35.0,
-                "default": 8,//8.0,
+                "maximum": 35.0,
+                "default": 8.0,
                 "minimum": 0.1,
                 "val": 35
             },
@@ -53,12 +52,11 @@ class ViewStore {
             {
                 "type": "integer",
                 "title": "Фокус, мм",
-                "maximum": 15,//15.0,
-                "default": 1,//1.0,
-                "minimum": -15,//-15.0,
-                "val": 1//1.0
+                "maximum": 15.0,
+                "default": 1.0,
+                "minimum": -15.0,
+                "val": 1.0
             },
-
             {
                 "type": "number",
                 "minimum": 10,
@@ -83,65 +81,6 @@ class ViewStore {
                 "minimum": 100,
                 "val": 10000
 
-            },
-            {
-                "type": "integer",
-                "minimum": 0.1,
-                "maximum": 20,//.0
-                "val": 1,//.0
-                "default": 1,//.0
-                "title": "Высота, мм"
-            },
-            {
-                "type": "number",
-                "title": "Частота импульсов, Hz",
-                "maximum": 1000,
-                "default": 0,
-                "minimum": 0,
-                "val": 0,
-
-            },
-            {
-                "type": "number",
-                "title": "Максимальная разрешенная мощность, Вт",
-                "maximum": 100000,
-                "default": 1000,
-                "val": 50000,
-                "minimum": 10
-            },
-            {
-                "type": "number",
-                "title": "Начальная несущая частота, Hz",
-                "maximum": 100000,
-                "default": 10000,
-                "val": 10000,
-                "minimum": 100
-            },
-            {
-                "type": "integer",
-                "title": "Энергия шага, Вт/с",
-                "maximum": 1000000,
-                "default": 1000,
-                "minimum": 10,
-                "val": 1000000,
-            },
-            {
-                "type": "integer",
-                "title": "Давление, бар",
-                "maximum": 35,//35.0,
-                "default": 8,//8.0,
-                "minimum": 0.1,
-                "val": 35
-            },
-
-
-            {
-                "type": "integer",
-                "title": "Заполнение, %",
-                "maximum": 100,
-                "default": 50,
-                "val": 50,
-                "minimum": 0.1
             },
         ]
 
