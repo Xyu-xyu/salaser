@@ -12,9 +12,10 @@ const MacrosSelector = observer(() => {
 	const { knobs, knobPath, selectedMacros } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
-	const knob = knobs[index]
-	const { minimum, maximum, title, type } = knob;
-    
+	const minimum = 0 
+	const maximum = knobs.length-1  
+	const title = "Выбранный макрос, index"
+	
 	const step = 1
 	const stepBig = 1
 

@@ -5,19 +5,27 @@ import { useEffect, useRef, useState } from 'react';
 
 interface CustomKnobProps {
 	index: number;
-}
-
-const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
+	param: string;
+  }
+ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-	const { knobs, knobPath, knobStep, selectedMacros } = viewStore
+	const { knobs, knobPath, knobStep, selectedMacros, macrosProperties  } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
-	const knob = knobs[index]
+	const knob = knobs[selectedMacros]
 	const knobStp =knobStep[index]
-	const { minimum, maximum, val, title, type } = knob;
+	const val = Number ( knob.cutting[param as keyof typeof knob.cutting] );
+
+	const property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
+	const { title, type } = property;
+	
+	// Безопасно получаем minimum и maximum, если они есть fuck the TSX
+	const minimum = 'minimum' in property ? property.minimum : 0;
+	const maximum = 'maximum' in property ? property.maximum : 1;
+	
 	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
 	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) /50 : Number(knobStp)
 
@@ -70,7 +78,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 		let path = getPath()
 		viewStore.setKnobPath(index, path)
 
-	}, [knobs[index].val, selectedMacros]);
+	}, [/* knobs[index].val, */ selectedMacros]);
 
 
 	useEffect(() => {
@@ -79,8 +87,8 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
-			const currentVal = viewStore.knobs[index].val;
-			viewStore.setVal(index, currentVal + (e.deltaY < 0 ? step : -step));
+			//const currentVal = viewStore.knobs[index].val;
+			//viewStore.setVal(index, currentVal + (e.deltaY < 0 ? step : -step));
 		};
 
 		svg.addEventListener('wheel', handleWheel);
@@ -90,13 +98,13 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index }) => {
 	}, [selectedMacros]);
 
 	const increase = () => {
-		let newval = knobs[index].val + stepBig
-		viewStore.setVal(index, newval);
+		//let newval = knobs[index].val + stepBig
+		//viewStore.setVal(index, newval);
 	}
 
 	const decrease = () => {
-		let newval = knobs[index].val - stepBig
-		viewStore.setVal(index, newval);
+		//let newval = knobs[index].val - stepBig
+		//viewStore.setVal(index, newval);
 	}
 
 	const polarToCartesian = (radius: number, angleDeg: number) => {

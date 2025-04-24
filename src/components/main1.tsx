@@ -30,12 +30,34 @@ const Main1 = observer(() => {
 				</div>
 
 				{
-					Array.from({ length: 7 }).map((_, i: number) => (
+					[
+						"pressure",
+						"power_W_mm",
+						//"gas": "AIR",
+						"focus",
+						//"enabled": false,
+						"feedLimit_mm_s",
+						//"cross_blow": false,
+						//"type": "CW",
+						"modulationMacro",
+						"height",
+						"modulationFrequency_Hz",
+					].map((a: string, i: number) => (
 						<div key={i} className="h-125 col-12 vidget">
-							<CustomKnob index={i+1} />
+							<CustomKnob index={i+1} param={a}/>
 						</div>
 					))
 				}
+
+				{/*
+					- Давление газа
+					- Энергия (мощность)
+					- Фокус
+					- Ограничение подачи
+					- Тип импульсного режима, также рядом кнопка для изменения макроса в модальном окне
+					- Высота сопла
+					- Несущая частота
+				*/} 
 			
 			</div>
 
