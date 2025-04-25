@@ -100,14 +100,28 @@ body {
   --grey-button-bottom: rgb(231, 231, 233);
   --grey-nav: rgb(223, 223, 226 );
   --color: #ffffff;        
-  --paleColor: #cccccc;    
   --transColor:none;
+
+  --gridColorStroke:#FFFFFF;;
+  --knobMainText: orangered;
+}
+.themeLight {
+  --mainBg: rgb(244, 244, 247);
+  --mainBg1: rgb(249, 223, 226);
+  --darkBg: rgb(231, 231, 233);
+  --gridColorFill: rgb(223, 223, 226 );
+  --paleColor: #434343;  
+  --shadow: drop-shadow(0px 0px 0px rgb(0,0,0))
+}
+
+.themeDark {
   --mainBg: #383838;
   --mainBg1: #282828;
   --darkBg:#171717;
-  --gridColorStroke:#FFFFFF;;
   --gridColorFill:#333333;
-  --knobMainText: orangered;
+  --paleColor: #cccccc;    
+  --shadow: drop-shadow(0px 2px 4px rgba(0,0,0,1))
+
 }
 
 html, body {
@@ -411,12 +425,9 @@ html, body {
 }
 
 
-.svgChart
+.themeDark.svgChart
  {
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
-/*   border-radius: 50%;
-  padding: 10px; */
-
 }
 
 .knob_body {

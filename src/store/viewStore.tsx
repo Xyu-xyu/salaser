@@ -33,6 +33,7 @@ export interface Makro {
   
 class ViewStore {
     mode: string = 'main1'
+    theme: string = 'themeLight'
     knobMode: Boolean = true
     selectedMacros:number=0
     knobPath: Array<String> = ['M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0']
@@ -63,6 +64,11 @@ class ViewStore {
     constructor() {
         makeAutoObservable(this);
     }
+
+    setTheme(theme:string ) {
+        this.theme =theme
+    }
+
 
     setKnobPath(index: number, path: string) {
         this.knobPath[index] = path;

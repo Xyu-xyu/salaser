@@ -207,7 +207,7 @@ const MacrosSelector = observer(() => {
 							fill={"url(#circleGradient)"}
 							stroke="gray"
 							strokeWidth="1"
-							filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
+							filter="var(--shadow)"
 							onPointerDown={startMove}
 							onPointerUp={endMove}
 							onPointerLeave={endMove}
@@ -261,7 +261,7 @@ const MacrosSelector = observer(() => {
 						fill={"url(#circleGradient)"}
 						stroke="gray"
 						strokeWidth="1"
-						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
+						filter="var(--shadow)"
 						onPointerDown={() => handleMouseDown(decrease)}
 						onPointerUp={handleMouseUp}
 						onPointerLeave={handleMouseUp}
@@ -286,7 +286,7 @@ const MacrosSelector = observer(() => {
 						fill={"url(#circleGradient)"}
 						stroke="gray"
 						strokeWidth="1"
-						filter="drop-shadow(0px 2px 4px rgba(0,0,0,1))"
+						filter="var(--shadow)"
 						onPointerDown={() => handleMouseDown(increase)}
 						onPointerUp={handleMouseUp}
 						onPointerLeave={handleMouseUp}

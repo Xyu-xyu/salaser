@@ -4,6 +4,8 @@ import Main1 from './components/main1'
 import { observer } from "mobx-react-lite";
 import IosToggle from './components/iosToggle';
 import IosToggle1 from './components/iosToggle1';
+import IosToggle2 from './components/iosToggle2';
+
 
 import viewStore from './store/viewStore.js';
 
@@ -20,11 +22,12 @@ const App = observer(() => {
     <>
       <div 
         id="App" 
-        className='themeLight' 
+        className= { viewStore.theme} 
         onContextMenu={handleContextMenu}
       >
         <IosToggle />
         <IosToggle1 />
+        <IosToggle2 />
         {mode === 'main' ? <Main /> : <Main1 />}
       </div>
 
