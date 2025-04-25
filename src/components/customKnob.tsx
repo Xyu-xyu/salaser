@@ -1,33 +1,33 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useRef, useState } from 'react';
-//import Button from 'react-bootstrap/esm/Button';
 
 interface CustomKnobProps {
 	index: number;
 	param: string;
-  }
- const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
+}
+
+const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-	const { knobs, knobPath, knobStep, selectedMacros, macrosProperties  } = viewStore
+	const { knobs, knobPath, knobStep, selectedMacros, macrosProperties, knobRound } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
 	const knob = knobs[selectedMacros]
-	const knobStp =knobStep[index]
-	const val = Number ( knob.cutting[param as keyof typeof knob.cutting] );
+	const knobStp = knobStep[param]
+	const val = Number(knob.cutting[param as keyof typeof knob.cutting]);
 
 	const property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 	const { title, type } = property;
-	
+
 	// Безопасно получаем minimum и maximum, если они есть fuck the TSX
 	const minimum = 'minimum' in property ? property.minimum : 0;
 	const maximum = 'maximum' in property ? property.maximum : 1;
-	
+
 	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
-	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) /50 : Number(knobStp)
+	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) / 50 : Number(knobStp)
 
 	const r1 = 37.5;
 	const r2 = 38.5;
@@ -69,16 +69,15 @@ interface CustomKnobProps {
 
 		let normalizedAngle = (angle - 225 + 360) % 360;
 		const newValue = Math.round((normalizedAngle / 270) * (maximum - minimum) + minimum);
-		viewStore.setVal(index, newValue);
+		viewStore.setVal(param, newValue, minimum, maximum);
 
 	};
 
 	useEffect(() => {
-
 		let path = getPath()
 		viewStore.setKnobPath(index, path)
 
-	}, [/* knobs[index].val, */ selectedMacros]);
+	}, [selectedMacros, val]);
 
 
 	useEffect(() => {
@@ -87,8 +86,8 @@ interface CustomKnobProps {
 
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
-			//const currentVal = viewStore.knobs[index].val;
-			//viewStore.setVal(index, currentVal + (e.deltaY < 0 ? step : -step));
+			const currentVal = Number(knob.cutting[param as keyof typeof knob.cutting]);
+			viewStore.setVal(param, currentVal + (e.deltaY < 0 ? step : -step), minimum, maximum);
 		};
 
 		svg.addEventListener('wheel', handleWheel);
@@ -98,15 +97,16 @@ interface CustomKnobProps {
 	}, [selectedMacros]);
 
 	const increase = () => {
-		//let newval = knobs[index].val + stepBig
-		//viewStore.setVal(index, newval);
+		let newval = Number(knob.cutting[param as keyof typeof knob.cutting]) + stepBig
+		viewStore.setVal(param, newval, minimum, maximum);
 	}
 
 	const decrease = () => {
-		//let newval = knobs[index].val - stepBig
-		//viewStore.setVal(index, newval);
+		let newval = Number(knob.cutting[param as keyof typeof knob.cutting]) - stepBig
+		viewStore.setVal(param, newval, minimum, maximum);
 	}
 
+	// TODO to utils
 	const polarToCartesian = (radius: number, angleDeg: number) => {
 		const rad = (angleDeg - 90) * (Math.PI / 180); // SVG 0° вверх
 		return {
@@ -115,8 +115,10 @@ interface CustomKnobProps {
 		};
 	};
 
+	// TODO to utils
 	const round = (n: number) => Math.round(n * 10000) / 10000;
 
+	// TODO to utils
 	const getPath = () => {
 
 		const percentage = (val - minimum) / (maximum - minimum);
@@ -241,10 +243,10 @@ interface CustomKnobProps {
 							}}
 						/>
 						<text x="83" y="60" textAnchor="end" fontSize={fontSize} className='segments14' fill="var(--knobMainText)">
-							{type === 'integer' ?  (Math.round(val) - val === 0 ? String(val)+'.0' : val) : val }
+							{knobRound[param] !== 0 ? (Math.round(val) - val === 0 ? String(val) + '.0' : val) : val}
 						</text>
 					</g>
-					{title.split(', ')[0].split(' ').map((a, i) => (
+					{title.split(', ')[0].split(' ').map((a: string, i: number) => (
 						<text
 							key={i}
 							x="5"

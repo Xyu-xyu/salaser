@@ -59,7 +59,7 @@ const MacrosSelector = observer(() => {
 
 		let normalizedAngle = (angle - 225 + 360) % 360;
 		const newValue = Math.round((normalizedAngle / 270) * (maximum - minimum) + minimum);
-		viewStore.setVal(index, newValue);
+		viewStore.setVal('selector', newValue, minimum, maximum);
 
 	};
 
@@ -77,7 +77,8 @@ const MacrosSelector = observer(() => {
 
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
-			viewStore.setVal(index, selectedMacros + (e.deltaY < 0 ? step : -step));
+			const newValue = selectedMacros + (e.deltaY < 0 ? step : -step)
+			viewStore.setVal('selector', newValue, minimum, maximum);
 		};
 
 		svg.addEventListener('wheel', handleWheel);
@@ -88,12 +89,12 @@ const MacrosSelector = observer(() => {
 
 	const increase = () => {
 		let newval = selectedMacros + stepBig
-		viewStore.setVal(index, newval);
+		viewStore.setVal('selector', newval, minimum, maximum);
 	}
 
 	const decrease = () => {
 		let newval = selectedMacros - stepBig
-		viewStore.setVal(index, newval);
+		viewStore.setVal('selector', newval, minimum, maximum);
 	}
 
 	const polarToCartesian = (radius: number, angleDeg: number) => {
