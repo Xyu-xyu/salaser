@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useRef, useState } from 'react';
+import MacrosEditModalButton from './macrosEditModalButton';
 import utils from '../scripts/util';
 
 
@@ -10,7 +11,7 @@ const MacrosSelector = observer(() => {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-	const { knobs, knobPath, selectedMacros } = viewStore
+	const { knobs, knobPath, selectedMacros, macrosModalEdit } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
 	const minimum = 0 
@@ -113,6 +114,7 @@ const MacrosSelector = observer(() => {
 							<stop offset="100%" stopColor="#cccccc" />
 						</radialGradient>
 					</defs>
+					{ !macrosModalEdit && <MacrosEditModalButton /> }
 
 					<g ref={svgRef}>
 						<circle

@@ -32,6 +32,7 @@ export interface Makro {
 
   
 class ViewStore {
+    macrosModalEdit:boolean = false;
     mode: string = 'main1'
     theme: string = 'themeLight'
     knobMode: Boolean = true
@@ -69,7 +70,6 @@ class ViewStore {
         this.theme =theme
     }
 
-
     setKnobPath(index: number, path: string) {
         this.knobPath[index] = path;
     }
@@ -80,6 +80,11 @@ class ViewStore {
 
     setKnobMode(newMode: Boolean) {
         this.knobMode = newMode;
+    }
+
+    setMacrosModalEdit (val:boolean) {
+        console.log ('setMacrosModalEdit')
+        this.macrosModalEdit =  val
     }
 
     setVal(param: string, newVal: number, minimum:number, maximum:number) {

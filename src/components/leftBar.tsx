@@ -1,5 +1,4 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import IosToggle from "./iosToggle";
 
 const LeftBar = () => {
 

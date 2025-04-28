@@ -14,6 +14,7 @@ import { observer } from "mobx-react-lite";
 import viewStore from "../store/viewStore";
 import MyForm from "./machineForm";
 import MacrosSelector from "./macrosSelector";
+import MacrosEditModalPanel from "./macrosEditModalPanel";
 
 
 
@@ -126,6 +127,7 @@ const Main1 = observer(() => {
 					</div>					
 				</div>
 			</div>
+			<MacrosEditModalPanel />
 
 		</main>
 	);
