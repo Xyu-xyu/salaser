@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useRef, useState } from 'react';
+import utils from '../scripts/util';
 
 
 const MacrosSelector = observer(() => {
@@ -65,7 +66,7 @@ const MacrosSelector = observer(() => {
 
 	useEffect(() => {
 
-		let path = getPath()
+		const path = utils.getPath(selectedMacros, minimum, maximum, sweepAngle, r1, r2, startAngle);
 		viewStore.setKnobPath(index, path)
 
 	}, [ selectedMacros]);
@@ -95,92 +96,6 @@ const MacrosSelector = observer(() => {
 	const decrease = () => {
 		let newval = selectedMacros - stepBig
 		viewStore.setVal('selector', newval, minimum, maximum);
-	}
-
-	const polarToCartesian = (radius: number, angleDeg: number) => {
-		const rad = (angleDeg - 90) * (Math.PI / 180); // SVG 0° вверх
-		return {
-			x: round(center.x + radius * Math.cos(rad)),
-			y: round(center.y + radius * Math.sin(rad)),
-		};
-	};
-
-	const round = (n: number) => Math.round(n * 10000) / 10000;
-
-	const getPath = () => {
-
-		const percentage = (selectedMacros - minimum) / (maximum - minimum);
-		const angle = sweepAngle * percentage;
-
-		const startOuter = polarToCartesian(r2, startAngle);
-		const endOuter = polarToCartesian(r2, startAngle + angle);
-		const startInner = polarToCartesian(r1, startAngle);
-		const endInner = polarToCartesian(r1, startAngle + angle);
-
-		// Определяем, нужен ли флаг large-arc (больше 180°)
-		const largeArcFlag = angle > 180 ? 1 : 0;
-
-		const arcOuter = `A ${r2} ${r2} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}`;
-		const arcInner = `A ${r1} ${r1} 0 ${largeArcFlag} 0 ${startInner.x} ${startInner.y}`;
-
-		// Возвращаем замкнутый сектор
-
-		return `
-			M ${startOuter.x} ${startOuter.y}
-			${arcOuter}
-			L ${endInner.x} ${endInner.y}
-			${arcInner}
-			Z
-		`;
-	};
-
-	const getTicks = () => {
-
-		const totalSteps = Math.floor((maximum - minimum) / stepBig);
-		const anglePerStep = 270 / totalSteps;
-		const startAngle = 225;
-		const endAngle = startAngle + 270;
-
-		// Построение кольцевого сегмента от 225° до 135°
-		const startOuter = polarToCartesian(r2, startAngle);
-		const endOuter = polarToCartesian(r2, endAngle);
-		const startInner = polarToCartesian(r1, endAngle);
-		const endInner = polarToCartesian(r1, startAngle);
-
-		const ringPath = `
-				M ${startOuter.x} ${startOuter.y}
-				A ${r2} ${r2} 0 1 1 ${endOuter.x} ${endOuter.y}
-				L ${startInner.x} ${startInner.y}
-				A ${r1} ${r1} 0 1 0 ${endInner.x} ${endInner.y}
-				Z
-			`;
-
-		return (
-			<>
- 				<path
-					d={ringPath}
-					fill="rgba(0,0,0,0.05)"
-				/>
-
- 				{Array.from({ length: totalSteps + 1 }).map((_, i) => {
-					const angle = startAngle + i * anglePerStep;
-					const r = (r1 + r2) / 2;
-					const pos = polarToCartesian(r, angle);
-
-					return (
-						<circle
-							key={i}
-							cx={pos.x}
-							cy={pos.y}
-							r={1}
-							fill={'#aaa'}
-						/>
-					);
-				})}
-			</>
-		);
-
-
 	}
 
 	return (
@@ -216,7 +131,15 @@ const MacrosSelector = observer(() => {
 
 						/>
 
-						{getTicks()}
+						{ 
+							utils.getTicks(
+								minimum,
+								maximum,
+								stepBig,
+								r1,
+								r2
+							) 
+						}
 
 						<path
 							d={`${knobPath[index]}`}
