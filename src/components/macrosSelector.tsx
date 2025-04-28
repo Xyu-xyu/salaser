@@ -247,17 +247,14 @@ const MacrosSelector = observer(() => {
 					<text x="30" y="85" className='moderat' fontSize={10} fill="var(--knobMainText)">
 						{title.split(', ')[1]}
 					</text>
-					<text x="5" y="130" textAnchor="start" className='moderat' fontSize={10} fill="var(--paleColor)">
-						max:{maximum}
-					</text>
-					<text x="5" y="120" textAnchor="start" className='moderat' fontSize={10} fill="var(--paleColor)">
-						min:{minimum}
+					<text x="95" y="130" textAnchor="end" className='moderat' fontSize={8} fill="var(--paleColor)">
+						min:{minimum} max:{maximum}
 					</text>
 
 					<circle
-						cx="15"
-						cy="95"
-						r="10"
+						cx="17"
+						cy="105"
+						r="15"
 						fill={"url(#circleGradient)"}
 						stroke="gray"
 						strokeWidth="1"
@@ -267,8 +264,8 @@ const MacrosSelector = observer(() => {
 						onPointerLeave={handleMouseUp}
 					/>
 					<text
-						x="15"
-						y="97"
+						x="17"
+						y="105"
 						textAnchor="middle"
 						alignmentBaseline="middle"
 						fontSize="14"
@@ -280,9 +277,9 @@ const MacrosSelector = observer(() => {
 					</text>
 
 					<circle
-						cx="85"
-						cy="95"
-						r="10"
+						cx="83" 
+						cy="105"
+						r="15"
 						fill={"url(#circleGradient)"}
 						stroke="gray"
 						strokeWidth="1"
@@ -292,8 +289,8 @@ const MacrosSelector = observer(() => {
 						onPointerLeave={handleMouseUp}
 					/>
 					<text
-						x="85"
-						y="96"
+						x="83"
+						y="105"
 						textAnchor="middle"
 						alignmentBaseline="middle"
 						fontSize="14"
