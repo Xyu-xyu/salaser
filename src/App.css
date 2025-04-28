@@ -437,3 +437,17 @@ html, body {
   color: #aaa;
   text-align: center;
 }
+
+.editModal_row {
+  height: 250px;
+}
+
+.editModal_col {
+  width: 150px;
+  height: 250px;
+}
+
+
+.modal-content {
+  background-color: rgb(244, 244, 247);
+}

@@ -117,7 +117,7 @@ const cut_settings= {
             "cutting": {
               "pressure": 9.0,
               "power_W_mm": 20000.0,
-              "gas": "AIR",
+              "gas": "O2",
               "focus": 10.0,
               "enabled": false,
               "feedLimit_mm_s": 50000,
@@ -133,7 +133,7 @@ const cut_settings= {
             "cutting": {
               "pressure": 10.0,
               "power_W_mm": 30000.0,
-              "gas": "AIR",
+              "gas": "N2",
               "focus": -11.0,
               "enabled": false,
               "feedLimit_mm_s": 50000,
@@ -213,7 +213,7 @@ const cut_settings= {
             "cutting": {
               "pressure": 15.0,
               "power_W_mm": 100000.0,
-              "gas": "AIR",
+              "gas": "O2",
               "focus": 0,
               "enabled": false,
               "feedLimit_mm_s": 50000,
