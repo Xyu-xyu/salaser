@@ -1,6 +1,7 @@
 import './IosToggle.css';
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
+import IosToggleForm from './iosToggleForm';
 
 const IosToggle1 = observer(() => {
 	const { theme } = viewStore
@@ -13,20 +14,7 @@ const IosToggle1 = observer(() => {
 	}
 
 	return (
-		<div id="toggles2" className='mx-4'>
-			<input
-				id="checkbox3"
-				type="checkbox"
-				className="ios-toggle"
-				onChange={ setTheme }
-			/>
-			<label
-				htmlFor="checkbox3"
-				className="checkbox-label"
-				data-off=""
-				data-on=""
-			/>
-		</div>
+		<IosToggleForm id={'2'} checked={Boolean(theme=== 'themeLight')} onChange={setTheme} dataOff={''}  dataOn={''}/> 
 	);
 });
 
