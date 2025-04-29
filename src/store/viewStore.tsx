@@ -37,7 +37,7 @@ class ViewStore {
     theme: string = 'themeLight'
     knobMode: Boolean = true
     selectedMacros:number=0
-    knobPath: Array<String> = ['M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0']
+    knobPath: Array<String> = ['M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0', 'M0 0','M0 0', 'M0 0','M0 0']
     knobStep: { [key: string]: number } = {
         pressure: 0.1,
         power_W_mm: 100,
@@ -46,6 +46,8 @@ class ViewStore {
         modulationMacro: 1,
         height: 1,
         modulationFrequency_Hz: 1,
+        piercingMacro: 1
+        
     };
 
     knobRound: { [key: string]: number } = {
@@ -56,6 +58,7 @@ class ViewStore {
         modulationMacro: 0,
         height: 1,
         modulationFrequency_Hz: 0,
+        piercingMacro:0
     };
       
     knobs = cut_settings.result.technology.macros;
@@ -99,8 +102,9 @@ class ViewStore {
 
             if (param in macro.cutting) {
                 (macro.cutting as any)[param] = Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+            } else if (param in macro) {
+                (macro as any)[param] = Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
             }
-            
         }
     }
     

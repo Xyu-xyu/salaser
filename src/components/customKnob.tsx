@@ -19,10 +19,20 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 
 	const knob = knobs[selectedMacros]
 	const knobStp = knobStep[param]
-	const val = Number(knob.cutting[param as keyof typeof knob.cutting]);
+	
+	let val = Number(knob.cutting[param as keyof typeof knob.cutting]);
+	if (param === 'piercingMacro') {
+		val = Number(knob[param as keyof typeof knob]);
+	}
 
-	const property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
-	const { title, type } = property;
+	let property 
+	if (param === 'piercingMacro') {
+		property = macrosProperties[param as keyof typeof macrosProperties];
+	} else {
+		property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
+	}
+
+	const { title  } = property;
 
 	// Безопасно получаем minimum и maximum, если они есть fuck the TSX
 	const minimum = 'minimum' in property ? property.minimum : 0;
@@ -100,15 +110,19 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 
 	const increase = () => {
 		let newval = Number(knob.cutting[param as keyof typeof knob.cutting]) + stepBig
+		if (param === 'piercingMacro') {
+			newval = Number(knob[param as keyof typeof knob]) + stepBig
+		}
 		viewStore.setVal(param, newval, minimum, maximum);
 	}
 
 	const decrease = () => {
 		let newval = Number(knob.cutting[param as keyof typeof knob.cutting]) - stepBig
+		if (param === 'piercingMacro') {
+			newval = Number(knob[param as keyof typeof knob]) - stepBig
+		}		
 		viewStore.setVal(param, newval, minimum, maximum);
 	}
-
-
 	
 
 	return (

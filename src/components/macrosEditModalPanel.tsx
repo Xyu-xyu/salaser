@@ -18,50 +18,55 @@ const MacrosEditModalPanel = observer(() => {
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container-fluid">
-						<div className='d-flex mt-10 d-flex justify-content-evenly'>
+						<div className='d-flex mt-10 d-flex justify-content-evenly mt-5'>
 							<div key={0} className="editModal_row">
 								<div key={0} className="editModal_col">
 									<MacrosSelector />
  								</div>	
- 							</div>	
-
-							<div key={9} className="editModal_row">
-										 
- 								<div key={9} className="editModal_col">
- 									<NamedKnob  param={'gas'}/>
-								</div>
-							</div>
+ 							</div>
+							{[
+								"gas",
+								"type",
+							].map((a: string, i: number) => (
+								
+									<div key={i+3} className="editModal_row">										 
+										<div key={i+3} className="editModal_col">
+											<NamedKnob  param={ a } index={i+3}/>
+										</div>
+									</div>
+								))
+							}
 						</div>
-						<div className='d-flex d-flex justify-content-evenly'>
+						<div className='d-flex d-flex justify-content-evenly mt-5'>
 							{[
 								"pressure",
 								"power_W_mm",
 								"focus",
-								"feedLimit_mm_s",								
+								"feedLimit_mm_s",
 							].map((a: string, i: number) => (
 								
-								<div  className="editModal_row">
-									<div className="editModal_col">
-										<CustomKnob index={i + 1} param={a} />
-									</div>
-								</div>
-							))}
-						</div>
-						<div className='d-flex d-flex justify-content-evenly'>
-							{[
-								"modulationMacro",
-								"height",
-								"modulationFrequency_Hz",
-							].map((a: string, i: number) => (
-								
-								<div  className="editModal_row">
+								<div  className="editModal_row" key={i+5}>
 									<div className="editModal_col">
 										<CustomKnob index={i + 5} param={a} />
 									</div>
 								</div>
 							))}
 						</div>
-						
+						<div className='d-flex d-flex justify-content-evenly mt-5'>
+							{[
+								"height",
+								"modulationFrequency_Hz",
+								"modulationMacro",
+								"piercingMacro"
+							].map((a: string, i: number) => (
+								
+								<div  className="editModal_row" key={i+9}>
+									<div className="editModal_col">
+										<CustomKnob index={i + 9} param={a} />
+									</div>
+								</div>
+							))}
+						</div>						
 					</div>
 				</Modal.Body>
 				<Modal.Footer>

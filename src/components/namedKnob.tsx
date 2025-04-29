@@ -3,13 +3,7 @@ import viewStore from '../store/viewStore';
 import { useEffect, useRef, useState } from 'react';
 import utils from '../scripts/util';
 
-/*"feedLimit_mm_s": {
-	"type": "number",
-	"minimum": 10,
-	"maximum": 200000,
-	"default": 50000,
-	"title": "Ограничение подачи, мм/с"
-},
+/*
 "cross_blow": {
 	"title": "Охлаждение",
 	"type": "boolean",
@@ -29,9 +23,10 @@ import utils from '../scripts/util';
 },*/
 interface NamedKnobProps {
 	param: string;
+	index: number;
 }
 
-const NamedKnob: React.FC<NamedKnobProps> = observer(({  param }) => {
+const NamedKnob: React.FC<NamedKnobProps> = observer(({  param, index }) => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
@@ -41,15 +36,13 @@ const NamedKnob: React.FC<NamedKnobProps> = observer(({  param }) => {
 
 	const knob = knobs[selectedMacros]
 	const val = knob.cutting[param as keyof typeof knob.cutting];
-	const index:number = 9
-
 	const property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 
 	console.log( Object.keys(property));
 	console.log( Object.values(property));
 	
 
-	const { type, title } = property
+	const { title } = property
 	const values = 'enum' in property ? property.enum : [];
 	
 	// Безопасно получаем minimum и maximum, если они есть fuck the TSX

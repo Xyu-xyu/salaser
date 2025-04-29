@@ -113,7 +113,7 @@ const cut_settings= {
             }
           },
           {
-            "piercingMacro": 0,
+            "piercingMacro": 1,
             "cutting": {
               "pressure": 9.0,
               "power_W_mm": 20000.0,
@@ -122,14 +122,14 @@ const cut_settings= {
               "enabled": false,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
-              "type": "CW",
+              "type": "PULSE",
               "modulationMacro": 15,
               "height": 1.9,
               "modulationFrequency_Hz": 40000.0
             }
           },
           {
-            "piercingMacro": 0,
+            "piercingMacro": 2,
             "cutting": {
               "pressure": 10.0,
               "power_W_mm": 30000.0,
@@ -138,14 +138,14 @@ const cut_settings= {
               "enabled": false,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
-              "type": "CW",
+              "type": "ENGRAVEING",
               "modulationMacro": 1,
               "height": 1.9,
               "modulationFrequency_Hz": 50000.0
             }
           },
           {
-            "piercingMacro": 0,
+            "piercingMacro": 3,
             "cutting": {
               "pressure": 11.0,
               "power_W_mm": 40000.0,
@@ -154,14 +154,14 @@ const cut_settings= {
               "enabled": false,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
-              "type": "CW",
+              "type": "VAPOR",
               "modulationMacro": 15,
               "height": 1.0,
               "modulationFrequency_Hz": 60000.0
             }
           },
           {
-            "piercingMacro": 0,
+            "piercingMacro": 4,
             "cutting": {
               "pressure": 12.0,
               "power_W_mm": 50000.0,
@@ -170,14 +170,14 @@ const cut_settings= {
               "enabled": false,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
-              "type": "CW",
+              "type": "EDGING",
               "modulationMacro": 2,
               "height": 1.5,
               "modulationFrequency_Hz": 70000.0
             }
           },
           {
-            "piercingMacro": 0,
+            "piercingMacro": 5,
             "cutting": {
               "pressure": 13.0,
               "power_W_mm": 60000.0,
@@ -193,7 +193,7 @@ const cut_settings= {
             }
           },
           {
-            "piercingMacro": 0,
+            "piercingMacro": 6,
             "cutting": {
               "pressure": 14.0,
               "power_W_mm": 70000.0,
@@ -209,7 +209,7 @@ const cut_settings= {
             }
           },
           {
-            "piercingMacro": 0,
+            "piercingMacro": 7,
             "cutting": {
               "pressure": 15.0,
               "power_W_mm": 100000.0,
