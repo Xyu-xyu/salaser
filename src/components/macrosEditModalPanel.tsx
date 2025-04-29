@@ -23,7 +23,7 @@ const MacrosEditModalPanel = observer(() => {
 					<div className="container-fluid">
 						<div className='d-flex mt-10 d-flex justify-content-evenly mt-5'>
 							<div key={0} className="editModal_row">
-								<div key={0} className="editModal_col">
+								<div className="editModal_col">
 									<MacrosSelector />
  								</div>	
  							</div>
@@ -32,9 +32,9 @@ const MacrosEditModalPanel = observer(() => {
 								"type",
 							].map((a: string, i: number) => (
 								
-									<div key={i+3} className="editModal_row">										 
-										<div key={i+3} className="editModal_col">
-											<NamedKnob  param={ a } index={i+3}/>
+									<div  className="editModal_row" key={i+10}>										 
+										<div className="editModal_col">
+											<NamedKnob  param={ a } index={i+10}/>
 										</div>
 									</div>
 								))
@@ -44,28 +44,43 @@ const MacrosEditModalPanel = observer(() => {
 							{[
 								"pressure",
 								"power_W_mm",
+								//"gas": "AIR",
 								"focus",
+								//"enabled": false,
 								"feedLimit_mm_s",
+								//"cross_blow": false,
+								//"type": "CW",
+								//"modulationMacro",
+								//"height",
+								//"modulationFrequency_Hz",
 							].map((a: string, i: number) => (
 								
-								<div  className="editModal_row" key={i+5}>
+								<div  className="editModal_row" key={i+1}>
 									<div className="editModal_col">
-										<CustomKnob index={i + 5} param={a} />
+										<CustomKnob param={a} index={i+1}/>
 									</div>
 								</div>
 							))}
 						</div>
 						<div className='d-flex d-flex justify-content-evenly mt-5'>
 							{[
-								"height",
-								"modulationFrequency_Hz",
-								"modulationMacro",
-								"piercingMacro"
+	 							//"pressure",
+								//"power_W_mm",
+								 //"gas": "AIR",
+								 //"focus",
+								 //"enabled": false,
+								 //"feedLimit_mm_s",
+								 //"cross_blow": false,
+								 //"type": "CW",
+								 "modulationMacro",
+								 "height",
+								 "modulationFrequency_Hz",
+								 "piercingMacro"
 							].map((a: string, i: number) => (
 								
-								<div  className="editModal_row" key={i+9}>
+								<div  className="editModal_row" key={5+i}>
 									<div className="editModal_col">
-										<CustomKnob index={i + 9} param={a} />
+										<CustomKnob index={5+i} param={a} />
 									</div>
 								</div>
 							))}
