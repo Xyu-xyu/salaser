@@ -105,6 +105,8 @@ body {
   --gridColorStroke:#FFFFFF;;
   --knobMainText: orangered;
 }
+
+
 .themeLight {
   --mainBg: rgb(244, 244, 247);
   --mainBg1: rgb(249, 223, 226);
@@ -449,5 +451,5 @@ html, body {
 
 
 .modal-content {
-  background-color: rgb(244, 244, 247);
+  background-color: rgb(234, 234, 238);
 }

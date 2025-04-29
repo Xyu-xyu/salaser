@@ -4,6 +4,9 @@ import viewStore from '../store/viewStore';
 import CustomKnob from './customKnob';
 import MacrosSelector from './macrosSelector';
 import NamedKnob from './namedKnob';
+import IosToggle3 from './iosToggle3';
+import IosToggle4 from './iosToggle4';
+
 
 const MacrosEditModalPanel = observer(() => {
 	const handleClose = () => {
@@ -14,7 +17,7 @@ const MacrosEditModalPanel = observer(() => {
 		<>
 			<Modal show={viewStore.macrosModalEdit} onHide={handleClose} centered fullscreen>
 				<Modal.Header closeButton>
-					<Modal.Title>Macro editing mode</Modal.Title>
+					<Modal.Title><h1>Режим редактирования макросов</h1></Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container-fluid">
@@ -66,6 +69,19 @@ const MacrosEditModalPanel = observer(() => {
 									</div>
 								</div>
 							))}
+						</div>	
+						<div className='d-flex d-flex justify-content-evenly mt-5'>
+							<div  className="editModal_row">
+								<div className="editModal_col">
+									<IosToggle3 />
+								</div>
+							</div>
+							<div  className="editModal_row">
+								<div className="editModal_col">
+									<IosToggle4 />
+								</div>
+							</div>
+						
 						</div>						
 					</div>
 				</Modal.Body>

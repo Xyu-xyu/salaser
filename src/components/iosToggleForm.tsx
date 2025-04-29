@@ -11,7 +11,7 @@ interface IosToggleProps {
 
 const IosToggleForm: React.FC<IosToggleProps> = ({ id, checked, onChange, dataOn="", dataOff=""}) => {
   return (
-    <div id={`toggles${id}`} className='mx-4'>
+    <div id={`toggles${id}`} className='mx-4 toggles'>
       <input
         id={`checkbox${id}`}
         type="checkbox"

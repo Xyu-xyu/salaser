@@ -107,6 +107,13 @@ class ViewStore {
             }
         }
     }
+
+    setValBoolean (param: string, newVal: boolean,) {
+        const macro = this.knobs[this.selectedMacros];  
+        if (param in macro.cutting) {
+            (macro.cutting as any)[param] = newVal
+        }  
+    }
     
     setSelectedMacros ( newVal: number) {
         if (newVal < 0) newVal = 0
