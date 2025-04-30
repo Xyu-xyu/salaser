@@ -38,7 +38,7 @@ const IosToggle3 = observer(() => {
 						</text>
 					))}
 				</svg>
-				<IosToggleForm id={'3'} checked={val} onChange={setVal} dataOff={'Выключен'} dataOn={'Включен'} />
+				<IosToggleForm id={'3'} checked={val} onChange={setVal} dataOff={'Выкл'} dataOn={'Вкл'} />
 			</div>
 		</div>
 	);

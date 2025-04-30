@@ -6,6 +6,7 @@ import MacrosSelector from './macrosSelector';
 import NamedKnob from './namedKnob';
 import IosToggle3 from './iosToggle3';
 import IosToggle4 from './iosToggle4';
+import ListMacrosEdit from './listMacrosEdit';
 
 
 const MacrosEditModalPanel = observer(() => {
@@ -27,18 +28,11 @@ const MacrosEditModalPanel = observer(() => {
 									<MacrosSelector />
  								</div>	
  							</div>
-							{[
-								"gas",
-								"type",
-							].map((a: string, i: number) => (
-								
-									<div  className="editModal_row" key={i+10}>										 
-										<div className="editModal_col">
-											<NamedKnob  param={ a } index={i+10}/>
-										</div>
-									</div>
-								))
-							}
+							 <div key={0} className="editModal_row">
+								<div className="editModal_col">
+									<ListMacrosEdit />
+								</div>
+							</div>
 						</div>
 						<div className='d-flex d-flex justify-content-evenly mt-5'>
 							{[
@@ -97,8 +91,25 @@ const MacrosEditModalPanel = observer(() => {
 								</div>
 							</div>
 						
-						</div>						
+						</div>
+						<div className='d-flex d-flex justify-content-evenly mt-5'>
+								{[
+								"gas",
+								"type",
+							].map((a: string, i: number) => (
+								
+									<div  className="editModal_row" key={i+10}>										 
+										<div className="editModal_col">
+											<NamedKnob  param={ a } index={i+10}/>
+										</div>
+									</div>
+								))
+							}
+						
+						</div>									
 					</div>
+
+
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="secondary" onClick={handleClose}>
