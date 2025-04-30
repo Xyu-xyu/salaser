@@ -1,32 +1,37 @@
-import { useState } from 'react';
 import { ListGroup, Form } from 'react-bootstrap';
+import { observer } from 'mobx-react-lite';
+import viewStore from '../store/viewStore';
 
 
-const listMacrosEdit = () => {
-	const [selectedOption, setSelectedOption] = useState("AIR");
+  
+ const ListMacrosEdit: React.FC<{ param: string }> = observer(({ param }) => {
 
-	const options = [
-		"AIR",
-		"O2",
-		"N2"
-	];
+	const { knobs, selectedMacros, macrosProperties } = viewStore
+	const knob = knobs[selectedMacros]
+	const val = knob.cutting[param as keyof typeof knob.cutting];
+	let property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
+	const { title } = property;	
+	const setSelectedOption =(val:string) =>{
+		viewStore.setValString ( param,val)
+	}
+
 
 	return (
 		<div className='listMacrosEdit w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
 			<div className='col-12 h-100 d-flex flex-column'>
 	
-				<div className='listMacrosEdit_title'>{'Газ'}</div>
+				<div className='listMacrosEdit_title'>{title}</div>
 			
 				<ListGroup>
-					{options.map((option) => (
+					{property.enum.map((option) => (
 						<ListGroup.Item key={option}>
 							<Form.Check
 								type="radio"
-								id={`radio-${option}`}
+								id={`radio-${option}-${title}`}
 								label={option}
-								name="gasOptions"
+								name={`${title}Options`}
 								value={option}
-								checked={selectedOption === option}
+								checked={val === option}
 								onChange={(e) => setSelectedOption(e.target.value)}
 							/>
 						</ListGroup.Item>
@@ -36,6 +41,6 @@ const listMacrosEdit = () => {
 		</div>
 
 	);
-};
+});
 
-export default listMacrosEdit;
+export default ListMacrosEdit;

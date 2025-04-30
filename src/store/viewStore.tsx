@@ -114,6 +114,13 @@ class ViewStore {
             (macro.cutting as any)[param] = newVal
         }  
     }
+
+    setValString (param: string, newVal: string,) {
+        const macro = this.knobs[this.selectedMacros];  
+        if (param in macro.cutting) {
+            (macro.cutting as any)[param] = newVal
+        }  
+    }
     
     setSelectedMacros ( newVal: number) {
         if (newVal < 0) newVal = 0
