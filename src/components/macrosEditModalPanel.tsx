@@ -5,8 +5,7 @@ import CustomKnob from './customKnob';
 import MacrosSelector from './macrosSelector';
 import IosToggle3 from './iosToggle3';
 import IosToggle4 from './iosToggle4';
-import ListMacrosEdit from './listMacrosEdit';
-import { Icon } from '@iconify/react/dist/iconify.js';
+import MacrosEditList from './MacrosEditList';
 
 
 const MacrosEditModalPanel = observer(() => {
@@ -19,16 +18,6 @@ const MacrosEditModalPanel = observer(() => {
 			<Modal show={viewStore.macrosModalEdit} onHide={handleClose} centered fullscreen>
 				<Modal.Header closeButton>
 					<Modal.Title>
-						<h1><Icon
-							icon="fluent:document-edit-16-regular"
-							width="36"
-							height="36"
-							style={{
-								color: "var(--knobMainText)",
-								transform: "translate(50%, 50%)",
-							}}
-						/>
-						</h1>
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
@@ -47,7 +36,7 @@ const MacrosEditModalPanel = observer(() => {
 
 								<div className="editModal_row" key={i + 10}>
 									<div className="editModal_col">
-										<ListMacrosEdit param={a} />
+										<MacrosEditList param={a} />
 									</div>
 								</div>
 							))}

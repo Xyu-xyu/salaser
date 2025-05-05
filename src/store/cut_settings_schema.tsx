@@ -676,7 +676,7 @@ const cutting_settings = {
                                             "enum": [
                                                 "CW",
                                                 "PULSE",
-                                                "ENGRAVEING",
+                                                "ENGRAVING",
                                                 "VAPOR",
                                                 "EDGING"
                                             ],

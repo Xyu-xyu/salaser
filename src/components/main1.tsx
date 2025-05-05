@@ -88,7 +88,7 @@ const Main1 = observer(() => {
 						</div>	
 						<div className="col-12 h-50 p-3">
 							<div className="vidget col-12 h-100">
-								<CardExample />
+								{/* <CardExample /> */}
 							</div>
 						</div>					
 					</div>
@@ -106,14 +106,14 @@ const Main1 = observer(() => {
 
 					<div className="d-flex flex-column h-100 col-4 ">
 						<div className="col-12 h-60 p-3">
-							<div className="vidget col-12 h-100 knob_body">
-								<CustomKnob2 />
-							</div>
+							<div className="vidget col-12 h-100">
+{/* 								<CustomKnob2 />
+ */}							</div>
 						</div>	
 						<div className="col-12 h-40 p-3">
 							<div className="vidget col-12 h-100">
-								<BasicTable />
-							</div>
+{/* 								<BasicTable />
+ */}							</div>
 						</div>	
 						
 					</div>						
@@ -122,8 +122,8 @@ const Main1 = observer(() => {
 				<div className="d-flex row h-15 p-3">
 					<div className="col-12 h-100">
 						<div className="vidget col-12 h-100">
-							<BasicTabs />
-						</div>
+{/* 							<BasicTabs />
+ */}						</div>
 					</div>					
 				</div>
 			</div>

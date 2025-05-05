@@ -44,18 +44,18 @@ const MacrosEditModalButton = observer(() => {
 
 			</g>
 
-			<Modal show={show} onHide={handleClose} centered>
+			<Modal show={show} onHide={handleClose} size="lg" centered>
 				<Modal.Header closeButton>
-					<Modal.Title>Macro editing mode</Modal.Title>
+					<Modal.Title></Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					Do you want to start macro editing ?
+					<h3>Do you want to start macro editing ?</h3>
 				</Modal.Body>
 				<Modal.Footer>
-					<Button variant="secondary" onClick={handleClose}>
+					<Button variant="secondary" className="mt-4 py-3 px-5 fs-3 close-button" onClick={handleClose}>
 						Close
 					</Button>
-					<Button variant="primary" onClick={handleContinue}>
+					<Button variant="primary" className="mt-4 py-3 px-5 fs-3 close-button" onClick={handleContinue}>
 						Continue
 					</Button>
 				</Modal.Footer>

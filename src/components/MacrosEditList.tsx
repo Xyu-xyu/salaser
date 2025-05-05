@@ -4,7 +4,7 @@ import viewStore from '../store/viewStore';
 
 
   
- const ListMacrosEdit: React.FC<{ param: string }> = observer(({ param }) => {
+ const MacrosEditList: React.FC<{ param: string }> = observer(({ param }) => {
 
 	const { knobs, selectedMacros, macrosProperties } = viewStore
 	const knob = knobs[selectedMacros]
@@ -43,4 +43,4 @@ import viewStore from '../store/viewStore';
 	);
 });
 
-export default ListMacrosEdit;
+export default MacrosEditList;

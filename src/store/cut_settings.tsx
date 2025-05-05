@@ -138,7 +138,7 @@ const cut_settings= {
               "enabled": false,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
-              "type": "ENGRAVEING",
+              "type": "ENGRAVING",
               "modulationMacro": 1,
               "height": 1.9,
               "modulationFrequency_Hz": 50000.0
