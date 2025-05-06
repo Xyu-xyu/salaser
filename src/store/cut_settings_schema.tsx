@@ -1,4 +1,4 @@
-export interface Root {
+/* export interface Root {
     success: boolean
     result: Result
 }
@@ -527,9 +527,9 @@ export interface FeedLimitMmS2 {
     maximum: number
     default: number
     title: string
-}
+} */
 
-const cutting_settings = {
+const cutting_settings = JSON.parse(`{
     "success": true,
     "result": {
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -992,6 +992,6 @@ const cutting_settings = {
         "$id": "sgnMachineSettings",
         "type": "object"
     }
-}
+}`)
 
 export default cutting_settings

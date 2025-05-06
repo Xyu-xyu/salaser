@@ -1,4 +1,4 @@
-export interface Root {
+/* export interface Root {
     success: boolean
     result: Result
   }
@@ -80,9 +80,9 @@ export interface Root {
   
   export interface Feeding {
     feedLimit_mm_s: number
-  }
+  } */
   
-const cut_settings= {
+const cut_settings= JSON.parse(`{
     "success": true,
     "result": {
       "machine": {
@@ -104,7 +104,7 @@ const cut_settings= {
               "gas": "AIR",
               "focus": -15.0,
               "enabled": false,
-              "feedLimit_mm_s": 50000,
+              "feedLimit_mm_s": 40000,
               "cross_blow": false,
               "type": "CW",
               "modulationMacro": 0,
@@ -230,7 +230,7 @@ const cut_settings= {
             "initial_modulationFrequency_Hz": 10000.0,
             "stages": [
               {
-                "pressure": .0,
+                "pressure": 0,
                 "power": 1000,
                 "enabled": false,
                 "delay_s": 0,
@@ -1954,6 +1954,6 @@ const cut_settings= {
         }
       }
     }
-  }
+  }`)
 
   export default cut_settings;

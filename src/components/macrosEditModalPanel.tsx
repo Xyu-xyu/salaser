@@ -5,7 +5,7 @@ import CustomKnob from './customKnob';
 import MacrosSelector from './macrosSelector';
 import IosToggle3 from './iosToggle3';
 import IosToggle4 from './iosToggle4';
-import MacrosEditList from './MacrosEditList';
+import MacrosEditList from './macrosEditList';
 
 
 const MacrosEditModalPanel = observer(() => {

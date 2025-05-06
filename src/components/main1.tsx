@@ -12,7 +12,7 @@ const Main1 = observer(() => {
 	const { knobMode } = viewStore
 
 	return (
-		<main id="main1" className="h-100 overflow-hidden d-flex">	
+		<main id="main1" className="h-100 overflow-hidden d-flex w-100 h-100">	
 			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible' : ''} ms-3`}>
 					
 				<div key={0} className="h-125 col-12 vidget">
@@ -52,18 +52,20 @@ const Main1 = observer(() => {
 			</div>
 
 			<div className="h-100 overflow-hidden">		
-				<div className="d-flex h-60"> 
-					
-					<div className="col-8 h-100">
-						<embed className='w-100 h-100 p-3'
-						src="http://127.0.0.1/editor.html?filename=8339_geos_test.ncp"
-					/> 
-					</div>
+				<div className="d-flex h-60">
+					<div className="col-8 h-100 p-3">
+						<div className=" vidget col-12 h-100 overflow-y-scroll">
+								<MyForm />
+							</div>
+							{/* <embed className='w-100 h-100 p-3'
+							src="http://127.0.0.1/editor.html?filename=8339_geos_test.ncp"
+						/>  */}
+						</div>
 					<div className="d-flex flex-column w-100">
 						<div className="col-12 h-100 p-3">
 							<div className=" vidget col-12 h-100 overflow-y-scroll">
-								<MyForm />
-							</div>
+{/* 								<MyForm />
+ */}							</div>
 						</div>
 					</div>
 				</div>	

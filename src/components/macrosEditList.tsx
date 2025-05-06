@@ -23,7 +23,7 @@ import viewStore from '../store/viewStore';
 				<div className='listMacrosEdit_title'>{title}</div>
 			
 				<ListGroup>
-					{property.enum.map((option) => (
+					{property.enum.map((option="") => (
 						<ListGroup.Item key={option}>
 							<Form.Check
 								type="radio"

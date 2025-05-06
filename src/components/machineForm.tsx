@@ -12,13 +12,11 @@ const MachineSettingsForm: React.FC = () => {
 	};
 
 	const Form = withTheme(Theme);
-	type FormData = typeof cut_settings;
-
 
 
 	return (
 		<div style={{ padding: "1rem" }}>
-			<Form<FormData>
+			<Form
 				schema={cutting_settings_schema.result}
 				validator={validator}
 				formData={cut_settings}
