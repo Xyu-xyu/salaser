@@ -13,6 +13,8 @@ const MacrosEditModalPanel = observer(() => {
 		viewStore.setMacrosModalEdit(false);
 	};
 
+	const { isVertical } = viewStore;
+
 	return (
 		<>
 			<Modal show={viewStore.macrosModalEdit} onHide={handleClose} centered fullscreen>
@@ -22,9 +24,9 @@ const MacrosEditModalPanel = observer(() => {
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container-fluid">
-						<div className='d-flex mt-10 d-flex justify-content-evenly mt-10'>
+						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 							<div key={0} className="editModal_row">
-								<div className="editModal_col">
+								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 									<MacrosSelector />
 								</div>
 							</div>
@@ -35,14 +37,14 @@ const MacrosEditModalPanel = observer(() => {
 							].map((a: string, i: number) => (
 
 								<div className="editModal_row" key={i + 10}>
-									<div className="editModal_col">
+									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 										<MacrosEditList param={a} />
 									</div>
 								</div>
 							))}
 
 						</div>
-						<div className='d-flex d-flex justify-content-evenly mt-10'>
+						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")} >
 							{[
 								"pressure",
 								"power_W_mm",
@@ -58,13 +60,13 @@ const MacrosEditModalPanel = observer(() => {
 							].map((a: string, i: number) => (
 
 								<div className="editModal_row" key={i + 1}>
-									<div className="editModal_col">
+									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 										<CustomKnob param={a} index={i + 1} />
 									</div>
 								</div>
 							))}
 						</div>
-						<div className='d-flex d-flex justify-content-evenly mt-10'>
+						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 							{[
 								//"pressure",
 								//"power_W_mm",
@@ -81,13 +83,13 @@ const MacrosEditModalPanel = observer(() => {
 							].map((a: string, i: number) => (
 
 								<div className="editModal_row" key={5 + i}>
-									<div className="editModal_col">
+									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 										<CustomKnob index={5 + i} param={a} />
 									</div>
 								</div>
 							))}
 						</div>
-						<div className='d-flex d-flex justify-content-evenly mt-10'>
+						<div className={'d-flex d-flex justify-content-evenly ' +  (isVertical ? "mt-10" : "mt-4")}>
 							<div className="editModal_row">
 								<div className="editModal_col">
 									<IosToggle3 />

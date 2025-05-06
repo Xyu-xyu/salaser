@@ -30,8 +30,9 @@ export interface Makro {
     cutting: CuttingSettings;
 }
 
-  
+
 class ViewStore {
+    isVertical:boolean = (window.innerHeight > window.innerWidth)
     macrosModalEdit:boolean = false;
     mode: string = 'main1'
     theme: string = 'themeLight'
@@ -64,6 +65,9 @@ class ViewStore {
     knobs = cut_settings.result.technology.macros;
     macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
 
+    setIsVertical (val:boolean) {
+        this.isVertical = val
+    }
         
     constructor() {
         makeAutoObservable(this);

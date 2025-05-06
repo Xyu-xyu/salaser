@@ -11,12 +11,23 @@ const MacrosSelector = observer(() => {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-	const { knobs, knobPath, selectedMacros, macrosModalEdit } = viewStore
+	const { knobs, knobPath, selectedMacros, macrosModalEdit, isVertical } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
 	const minimum = 0 
 	const maximum = knobs.length-1  
 	const title = "Выбранный макрос, index"
+
+	
+	const x1 = isVertical ? 17 : -10
+	const x2 = isVertical ? 83 : 110
+	const x4 = isVertical ? 5 : -30
+
+	const y1 = isVertical ? 105 : 80
+	const y2 = isVertical ? 80 : 80
+	const y3 = isVertical ? -15 : 10
+
+	
 	
 	const step = 1
 	const stepBig = 1
@@ -153,32 +164,34 @@ const MacrosSelector = observer(() => {
 								transition: "none"
 							}}
 						/>
-						<text x="83" y="60" textAnchor="end" fontSize={fontSize} className='segments14' fill="var(--knobMainText)">
+						<text x={83} y={60} textAnchor="end" fontSize={fontSize} className='segments14' fill="var(--knobMainText)">
 							{ selectedMacros }
 						</text>
 					</g>
 					{title.split(', ')[0].split(' ').map((a, i) => (
 						<text
 							key={i}
-							x="5"
-							y={-15 + i * 9}
+							x={x4}
+							y={y3 + i * 9}
 							className="moderat"
 							fill="var(--knobMainText)"
-							fontSize={10}
+							fontSize={isVertical ? 10 : 7 }
 						>
 							{a}
 						</text>
 					))}
-					<text x="30" y="85" className='moderat' fontSize={10} fill="var(--knobMainText)">
+					<text x={30} y={y2} className='moderat' 
+						fontSize={isVertical ? 10 : 7}
+						fill="var(--knobMainText)">
 						{title.split(', ')[1]}
 					</text>
-					<text x="95" y="130" textAnchor="end" className='moderat' fontSize={8} fill="var(--paleColor)">
+					<text x={95} y={130} textAnchor="end" className='moderat' fontSize={8} fill="var(--paleColor)">
 						min:{minimum} max:{maximum}
 					</text>
 
 					<circle
-						cx="17"
-						cy="105"
+						cx={x1}
+						cy={y1}
 						r="15"
 						fill={"url(#circleGradient)"}
 						stroke="gray"
@@ -189,8 +202,8 @@ const MacrosSelector = observer(() => {
 						onPointerLeave={handleMouseUp}
 					/>
 					<text
-						x="17"
-						y="105"
+						x={x1}
+						y={y1}
 						textAnchor="middle"
 						alignmentBaseline="middle"
 						fontSize="14"
@@ -202,8 +215,8 @@ const MacrosSelector = observer(() => {
 					</text>
 
 					<circle
-						cx="83" 
-						cy="105"
+						cx={x2} 
+						cy={y1}
 						r="15"
 						fill={"url(#circleGradient)"}
 						stroke="gray"
@@ -214,8 +227,8 @@ const MacrosSelector = observer(() => {
 						onPointerLeave={handleMouseUp}
 					/>
 					<text
-						x="83"
-						y="105"
+						x={x2}
+						y={y1}
 						textAnchor="middle"
 						alignmentBaseline="middle"
 						fontSize="14"

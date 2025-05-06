@@ -420,8 +420,9 @@ body {
   width: 0;
   overflow: hidden;
   white-space: nowrap; /* предотвращает перенос */
-  transition: opacity 1s ease, width 1s ease;
-}
+  transition: none;
+/*   transition: opacity 1s ease, width 1s ease;
+ */}
 
 .fade-toggle.visible {
   opacity: 1;
@@ -453,6 +454,10 @@ body {
   height: 250px;
 }
 
+.editModal_col_hor {
+  width: 250px;
+  height: 150px;
+}
 
 .modal-content {
   background-color: rgb(234, 234, 238);

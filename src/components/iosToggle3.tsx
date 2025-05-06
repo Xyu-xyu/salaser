@@ -4,7 +4,7 @@ import viewStore from '../store/viewStore';
 import IosToggleForm from './iosToggleForm';
 
 const IosToggle3 = observer(() => {
-	const { selectedMacros, knobs, macrosProperties } = viewStore
+	const { selectedMacros, knobs, macrosProperties, isVertical } = viewStore
 	const param: string = "cross_blow"
 	const knob = knobs[selectedMacros]
 	const property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
@@ -32,7 +32,7 @@ const IosToggle3 = observer(() => {
 							y={-15 + i * 9}
 							className="moderat"
 							fill="var(--knobMainText)"
-							fontSize={10}
+							fontSize={isVertical ? 10 : 7}
 						>
 							{a}
 						</text>

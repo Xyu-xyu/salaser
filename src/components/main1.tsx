@@ -9,11 +9,11 @@ import MacrosEditModalPanel from "./macrosEditModalPanel";
 
 const Main1 = observer(() => {
 
-	const { knobMode } = viewStore
+	const { knobMode, isVertical } = viewStore
 
 	return (
-		<main id="main1" className="h-100 overflow-hidden d-flex w-100 h-100">	
-			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible' : ''} ms-3`}>
+		<main id="main1" className="h-100 overlow-hidden d-flex w-100 h-100">	
+			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible ms-3' : ''} ${ isVertical ? 'mt-3' :""}`}>
 					
 				<div key={0} className="h-125 col-12 vidget">
 					<MacrosSelector />
