@@ -99,6 +99,14 @@ body {
   #CentralBar {
       width: 907px;
   }
+
+  .fade-toggle.visible {
+    opacity: 1;
+    width: 300px !important; /* или фиксированная ширина, если нужно */
+    min-width: 150px !important;
+    max-height: 1900px;
+  }
+  
 }
 
 @media (orientation: landscape) {
@@ -109,6 +117,13 @@ body {
     #CentralBar {
       width: 1747px;
   }
+
+  .fade-toggle.visible {
+    opacity: 1;
+    width: 300px !important; /* или фиксированная ширина, если нужно */
+    min-width: 250px !important;
+    max-height: 1060px;
+  }  
 
 }
 
@@ -424,12 +439,6 @@ body {
 /*   transition: opacity 1s ease, width 1s ease;
  */}
 
-.fade-toggle.visible {
-  opacity: 1;
-  width: 300px !important; /* или фиксированная ширина, если нужно */
-  min-width: 125px !important;
-  max-height: 1920px;
-}
 
 
 .themeDark.svgChart
@@ -544,4 +553,8 @@ body {
   background-color: #bfbfbf !important;
   border: 1px solid #bfbfbf !important;
   color: #484848 !important;
+}
+
+.modal-fullscreen .modal-body {
+   overflow: hidden !important;
 }

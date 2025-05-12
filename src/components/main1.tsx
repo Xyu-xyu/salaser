@@ -4,16 +4,17 @@ import viewStore from "../store/viewStore";
 import MyForm from "./machineForm";
 import MacrosSelector from "./macrosSelector";
 import MacrosEditModalPanel from "./macrosEditModalPanel";
+import Technology from "./technology";
 
 
 
 const Main1 = observer(() => {
 
-	const { knobMode, isVertical } = viewStore
+	const { knobMode } = viewStore
 
 	return (
 		<main id="main1" className="h-100 overlow-hidden d-flex w-100 h-100">	
-			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible ms-3' : ''} ${ isVertical ? 'mt-3' :""}`}>
+			<div className={`h-100 d-flex flex-column fade-toggle ${knobMode ? 'visible ms-3 mt-3' : ''}`}>
 					
 				<div key={0} className="h-125 col-12 vidget">
 					<MacrosSelector />
@@ -55,7 +56,7 @@ const Main1 = observer(() => {
 				<div className="d-flex h-60">
 					<div className="col-8 h-100 p-3">
 						<div className=" vidget col-12 h-100 overflow-y-scroll">
-								<MyForm />
+ 							<Technology />
 							</div>
 							{/* <embed className='w-100 h-100 p-3'
 							src="http://127.0.0.1/editor.html?filename=8339_geos_test.ncp"
@@ -64,8 +65,8 @@ const Main1 = observer(() => {
 					<div className="d-flex flex-column w-100">
 						<div className="col-12 h-100 p-3">
 							<div className=" vidget col-12 h-100 overflow-y-scroll">
-{/* 								<MyForm />
- */}							</div>
+ 								<MyForm />
+							</div>
 						</div>
 					</div>
 				</div>	

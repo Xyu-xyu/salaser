@@ -135,7 +135,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
-			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
+			<div className='col-12 h-100 d-flex align-items-center justify-content-center overflow-hidden'>
 
 				<svg id="svgChart"
 					className="svgChart" version="1.1"
