@@ -4,14 +4,18 @@ import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 
-const MacrosEditModalButton = observer(() => {
+interface MacrosEditModalButtonProps {
+	param: string;
+}
+
+const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) => {
 	const [show, setShow] = useState(false);
 
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
 	const handleContinue = () => {
 		setShow(false)
-		viewStore.setMacrosModalEdit (true)
+		viewStore.setModal (true, param)
 	}
 
 	const { isVertical } = viewStore
@@ -49,7 +53,6 @@ const MacrosEditModalButton = observer(() => {
 						}}
 					/>
 				</svg>
-
 			</g>
 
 			<Modal show={show} onHide={handleClose} size="lg" centered>
@@ -57,7 +60,7 @@ const MacrosEditModalButton = observer(() => {
 					<Modal.Title></Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<h3>Do you want to start macro editing ?</h3>
+					<h3>Do you want to start { param } editing ?</h3>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="secondary" className="mt-4 py-3 px-5 fs-3 close-button" onClick={handleClose}>

@@ -34,6 +34,9 @@ export interface Makro {
 class ViewStore {
     isVertical:boolean = (window.innerHeight > window.innerWidth)
     macrosModalEdit:boolean = false;
+    modulationMacroModalEdit:boolean = false;
+    piercingMacroModalEdit:boolean = false;
+
     mode: string = 'main1'
     theme: string = 'themeLight'
     knobMode: Boolean = true
@@ -89,9 +92,27 @@ class ViewStore {
         this.knobMode = newMode;
     }
 
-    setMacrosModalEdit (val:boolean) {
-        console.log ('setMacrosModalEdit')
-        this.macrosModalEdit =  val
+    setModal (val:boolean, modal:string ) {
+        console.log ('setModalEdit  '+ modal)
+        if (modal === 'macros') {
+
+            this.macrosModalEdit = val
+            this.piercingMacroModalEdit = false
+            this.modulationMacroModalEdit = false
+
+        } else if (modal === 'modulationMacro') {
+
+            this.modulationMacroModalEdit = val
+            this.macrosModalEdit = false
+            this.piercingMacroModalEdit = false
+            
+        } else if (modal === 'piercingMacro') {
+
+            this.piercingMacroModalEdit = val
+            this.modulationMacroModalEdit = false
+            this.macrosModalEdit = false
+
+        }
     }
 
     setVal(param: string, newVal: number, minimum:number, maximum:number) {

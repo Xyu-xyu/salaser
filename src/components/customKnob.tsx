@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useRef, useState } from 'react';
+import MacrosEditModalButton from './macrosEditModalButton';
 import utils from '../scripts/util';
 
 
@@ -37,6 +38,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 	// Безопасно получаем minimum и maximum, если они есть fuck the TSX
 	const minimum = 'minimum' in property ? property.minimum : 0;
 	const maximum = 'maximum' in property ? property.maximum : 1;
+	const isArray = '$wvEnumRef' in property ? property.$wvEnumRef : false;
 
 	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
 	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) / 50 : Number(knobStp)
@@ -136,7 +138,6 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
 			<div className='col-12 h-100 d-flex align-items-center justify-content-center overflow-hidden'>
-
 				<svg id="svgChart"
 					className="svgChart" version="1.1"
 					width="100%" height="100%"
@@ -148,7 +149,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 							<stop offset="100%" stopColor="#cccccc" />
 						</radialGradient>
 					</defs>
-
+					{ isArray && <MacrosEditModalButton param={param} /> }
 					<g ref={svgRef}>
 						<circle
 							cx="50"

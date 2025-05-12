@@ -10,7 +10,7 @@ import MacrosEditList from './macrosEditList';
 
 const MacrosEditModalPanel = observer(() => {
 	const handleClose = () => {
-		viewStore.setMacrosModalEdit(false);
+		viewStore.setModal(false, 'macros');
 	};
 
 	const { isVertical } = viewStore;

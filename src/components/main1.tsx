@@ -4,6 +4,8 @@ import viewStore from "../store/viewStore";
 import MyForm from "./machineForm";
 import MacrosSelector from "./macrosSelector";
 import MacrosEditModalPanel from "./macrosEditModalPanel";
+import PiercingEditModalPanel from "./piercingEditModalPanel";
+import ModulationMacroModalPanel from "./modulationMacroModalPanel"
 import Technology from "./technology";
 
 
@@ -115,6 +117,8 @@ const Main1 = observer(() => {
 				</div>
 			</div>
 			<MacrosEditModalPanel />
+			<PiercingEditModalPanel />
+			<ModulationMacroModalPanel />
 
 		</main>
 	);

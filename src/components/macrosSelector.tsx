@@ -125,7 +125,7 @@ const MacrosSelector = observer(() => {
 							<stop offset="100%" stopColor="#cccccc" />
 						</radialGradient>
 					</defs>
-					{ !macrosModalEdit && <MacrosEditModalButton /> }
+					{ !macrosModalEdit && <MacrosEditModalButton param={"macros"} /> }
 
 					<g ref={svgRef}>
 						<circle
