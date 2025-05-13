@@ -42,23 +42,14 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
 	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) / 50 : Number(knobStp)
 
-	const x1 = isVertical ? 17 : -10
-	const x2 = isVertical ? 83 : 110
-	const x3 = isVertical ? 5 : -30
+	const {
+		x1, x2, x4,
+		y1, y2, y3,
+ 		r1, r2, center,
+		startAngle, sweepAngle
+	  } = utils.getKnobLayout(isVertical);
 
-	const y1 = isVertical ? 105 : 80
-	const y3 = isVertical ? -15 : 10
-
-
-	const r1 = 37.5;
-	const r2 = 38.5;
-	const center = { x: 50, y: 50 };
-	const startAngle = 225;
-	const sweepAngle = 270;
-
-	let fontSize = 80 / Math.max((`${minimum - step}`).length, (`${minimum + step}`).length, (`${maximum - step}`).length, (`${maximum + step}`).length)
-	fontSize = fontSize > 22.5 ? 22.5 : fontSize
-	fontSize = fontSize < 10 ? 10 : fontSize
+	let fontSize = utils.calculateFontSize(minimum, maximum, step);
 
 	const handleMouseDown = (callback: () => void) => {
 		callback();
@@ -193,7 +184,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 					{title.split(', ')[0].split(' ').map((a: string, i: number) => (
 						<text
 							key={i}
-							x={x3}
+							x={x4}
 							y={y3 + i * 9}
 							className="moderat"
 							fill="var(--knobMainText)"
@@ -202,7 +193,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 							{a}
 						</text>
 					))}
-					<text x="30" y="80" className='moderat' 
+					<text x="30" y={y2} className='moderat' 
 						fontSize={isVertical ? 10 : 7} 
 						fill="var(--knobMainText)">
 						{title.split(', ')[1]}

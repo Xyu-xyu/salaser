@@ -2,7 +2,6 @@ import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useRef, useState } from 'react';
 import utils from '../scripts/util';
-import cutting_settings_schema from '../store/cut_settings_schema';
 import cut_settings from '../store/cut_settings';
 
 
@@ -23,29 +22,17 @@ const modulationMacroSelector = observer(() => {
 	if ( settings ) {
 		maximum = settings.length-1
 	}
-
-
-	const x1 = isVertical ? 17 : -10
-	const x2 = isVertical ? 83 : 110
-	const x4 = isVertical ? 5 : -30
-
-	const y1 = isVertical ? 105 : 80
-	const y2 = isVertical ? 80 : 80
-	const y3 = isVertical ? -15 : 10
-
-		
 	const step = 1
 	const stepBig = 1
 
-	const r1 = 37.5;
-	const r2 = 38.5;
-	const center = { x: 50, y: 50 };
-	const startAngle = 225;
-	const sweepAngle = 270;
+	const {
+		x1, x2, x4,
+		y1, y2, y3,
+ 		r1, r2, center,
+		startAngle, sweepAngle
+	  } = utils.getKnobLayout(isVertical);
 
-	let fontSize = 80 / Math.max((`${minimum - step}`).length, (`${minimum + step}`).length, (`${maximum - step}`).length, (`${maximum + step}`).length)
-	fontSize = fontSize > 22.5 ? 22.5 : fontSize
-	fontSize = fontSize < 10 ? 10 : fontSize
+	let fontSize = utils.calculateFontSize(minimum, maximum, step);
 
 	const handleMouseDown = (callback: () => void) => {
 		callback();
