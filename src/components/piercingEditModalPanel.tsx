@@ -20,6 +20,7 @@ const PiercingEditModalPanel = observer(() => {
 			<Modal show={viewStore.piercingMacroModalEdit} onHide={handleClose} centered fullscreen>
 				<Modal.Header closeButton>
 					<Modal.Title>
+						{"Xуй"}
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
@@ -34,7 +35,7 @@ const PiercingEditModalPanel = observer(() => {
 
 										<div className="editModal_row" key={5 + i}>
 											<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-												<CustomKnob index={5 + i} param={a} />
+												<CustomKnob param={a} />
 											</div>
 										</div>
 									))}

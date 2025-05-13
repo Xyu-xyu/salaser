@@ -6,16 +6,15 @@ import utils from '../scripts/util';
 
 
 interface CustomKnobProps {
-	index: number;
 	param: string;
 }
 
-const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
+const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-	const { knobs, knobPath, knobStep, selectedMacros, macrosProperties, knobRound, isVertical } = viewStore
+	const { knobs, knobStep, selectedMacros, macrosProperties, knobRound, isVertical } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
 	const knob = knobs[selectedMacros]
@@ -97,7 +96,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 
 	useEffect(() => {
 		const path = utils.getPath(val, minimum, maximum, sweepAngle, r1, r2, startAngle);
-		viewStore.setKnobPath(index, path)
+		viewStore.setKnobPath(param, path)
 
 	}, [selectedMacros, val]);
 
@@ -178,7 +177,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ index, param }) => {
 						}
 
 						<path
-							d={`${knobPath[index]}`}
+							d={ viewStore.getKnobPath(param) }
 							fill="var(--knobMainText)"
 							stroke="var(--knobMainText)"
 							strokeWidth="2"

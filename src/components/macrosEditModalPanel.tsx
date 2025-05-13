@@ -48,34 +48,19 @@ const MacrosEditModalPanel = observer(() => {
 							{[
 								"pressure",
 								"power_W_mm",
-								//"gas": "AIR",
-								"focus",
-								//"enabled": false,
-								"feedLimit_mm_s",
-								//"cross_blow": false,
-								//"type": "CW",
-								//"modulationMacro",
-								//"height",
-								//"modulationFrequency_Hz",
-							].map((a: string, i: number) => (
+ 								"focus",
+ 								"feedLimit_mm_s",
+ 							].map((a: string, i: number) => (
 
 								<div className="editModal_row" key={i + 1}>
 									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-										<CustomKnob param={a} index={i + 1} />
+										<CustomKnob param={a} />
 									</div>
 								</div>
 							))}
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
-							{[
-								//"pressure",
-								//"power_W_mm",
-								//"gas": "AIR",
-								//"focus",
-								//"enabled": false,
-								//"feedLimit_mm_s",
-								//"cross_blow": false,
-								//"type": "CW",
+							{[								 
 								"modulationMacro",
 								"height",
 								"modulationFrequency_Hz",
@@ -84,7 +69,7 @@ const MacrosEditModalPanel = observer(() => {
 
 								<div className="editModal_row" key={5 + i}>
 									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-										<CustomKnob index={5 + i} param={a} />
+										<CustomKnob param={a} />
 									</div>
 								</div>
 							))}

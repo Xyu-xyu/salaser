@@ -2,44 +2,29 @@ import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useRef, useState } from 'react';
 import utils from '../scripts/util';
-import cutting_settings from '../store/cut_settings_schema';
+import cutting_settings_schema from '../store/cut_settings_schema';
+import cut_settings from '../store/cut_settings';
 
 
 const modulationMacroSelector = observer(() => {
-	const index= 30;
-	const key =  "modulationMacros"
+	const param =  "modulationMacros"
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
-
-	const { knobPath, selectedMacros, isVertical } = viewStore
+	const { knobs, selectedMacros, isVertical, selectedModulationMacro } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
-
-	let minimum:number = 0 
+ 	let minimum:number = 0 
 	let maximum:number = 0
-	let title: string = "Без названия";	
-	const params = utils.findByKey(cutting_settings, key)[0];
-	console.log (params)
+	let title: string = "Индекс импульсного режима";	
+	//const params = utils.findByKey(cutting_settings_schema, param)[0];
+	const settings = utils.findByKey(cut_settings, param)[0];
 
-	if (params && typeof params === 'object' && 'title' in params && typeof params.title === 'string') {
-	  title = params.title;
+	if ( settings ) {
+		maximum = settings.length-1
 	}
 
-	if (params && typeof params === 'object' && 'maxItems' in params && typeof params.maxItems === 'number') {
-		maximum = params.maxItems-1;
-	}
 
-	if (params && typeof params === 'object' && 'type' in params && typeof params.type === 'string' && params.type === 'array') {
-		minimum = 0;
-	}
-
-	console.log ("minimun "+ minimum)
-	console.log ("maximum "+ maximum)
-	console.log ("title "+ title)
-
-
-	
 	const x1 = isVertical ? 17 : -10
 	const x2 = isVertical ? 83 : 110
 	const x4 = isVertical ? 5 : -30
@@ -92,42 +77,47 @@ const modulationMacroSelector = observer(() => {
 
 		let normalizedAngle = (angle - 225 + 360) % 360;
 		const newValue = Math.round((normalizedAngle / 270) * (maximum - minimum) + minimum);
-		viewStore.setVal('selector', newValue, minimum, maximum);
+		viewStore.setSelectedModulationMacro( newValue );
 
 	};
 
 	useEffect(() => {
+		const knob = knobs[selectedMacros]
+		let val = knob.cutting['modulationMacro']
+		const path = utils.getPath( val, minimum, maximum, sweepAngle, r1, r2, startAngle);
+		viewStore.setKnobPath( param, path)
+		viewStore.setSelectedModulationMacro( val )		
 
-		const path = utils.getPath(selectedMacros, minimum, maximum, sweepAngle, r1, r2, startAngle);
-		viewStore.setKnobPath(index, path)
-
-	}, [ selectedMacros]);
+	}, []);
 
 
 	useEffect(() => {
 		const svg = svgRef.current;
 		if (!svg) return;
 
+		const path = utils.getPath( selectedModulationMacro, minimum, maximum, sweepAngle, r1, r2, startAngle);
+		viewStore.setKnobPath( param, path)
+
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
-			const newValue = selectedMacros + (e.deltaY < 0 ? step : -step)
-			viewStore.setVal('selector', newValue, minimum, maximum);
+			const newValue = selectedModulationMacro + (e.deltaY < 0 ? step : -step)
+			viewStore.setSelectedModulationMacro( newValue );			
 		};
 
 		svg.addEventListener('wheel', handleWheel);
 		return () => {
 			svg.removeEventListener('wheel', handleWheel);
 		};
-	}, [selectedMacros]);
+	}, [ selectedModulationMacro ]);
 
 	const increase = () => {
-		let newval = selectedMacros + stepBig
-		viewStore.setVal('selector', newval, minimum, maximum);
+		let newval = selectedModulationMacro + stepBig
+		viewStore.setSelectedModulationMacro( newval );
 	}
 
 	const decrease = () => {
-		let newval = selectedMacros - stepBig
-		viewStore.setVal('selector', newval, minimum, maximum);
+		let newval = selectedModulationMacro - stepBig
+		viewStore.setSelectedModulationMacro( newval );
 	}
 
 	return (
@@ -172,7 +162,7 @@ const modulationMacroSelector = observer(() => {
 						}
 
 						<path
-							d={`${knobPath[index]}`}
+							d={ viewStore.getKnobPath(param)}
 							fill="var(--knobMainText)"
 							stroke="var(--knobMainText)"
 							strokeWidth="2"
@@ -182,7 +172,7 @@ const modulationMacroSelector = observer(() => {
 							}}
 						/>
 						<text x={83} y={60} textAnchor="end" fontSize={fontSize} className='segments14' fill="var(--knobMainText)">
-							{ selectedMacros }
+							{ selectedModulationMacro }
 						</text>
 					</g>
 					{title.split(', ')[0].split(' ').map((a, i) => (

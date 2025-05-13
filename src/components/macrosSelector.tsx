@@ -6,12 +6,12 @@ import utils from '../scripts/util';
 
 
 const MacrosSelector = observer(() => {
-	const index= 0;
+	const param = 'macros'
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const rect = svgRef.current?.getBoundingClientRect();
 
-	const { knobs, knobPath, selectedMacros, macrosModalEdit, isVertical } = viewStore
+	const { knobs, selectedMacros, macrosModalEdit, isVertical } = viewStore
 	const [isDragging, setIsDragging] = useState(false);
 
 	const minimum = 0 
@@ -79,7 +79,7 @@ const MacrosSelector = observer(() => {
 	useEffect(() => {
 
 		const path = utils.getPath(selectedMacros, minimum, maximum, sweepAngle, r1, r2, startAngle);
-		viewStore.setKnobPath(index, path)
+		viewStore.setKnobPath('macros', path)
 
 	}, [ selectedMacros]);
 
@@ -155,7 +155,7 @@ const MacrosSelector = observer(() => {
 						}
 
 						<path
-							d={`${knobPath[index]}`}
+							d={viewStore.getKnobPath(param) }
 							fill="var(--knobMainText)"
 							stroke="var(--knobMainText)"
 							strokeWidth="2"
