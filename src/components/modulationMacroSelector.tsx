@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import utils from '../scripts/util';
 import cut_settings from '../store/cut_settings';
 
@@ -9,14 +9,11 @@ const modulationMacroSelector = observer(() => {
 	const param =  "modulationMacros"
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const rect = svgRef.current?.getBoundingClientRect();
 	const { knobs, selectedMacros, isVertical, selectedModulationMacro } = viewStore
-	const [isDragging, setIsDragging] = useState(false);
 
  	let minimum:number = 0 
 	let maximum:number = 0
 	let title: string = "Индекс импульсного режима";	
-	//const params = utils.findByKey(cutting_settings_schema, param)[0];
 	const settings = utils.findByKey(cut_settings, param)[0];
 
 	if ( settings ) {
@@ -28,7 +25,7 @@ const modulationMacroSelector = observer(() => {
 	const {
 		x1, x2, x4,
 		y1, y2, y3,
- 		r1, r2, center,
+ 		r1, r2, 
 		startAngle, sweepAngle
 	  } = utils.getKnobLayout(isVertical);
 
@@ -41,31 +38,6 @@ const modulationMacroSelector = observer(() => {
 
 	const handleMouseUp = () => {
 		if (intervalRef.current) clearInterval(intervalRef.current);
-	};
-
-	const startMove = () => setIsDragging(true)
-	const endMove = () => setIsDragging(false);
-
-	const move = (e: React.PointerEvent<SVGElement>) => {
-		if (!rect || !isDragging) return;
-
-		const x = e.clientX - rect.left;
-		const y = e.clientY - rect.top;
-
-		// Координаты в системе viewBox
-		const svgX = (x / rect.width) * 100;
-		const svgY = (y / rect.height) * 100;
-
-		const dx = svgX - center.x;
-		const dy = svgY - center.y;
-
-		let angle = Math.atan2(dy, dx) * (180 / Math.PI); // угол в градусах
-		angle = (angle + 360) % 360;
-
-		let normalizedAngle = (angle - 225 + 360) % 360;
-		const newValue = Math.round((normalizedAngle / 270) * (maximum - minimum) + minimum);
-		viewStore.setSelectedModulationMacro( newValue );
-
 	};
 
 	useEffect(() => {
@@ -130,12 +102,6 @@ const modulationMacroSelector = observer(() => {
 							stroke="gray"
 							strokeWidth="1"
 							filter="var(--shadow)"
-							onPointerDown={startMove}
-							onPointerUp={endMove}
-							onPointerLeave={endMove}
-							onPointerCancel={endMove}
-							onPointerMove={move}
-
 						/>
 
 						{ 

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import MacrosEditModalButton from './macrosEditModalButton';
 import utils from '../scripts/util';
 
@@ -12,10 +12,7 @@ interface CustomKnobProps {
 const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const rect = svgRef.current?.getBoundingClientRect();
-
 	const { knobs, knobStep, selectedMacros, macrosProperties, knobRound, isVertical } = viewStore
-	const [isDragging, setIsDragging] = useState(false);
 
 	const knob = knobs[selectedMacros]
 	const knobStp = knobStep[param]
@@ -45,7 +42,7 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 	const {
 		x1, x2, x4,
 		y1, y2, y3,
- 		r1, r2, center,
+ 		r1, r2, 
 		startAngle, sweepAngle
 	  } = utils.getKnobLayout(isVertical);
 
@@ -58,31 +55,6 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 
 	const handleMouseUp = () => {
 		if (intervalRef.current) clearInterval(intervalRef.current);
-	};
-
-	const startMove = () => setIsDragging(true)
-	const endMove = () => setIsDragging(false);
-
-	const move = (e: React.PointerEvent<SVGElement>) => {
-		if (!rect || !isDragging) return;
-
-		const x = e.clientX - rect.left;
-		const y = e.clientY - rect.top;
-
-		// Координаты в системе viewBox
-		const svgX = (x / rect.width) * 100;
-		const svgY = (y / rect.height) * 100;
-
-		const dx = svgX - center.x;
-		const dy = svgY - center.y;
-
-		let angle = Math.atan2(dy, dx) * (180 / Math.PI); // угол в градусах
-		angle = (angle + 360) % 360;
-
-		let normalizedAngle = (angle - 225 + 360) % 360;
-		const newValue = Math.round((normalizedAngle / 270) * (maximum - minimum) + minimum);
-		viewStore.setVal(param, newValue, minimum, maximum);
-
 	};
 
 	useEffect(() => {
@@ -149,12 +121,6 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 							stroke="gray"
 							strokeWidth="1"
 							filter="var(--shadow)"
-							onPointerDown={startMove}
-							onPointerUp={endMove}
-							onPointerLeave={endMove}
-							onPointerCancel={endMove}
-							onPointerMove={move}
-
 						/>
 
 						{ 
