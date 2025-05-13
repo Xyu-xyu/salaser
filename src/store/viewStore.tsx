@@ -51,7 +51,9 @@ class ViewStore {
         modulationMacro: 1,
         height: 1,
         modulationFrequency_Hz: 1,
-        piercingMacro: 1
+        piercingMacro: 1,
+        pulseFill_percent:1,
+		pulseFrequency_Hz:1
         
     };
 
@@ -63,7 +65,9 @@ class ViewStore {
         modulationMacro: 0,
         height: 1,
         modulationFrequency_Hz: 0,
-        piercingMacro:0
+        piercingMacro:0,
+        pulseFill_percent:0,
+		pulseFrequency_Hz:0
     };
       
     knobs = cut_settings.result.technology.macros;

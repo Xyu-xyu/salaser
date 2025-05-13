@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
-import CustomKnob from './customKnob';
 import ModulationMacroSelector from './modulationMacroSelector';
+import UniversalKnob from './universalKnob';
 
 
 const ModulationMacroModalPanel = observer(() => {
@@ -25,29 +25,25 @@ const ModulationMacroModalPanel = observer(() => {
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 							<div key={0} className="editModal_row">
 								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-									<ModulationMacroSelector />
-								
+									<ModulationMacroSelector />								
 								</div>
 							</div>
- 
-
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")} >
-							<div key={0} className="editModal_row">
-								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-								{/* {[								 
- 								 	"modulationMacro",
-									].map((a: string, i: number) => (
-		
-										<div className="editModal_row" key={5 + i}>
-											<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-												<CustomKnob index={5 + i} param={a} />
-											</div>
+							
+							{	[								 
+									"pulseFill_percent",
+									"pulseFrequency_Hz",
+									/* "name" */										
+								].map((a: string, i: number) => (
+	
+									<div className="editModal_row" key={i}>
+										<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+											<UniversalKnob param={a} />
 										</div>
-								))} */}
-								
-								</div>
-							</div>
+									</div>
+								))
+							} 
 						 
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
