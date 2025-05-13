@@ -2,10 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 import CustomKnob from './customKnob';
-import MacrosSelector from './macrosSelector';
-import IosToggle3 from './iosToggle3';
-import IosToggle4 from './iosToggle4';
-import MacrosEditList from './macrosEditList';
+import ModulationMacroSelector from './modulationMacroSelector';
 
 
 const ModulationMacroModalPanel = observer(() => {
@@ -20,6 +17,7 @@ const ModulationMacroModalPanel = observer(() => {
 			<Modal show={viewStore.modulationMacroModalEdit} onHide={handleClose} centered fullscreen>
 				<Modal.Header closeButton>
 					<Modal.Title>
+					<h1>{"ПИЗДА"}</h1>
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
@@ -27,7 +25,17 @@ const ModulationMacroModalPanel = observer(() => {
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 							<div key={0} className="editModal_row">
 								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-								{[								 
+									<ModulationMacroSelector />
+								
+								</div>
+							</div>
+ 
+
+						</div>
+						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")} >
+							<div key={0} className="editModal_row">
+								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+								{/* {[								 
  								 	"modulationMacro",
 									].map((a: string, i: number) => (
 		
@@ -36,13 +44,10 @@ const ModulationMacroModalPanel = observer(() => {
 												<CustomKnob index={5 + i} param={a} />
 											</div>
 										</div>
-								))}
+								))} */}
+								
 								</div>
 							</div>
- 
-
-						</div>
-						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")} >
 						 
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>

@@ -97,6 +97,25 @@ class Utils {
             </>
         );
     }
+
+    findByKey(obj: any, keyToFind: string): any[] {
+    
+        const results: any[] = [];
+            function recursiveSearch(obj: any) {
+            if (typeof obj !== 'object' || obj === null) return;
+    
+            for (const key in obj) {
+                if (key === keyToFind) {
+                    results.push(obj[key]);
+                }
+                recursiveSearch(obj[key]);
+            }
+        }
+    
+        recursiveSearch(obj);
+        return results;
+    }
+    
 }
 
 const utils = new Utils();
