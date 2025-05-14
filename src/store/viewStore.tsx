@@ -71,6 +71,7 @@ class ViewStore {
     };
       
     knobs = cut_settings.result.technology.macros;
+    technology = cut_settings.result.technology
     macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
 
     setIsVertical (val:boolean) {

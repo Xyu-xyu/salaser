@@ -8,29 +8,58 @@ import MacrosEditModalButton from './macrosEditModalButton'
 
 interface CustomKnobProps {
 	param: string;
+	keyParam: string;
 }
 
-const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
+
+const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) => {
 	const svgRef = useRef<SVGGElement>(null);
-	const {isVertical, knobStep, knobRound  } = viewStore	
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const {isVertical, knobStep, knobRound, selectedMacros, selectedModulationMacro, technology } = viewStore	
 	let property = utils.findByKey(cutting_settings_schema, param)[0]
 	let {minimum, maximum, title } = property
-	let val = 0
 	const isArray = '$wvEnumRef' in property ? property.$wvEnumRef : false;
-	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const knobStp = 1//knobStep[param]||1
 	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
 	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) / 50 : Number(knobStp)
+	let fontSize = utils.calculateFontSize(minimum, maximum, step);
 	const {
 		x1, x2, x4,
 		y1, y2, y3,
  		r1, r2, 
 		startAngle, sweepAngle
-	  } = utils.getKnobLayout(isVertical);
-	
-	  let fontSize = utils.calculateFontSize(minimum, maximum, step);
+	} = utils.getKnobLayout(isVertical);
 
+	let val=0
+	if (keyParam === 'macros') {
+		const knob = technology[selectedMacros]	
+		val = Number(knob.cutting[param as keyof typeof knob.cutting]);
+		if (param === 'piercingMacro') {
+			val = Number(knob[param as keyof typeof knob]);
+		}
+	} else if (keyParam === 'modulationMacros') {
+		console.log ('modulationMacros')
+		val =technology.modulationMacros[selectedModulationMacro][param]
+	}
+ 
 
+	useEffect(()=>{
+		if (keyParam === 'macros') {
+			const knob = technology[selectedMacros]	
+			val = Number(knob.cutting[param as keyof typeof knob.cutting]);
+			if (param === 'piercingMacro') {
+				val = Number(knob[param as keyof typeof knob]);
+			}
+		} else if (keyParam === 'modulationMacros') {
+			console.log ('modulationMacros')
+			val=technology.modulationMacros[selectedModulationMacro][param]
+			console.log ('modulationMacros' + val)
+		}
+
+		const path = utils.getPath(Number(val), minimum, maximum, sweepAngle, r1, r2, startAngle);
+		viewStore.setKnobPath(param, path)
+
+	},[	selectedMacros, selectedModulationMacro]) 
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
@@ -78,7 +107,12 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 								transition: "none"
 							}}
 						/>
-						<text x={83} y={60} textAnchor="end" fontSize={fontSize} className='segments14' fill="var(--knobMainText)">
+						<text x={83} y={60} 
+							textAnchor="end" 
+							fontSize={fontSize} 
+							className='segments14 value' 
+							fill="var(--knobMainText)"
+							>
 							{knobRound[param] !== 0 ? (Math.round(val) - val === 0 ? String(val) + '.0' : val) : val}
 						</text>
 					</g>
