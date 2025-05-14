@@ -19,7 +19,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 	let property = utils.findByKey(cutting_settings_schema, param)[0]
 	let {minimum, maximum, title } = property
 	const isArray = '$wvEnumRef' in property ? property.$wvEnumRef : false;
-	const knobStp = 1//knobStep[param]||1
+	const knobStp = knobStep[param]
 	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
 	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) / 50 : Number(knobStp)
 	let fontSize = utils.calculateFontSize(minimum, maximum, step);
@@ -40,6 +40,8 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 	} else if (keyParam === 'modulationMacros') {
 		val =technology.modulationMacros[selectedModulationMacro][param]
 	} else if (keyParam === 'piercingMacros') {
+		console.log ('param  '+param)
+		console.log ('param  '+param)
 		val=technology.piercingMacros[selectedPiercingMacro][param]
 	}
 

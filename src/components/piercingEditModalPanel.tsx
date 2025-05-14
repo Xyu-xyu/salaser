@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
-import CustomKnob from './customKnob';
+import PiercingMacroSelector from './piercingMacroSelector';
 import UniversalKnob from './universalKnob';
 
 
@@ -25,17 +25,8 @@ const PiercingEditModalPanel = observer(() => {
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 							<div key={0} className="editModal_row">
 								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>								
-
-									{[								 
-										"piercingMacro"
-									].map((a: string, i: number) => (
-
-										<div className="editModal_row" key={5 + i}>
-											<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-												<CustomKnob param={a} />
-											</div>
-										</div>
-									))}
+									<PiercingMacroSelector />
+								
 								</div>
 							</div>						
 						</div>

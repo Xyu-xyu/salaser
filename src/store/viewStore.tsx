@@ -76,7 +76,7 @@ class ViewStore {
         pulseFill_percent:0,
 		pulseFrequency_Hz:0,
         initial_modulationFrequency_Hz:0,
-        initial_pressure:0,
+        initial_pressure:1,
         initial_modulationMacro:0,
         initial_power:1,
         initial_focus:1,
@@ -173,18 +173,20 @@ class ViewStore {
     setSelectedMacros ( newVal: number) {
         if (newVal < 0) newVal = 0
         if (newVal > this.knobs.length-1) newVal = this.knobs.length-1
-        this.selectedMacros = newVal;            "initial_modulationFrequency_Hz"
-        "initial_pressure"
-        "initial_modulationMacro"
-        "initial_power"
-        "initial_focus"
-        "initial_height"
+        this.selectedMacros = newVal;
     }
 
     setSelectedModulationMacro  ( newVal: number) {
         if (newVal < 0) newVal = 0
         if (newVal > 15) newVal = 15
         this.selectedModulationMacro = newVal;
+    }
+
+    setSelectedPiercingMacro  ( newVal: number) {
+        if (newVal < 0) newVal = 0
+        if (newVal > 7) newVal = 7
+        console.log ('setSelectedPiercingMacro ' + newVal)
+        this.selectedPiercingMacro = newVal;
     }
 
     getTecnologyValue (param:string, keyParam:string) {
