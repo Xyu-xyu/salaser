@@ -37,6 +37,7 @@ class ViewStore {
     modulationMacroModalEdit:boolean = false;
     piercingMacroModalEdit:boolean = false;
     selectedModulationMacro:number = 0
+    selectedPiercingMacro:number = 0
 
     mode: string = 'main1'
     theme: string = 'themeLight'
@@ -53,7 +54,13 @@ class ViewStore {
         modulationFrequency_Hz: 1,
         piercingMacro: 1,
         pulseFill_percent:1,
-		pulseFrequency_Hz:1
+		pulseFrequency_Hz:1,
+        initial_modulationFrequency_Hz:1,
+        initial_pressure:0.1,
+        initial_modulationMacro:1,
+        initial_power:100,
+        initial_focus:0.1,
+        initial_height:1
         
     };
 
@@ -67,7 +74,13 @@ class ViewStore {
         modulationFrequency_Hz: 0,
         piercingMacro:0,
         pulseFill_percent:0,
-		pulseFrequency_Hz:0
+		pulseFrequency_Hz:0,
+        initial_modulationFrequency_Hz:0,
+        initial_pressure:0,
+        initial_modulationMacro:0,
+        initial_power:1,
+        initial_focus:1,
+        initial_height:1
     };
       
     knobs = cut_settings.result.technology.macros;
@@ -160,13 +173,41 @@ class ViewStore {
     setSelectedMacros ( newVal: number) {
         if (newVal < 0) newVal = 0
         if (newVal > this.knobs.length-1) newVal = this.knobs.length-1
-        this.selectedMacros = newVal;
+        this.selectedMacros = newVal;            "initial_modulationFrequency_Hz"
+        "initial_pressure"
+        "initial_modulationMacro"
+        "initial_power"
+        "initial_focus"
+        "initial_height"
     }
 
     setSelectedModulationMacro  ( newVal: number) {
         if (newVal < 0) newVal = 0
         if (newVal > 15) newVal = 15
         this.selectedModulationMacro = newVal;
+    }
+
+    getTecnologyValue (param:string, keyParam:string) {
+        if (keyParam === 'macros') {
+            return this.technology.macros[this.selectedMacros][param]	
+        } else if (keyParam === 'modulationMacros') {
+             return this.technology.modulationMacros[this.selectedModulationMacro][param]
+        } else if (keyParam === 'piercingMacros') {
+            return this.technology.piercingMacros[this.selectedPiercingMacro][param]
+        } 
+    }
+
+    setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number) {
+        if (newVal < minimum) newVal = minimum
+        if (newVal > maximum) newVal = maximum
+        if (keyParam === 'macros') {
+            this.technology.macros[this.selectedMacros][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+        } else if (keyParam === 'modulationMacros') {
+            this.technology.modulationMacros[this.selectedModulationMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+        } else if (keyParam === 'piercingMacros') {
+            this.technology.piercingMacros[this.selectedPiercingMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+        } 
+
     }
 }
 

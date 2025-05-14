@@ -17,7 +17,7 @@ const ModulationMacroModalPanel = observer(() => {
 			<Modal show={viewStore.modulationMacroModalEdit} onHide={handleClose} centered fullscreen>
 				<Modal.Header closeButton>
 					<Modal.Title>
-					<h1>{"ПИЗДА"}</h1>
+					<h1>{"modulationMacro"}</h1>
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>

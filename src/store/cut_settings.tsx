@@ -1868,86 +1868,86 @@ const cut_settings= JSON.parse(`{
           }
         ],
         "modulationMacros": [
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          },
-          {
-            "pulseFill_percent": 50.0,
-            "name": "Unknown modulation macro",
-            "pulseFrequency_Hz": 0
-          }
+            {
+              "pulseFill_percent": 0.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 0
+            },
+            {
+              "pulseFill_percent": 7.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 67
+            },
+            {
+              "pulseFill_percent": 13.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 134
+            },
+            {
+              "pulseFill_percent": 20.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 201
+            },
+            {
+              "pulseFill_percent": 27.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 268
+            },
+            {
+              "pulseFill_percent": 33.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 335
+            },
+            {
+              "pulseFill_percent": 40.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 402
+            },
+            {
+              "pulseFill_percent": 47.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 469
+            },
+            {
+              "pulseFill_percent": 53.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 536
+            },
+            {
+              "pulseFill_percent": 60.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 603
+            },
+            {
+              "pulseFill_percent": 67.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 670
+            },
+            {
+              "pulseFill_percent": 73.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 737
+            },
+            {
+              "pulseFill_percent": 80.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 804
+            },
+            {
+              "pulseFill_percent": 87.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 871
+            },
+            {
+              "pulseFill_percent": 93.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 938
+            },
+            {
+              "pulseFill_percent": 100.0,
+              "name": "Unknown modulation macro",
+              "pulseFrequency_Hz": 1000
+            }          
         ],
         "feeding": {
           "feedLimit_mm_s": 50000

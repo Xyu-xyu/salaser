@@ -15,7 +15,7 @@ interface CustomKnobProps {
 const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const {isVertical, knobStep, knobRound, selectedMacros, selectedModulationMacro, technology } = viewStore	
+	const {isVertical, knobStep, knobRound, selectedMacros, selectedModulationMacro, technology, selectedPiercingMacro } = viewStore	
 	let property = utils.findByKey(cutting_settings_schema, param)[0]
 	let {minimum, maximum, title } = property
 	const isArray = '$wvEnumRef' in property ? property.$wvEnumRef : false;
@@ -38,10 +38,10 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 			val = Number(knob[param as keyof typeof knob]);
 		}
 	} else if (keyParam === 'modulationMacros') {
-		console.log ('modulationMacros')
 		val =technology.modulationMacros[selectedModulationMacro][param]
+	} else if (keyParam === 'piercingMacros') {
+		val=technology.piercingMacros[selectedPiercingMacro][param]
 	}
- 
 
 	useEffect(()=>{
 		if (keyParam === 'macros') {
@@ -51,15 +51,61 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 				val = Number(knob[param as keyof typeof knob]);
 			}
 		} else if (keyParam === 'modulationMacros') {
-			console.log ('modulationMacros')
 			val=technology.modulationMacros[selectedModulationMacro][param]
-			console.log ('modulationMacros' + val)
+		} else if (keyParam === 'piercingMacros') {
+			val=technology.piercingMacros[selectedPiercingMacro][param]
 		}
 
 		const path = utils.getPath(Number(val), minimum, maximum, sweepAngle, r1, r2, startAngle);
 		viewStore.setKnobPath(param, path)
 
 	},[	selectedMacros, selectedModulationMacro]) 
+
+	const handleMouseDown = (callback: () => void) => {
+		callback();
+		intervalRef.current = setInterval(callback, 50);
+	};
+
+	const handleMouseUp = () => {
+		if (intervalRef.current) clearInterval(intervalRef.current);
+	};
+
+	useEffect(() => {
+		const path = utils.getPath(val, minimum, maximum, sweepAngle, r1, r2, startAngle);
+		viewStore.setKnobPath(param, path)
+
+	}, [selectedMacros, val]);
+
+
+	useEffect(() => {
+		const svg = svgRef.current;
+		if (!svg) return;
+
+		const handleWheel = (e: WheelEvent) => {
+			e.preventDefault();
+			setVal( (e.deltaY < 0 ? step : -step));
+		};
+
+		svg.addEventListener('wheel', handleWheel);
+		return () => {
+			svg.removeEventListener('wheel', handleWheel);
+		};
+	}, [selectedMacros]);
+
+	const increase = () => {
+		setVal( stepBig );
+	}
+
+	const decrease = () => {
+		setVal( -stepBig);
+	}
+
+	const setVal =(step:number) =>{
+		let currentValue= viewStore.getTecnologyValue(param, keyParam)
+		let newValue = currentValue + step
+		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum )
+	}
+	
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
@@ -145,9 +191,9 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 						stroke="gray"
 						strokeWidth="1"
 						filter="var(--shadow)"
-						/* onPointerDown={() => handleMouseDown(decrease)}
+						onPointerDown={() => handleMouseDown(decrease)}
 						onPointerUp={handleMouseUp}
-						onPointerLeave={handleMouseUp} */
+						onPointerLeave={handleMouseUp} 
 					/>
 					<text
 						x={x1}
@@ -170,9 +216,9 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 						stroke="gray"
 						strokeWidth="1"
 						filter="var(--shadow)"
-					/* 	onPointerDown={() => handleMouseDown(increase)}
+						onPointerDown={() => handleMouseDown(increase)}
 						onPointerUp={handleMouseUp}
-						onPointerLeave={handleMouseUp} */
+						onPointerLeave={handleMouseUp}
 					/>
 					<text
 						x={x2}

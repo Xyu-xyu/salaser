@@ -2,10 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 import CustomKnob from './customKnob';
-import MacrosSelector from './macrosSelector';
-import IosToggle3 from './iosToggle3';
-import IosToggle4 from './iosToggle4';
-import MacrosEditList from './macrosEditList';
+import UniversalKnob from './universalKnob';
 
 
 const PiercingEditModalPanel = observer(() => {
@@ -20,7 +17,7 @@ const PiercingEditModalPanel = observer(() => {
 			<Modal show={viewStore.piercingMacroModalEdit} onHide={handleClose} centered fullscreen>
 				<Modal.Header closeButton>
 					<Modal.Title>
-						{"Xуй"}
+						{"piercingMacro"}
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
@@ -43,9 +40,39 @@ const PiercingEditModalPanel = observer(() => {
 							</div>						
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")} >
-						 
+
+							{	
+								[								 
+								"initial_modulationFrequency_Hz",
+								"initial_pressure",
+								"initial_modulationMacro",
+								].map((a: string, i: number) => (
+
+									<div className="editModal_row" key={i}>
+										<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+											<UniversalKnob param={a}  keyParam={'piercingMacros'}/>
+										</div>
+									</div>
+								))
+							} 
+					
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+
+							{	
+								[								 
+								"initial_power",
+								"initial_focus",
+								"initial_height",									
+								].map((a: string, i: number) => (
+
+									<div className="editModal_row" key={i}>
+										<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+											<UniversalKnob param={a}  keyParam={'piercingMacros'}/>
+										</div>
+									</div>
+								))
+							} 
 						
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' +  (isVertical ? "mt-10" : "mt-4")}>
