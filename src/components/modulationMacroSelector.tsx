@@ -9,7 +9,7 @@ const modulationMacroSelector = observer(() => {
 	const param =  "modulationMacros"
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const { knobs, selectedMacros, isVertical, selectedModulationMacro } = viewStore
+	const { technology, selectedMacros, isVertical, selectedModulationMacro } = viewStore
 
  	let minimum:number = 0 
 	let maximum:number = 0
@@ -41,7 +41,7 @@ const modulationMacroSelector = observer(() => {
 	};
 
 	useEffect(() => {
-		const knob = knobs[selectedMacros]
+		const knob = technology.macros[selectedMacros]
 		let val = knob.cutting['modulationMacro']
 		const path = utils.getPath( val, minimum, maximum, sweepAngle, r1, r2, startAngle);
 		viewStore.setKnobPath( param, path)

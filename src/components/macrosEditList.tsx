@@ -6,8 +6,8 @@ import viewStore from '../store/viewStore';
   
  const MacrosEditList: React.FC<{ param: string }> = observer(({ param }) => {
 
-	const { knobs, selectedMacros, macrosProperties } = viewStore
-	const knob = knobs[selectedMacros]
+	const { technology, selectedMacros, macrosProperties } = viewStore
+	const knob = technology.macros[selectedMacros]
 	const val = knob.cutting[param as keyof typeof knob.cutting];
 	let property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 	const { title } = property;	

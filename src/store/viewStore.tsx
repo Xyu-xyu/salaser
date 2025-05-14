@@ -83,7 +83,6 @@ class ViewStore {
         initial_height:1
     };
       
-    knobs = cut_settings.result.technology.macros;
     technology = cut_settings.result.technology
     macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
 
@@ -146,7 +145,7 @@ class ViewStore {
             console.log ( arguments )
             if (newVal < minimum) newVal = minimum
             if (newVal > maximum) newVal = maximum
-            const macro = this.knobs[this.selectedMacros];    
+            const macro = this.technology.macros[this.selectedMacros];    
 
             if (param in macro.cutting) {
                 (macro.cutting as any)[param] = Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
@@ -157,14 +156,14 @@ class ViewStore {
     }
 
     setValBoolean (param: string, newVal: boolean,) {
-        const macro = this.knobs[this.selectedMacros];  
+        const macro = this.technology.macros[this.selectedMacros];  
         if (param in macro.cutting) {
             (macro.cutting as any)[param] = newVal
         }  
     }
 
     setValString (param: string, newVal: string,) {
-        const macro = this.knobs[this.selectedMacros];  
+        const macro = this.technology.macros[this.selectedMacros];  
         if (param in macro.cutting) {
             (macro.cutting as any)[param] = newVal
         }  
@@ -172,7 +171,7 @@ class ViewStore {
     
     setSelectedMacros ( newVal: number) {
         if (newVal < 0) newVal = 0
-        if (newVal > this.knobs.length-1) newVal = this.knobs.length-1
+        if (newVal > this.technology.macros.length-1) newVal = this.technology.macros.length-1
         this.selectedMacros = newVal;
     }
 

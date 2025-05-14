@@ -9,10 +9,10 @@ const MacrosSelector = observer(() => {
 	const param = 'macros'
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const { knobs, selectedMacros, macrosModalEdit, isVertical } = viewStore
+	const { technology, selectedMacros, macrosModalEdit, isVertical } = viewStore
  
 	const minimum = 0 
-	const maximum = knobs.length-1  
+	const maximum = technology.macros-1  
 	const title = "Выбранный макрос, index"
 	const step = 1
 	const stepBig = 1

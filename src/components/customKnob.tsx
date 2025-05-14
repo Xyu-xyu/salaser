@@ -12,9 +12,9 @@ interface CustomKnobProps {
 const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const { knobs, knobStep, selectedMacros, macrosProperties, knobRound, isVertical } = viewStore
+	const { technology, knobStep, selectedMacros, macrosProperties, knobRound, isVertical } = viewStore
 
-	const knob = knobs[selectedMacros]
+	const knob = technology.macros[selectedMacros]
 	const knobStp = knobStep[param]
 	
 	let val = Number(knob.cutting[param as keyof typeof knob.cutting]);

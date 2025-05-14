@@ -4,9 +4,9 @@ import viewStore from '../store/viewStore';
 import IosToggleForm from './iosToggleForm';
 
 const IosToggle4 = observer(() => {
-	const { selectedMacros, knobs, isVertical/* macrosProperties */ } = viewStore
+	const { selectedMacros, isVertical, technology } = viewStore
 	const param:string = "enabled"
-	const knob = knobs[selectedMacros]
+	const knob = technology.macros[selectedMacros]
  	//const property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 	const title  = "Макрос";
 	
