@@ -122,7 +122,8 @@ class ViewStore {
             this.piercingMacroModalEdit = false
             this.modulationMacroModalEdit = false
 
-        } else if (modal === 'modulationMacro') {
+        } else if (modal === 'modulationMacro'  
+            || modal === 'initial_modulationMacro') {
 
             this.modulationMacroModalEdit = val
             this.macrosModalEdit = false
@@ -190,7 +191,12 @@ class ViewStore {
 
     getTecnologyValue (param:string, keyParam:string) {
         if (keyParam === 'macros') {
-            return this.technology.macros[this.selectedMacros][param]	
+            
+            if (param === 'piercingMacro') {
+                return this.technology.macros[this.selectedMacros][param]	    
+            }
+            return this.technology.macros[this.selectedMacros].cutting[param]	
+            
         } else if (keyParam === 'modulationMacros') {
              return this.technology.modulationMacros[this.selectedModulationMacro][param]
         } else if (keyParam === 'piercingMacros') {
@@ -202,7 +208,13 @@ class ViewStore {
         if (newVal < minimum) newVal = minimum
         if (newVal > maximum) newVal = maximum
         if (keyParam === 'macros') {
-            this.technology.macros[this.selectedMacros][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+
+            if (param === 'piercingMacro') {
+                this.technology.macros[this.selectedMacros][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);    return this.technology.macros[this.selectedMacros][param]	    
+            } else {
+                this.technology.macros[this.selectedMacros].cutting[param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+            }
+           
         } else if (keyParam === 'modulationMacros') {
             this.technology.modulationMacros[this.selectedModulationMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
         } else if (keyParam === 'piercingMacros') {

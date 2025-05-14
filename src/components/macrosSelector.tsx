@@ -12,7 +12,7 @@ const MacrosSelector = observer(() => {
 	const { technology, selectedMacros, macrosModalEdit, isVertical } = viewStore
  
 	const minimum = 0 
-	const maximum = technology.macros-1  
+	const maximum = technology.macros.length-1  
 	const title = "Выбранный макрос, index"
 	const step = 1
 	const stepBig = 1

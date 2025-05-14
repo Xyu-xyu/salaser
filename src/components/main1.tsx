@@ -1,4 +1,3 @@
-import CustomKnob from "./customKnob";
 import { observer } from "mobx-react-lite";
 import viewStore from "../store/viewStore";
 import MyForm from "./machineForm";
@@ -7,6 +6,7 @@ import MacrosEditModalPanel from "./macrosEditModalPanel";
 import PiercingEditModalPanel from "./piercingEditModalPanel";
 import ModulationMacroModalPanel from "./modulationMacroModalPanel"
 import Technology from "./technology";
+import UniversalKnob from "./universalKnob";
 
 
 
@@ -37,21 +37,11 @@ const Main1 = observer(() => {
 						"modulationFrequency_Hz",
 					].map((a: string, i: number) => (
 						<div key={i} className="h-125 col-12 vidget">
-							<CustomKnob index={i+1} param={a}/>
+							<UniversalKnob  param={a} keyParam={"macros"}/>
 						</div>
 					))
 				}
-
-				{/*
-					- Давление газа
-					- Энергия (мощность)
-					- Фокус
-					- Ограничение подачи
-					- Тип импульсного режима, также рядом кнопка для изменения макроса в модальном окне
-					- Высота сопла
-					- Несущая частота
-				*/} 
-			
+ 			
 			</div>
 
 			<div className="h-100 overflow-hidden">		

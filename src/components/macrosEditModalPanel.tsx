@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
-import CustomKnob from './customKnob';
+import UniversalKnob from './universalKnob';
 import MacrosSelector from './macrosSelector';
 import IosToggle3 from './iosToggle3';
 import IosToggle4 from './iosToggle4';
@@ -54,7 +54,7 @@ const MacrosEditModalPanel = observer(() => {
 
 								<div className="editModal_row" key={i + 1}>
 									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-										<CustomKnob param={a} />
+										<UniversalKnob param={a} keyParam={'macros'}/>
 									</div>
 								</div>
 							))}
@@ -69,7 +69,7 @@ const MacrosEditModalPanel = observer(() => {
 
 								<div className="editModal_row" key={5 + i}>
 									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-										<CustomKnob param={a} />
+										<UniversalKnob param={a} keyParam={'macros'}/>
 									</div>
 								</div>
 							))}

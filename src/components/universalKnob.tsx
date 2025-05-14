@@ -32,10 +32,10 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 
 	let val=0
 	if (keyParam === 'macros') {
-		const knob = technology[selectedMacros]	
-		val = Number(knob.cutting[param as keyof typeof knob.cutting]);
+		const knob = technology.macros[selectedMacros]	
+		val = Number(knob.cutting[param]);
 		if (param === 'piercingMacro') {
-			val = Number(knob[param as keyof typeof knob]);
+			val = Number(knob[param]);
 		}
 	} else if (keyParam === 'modulationMacros') {
 		val =technology.modulationMacros[selectedModulationMacro][param]
@@ -47,10 +47,10 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 
 	useEffect(()=>{
 		if (keyParam === 'macros') {
-			const knob = technology[selectedMacros]	
-			val = Number(knob.cutting[param as keyof typeof knob.cutting]);
+			const knob = technology.macros[selectedMacros]	
+			val = Number(knob.cutting[param]);
 			if (param === 'piercingMacro') {
-				val = Number(knob[param as keyof typeof knob]);
+				val = Number(knob[param]);
 			}
 		} else if (keyParam === 'modulationMacros') {
 			val=technology.modulationMacros[selectedModulationMacro][param]
