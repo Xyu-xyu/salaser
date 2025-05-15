@@ -4,10 +4,12 @@ import viewStore from '../store/viewStore';
 
 
 const Stepper = observer(() => {
-	const steps = Array.from({ length: 16 }, (_, i) => i);
-	const { selectedPercingStage, isVertical } = viewStore
+	const {technology, selectedPiercingMacro} = viewStore
+	const length = technology.piercingMacros[selectedPiercingMacro].stages.length
+	const steps = Array.from({ length: length }, (_, i) => i);
+	const { selectedPiercingStage, isVertical } = viewStore
 	const onStepChange = (step: number) => {
-		viewStore.setSelectedPercingStage(step)
+		viewStore.setselectedPiercingStage(step)
 	}
 
 	return (
@@ -16,7 +18,7 @@ const Stepper = observer(() => {
 			{steps.map((step) => (
 				<Button
 					key={step}
-					variant={step === selectedPercingStage ? 'primary' : 'outline-primary'}
+					variant={step === selectedPiercingStage ? 'primary' : 'outline-primary'}
 					onClick={() => onStepChange(step)}
 					style={{ minWidth: '40px' }}
 				>

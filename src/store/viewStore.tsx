@@ -39,7 +39,7 @@ class ViewStore {
     piercingMacroModalEdit:boolean = false;
     selectedModulationMacro:number = 0;
     selectedPiercingMacro:number = 0;
-    selectedPercingStage:number = 0; 
+    selectedPiercingStage:number = 0; 
 
     mode: string = 'main1'
     theme: string = 'themeLight'
@@ -64,7 +64,8 @@ class ViewStore {
         initial_focus:0.1,
         initial_height:1,
         delay_s:0.1,
-        power_W_s:100
+        power_W_s:100,
+        power:100
         
     };
 
@@ -86,7 +87,8 @@ class ViewStore {
         initial_focus:1,
         initial_height:1,
         delay_s:1,
-        power_W_s:0
+        power_W_s:0,
+        power:0
     };
       
     technology = cut_settings.result.technology
@@ -195,8 +197,9 @@ class ViewStore {
         this.selectedPiercingMacro = newVal;
     }
 
-    setSelectedPercingStage (val:number) {
-        this.selectedPercingStage =  val
+    setselectedPiercingStage (val:number) {
+        console.log ('setselectedPiercingStage ' + val)
+        this.selectedPiercingStage =  val
     }
 
     getTecnologyValue (param:string, keyParam:string) {
@@ -211,7 +214,9 @@ class ViewStore {
              return this.technology.modulationMacros[this.selectedModulationMacro][param]
         } else if (keyParam === 'piercingMacros') {
             return this.technology.piercingMacros[this.selectedPiercingMacro][param]
-        } 
+        } else if (keyParam === 'piercingStages') {
+            return this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage][param]
+        }
     }
 
     setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number) {
@@ -229,8 +234,10 @@ class ViewStore {
             this.technology.modulationMacros[this.selectedModulationMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
         } else if (keyParam === 'piercingMacros') {
             this.technology.piercingMacros[this.selectedPiercingMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
-        } 
-
+        } else if (keyParam === 'piercingStages') {
+            this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage][param] =  
+            Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+        }
     }
 }
 

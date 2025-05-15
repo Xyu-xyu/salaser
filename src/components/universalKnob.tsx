@@ -41,6 +41,8 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 		val =technology.modulationMacros[selectedModulationMacro][param]
 	} else if (keyParam === 'piercingMacros') {
 		val=technology.piercingMacros[selectedPiercingMacro][param]
+	} else if ('piercingStages') {
+		val =  viewStore.getTecnologyValue (param, keyParam)
 	}
 
 	useEffect(()=>{
@@ -54,6 +56,8 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 			val=technology.modulationMacros[selectedModulationMacro][param]
 		} else if (keyParam === 'piercingMacros') {
 			val=technology.piercingMacros[selectedPiercingMacro][param]
+		} else if ('piercingStages') {
+			val =  viewStore.getTecnologyValue (param, keyParam)
 		}
 
 		const path = utils.getPath(Number(val), minimum, maximum, sweepAngle, r1, r2, startAngle);
