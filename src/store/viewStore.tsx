@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import cut_settings_schema from './cut_settings_schema'
 import cut_settings from "./cut_settings";
+import { number } from "framer-motion";
 
 export interface KnobData {
     minimum: number;
@@ -36,8 +37,9 @@ class ViewStore {
     macrosModalEdit:boolean = false;
     modulationMacroModalEdit:boolean = false;
     piercingMacroModalEdit:boolean = false;
-    selectedModulationMacro:number = 0
-    selectedPiercingMacro:number = 0
+    selectedModulationMacro:number = 0;
+    selectedPiercingMacro:number = 0;
+    selectedPercingStage:number = 0; 
 
     mode: string = 'main1'
     theme: string = 'themeLight'
@@ -60,7 +62,9 @@ class ViewStore {
         initial_modulationMacro:1,
         initial_power:100,
         initial_focus:0.1,
-        initial_height:1
+        initial_height:1,
+        delay_s:0.1,
+        power_W_s:100
         
     };
 
@@ -80,7 +84,9 @@ class ViewStore {
         initial_modulationMacro:0,
         initial_power:1,
         initial_focus:1,
-        initial_height:1
+        initial_height:1,
+        delay_s:1,
+        power_W_s:0
     };
       
     technology = cut_settings.result.technology
@@ -187,6 +193,10 @@ class ViewStore {
         if (newVal > 7) newVal = 7
         console.log ('setSelectedPiercingMacro ' + newVal)
         this.selectedPiercingMacro = newVal;
+    }
+
+    setSelectedPercingStage (val:number) {
+        this.selectedPercingStage =  val
     }
 
     getTecnologyValue (param:string, keyParam:string) {

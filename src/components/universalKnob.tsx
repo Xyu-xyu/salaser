@@ -40,8 +40,6 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 	} else if (keyParam === 'modulationMacros') {
 		val =technology.modulationMacros[selectedModulationMacro][param]
 	} else if (keyParam === 'piercingMacros') {
-		console.log ('param  '+param)
-		console.log ('param  '+param)
 		val=technology.piercingMacros[selectedPiercingMacro][param]
 	}
 

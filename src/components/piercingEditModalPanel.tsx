@@ -6,7 +6,7 @@ import UniversalKnob from './universalKnob';
 import { useState } from 'react';
 import Stepper from './stepper';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import PiercingEditStagesPanel from './piercingEditStagesPanel'
 
 
 const PiercingEditModalPanel = observer(() => {
@@ -59,7 +59,8 @@ const PiercingEditModalPanel = observer(() => {
 									exit="exit"
 									transition={slideVariants.transition}
 								>
-									<Stepper />
+									  <Stepper />
+									  <PiercingEditStagesPanel />
 								</motion.div>
 							) : (
 								<motion.div

@@ -543,8 +543,6 @@ body {
 
 /* CUSTOM RADIO BUTTON  END*/
 
-
-
 .mt-10 {
   margin-top: 6rem!important;
 }
@@ -557,4 +555,10 @@ body {
 
 .modal-fullscreen .modal-body {
    overflow: hidden !important;
+}
+
+.modal-content #stages .btn-primary {
+  background-color: var(--knobMainText) !important;
+  color: white !important;
+  font-weight: bold;
 }
