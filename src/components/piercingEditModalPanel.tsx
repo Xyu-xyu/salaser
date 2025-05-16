@@ -36,13 +36,12 @@ const PiercingEditModalPanel = observer(() => {
 			<Modal show={viewStore.piercingMacroModalEdit} onHide={handleClose} centered fullscreen>
 				<Modal.Header closeButton>
 					<Modal.Title>
-						{"piercingMacro"}
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container-fluid">
 						<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
-							<div key={0} className="editModal_row">
+							<div key={0} className="">
 								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 									<PiercingMacroSelector />
 								</div>
@@ -72,13 +71,13 @@ const PiercingEditModalPanel = observer(() => {
 									transition={slideVariants.transition}
 								>
 									{/* Оригинальный контент */}
-									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-10")}>
 										{[
 											"initial_modulationFrequency_Hz",
 											"initial_pressure",
 											"initial_modulationMacro",
 										].map((a: string, i: number) => (
-											<div className="editModal_row" key={i}>
+											<div className="" key={i}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 													<UniversalKnob param={a} keyParam={'piercingMacros'} />
 												</div>
@@ -86,13 +85,13 @@ const PiercingEditModalPanel = observer(() => {
 										))}
 									</div>
 
-									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-10")}>
 										{[
 											"initial_power",
 											"initial_focus",
 											"initial_height",
 										].map((a: string, i: number) => (
-											<div className="editModal_row" key={i}>
+											<div className="" key={i}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 													<UniversalKnob param={a} keyParam={'piercingMacros'} />
 												</div>

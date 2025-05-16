@@ -1,21 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import UniversalKnob from './universalKnob';
-/*
-{
-                "pressure": 0,
-                "power": 1000,
-                	//"enabled": false,
-                "delay_s": 0,
-                "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
-                "modulationFrequency_Hz": 10000.0,
-                	//"cross_blow": false,
-                "modulationMacro": 0
-              },
-
-*/
+import IosToggleBlowInStage from './iosToggleBlowInStage';
+import IosToggleMacrosInStage from './iosToggleMacrosInStage';
 
 const PiercingEditModalPanel = observer(() => {
 	const { isVertical } = viewStore;
@@ -29,7 +16,7 @@ const PiercingEditModalPanel = observer(() => {
 					"delay_s",
 					"power_W_s",
 				].map((a: string, i: number) => (
-					<div className="editModal_row" key={i}>
+					<div className="" key={i}>
 						<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 							<UniversalKnob param={a} keyParam={'piercingStages'} />
 						</div>
@@ -43,14 +30,25 @@ const PiercingEditModalPanel = observer(() => {
 					 "modulationFrequency_Hz",
 					 "modulationMacro",
 				].map((a: string, i: number) => (
-					<div className="editModal_row" key={i}>
+					<div className="" key={i}>
 						<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 							<UniversalKnob param={a} keyParam={'piercingStages'} />
 						</div>
 					</div>
 				))}
 			</div>
-
+			<div className={'d-flex d-flex justify-content-evenly ' +  (isVertical ? "mt-10" : "mt-4")}>
+				<div className="">
+					<div className="editModal_col">
+						<IosToggleBlowInStage />
+					</div>
+				</div>
+				<div className="">
+					<div className="editModal_col">
+						<IosToggleMacrosInStage />
+					</div>
+				</div>
+			</div>
 		</>
 	);
 });

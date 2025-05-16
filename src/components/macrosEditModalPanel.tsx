@@ -3,8 +3,8 @@ import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 import UniversalKnob from './universalKnob';
 import MacrosSelector from './macrosSelector';
-import IosToggle3 from './iosToggle3';
-import IosToggle4 from './iosToggle4';
+import IosToggleBlowInMacros from './iosToggleBlowInMacros';
+import IosToggleMacrocInMacros from './iosToggleMacrosInMacros';
 import MacrosEditList from './macrosEditList';
 
 
@@ -67,7 +67,7 @@ const MacrosEditModalPanel = observer(() => {
 								"piercingMacro"
 							].map((a: string, i: number) => (
 
-								<div className="editModal_row" key={5 + i}>
+								<div className="" key={5 + i}>
 									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 										<UniversalKnob param={a} keyParam={'macros'}/>
 									</div>
@@ -75,14 +75,14 @@ const MacrosEditModalPanel = observer(() => {
 							))}
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' +  (isVertical ? "mt-10" : "mt-4")}>
-							<div className="editModal_row">
+							<div className="">
 								<div className="editModal_col">
-									<IosToggle3 />
+									<IosToggleBlowInMacros />
 								</div>
 							</div>
-							<div className="editModal_row">
+							<div className="">
 								<div className="editModal_col">
-									<IosToggle4 />
+									<IosToggleMacrocInMacros />
 								</div>
 							</div>
 						</div>

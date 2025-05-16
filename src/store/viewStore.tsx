@@ -239,6 +239,12 @@ class ViewStore {
             Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
         }
     }
+
+    setTecnologyValueBoolean (newVal: boolean, param: string, keyParam:string ) {
+        if (keyParam === 'piercingStages') {
+            this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage][param] = newVal
+        }
+    }
 }
 
 const viewStore = new ViewStore();

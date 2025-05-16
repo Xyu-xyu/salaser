@@ -13,7 +13,7 @@ const Stepper = observer(() => {
 	}
 
 	return (
-		<div className={"d-flex flex-wrap justify-content-center gap-2 " + (isVertical ? "mt-10" : "mt-4")}
+		<div className={"d-flex flex-wrap justify-content-center gap-2 mt-10"}
 			id='stages'>
 			{steps.map((step) => (
 				<Button
