@@ -379,6 +379,10 @@ body {
   height: 80% !important;
 }
 
+.d-contents {
+  display: contents !important;
+}
+
 .h-70 {
   height: 70% !important;
 }
@@ -561,4 +565,29 @@ body {
   background-color: var(--knobMainText) !important;
   color: white !important;
   font-weight: bold;
+}
+
+.stringComponentContainer {
+  width: 550px;
+  height: 80px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border: 2px solid black;
+  border-radius: 20px;
+}
+
+.stringComponentLabel {
+
+  font-size:25px;
+  font-family: "Moderat";
+
+}
+
+.stringComponent {
+  width: 500px;
+  height: 20x;
+  font-size:25px;
+  font-family: "Moderat";
+
 }

@@ -8,6 +8,7 @@ import Stepper from './stepper';
 import { motion, AnimatePresence } from 'framer-motion';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
 import MacrosEditList from './macrosEditList';
+import StringComponent from './stringComponent';
 
 
 const PiercingEditModalPanel = observer(() => {
@@ -42,9 +43,12 @@ const PiercingEditModalPanel = observer(() => {
 				<Modal.Body>
 					<div className="container-fluid">
 						<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
-							<div key={0} className="">
+							<div key={0} className="d-flex align-items-center">
 								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 									<PiercingMacroSelector />
+								</div>
+								<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
+									<StringComponent />
 								</div>
 							</div>
 						</div>
