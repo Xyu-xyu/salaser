@@ -38,7 +38,7 @@ const MacrosEditModalPanel = observer(() => {
 
 								<div className="editModal_row" key={i + 10}>
 									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-										<MacrosEditList param={a} />
+										<MacrosEditList param={a} keyParam={'macros'}/>
 									</div>
 								</div>
 							))}

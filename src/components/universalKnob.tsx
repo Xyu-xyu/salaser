@@ -61,8 +61,12 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 		}
 
 		const path = utils.getPath(Number(val), minimum, maximum, sweepAngle, r1, r2, startAngle);
-		viewStore.setKnobPath(param, path)
-
+		if (path.includes('NaN')) {
+			viewStore.setKnobPath(param, "M0 0")
+		} else {
+			viewStore.setKnobPath(param, path)
+		}
+		
 	},[	selectedMacros, selectedModulationMacro]) 
 
 	const handleMouseDown = (callback: () => void) => {
@@ -76,7 +80,11 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 
 	useEffect(() => {
 		const path = utils.getPath(val, minimum, maximum, sweepAngle, r1, r2, startAngle);
-		viewStore.setKnobPath(param, path)
+		if (path.includes('NaN')) {
+			viewStore.setKnobPath(param, "M0 0")
+		} else {
+			viewStore.setKnobPath(param, path)
+		}
 
 	}, [selectedMacros, val]);
 

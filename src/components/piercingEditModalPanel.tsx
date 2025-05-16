@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Stepper from './stepper';
 import { motion, AnimatePresence } from 'framer-motion';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
+import MacrosEditList from './macrosEditList';
 
 
 const PiercingEditModalPanel = observer(() => {
@@ -83,6 +84,17 @@ const PiercingEditModalPanel = observer(() => {
 												</div>
 											</div>
 										))}
+														
+										{[
+											"gas",
+											].map((a: string, i: number) => (
+
+												<div className="editModal_row" key={i + 10}>
+													<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+														<MacrosEditList param={a} keyParam={'piercingMacros'}/>
+													</div>
+												</div>
+											))}
 									</div>
 
 									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-10")}>

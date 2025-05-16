@@ -2,17 +2,20 @@ import { ListGroup, Form } from 'react-bootstrap';
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 
-
+interface MacrosEditListInt {
+	param: string;
+	keyParam: string;
+}
   
- const MacrosEditList: React.FC<{ param: string }> = observer(({ param }) => {
+const MacrosEditList: React.FC<MacrosEditListInt> = observer(({ param, keyParam }) => {
 
-	const { technology, selectedMacros, macrosProperties } = viewStore
-	const knob = technology.macros[selectedMacros]
-	const val = knob.cutting[param as keyof typeof knob.cutting];
+	const { macrosProperties } = viewStore
+	let val:string = viewStore.getTecnologyValue(param, keyParam)
+	
 	let property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 	const { title } = property;	
 	const setSelectedOption =(val:string) =>{
-		viewStore.setValString ( param,val)
+ 		viewStore.setValString ( param, val, keyParam)
 	}
 
 

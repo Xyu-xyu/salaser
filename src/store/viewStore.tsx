@@ -171,11 +171,15 @@ class ViewStore {
         }  
     }
 
-    setValString (param: string, newVal: string,) {
-        const macro = this.technology.macros[this.selectedMacros];  
-        if (param in macro.cutting) {
-            (macro.cutting as any)[param] = newVal
-        }  
+    setValString(param: string, newVal: string, keyParam: string) {
+        if (keyParam === 'macros') {
+            const macro = this.technology.macros[this.selectedMacros];
+            if (param in macro.cutting) {
+                (macro.cutting as any)[param] = newVal
+            }
+        } else if (keyParam === 'piercingMacros') {
+            this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
+        }
     }
     
     setSelectedMacros ( newVal: number) {
