@@ -3,6 +3,7 @@ import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 import ModulationMacroSelector from './modulationMacroSelector';
 import UniversalKnob from './universalKnob';
+import StringComponent from './stringComponent';
 
 
 const ModulationMacroModalPanel = observer(() => {
@@ -17,18 +18,20 @@ const ModulationMacroModalPanel = observer(() => {
 			<Modal show={viewStore.modulationMacroModalEdit} onHide={handleClose} centered fullscreen>
 				<Modal.Header closeButton>
 					<Modal.Title>
-					<h1>{"modulationMacro"}</h1>
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container-fluid">
-						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
-							<div key={0} className="editModal_row">
-								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-									<ModulationMacroSelector />								
-								</div>
+						<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
+							
+							<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+								<ModulationMacroSelector />								
+							</div>
+							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
+								<StringComponent param={'name'} keyParam={'modulationMacros'}/>
 							</div>
 						</div>
+
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")} >
 							
 							{	[								 

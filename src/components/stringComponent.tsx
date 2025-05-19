@@ -8,7 +8,7 @@ interface StringComponentInt {
 }
 
 
-const StringComponent: React.FC = observer(() => {
+const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam}) => {
     const [error, setError] = useState<boolean>(false);
 	const { selectedPiercingMacro } = viewStore
 
@@ -23,14 +23,13 @@ const StringComponent: React.FC = observer(() => {
         } else {
             setError( false);
         }
-        viewStore.setValString('name', newValue, 'piercingMacros')
+        viewStore.setValString( param, newValue, keyParam)
     };
 
-
-	let value = viewStore.getTecnologyValue('name', 'piercingMacros')
+	let value = viewStore.getTecnologyValue( param, keyParam)
 
 	useEffect (()=>{
-		value = viewStore.getTecnologyValue('name', 'piercingMacros')
+		value = viewStore.getTecnologyValue( param, keyParam)
 		if (value.length < 1) {
             setError( true);
 			return
@@ -46,14 +45,14 @@ const StringComponent: React.FC = observer(() => {
     return (
         <div className='stringComponentContainer px-2'>
 			<div className='stringComponentLabel mx-2' >
-				{'Name:'}
+				{'Name'}
 			</div>
             <input 
                 type="text" 
                 value={value} 
                 onChange={handleChange} 
                 placeholder="Введите строку" 
-				className={`form-control stringComponent ${error ? 'is-invalid' : ''}`} // Bootstrap styling for inputs
+				className={`form-control stringComponent ${error ? 'is-invalid' : ''}`} 
             />
          </div>
     );

@@ -42,14 +42,13 @@ const PiercingEditModalPanel = observer(() => {
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container-fluid">
-						<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
-							<div key={0} className="d-flex align-items-center">
-								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-									<PiercingMacroSelector />
-								</div>
-								<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
-									<StringComponent />
-								</div>
+						<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
+							
+							<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+								<PiercingMacroSelector />
+							</div>
+							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
+								<StringComponent param={'name'} keyParam={'piercingMacros'}/>
 							</div>
 						</div>
 

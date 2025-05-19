@@ -179,6 +179,8 @@ class ViewStore {
             }
         } else if (keyParam === 'piercingMacros') {
             this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
+        } else if (keyParam === 'modulationMacros') {
+            this.technology.modulationMacros[this.selectedModulationMacro][param] = newVal
         }
     }
     

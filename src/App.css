@@ -88,7 +88,7 @@ body {
 }
 
 .moderat {
-  font-family: 'Moderat', monospace !important;
+  font-family: 'Moderat', Arial, sans-serif  !important;
 }
 
 
@@ -569,18 +569,20 @@ body {
 
 .stringComponentContainer {
   width: 550px;
-  height: 80px;
+  height: 66px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  border: 2px solid black;
-  border-radius: 20px;
-}
+  border: 1px solid var(--bs-body-bg) !important;
+  border-radius: 0.75em;
+  background-color: var(--bs-body-bg);
+ }
 
 .stringComponentLabel {
 
   font-size:25px;
-  font-family: "Moderat";
+  font-family: "Moderat", Arial, sans-serif;
+  color: var(--red);
 
 }
 
@@ -588,6 +590,15 @@ body {
   width: 500px;
   height: 20x;
   font-size:25px;
-  font-family: "Moderat";
+  font-family: "Moderat", Arial, sans-serif;  
+  border: none;
 
 }
+/* 
+
+.modal-auto-size {
+  max-width: 90vw;
+  width: auto;
+}
+
+ */
