@@ -23,8 +23,8 @@ const MacrosEditList: React.FC<MacrosEditListInt> = observer(({ param, keyParam 
 		<div className='listMacrosEdit w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
 			<div className='col-12 h-100 d-flex flex-column'>
 	
-				<div className='listMacrosEdit_title'>{title}</div>
-			
+{/* 				<div className='listMacrosEdit_title'>{title}</div>
+ */}			
 				<ListGroup>
 					{property.enum.map((option="") => (
 						<ListGroup.Item key={option}>

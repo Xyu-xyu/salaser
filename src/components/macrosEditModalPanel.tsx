@@ -46,8 +46,8 @@ const MacrosEditModalPanel = observer(() => {
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")} >
 							{[
-								"pressure",
-								"power_W_mm",
+								"modulationMacro",
+								"piercingMacro",
  								"focus",
  								"feedLimit_mm_s",
  							].map((a: string, i: number) => (
@@ -61,10 +61,10 @@ const MacrosEditModalPanel = observer(() => {
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 							{[								 
-								"modulationMacro",
 								"height",
+								"pressure",
+								"power_W_mm",
 								"modulationFrequency_Hz",
-								"piercingMacro"
 							].map((a: string, i: number) => (
 
 								<div className="" key={5 + i}>

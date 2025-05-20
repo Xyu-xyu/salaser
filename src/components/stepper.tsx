@@ -5,7 +5,7 @@ import viewStore from '../store/viewStore';
 
 const Stepper = observer(() => {
 	const {technology, selectedPiercingMacro} = viewStore
-	const length = technology.piercingMacros[selectedPiercingMacro].stages.length
+	const length = technology.piercingMacros[selectedPiercingMacro].stages.length+1
 	const steps = Array.from({ length: length }, (_, i) => i);
 	const { selectedPiercingStage, isVertical } = viewStore
 	const onStepChange = (step: number) => {
@@ -15,6 +15,7 @@ const Stepper = observer(() => {
 	return (
 		<div className={"d-flex flex-wrap justify-content-center gap-2 mt-10"}
 			id='stages'>
+				
 			{steps.map((step) => (
 				<Button
 					key={step}
@@ -22,7 +23,7 @@ const Stepper = observer(() => {
 					onClick={() => onStepChange(step)}
 					style={{ minWidth: '40px' }}
 				>
-					{step + 1}
+					{ step }
 				</Button>
 			))}
 		</div>

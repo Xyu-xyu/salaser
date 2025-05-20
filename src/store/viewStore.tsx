@@ -255,6 +255,8 @@ class ViewStore {
     setTecnologyValueBoolean (newVal: boolean, param: string, keyParam:string ) {
         if (keyParam === 'piercingStages') {
             this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage][param] = newVal
+        } else if (keyParam === 'piercingMacros') {
+            this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
         }
     }
 }

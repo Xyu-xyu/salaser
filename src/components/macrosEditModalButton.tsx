@@ -1,7 +1,5 @@
 import { observer } from 'mobx-react-lite';
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { useState } from 'react';
-import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 
 interface MacrosEditModalButtonProps {
@@ -30,7 +28,6 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 	}
 
 
-
 	return (
 		<>
 			<g onClick={handleShow} style={{ cursor: "pointer" }}>
@@ -44,7 +41,7 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 					filter="var(--shadow)"
 				/>
 				<svg x={x2} y={y2} width="26" height="26">
-					<Icon
+					{/* <Icon
 						icon="fluent:document-edit-16-regular"
 						width="14"
 						height="14"
@@ -55,7 +52,18 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 							left: "50%",
 							transform: "translate(50%, 50%)",
 						}}
-					/>
+					/> */}
+
+					<Icon icon="fa:gear" 
+						width="14"
+						height="14"
+						style={{
+							color: "var(--knobMainText)",
+							position: "absolute",
+							top: "50%",
+							left: "50%",
+							transform: "translate(50%, 50%)",
+						}} />
 				</svg>
 			</g>
 

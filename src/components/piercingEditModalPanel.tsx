@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
 import MacrosEditList from './macrosEditList';
 import StringComponent from './stringComponent';
+import IosToggleBlowInPiercing from './iosToggleBlowInPiercing'
 
 
 const PiercingEditModalPanel = observer(() => {
@@ -50,6 +51,16 @@ const PiercingEditModalPanel = observer(() => {
 							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 								<StringComponent param={'name'} keyParam={'piercingMacros'}/>
 							</div>
+								{[
+								"gas",
+								].map((a: string, i: number) => (
+
+									<div className="" key={i + 10}>
+										<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+											<MacrosEditList param={a} keyParam={'piercingMacros'}/>
+										</div>
+									</div>
+								))}
 						</div>
 
 						<AnimatePresence mode="wait">
@@ -77,9 +88,10 @@ const PiercingEditModalPanel = observer(() => {
 									{/* Оригинальный контент */}
 									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-10")}>
 										{[
+											"initial_modulationMacro",
 											"initial_modulationFrequency_Hz",
 											"initial_pressure",
-											"initial_modulationMacro",
+											
 										].map((a: string, i: number) => (
 											<div className="" key={i}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
@@ -87,17 +99,10 @@ const PiercingEditModalPanel = observer(() => {
 												</div>
 											</div>
 										))}
-														
-										{[
-											"gas",
-											].map((a: string, i: number) => (
-
-												<div className="editModal_row" key={i + 10}>
-													<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-														<MacrosEditList param={a} keyParam={'piercingMacros'}/>
-													</div>
-												</div>
-											))}
+										<div className="editModal_col">
+											<IosToggleBlowInPiercing />	
+										</div>
+										
 									</div>
 
 									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-10")}>
