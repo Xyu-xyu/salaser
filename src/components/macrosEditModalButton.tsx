@@ -9,14 +9,14 @@ interface MacrosEditModalButtonProps {
 }
 
 const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) => {
-	const [show, setShow] = useState(false);
+	/* const [show, setShow] = useState(false);
 
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
 	const handleContinue = () => {
 		setShow(false)
 		viewStore.setModal (true, param)
-	}
+	} */
 
 	const { isVertical } = viewStore
 	const x1 = isVertical ? 83 : 110
@@ -24,6 +24,10 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 
 	const x2 = isVertical ? 77 : 103
 	const y2 = isVertical ? -20 : 13
+
+	const handleShow = ()=>{
+		viewStore.setModal ( true, param)
+	}
 
 
 
@@ -55,7 +59,7 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 				</svg>
 			</g>
 
-			<Modal show={show} onHide={handleClose} size="lg" centered>
+			{/* <Modal show={show} onHide={handleClose} size="lg" centered>
 				<Modal.Header closeButton>
 					<Modal.Title></Modal.Title>
 				</Modal.Header>
@@ -70,7 +74,7 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 						Continue
 					</Button>
 				</Modal.Footer>
-			</Modal>
+			</Modal> */}
 		</>
 	);
 });

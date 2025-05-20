@@ -127,22 +127,28 @@ class ViewStore {
         if (modal === 'macros') {
 
             this.macrosModalEdit = val
-            this.piercingMacroModalEdit = false
-            this.modulationMacroModalEdit = false
+            setTimeout (()=>{
+                this.piercingMacroModalEdit = false
+                this.modulationMacroModalEdit = false
+            },200)
 
         } else if (modal === 'modulationMacro'  
             || modal === 'initial_modulationMacro') {
 
             this.modulationMacroModalEdit = val
-            this.macrosModalEdit = false
-            this.piercingMacroModalEdit = false
+            setTimeout (()=>{
+                this.macrosModalEdit = false
+                this.piercingMacroModalEdit = false
+            },200)
+          
             
         } else if (modal === 'piercingMacro') {
 
             this.piercingMacroModalEdit = val
-            this.modulationMacroModalEdit = false
-            this.macrosModalEdit = false
-
+            setTimeout (()=>{
+                this.modulationMacroModalEdit = false
+                this.macrosModalEdit = false
+            },200)
         }
     }
 

@@ -17,7 +17,7 @@ const MacrosEditModalPanel = observer(() => {
 
 	return (
 		<>
-			<Modal show={viewStore.macrosModalEdit} onHide={handleClose} centered fullscreen>
+			<Modal show={viewStore.macrosModalEdit} onHide={handleClose} fullscreen centered >
 				<Modal.Header closeButton>
 					<Modal.Title>
 					</Modal.Title>

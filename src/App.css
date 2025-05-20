@@ -473,7 +473,8 @@ body {
 }
 
 .modal-content {
-  background-color: rgb(234, 234, 238);
+  /* background-color: rgb(234, 234, 238); */
+  background-color: white;
 }
 
 
@@ -552,8 +553,8 @@ body {
 }
 
 .modal-content .btn {
-  background-color: #bfbfbf !important;
-  border: 1px solid #bfbfbf !important;
+  background-color: var(--grey-nav) !important;
+  border: 1px solid var(--grey-nav) !important;
   color: #484848 !important;
 }
 
@@ -573,9 +574,9 @@ body {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  border: 1px solid var(--bs-body-bg) !important;
+  border: 1px solid var(--grey-nav) !important;
   border-radius: 0.75em;
-  background-color: var(--bs-body-bg);
+  background-color: var(--grey-nav);
  }
 
 .stringComponentLabel {
@@ -592,13 +593,6 @@ body {
   font-size:25px;
   font-family: "Moderat", Arial, sans-serif;  
   border: none;
+  background-color: var(--grey-nav);
 
 }
-/* 
-
-.modal-auto-size {
-  max-width: 90vw;
-  width: auto;
-}
-
- */

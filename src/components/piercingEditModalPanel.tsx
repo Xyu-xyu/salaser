@@ -18,7 +18,7 @@ const PiercingEditModalPanel = observer(() => {
 		initial: { x: '100%', opacity: 0 },
 		animate: { x: 0, opacity: 1 },
 		exit: { x: '-100%', opacity: 0 },
-		transition: { duration: 0.4, ease: 'easeInOut' }
+		transition: { duration: 0.1, ease: 'easeInOut' }
 	};
 
 
@@ -35,7 +35,7 @@ const PiercingEditModalPanel = observer(() => {
 
 	return (
 		<>
-			<Modal show={viewStore.piercingMacroModalEdit} onHide={handleClose} centered fullscreen>
+			<Modal show={viewStore.piercingMacroModalEdit} onHide={handleClose} fullscreen centered >
 				<Modal.Header closeButton>
 					<Modal.Title>
 					</Modal.Title>

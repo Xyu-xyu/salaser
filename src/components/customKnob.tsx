@@ -165,9 +165,9 @@ const CustomKnob: React.FC<CustomKnobProps> = observer(({ param }) => {
 						fill="var(--knobMainText)">
 						{title.split(', ')[1]}
 					</text>
-					<text x="95" y="130" textAnchor="end" className='moderat' fontSize={8} fill="var(--paleColor)">
+					{/* <text x="95" y="130" textAnchor="end" className='moderat' fontSize={8} fill="var(--paleColor)">
 						min:{minimum} max:{maximum}
-					</text>
+					</text> */}
 
 					<circle
 						cx={x1}
