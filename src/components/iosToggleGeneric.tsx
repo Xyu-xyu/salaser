@@ -30,7 +30,7 @@ const IosToggleGeneric: React.FC<IosToggleGenericProps> = observer(({
 						<text
 							key={i}
 							x="5"
-							y={-15 + i * 9}
+							y={5 + i * 9}
 							className="moderat"
 							fill="var(--knobMainText)"
 							fontSize={isVertical ? 10 : 7}

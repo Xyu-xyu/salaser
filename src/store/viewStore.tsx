@@ -207,11 +207,13 @@ class ViewStore {
         if (newVal > 7) newVal = 7
         console.log ('setSelectedPiercingMacro ' + newVal)
         this.selectedPiercingMacro = newVal;
+        this.selectedPiercingStage = 0;
     }
 
     setselectedPiercingStage (val:number) {
         console.log ('setselectedPiercingStage ' + val)
-        this.selectedPiercingStage =  val
+        this.selectedPiercingStage = val
+
     }
 
     getTecnologyValue (param:string, keyParam:string) {
@@ -227,7 +229,7 @@ class ViewStore {
         } else if (keyParam === 'piercingMacros') {
             return this.technology.piercingMacros[this.selectedPiercingMacro][param]
         } else if (keyParam === 'piercingStages') {
-            return this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage][param]
+            return this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param]
         }
     }
 
@@ -247,16 +249,16 @@ class ViewStore {
         } else if (keyParam === 'piercingMacros') {
             this.technology.piercingMacros[this.selectedPiercingMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
         } else if (keyParam === 'piercingStages') {
-            this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage][param] =  
+            this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param] =  
             Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
         }
     }
 
     setTecnologyValueBoolean (newVal: boolean, param: string, keyParam:string ) {
         if (keyParam === 'piercingStages') {
-            this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage][param] = newVal
+            this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param] = newVal
         } else if (keyParam === 'piercingMacros') {
-            this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
+            this.technology.piercingMacros[this.selectedPiercingMacro-1][param] = newVal
         }
     }
 }

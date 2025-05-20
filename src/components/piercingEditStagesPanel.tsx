@@ -4,7 +4,7 @@ import UniversalKnob from './universalKnob';
 import IosToggleBlowInStage from './iosToggleBlowInStage';
 import IosToggleMacrosInStage from './iosToggleMacrosInStage';
 
-const PiercingEditModalPanel = observer(() => {
+const piercingEditStagesPanel = observer(() => {
 	const { isVertical } = viewStore;
 
 	return (
@@ -12,8 +12,8 @@ const PiercingEditModalPanel = observer(() => {
 			<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 				{[
 	 	  		    "modulationMacro",
-					"pressure",
-					"power",
+					"modulationFrequency_Hz",
+					"pressure",					
 					"delay_s",					
 				].map((a: string, i: number) => (
 					<div className="" key={i}>
@@ -25,10 +25,11 @@ const PiercingEditModalPanel = observer(() => {
 			</div>
 			<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 				{[
+					
+					"power",
+					"focus",
+					"height",
 					"power_W_s",
- 					 "focus",
-					 "height",
-					 "modulationFrequency_Hz",
 				].map((a: string, i: number) => (
 					<div className="" key={i}>
 						<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
@@ -54,4 +55,4 @@ const PiercingEditModalPanel = observer(() => {
 });
 
 
-export default PiercingEditModalPanel;
+export default piercingEditStagesPanel;
