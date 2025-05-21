@@ -20,8 +20,8 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 	const x1 = isVertical ? 83 : 110
 	const y1 = isVertical ? -12 : 20
 
-	const x2 = isVertical ? 77 : 103
-	const y2 = isVertical ? -20 : 13
+	const x2 = isVertical ? 76 : 103
+	const y2 = isVertical ? -19 : 13
 
 	const handleShow = ()=>{
 		viewStore.setModal ( true, param)

@@ -258,7 +258,7 @@ class ViewStore {
         if (keyParam === 'piercingStages') {
             this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param] = newVal
         } else if (keyParam === 'piercingMacros') {
-            this.technology.piercingMacros[this.selectedPiercingMacro-1][param] = newVal
+            this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
         }
     }
 }
