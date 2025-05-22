@@ -88,11 +88,11 @@ const MacrosEditModalPanel = observer(() => {
 						</div>
 					</div>
 				</Modal.Body>
-				<Modal.Footer>
+				<Modal.Footer className="position-relative">
 					<Button
 						variant="secondary"
 						onClick={handleClose}
-						className="mt-4 py-3 px-5 fs-3 close-button"
+						className="mt-4 py-3 px-5 fs-3 close-button ms-auto"
 					>
 						Close
 					</Button>

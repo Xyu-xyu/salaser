@@ -35,6 +35,7 @@ export interface Makro {
 class ViewStore {
     isVertical:boolean = (window.innerHeight > window.innerWidth)
     macrosModalEdit:boolean = false;
+    carouselMode:boolean = false;
     modulationMacroModalEdit:boolean = false;
     piercingMacroModalEdit:boolean = false;
     selectedModulationMacro:number = 0;
@@ -229,7 +230,8 @@ class ViewStore {
         } else if (keyParam === 'piercingMacros') {
             return this.technology.piercingMacros[this.selectedPiercingMacro][param]
         } else if (keyParam === 'piercingStages') {
-            return this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param]
+            let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+            return this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param]
         }
     }
 
@@ -249,17 +251,24 @@ class ViewStore {
         } else if (keyParam === 'piercingMacros') {
             this.technology.piercingMacros[this.selectedPiercingMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
         } else if (keyParam === 'piercingStages') {
-            this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param] =  
+            let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+            this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] =  
             Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
         }
     }
 
     setTecnologyValueBoolean (newVal: boolean, param: string, keyParam:string ) {
         if (keyParam === 'piercingStages') {
-            this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param] = newVal
+            let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+            this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] = newVal
         } else if (keyParam === 'piercingMacros') {
             this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
         }
+    }
+
+    setCarouselMode (val:boolean) {
+        console.log ('setCarouselMode  to ' + val)
+        this.carouselMode = val
     }
 }
 

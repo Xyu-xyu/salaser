@@ -9,7 +9,7 @@ import { Swiper as SwiperClass } from 'swiper/types';
  
 
 export default function SwiperPlan() {
-	let arr = Array.from({ length: 10 })
+	let arr = Array.from({ length: 8 })
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const [isVertical, setIsVertical] = useState<boolean>(
 		window.innerHeight > window.innerWidth
@@ -46,14 +46,14 @@ export default function SwiperPlan() {
       coverflowEffect={{
         rotate: isVertical ? 0 : 0,
         stretch: isVertical ? 0 : 0,
-        depth: 750,
+        depth: 400,
         modifier: isVertical ? 1: 0.8,
         slideShadows: false,
       }}
       modules={[EffectCoverflow, Scrollbar ]}
 	  style={{
-        height: isVertical ? '100vh' : '80%',
-        width: isVertical ? '534px' : '100vw',
+        height: isVertical ? '80vh' : '80%',
+        width: isVertical ? '80%' : '80vw',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -61,7 +61,7 @@ export default function SwiperPlan() {
 	  /* className="mySwiper" */
     >
 				{
-					arr.map(a =>
+					arr.map((a,i) =>
 						<SwiperSlide>
 							<PlanCard />
 						</SwiperSlide>
