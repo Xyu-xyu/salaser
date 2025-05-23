@@ -6,26 +6,14 @@ import PlanCard from './planCard';
 import 'swiper/css/scrollbar';
 import { EffectCoverflow, Scrollbar } from 'swiper/modules';
 import { Swiper as SwiperClass } from 'swiper/types';
+import { observer } from 'mobx-react-lite';
+import viewStore from '../store/viewStore';
  
 
-export default function SwiperPlan() {
+const  SwiperPlan =observer (()=> {
 	let arr = Array.from({ length: 8 })
 	const swiperRef = useRef<SwiperClass | null>(null);
-	const [isVertical, setIsVertical] = useState<boolean>(
-		window.innerHeight > window.innerWidth
-	  );
-	
- 	  const checkOrientation = () => {
-		setIsVertical(window.innerHeight > window.innerWidth);
-	  };
-	
-	  // установка listener на resize
-	  useEffect(() => {
-		window.addEventListener('resize', checkOrientation);
-		return () => {
-		  window.removeEventListener('resize', checkOrientation);
-		};
-	  }, []);
+	const { isVertical} = viewStore
 
 	return (
 
@@ -85,4 +73,7 @@ export default function SwiperPlan() {
 			</Swiper>
 		</>
 	);
-}
+})
+
+
+export default SwiperPlan;

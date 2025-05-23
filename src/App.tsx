@@ -1,7 +1,6 @@
 import './../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js';
 import Main from './components/main'
 import Main1 from './components/main1'
-import { useEffect } from 'react';
 import { observer } from "mobx-react-lite";
 import viewStore from './store/viewStore.js';
 import IosToggle0 from './components/iosToggle0.js';
@@ -15,17 +14,6 @@ const App = observer(() => {
 	const handleContextMenu = (e: React.MouseEvent) => {
 		e.preventDefault(); // Блокируем стандартное контекстное меню
 	};
-
-	const checkOrientation = () => {
-		viewStore.setIsVertical(window.innerHeight > window.innerWidth);
-	};
-
-	useEffect(() => {
-		window.addEventListener('resize', checkOrientation);
-		return () => {
-			window.removeEventListener('resize', checkOrientation);
-		};
-	},[]);
 
 	return (
 		<>

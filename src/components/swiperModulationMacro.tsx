@@ -12,22 +12,9 @@ import { observer } from 'mobx-react-lite';
 
 
 const swiperModulationMacro = observer(() => {
-	let arr = Array.from({ length: 16 })
+ 	let arr = Array.from({ length: 16 })
 	const swiperRef = useRef<SwiperClass | null>(null);
-	const [isVertical, setIsVertical] = useState<boolean>(
-		window.innerHeight > window.innerWidth
-	);
-
-	const checkOrientation = () => {
-		setIsVertical(window.innerHeight > window.innerWidth);
-	};
-
- 	useEffect(() => {
-		window.addEventListener('resize', checkOrientation);
-		return () => {
-			window.removeEventListener('resize', checkOrientation);
-		};
-	}, []);
+	const { isVertical } = viewStore
 
 	return (
 
@@ -66,6 +53,11 @@ const swiperModulationMacro = observer(() => {
 					arr.map((a, i) =>
 						<SwiperSlide>
 							<div className="swiperSlide position-absolute top-50 start-50 translate-middle fs-4">
+							<div 
+								className={"text-center swiperSlideName " + (i % 2 === 0 ? "notInUse" : "")}
+								> 
+								Any name for something  { i }
+								</div>	
 							<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
 								<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 									<StringComponent param={'name'} keyParam={'modulationMacros'}/>

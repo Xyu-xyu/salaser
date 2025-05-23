@@ -33,7 +33,6 @@ export interface Makro {
 
 
 class ViewStore {
-    isVertical:boolean = (window.innerHeight > window.innerWidth)
     macrosModalEdit:boolean = false;
     carouselMode:boolean = false;
     modulationMacroModalEdit:boolean = false;
@@ -96,7 +95,9 @@ class ViewStore {
     constructor() {
         makeAutoObservable(this, {
             selectedModulationMacro: computed,
-            selectedPiercingMacro: computed
+            selectedPiercingMacro: computed,
+            isVertical: computed,
+
         });
     }
 
@@ -108,10 +109,11 @@ class ViewStore {
         return this.technology.macros[this.selectedMacros].piercingMacroMacro;
     }
 
-    setIsVertical (val:boolean) {
-        this.isVertical = val
+    get isVertical () {
+        return Boolean(window.innerHeight > window.innerWidth)
     }
-            
+
+          
     setTheme(theme:string ) {
        this.theme =theme
     }

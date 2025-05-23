@@ -27,6 +27,7 @@
   --green: rgb(42, 199, 94);
   --blue: rgb(71, 209, 204);
   --violet: rgb(93, 83, 247);
+  --darkBlue: #3030d1;
   --white: rgb(255, 255, 255);
   --grey-progress: rgb(234, 234, 238);
   --grey-main: rgb(244, 244, 247);
@@ -619,9 +620,17 @@ body {
   width: 600px;
   height: 700px;
   margin: 1em;
+  overflow: hidden;
+}
+
+.swiperSlideName {
+  background-color: var(--violet);  
+  color: white;
 }
 
 
-/* .swiper-slide:not(.swiper-slide-active) {
-  display: none;
-} */
+.notInUse {
+  background-color: var(--grey-nav);  
+  color: black;
+}
+
