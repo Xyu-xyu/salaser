@@ -7,9 +7,11 @@ import { EffectCoverflow, Scrollbar } from 'swiper/modules';
 import { Swiper as SwiperClass } from 'swiper/types';
 import StringComponent from './stringComponent';
 import UniversalKnob from './universalKnob';
+import viewStore from '../store/viewStore';
+import { observer } from 'mobx-react-lite';
 
 
-export default function swiperModulationMacro() {
+const swiperModulationMacro = observer(() => {
 	let arr = Array.from({ length: 16 })
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const [isVertical, setIsVertical] = useState<boolean>(
@@ -41,6 +43,7 @@ export default function swiperModulationMacro() {
 				grabCursor={true}
 				centeredSlides={true}
 				slidesPerView={5}
+				initialSlide={ viewStore.selectedModulationMacro } // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
 				freeMode={false}
 				scrollbar={{ el: '.swiper-scrollbar', draggable: true }}
 				coverflowEffect={{
@@ -88,4 +91,6 @@ export default function swiperModulationMacro() {
 			</Swiper>
 		</>
 	);
-}
+})
+
+export default swiperModulationMacro;

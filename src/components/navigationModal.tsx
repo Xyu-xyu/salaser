@@ -5,17 +5,13 @@ import viewStore from '../store/viewStore';
  
 const NavigationModal = observer(() => {
 
-  	const { selectedModulationMacro, carouselMode } = viewStore
+  	const { carouselMode } = viewStore
  	const stepBig = 1
 
 	const increase = () => {
-		let newval = selectedModulationMacro + stepBig
-		viewStore.setSelectedModulationMacro( newval );
 	}
 
 	const decrease = () => {
-		let newval = selectedModulationMacro - stepBig
-		viewStore.setSelectedModulationMacro( newval );
 	}
 
 	const carousel = () =>{
@@ -25,7 +21,7 @@ const NavigationModal = observer(() => {
 	return (
 		<>
 			<div className="mt-2">
-				<button className="carousel_btn grey_button m-2">
+			{ !carouselMode && <button className="carousel_btn grey_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
 						onMouseDown={ decrease }>
 						<Icon icon="icon-park:left"
@@ -33,7 +29,7 @@ const NavigationModal = observer(() => {
 							height="48"
 							style={{ color: 'white' }} />
 					</div>
-				</button>
+				</button>}
 				<button className="carousel_btn violet_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
 							onMouseDown={ carousel }>
@@ -51,7 +47,7 @@ const NavigationModal = observer(() => {
 						}
 					</div>
 				</button>
-				<button className="carousel_btn grey_button m-2">
+				{ !carouselMode && <button className="carousel_btn grey_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
 						onMouseDown={ increase }>
 						<Icon
@@ -61,7 +57,7 @@ const NavigationModal = observer(() => {
 							style={{ color: 'white' }}/>
 						
 					</div>
-				</button>
+				</button>}
 			</div>
 		</>
 	)

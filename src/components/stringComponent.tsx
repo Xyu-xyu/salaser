@@ -10,7 +10,7 @@ interface StringComponentInt {
 
 const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam}) => {
     const [error, setError] = useState<boolean>(false);
-	const { selectedPiercingMacro } = viewStore
+	const { selectedPiercingMacro, selectedModulationMacro } = viewStore
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
@@ -40,7 +40,7 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
             setError( false);
         }
 
-	},[ selectedPiercingMacro ])
+	},[ selectedPiercingMacro, selectedModulationMacro ])
 
     return (
         <div className='stringComponentContainer px-2'>

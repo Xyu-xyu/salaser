@@ -1,7 +1,7 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, computed } from "mobx";
 import cut_settings_schema from './cut_settings_schema'
 import cut_settings from "./cut_settings";
-import { number } from "framer-motion";
+//import { number } from "framer-motion";
 
 export interface KnobData {
     minimum: number;
@@ -38,8 +38,6 @@ class ViewStore {
     carouselMode:boolean = false;
     modulationMacroModalEdit:boolean = false;
     piercingMacroModalEdit:boolean = false;
-    selectedModulationMacro:number = 0;
-    selectedPiercingMacro:number = 0;
     selectedPiercingStage:number = 0; 
 
     mode: string = 'main1'
@@ -95,16 +93,27 @@ class ViewStore {
     technology = cut_settings.result.technology
     macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
 
+    constructor() {
+        makeAutoObservable(this, {
+            selectedModulationMacro: computed,
+            selectedPiercingMacro: computed
+        });
+    }
+
+    get selectedModulationMacro() {
+        return this.technology.macros[this.selectedMacros].cutting.modulationMacro;
+    }
+
+    get selectedPiercingMacro() {
+        return this.technology.macros[this.selectedMacros].piercingMacroMacro;
+    }
+
     setIsVertical (val:boolean) {
         this.isVertical = val
     }
-        
-    constructor() {
-        makeAutoObservable(this);
-    }
-
+            
     setTheme(theme:string ) {
-        this.theme =theme
+       this.theme =theme
     }
 
     setKnobPath(param: string, path: string) {
@@ -197,24 +206,9 @@ class ViewStore {
         this.selectedMacros = newVal;
     }
 
-    setSelectedModulationMacro  ( newVal: number) {
-        if (newVal < 0) newVal = 0
-        if (newVal > 15) newVal = 15
-        this.selectedModulationMacro = newVal;
-    }
-
-    setSelectedPiercingMacro  ( newVal: number) {
-        if (newVal < 0) newVal = 0
-        if (newVal > 7) newVal = 7
-        console.log ('setSelectedPiercingMacro ' + newVal)
-        this.selectedPiercingMacro = newVal;
-        this.selectedPiercingStage = 0;
-    }
-
     setselectedPiercingStage (val:number) {
         console.log ('setselectedPiercingStage ' + val)
         this.selectedPiercingStage = val
-
     }
 
     getTecnologyValue (param:string, keyParam:string) {
