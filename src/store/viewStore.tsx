@@ -213,52 +213,105 @@ class ViewStore {
         this.selectedPiercingStage = val
     }
 
-    getTecnologyValue (param:string, keyParam:string) {
-        if (keyParam === 'macros') {
+    getTecnologyValue (param:string, keyParam:string, keyInd:number|boolean=false) {
+        if (typeof keyInd === 'number') {
+            if (keyParam === 'macros') {
             
-            if (param === 'piercingMacro') {
-                return this.technology.macros[this.selectedMacros][param]	    
+                if (param === 'piercingMacro') {
+                    return this.technology.macros[keyInd][param]	    
+                }
+                return this.technology.macros[keyInd].cutting[param]	
+                
+            } else if (keyParam === 'modulationMacros') {
+                 return this.technology.modulationMacros[keyInd][param]
+            } else if (keyParam === 'piercingMacros') {
+                return this.technology.piercingMacros[keyInd][param]
+            } else if (keyParam === 'piercingStages') {
+                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                return this.technology.piercingMacros[keyInd].stages[index][param]
             }
-            return this.technology.macros[this.selectedMacros].cutting[param]	
-            
-        } else if (keyParam === 'modulationMacros') {
-             return this.technology.modulationMacros[this.selectedModulationMacro][param]
-        } else if (keyParam === 'piercingMacros') {
-            return this.technology.piercingMacros[this.selectedPiercingMacro][param]
-        } else if (keyParam === 'piercingStages') {
-            let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
-            return this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param]
+
+        } else {
+            if (keyParam === 'macros') {
+
+                if (param === 'piercingMacro') {
+                    return this.technology.macros[this.selectedMacros][param]	    
+                }
+                return this.technology.macros[this.selectedMacros].cutting[param]	
+                
+            } else if (keyParam === 'modulationMacros') {
+                 return this.technology.modulationMacros[this.selectedModulationMacro][param]
+            } else if (keyParam === 'piercingMacros') {
+                return this.technology.piercingMacros[this.selectedPiercingMacro][param]
+            } else if (keyParam === 'piercingStages') {
+                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                return this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param]
+            }
         }
+        
     }
 
-    setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number) {
+    setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number,  keyInd:number|boolean=false) {
         if (newVal < minimum) newVal = minimum
         if (newVal > maximum) newVal = maximum
-        if (keyParam === 'macros') {
+        if (typeof keyInd === 'boolean') {
+            if (keyParam === 'macros') {
 
-            if (param === 'piercingMacro') {
-                this.technology.macros[this.selectedMacros][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);    return this.technology.macros[this.selectedMacros][param]	    
-            } else {
-                this.technology.macros[this.selectedMacros].cutting[param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                if (param === 'piercingMacro') {
+                    this.technology.macros[this.selectedMacros][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);    return this.technology.macros[this.selectedMacros][param]	    
+                } else {
+                    this.technology.macros[this.selectedMacros].cutting[param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                }
+               
+            } else if (keyParam === 'modulationMacros') {
+                this.technology.modulationMacros[this.selectedModulationMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+            } else if (keyParam === 'piercingMacros') {
+                this.technology.piercingMacros[this.selectedPiercingMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+            } else if (keyParam === 'piercingStages') {
+                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] =  
+                Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
             }
-           
-        } else if (keyParam === 'modulationMacros') {
-            this.technology.modulationMacros[this.selectedModulationMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
-        } else if (keyParam === 'piercingMacros') {
-            this.technology.piercingMacros[this.selectedPiercingMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
-        } else if (keyParam === 'piercingStages') {
-            let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
-            this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] =  
-            Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+
+        } else {
+            if (keyParam === 'macros') {
+                if (param === 'piercingMacro') {
+                    this.technology.macros[keyInd][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);    return this.technology.macros[this.selectedMacros][param]	    
+                } else {
+                    this.technology.macros[keyInd].cutting[param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                }               
+            } else if (keyParam === 'modulationMacros') {
+                this.technology.modulationMacros[keyInd][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+            } else if (keyParam === 'piercingMacros') {
+                this.technology.piercingMacros[keyInd][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+            } else if (keyParam === 'piercingStages') {
+                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                this.technology.piercingMacros[keyInd].stages[index][param] =  
+                Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+            }
         }
     }
 
-    setTecnologyValueBoolean (newVal: boolean, param: string, keyParam:string ) {
-        if (keyParam === 'piercingStages') {
-            let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
-            this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] = newVal
-        } else if (keyParam === 'piercingMacros') {
-            this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
+    setTecnologyValueBoolean (newVal: boolean, param: string, keyParam:string,keyInd:number|boolean=false ) {
+
+        if (typeof keyInd === 'boolean') {
+
+            if (keyParam === 'piercingStages') {
+                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] = newVal
+            } else if (keyParam === 'piercingMacros') {
+                this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
+            }
+         
+        } else {
+
+            if (keyParam === 'piercingStages') {
+                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                this.technology.piercingMacros[keyInd].stages[index][param] = newVal
+            } else if (keyParam === 'piercingMacros') {
+                this.technology.piercingMacros[keyInd][param] = newVal
+            }
+
         }
     }
 

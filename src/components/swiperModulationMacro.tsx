@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/scrollbar';
 import { EffectCoverflow, Scrollbar } from 'swiper/modules';
 import { Swiper as SwiperClass } from 'swiper/types';
-import StringComponent from './stringComponent';
-import UniversalKnob from './universalKnob';
+//import StringComponent from './stringComponent';
+//import UniversalKnob from './universalKnob';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
+import SwipeUniversalKnob from './swipeUniversalKnob';
+import SwiperStringComponent from './swiperStringComponent';
 
 
 const swiperModulationMacro = observer(() => {
@@ -50,17 +52,17 @@ const swiperModulationMacro = observer(() => {
 				}}
  			>
 				{
-					arr.map((a, i) =>
+					arr.map((_, ii) =>
 						<SwiperSlide>
 							<div className="swiperSlide position-absolute top-50 start-50 translate-middle fs-4">
 							<div 
-								className={"text-center swiperSlideName " + (i % 2 === 0 ? "notInUse" : "")}
+								className={"text-center swiperSlideName "  /* +(ii % 2 === 0 ? "notInUse" : "") */}
 								> 
-								Any name for something  { i }
+								Any name for something  { ii }
 								</div>	
 							<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
 								<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
-									<StringComponent param={'name'} keyParam={'modulationMacros'}/>
+									<SwiperStringComponent param={'name'} keyParam={'modulationMacros'} keyInd={ii}/>
 								</div>
 							</div>
 							<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-10")} >
@@ -70,7 +72,7 @@ const swiperModulationMacro = observer(() => {
 								].map((a: string, i: number) => (
 									<div className="editModal_row" key={i}>
 										<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-											<UniversalKnob param={a}  keyParam={'modulationMacros'}/>
+											<SwipeUniversalKnob param={a}  keyParam={'modulationMacros'} keyInd={ii}/>
 										</div>
 									</div>
 									))
