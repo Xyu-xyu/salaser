@@ -43,19 +43,29 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
 	},[ selectedPiercingMacro, selectedModulationMacro ])
 
     return (
-        <div className='stringComponentContainer px-2'>
-			<div className='stringComponentLabel mx-2' >
-				{'Name'}
-			</div>
-            <input 
-                type="text" 
-                value={value} 
-                onChange={handleChange} 
-                placeholder="Введите строку" 
-				className={`form-control stringComponent ${error ? 'is-invalid' : ''}`} 
-            />
-         </div>
-    );
+        <div className='d-flex flex-column moderat'>
+            { keyParam === 'modulationMacros' && <div className='text-center'>
+                <p className="modulatiomNacroName">
+                { viewStore.getTecnologyValue('name', 'modulationMacros',selectedModulationMacro )}:&nbsp;  
+                { viewStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', selectedModulationMacro)}%,&nbsp; 
+                { viewStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', selectedModulationMacro)}Hz
+                </p>
+            </div>}
+            <div className='stringComponentContainer px-2'>
+                <div className='stringComponentLabel mx-2' >
+                    {'Name'}
+                </div>
+                <input 
+                    type="text" 
+                    value={value} 
+                    onChange={handleChange} 
+                    placeholder="Введите строку" 
+                    className={`form-control stringComponent ${error ? 'is-invalid' : ''}`} 
+                />
+            </div>
+
+        </div>
+            );
 });
 
 export default StringComponent;

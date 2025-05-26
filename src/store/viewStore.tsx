@@ -1,7 +1,7 @@
 import { makeAutoObservable, computed } from "mobx";
 import cut_settings_schema from './cut_settings_schema'
 import cut_settings from "./cut_settings";
-//import { number } from "framer-motion";
+import utils from "../scripts/util";
 
 export interface KnobData {
     minimum: number;
@@ -97,8 +97,13 @@ class ViewStore {
             selectedModulationMacro: computed,
             selectedPiercingMacro: computed,
             isVertical: computed,
+            modulationMacroinUse:computed,
 
         });
+    }
+
+    get modulationMacroinUse () {
+        return utils.extractValuesByKey(cut_settings, 'modulationMacro')
     }
 
     get selectedModulationMacro() {
@@ -106,7 +111,7 @@ class ViewStore {
     }
 
     get selectedPiercingMacro() {
-        return this.technology.macros[this.selectedMacros].piercingMacroMacro;
+        return this.technology.macros[this.selectedMacros].piercingMacro;
     }
 
     get isVertical () {

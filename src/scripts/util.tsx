@@ -1,3 +1,7 @@
+interface NestedObject {
+    [key: string]: any; 
+}
+
 class Utils {
 	// Метод для преобразования полярных координат в декартовы
 	polarToCartesian(radius: number, angle: number, center: { x: number, y: number } = { x: 50, y: 50 }) {
@@ -147,6 +151,27 @@ class Utils {
 		recursiveSearch(obj);
 		return results;
 	}
+
+	extractValuesByKey (obj: NestedObject, key: string): any[] {
+    	let result: any[] = [];
+
+		const search = (currentObj: NestedObject) => {
+			for (const currentKey in currentObj) {
+				if (currentObj.hasOwnProperty(currentKey)) {
+					if (currentKey === key) {
+						result.push(currentObj[currentKey]);
+					}
+					// Если значение - это объект, рекурсивно вызываем функцию
+					if (typeof currentObj[currentKey] === 'object' && currentObj[currentKey] !== null) {
+						search(currentObj[currentKey]);
+					}
+				}
+			}
+		};
+
+		search(obj);
+		return [...new Set(result)].sort((a,b)=> a-b);
+	};
 
 }
 

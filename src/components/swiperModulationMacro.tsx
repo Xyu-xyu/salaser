@@ -16,7 +16,7 @@ import SwiperStringComponent from './swiperStringComponent';
 const swiperModulationMacro = observer(() => {
  	let arr = Array.from({ length: 16 })
 	const swiperRef = useRef<SwiperClass | null>(null);
-	const { isVertical } = viewStore
+	const { isVertical, modulationMacroinUse } = viewStore
 
 	return (
 
@@ -56,9 +56,15 @@ const swiperModulationMacro = observer(() => {
 						<SwiperSlide>
 							<div className="swiperSlide position-absolute top-50 start-50 translate-middle fs-4">
 							<div 
-								className={"text-center swiperSlideName "  /* +(ii % 2 === 0 ? "notInUse" : "") */}
+								className={"text-center swiperSlideName "   +( modulationMacroinUse.includes( ii ) ?  "" : "notInUse") }
 								> 
-								Any name for something  { ii }
+						            <div className='text-center'>
+										<p className=''>
+										{ viewStore.getTecnologyValue('name', 'modulationMacros',ii )}:&nbsp;  
+										{ viewStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', ii)}%,&nbsp; 
+										{ viewStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', ii)}Hz
+										</p>
+									</div>
 								</div>	
 							<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
 								<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>

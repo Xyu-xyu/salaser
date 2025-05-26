@@ -45,7 +45,7 @@ const piercingMacroSelector = observer(() => {
 		let val = knob['piercingMacro']
 		const path = utils.getPath( val, minimum, maximum, sweepAngle, r1, r2, startAngle);
 		viewStore.setKnobPath( param, path)
-		viewStore.setSelectedPiercingMacro( val )		
+		//viewStore.setSelectedPiercingMacro( val )		
 
 	}, []);
 
@@ -60,7 +60,7 @@ const piercingMacroSelector = observer(() => {
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
 			const newValue = selectedPiercingMacro + (e.deltaY < 0 ? step : -step)
-			viewStore.setSelectedPiercingMacro( newValue );			
+			//viewStore.setSelectedPiercingMacro( newValue );			
 		};
 
 		svg.addEventListener('wheel', handleWheel);
@@ -71,12 +71,12 @@ const piercingMacroSelector = observer(() => {
 
 	const increase = () => {
 		let newval = selectedPiercingMacro + stepBig
-		viewStore.setSelectedPiercingMacro( newval );
+		//viewStore.setSelectedPiercingMacro( newval );
 	}
 
 	const decrease = () => {
 		let newval = selectedPiercingMacro - stepBig
-		viewStore.setSelectedPiercingMacro( newval );
+		//viewStore.setSelectedPiercingMacro( newval );
 	}
 
 	return (
