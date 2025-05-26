@@ -643,3 +643,9 @@ body {
   font-size: 25px;
   font-family: "Moderat", Arial, sans-serif;
 }
+
+.swiper-vertical > .swiper-wrapper {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}

@@ -3,6 +3,10 @@ import cut_settings_schema from './cut_settings_schema'
 import cut_settings from "./cut_settings";
 import utils from "../scripts/util";
 
+export interface NestedObject {
+    [key: string]: any; 
+}
+
 export interface KnobData {
     minimum: number;
     maximum: number;
@@ -33,12 +37,13 @@ export interface Makro {
 
 
 class ViewStore {
+
     macrosModalEdit:boolean = false;
     carouselMode:boolean = false;
     modulationMacroModalEdit:boolean = false;
     piercingMacroModalEdit:boolean = false;
     selectedPiercingStage:number = 0; 
-
+    selectedSlide:number = 0
     mode: string = 'main1'
     theme: string = 'themeLight'
     knobMode: Boolean = true
@@ -103,7 +108,7 @@ class ViewStore {
     }
 
     get modulationMacroinUse () {
-        return utils.extractValuesByKey(cut_settings, 'modulationMacro')
+        return utils.extractValuesByKey(this.technology, 'modulationMacro')
     }
 
     get selectedModulationMacro() {
@@ -257,6 +262,8 @@ class ViewStore {
     }
 
     setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number,  keyInd:number|boolean=false) {
+        console.log ( arguments )
+        
         if (newVal < minimum) newVal = minimum
         if (newVal > maximum) newVal = maximum
         if (typeof keyInd === 'boolean') {
@@ -324,6 +331,51 @@ class ViewStore {
         console.log ('setCarouselMode  to ' + val)
         this.carouselMode = val
     }
+
+    setSelectedSlide (num:number) {
+        this.selectedSlide = num;
+    }
+
+    deleteAndUpdate ( deleteKey: string, deleteIndex: number, adjustKey: string) {
+		// Проверяем, существует ли ключ для удаления и его значение - массив
+		if (this.technology[deleteKey] 
+            && Array.isArray(this.technology[deleteKey]) 
+            && this.technology[deleteKey].length > 1) {
+			// Удаляем элемент по индексу
+			this.technology[deleteKey].splice(deleteIndex, 1);
+		}
+	
+		const adjustValues = (currentObj: NestedObject) => {
+			for (const key in currentObj) {
+				if (currentObj.hasOwnProperty(key)) {
+		            if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
+ 						adjustValues(currentObj[key]);
+					} else if (key === adjustKey 
+                            && typeof currentObj[key] === 'number'
+                            && currentObj[key] > deleteIndex) {
+						currentObj[key] -=1 ;
+					}
+				}
+			} 
+		};
+ 		adjustValues(this.technology);
+	};
+
+    AddAndUpdate(key: string, selectedSlide: number) {
+        console.log(arguments);
+    
+        if (this.technology[key] 
+            && Array.isArray(this.technology[key]) 
+            && this.technology[key].length > 0) {
+            
+            // Создаем копию выбранного элемента
+            const itemCopy = { ...this.technology[key][selectedSlide] };
+    
+            // Добавляем копию в массив
+            this.technology[key].push(itemCopy);
+        }
+    }
+
 }
 
 const viewStore = new ViewStore();

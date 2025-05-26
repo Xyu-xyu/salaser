@@ -5,17 +5,14 @@ import viewStore from '../store/viewStore';
  
 const NavigationModal = observer(() => {
 
-  	const { selectedModulationMacro, carouselMode } = viewStore
- 	const stepBig = 1
-
-	const increase = () => {
-		let newval = selectedModulationMacro + stepBig
-		
+  	const { carouselMode, selectedSlide } = viewStore
+ 
+	const cloneThis = () => {
+		viewStore.AddAndUpdate('modulationMacros', selectedSlide ) 
 	}
 
-	const decrease = () => {
-		let newval = selectedModulationMacro - stepBig
-		
+	const deleteThis = () => {
+		viewStore.deleteAndUpdate('modulationMacros', selectedSlide, 'modulationMacro') 
 	}
 
 	const carousel = () =>{
@@ -27,9 +24,9 @@ const NavigationModal = observer(() => {
 			<div className="mt-2">
 			{ carouselMode && <button className="carousel_btn violet_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
-						onMouseDown={ decrease }>
-						<Icon icon="qlementine-icons:check-tick-16"
-							width="48"
+						onMouseDown={ cloneThis }>
+						<Icon icon="fa-regular:clone"
+							width="36"
 							height="48"
 							style={{ color: 'white' }} />
 					</div>
@@ -53,7 +50,7 @@ const NavigationModal = observer(() => {
 				</button>
 				{ carouselMode && <button className="carousel_btn violet_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
-						onMouseDown={ increase }>
+						onMouseDown={ deleteThis }>
 						<Icon
 							icon="ic:twotone-delete-outline"
 							width="48"

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -14,9 +14,12 @@ import SwiperStringComponent from './swiperStringComponent';
 
 
 const swiperModulationMacro = observer(() => {
- 	let arr = Array.from({ length: 16 })
 	const swiperRef = useRef<SwiperClass | null>(null);
-	const { isVertical, modulationMacroinUse } = viewStore
+	const { isVertical, modulationMacroinUse, technology  } = viewStore
+	let arr = Array.from({ length: technology.modulationMacros.length })
+	useEffect(()=>{
+		viewStore.setSelectedSlide (viewStore.selectedModulationMacro)
+	},[])
 
 	return (
 
@@ -49,6 +52,10 @@ const swiperModulationMacro = observer(() => {
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
+				}}
+				onSlideChange={(swiper) => {
+					const currentSlide = swiper.activeIndex;
+					viewStore.setSelectedSlide( currentSlide );
 				}}
  			>
 				{
