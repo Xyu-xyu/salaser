@@ -8,7 +8,7 @@ const NavigationModal = observer(() => {
   	const { carouselMode, selectedSlide } = viewStore
  
 	const cloneThis = () => {
-		viewStore.AddAndUpdate('modulationMacros', selectedSlide ) 
+		viewStore.AddAndUpdate('modulationMacros', selectedSlide, 'modulationMacro' ) 
 	}
 
 	const deleteThis = () => {

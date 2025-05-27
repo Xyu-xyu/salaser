@@ -1,24 +1,31 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useEffect, useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import utils from '../scripts/util';
-import cutting_settings_schema from '../store/cut_settings_schema';
 import MacrosEditModalButton from './macrosEditModalButton'
-
 
 interface CustomKnobProps {
 	param: string;
 	keyParam: string;
+	keyInd: number|boolean;
 }
 
-
-const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) => {
+const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, keyInd=false }) => {
+	
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	
+	let minimum = utils.deepFind ( false, [keyParam, param, 'minimum'])
+	let title   = utils.deepFind ( false, [keyParam, param, 'title'])
+	let maximum = utils.deepFind ( false, [keyParam, param, 'maximum'])
+	let isArray = utils.deepFind ( false, [keyParam, param, '$wvEnumRef'])
+
 	const {isVertical, knobStep, knobRound, selectedMacros, selectedModulationMacro, technology, selectedPiercingMacro } = viewStore	
-	let property = utils.findByKey(cutting_settings_schema, param)[0]
-	let {minimum, maximum, title } = property
-	const isArray = '$wvEnumRef' in property ? property.$wvEnumRef : false;
+
+	if (isArray) {
+		let paramName = isArray.split('/').reverse()[0]		
+		maximum =utils.deepFind(technology, [paramName]).length-1
+	}
 	const knobStp = knobStep[param]
 	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
 	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) / 50 : Number(knobStp)
@@ -30,44 +37,37 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 		startAngle, sweepAngle
 	} = utils.getKnobLayout(isVertical);
 
-	let val=0
-	if (keyParam === 'macros') {
-		const knob = technology.macros[selectedMacros]	
-		val = Number(knob.cutting[param]);
-		if (param === 'piercingMacro') {
-			val = Number(knob[param]);
-		}
-	} else if (keyParam === 'modulationMacros') {
-		val =technology.modulationMacros[selectedModulationMacro][param]
-	} else if (keyParam === 'piercingMacros') {
-		val=technology.piercingMacros[selectedPiercingMacro][param]
-	} else if ('piercingStages') {
-		val =  viewStore.getTecnologyValue (param, keyParam)
-	}
-
-	useEffect(()=>{
+	let val=0;
+	if (typeof keyInd === 'number') {
 		if (keyParam === 'macros') {
-			const knob = technology.macros[selectedMacros]	
+			let knob = technology.macros[keyInd]		
 			val = Number(knob.cutting[param]);
 			if (param === 'piercingMacro') {
 				val = Number(knob[param]);
 			}
 		} else if (keyParam === 'modulationMacros') {
-			val=technology.modulationMacros[selectedModulationMacro][param]
+			val = technology.modulationMacros[keyInd][param]
 		} else if (keyParam === 'piercingMacros') {
-			val=technology.piercingMacros[selectedPiercingMacro][param]
+			val = technology.piercingMacros[keyInd][param]
 		} else if ('piercingStages') {
-			val =  viewStore.getTecnologyValue (param, keyParam)
+			val = viewStore.getTecnologyValue (param, keyParam, keyInd)
 		}
 
-		const path = utils.getPath(Number(val), minimum, maximum, sweepAngle, r1, r2, startAngle);
-		if (path.includes('NaN')) {
-			viewStore.setKnobPath(param, "M0 0")
-		} else {
-			viewStore.setKnobPath(param, path)
+	} else {
+		if (keyParam === 'macros') {
+			let knob = technology.macros[selectedMacros]		
+			val = Number(knob.cutting[param]);
+			if (param === 'piercingMacro') {
+				val = Number(knob[param]);
+			}
+		} else if (keyParam === 'modulationMacros') {
+			val = technology.modulationMacros[selectedModulationMacro][param]
+		} else if (keyParam === 'piercingMacros') {
+			val = technology.piercingMacros[selectedPiercingMacro][param]
+		} else if ('piercingStages') {
+			val = viewStore.getTecnologyValue (param, keyParam, keyInd)
 		}
-		
-	},[	selectedMacros, selectedModulationMacro]) 
+	}
 
 	const handleMouseDown = (callback: () => void) => {
 		callback();
@@ -77,32 +77,6 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 	const handleMouseUp = () => {
 		if (intervalRef.current) clearInterval(intervalRef.current);
 	};
-
-	useEffect(() => {
-		const path = utils.getPath(val, minimum, maximum, sweepAngle, r1, r2, startAngle);
-		if (path.includes('NaN')) {
-			viewStore.setKnobPath(param, "M0 0")
-		} else {
-			viewStore.setKnobPath(param, path)
-		}
-
-	}, [selectedMacros, val]);
-
-
-	useEffect(() => {
-		const svg = svgRef.current;
-		if (!svg) return;
-
-		const handleWheel = (e: WheelEvent) => {
-			e.preventDefault();
-			setVal( (e.deltaY < 0 ? step : -step));
-		};
-
-		svg.addEventListener('wheel', handleWheel);
-		return () => {
-			svg.removeEventListener('wheel', handleWheel);
-		};
-	}, [selectedMacros]);
 
 	const increase = () => {
 		setVal( stepBig );
@@ -117,6 +91,21 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 		let newValue = currentValue + step
 		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum )
 	}
+
+	useEffect(() => {
+		const svg = svgRef.current;
+		if (!svg) return;
+
+		const handleWheel = (e: WheelEvent) => {
+			e.preventDefault();
+			setVal( (e.deltaY < 0 ? step : -step));
+		};
+
+		svg.addEventListener('wheel', handleWheel);
+		return () => {
+			svg.removeEventListener('wheel', handleWheel);
+		};
+	}, []);
 	
 
 	return (
@@ -156,7 +145,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 						}
 
 						<path
-							d={ viewStore.getKnobPath(param) }
+							d={ utils.getPath(val, minimum, maximum, sweepAngle, r1, r2, startAngle) }
 							fill="var(--knobMainText)"
 							stroke="var(--knobMainText)"
 							strokeWidth="2"
@@ -191,9 +180,6 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) 
 						fill="var(--knobMainText)">
 						{title.split(', ')[1]}
 					</text>
-{/* 					<text x="95" y="130" textAnchor="end" className='moderat' fontSize={8} fill="var(--paleColor)">
-						min:{minimum} max:{maximum}
-					</text> */}
 
 					<circle
 						cx={x1}

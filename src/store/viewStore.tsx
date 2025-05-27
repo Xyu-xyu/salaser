@@ -361,18 +361,19 @@ class ViewStore {
  		adjustValues(this.technology);
 	};
 
-    AddAndUpdate(key: string, selectedSlide: number) {
-        console.log(arguments);
-    
+    AddAndUpdate(key: string, selectedSlide: number, adjustKey: string) {
+        let max= utils.deepFind(false, [adjustKey, 'maximum'])
         if (this.technology[key] 
             && Array.isArray(this.technology[key]) 
-            && this.technology[key].length > 0) {
+            && this.technology[key].length < max) {
             
             // Создаем копию выбранного элемента
             const itemCopy = { ...this.technology[key][selectedSlide] };
     
             // Добавляем копию в массив
             this.technology[key].push(itemCopy);
+        } else  {
+            console.log ("Перебор!")
         }
     }
 

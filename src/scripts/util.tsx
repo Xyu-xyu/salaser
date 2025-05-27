@@ -1,3 +1,5 @@
+import cutting_settings_schema from '../store/cut_settings_schema';
+
 interface NestedObject {
     [key: string]: any; 
 }
@@ -172,6 +174,41 @@ class Utils {
 		search(obj);
 		return [...new Set(result)].sort((a,b)=> a-b);
 	};
+
+	deepFind(obj:  Record<string, any> | false, keys: string[]): any | false {
+		// If there are no keys to search or the object is empty, return false
+		if (!obj) obj = cutting_settings_schema;
+		if (!keys.length || !obj) return false
+		
+	
+		// Taking the first key from the array
+		const [currentKey, ...remainingKeys] = keys;
+	
+		// Recursive function to search for the key in the object at any depth
+		const findKey = (currentObj:  Record<string, any> | null): any | false => {
+			if (currentObj && typeof currentObj === 'object') {
+				// If the current object contains the desired key
+				if (currentKey in currentObj) {
+					// If this is the last key in the chain, return its value
+					if (remainingKeys.length === 0) {
+						return currentObj[currentKey];
+					}
+					// Otherwise, continue searching with the remaining keys in the value of the found key
+					return utils.deepFind(currentObj[currentKey], remainingKeys);
+				}
+	
+				// Searching for the key in all values of the object (recursively)
+				for (const key of Object.keys(currentObj)) {
+					const result = findKey(currentObj[key]);
+					if (result !== false) return result;
+				}
+			}
+	
+			return false;
+		};
+	
+		return findKey(obj);
+	}
 
 }
 

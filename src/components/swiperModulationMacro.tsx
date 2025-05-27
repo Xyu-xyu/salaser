@@ -6,10 +6,9 @@ import 'swiper/css/scrollbar';
 import { EffectCoverflow, Scrollbar } from 'swiper/modules';
 import { Swiper as SwiperClass } from 'swiper/types';
 //import StringComponent from './stringComponent';
-//import UniversalKnob from './universalKnob';
+import UniversalKnob from './universalKnob';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
-import SwipeUniversalKnob from './swipeUniversalKnob';
 import SwiperStringComponent from './swiperStringComponent';
 
 
@@ -85,7 +84,7 @@ const swiperModulationMacro = observer(() => {
 								].map((a: string, i: number) => (
 									<div className="editModal_row" key={i}>
 										<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-											<SwipeUniversalKnob param={a}  keyParam={'modulationMacros'} keyInd={ii}/>
+											<UniversalKnob param={a}  keyParam={'modulationMacros'} keyInd={ii}/>
 										</div>
 									</div>
 									))
