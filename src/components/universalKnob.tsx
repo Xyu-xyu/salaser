@@ -87,9 +87,9 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 	}
 
 	const setVal =(step:number) =>{
-		let currentValue= viewStore.getTecnologyValue(param, keyParam)
+		let currentValue= viewStore.getTecnologyValue(param, keyParam, keyInd)
 		let newValue = currentValue + step
-		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum )
+		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum, keyInd )
 	}
 
 	useEffect(() => {

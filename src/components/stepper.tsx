@@ -7,7 +7,7 @@ const Stepper = observer(() => {
 	const {technology, selectedPiercingMacro} = viewStore
 	const length = technology.piercingMacros[selectedPiercingMacro].stages.length+1
 	const steps = Array.from({ length: length }, (_, i) => i);
-	const { selectedPiercingStage, isVertical } = viewStore
+	const { selectedPiercingStage } = viewStore
 	const onStepChange = (step: number) => {
 		viewStore.setselectedPiercingStage(step)
 	}
