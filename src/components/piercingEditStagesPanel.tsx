@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import UniversalKnob from './universalKnob';
-import IosToggleBlowInStage from './iosToggleBlowInStage';
-import IosToggleMacrosInStage from './iosToggleMacrosInStage';
+import IosToggleBlowInStage from './toggles/iosToggleBlowInStage';
+import IosToggleMacrosInStage from './toggles/iosToggleMacrosInStage';
 
 const piercingEditStagesPanel = observer(() => {
 	const { isVertical } = viewStore;

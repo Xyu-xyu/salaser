@@ -1,6 +1,6 @@
 // IosToggle4.tsx
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import viewStore from '../../store/viewStore';
 import IosToggleGeneric from './iosToggleGeneric';
 
 const iosToggleMacrosInStage = observer(() => {

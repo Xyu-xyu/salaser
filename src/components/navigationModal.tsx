@@ -19,6 +19,10 @@ const NavigationModal = observer(() => {
 		viewStore.setCarouselMode ( !carouselMode)
 	}
 
+	const setThis =() =>{
+		viewStore.setTecnologyValue( selectedSlide, 'modulationMacro', 'macros', 0, 15, false  )
+	}
+
 	return (
 		<>
 			<div className="mt-2">
@@ -48,6 +52,17 @@ const NavigationModal = observer(() => {
 						}
 					</div>
 				</button>
+				{ carouselMode && <button className="carousel_btn violet_button m-2">
+					<div className="d-flex align-items-center justify-content-center"
+						onMouseDown={ setThis }>
+						<Icon
+							icon="charm:square-tick"
+							width="48"
+							height="48"
+							style={{ color: 'white' }}/>
+						
+					</div>
+				</button>}
 				{ carouselMode && <button className="carousel_btn violet_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
 						onMouseDown={ deleteThis }>

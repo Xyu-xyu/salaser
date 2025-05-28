@@ -7,7 +7,7 @@ import MacrosEditModalButton from './macrosEditModalButton'
 interface CustomKnobProps {
 	param: string;
 	keyParam: string;
-	keyInd: number|boolean;
+	keyInd?: number|boolean;
 }
 
 const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, keyInd=false }) => {

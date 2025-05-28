@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import viewStore from '../../store/viewStore';
 import IosToggleGeneric from './iosToggleGeneric';
-import utils from '../scripts/util';
-import cutting_settings_schema from '../store/cut_settings_schema';
+import utils from '../../scripts/util';
+import cutting_settings_schema from '../../store/cut_settings_schema';
 
 const iosToggleBlowInPiercing = observer(() => {
 

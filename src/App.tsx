@@ -3,9 +3,9 @@ import Main from './components/main'
 import SidePanel from './components/sidePanel.js'
 import { observer } from "mobx-react-lite";
 import viewStore from './store/viewStore.js';
-import IosToggle0 from './components/iosToggle0.js';
-import IosToggle1 from './components/iosToggle1';
-import IosToggle2 from './components/iosToggle2';
+import IosToggle0 from './components/toggles/iosToggle0.js';
+import IosToggle1 from './components/toggles/iosToggle1.js';
+import IosToggle2 from './components/toggles/iosToggle2.js';
 
 
 const App = observer(() => {

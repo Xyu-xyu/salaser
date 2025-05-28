@@ -3,8 +3,8 @@ import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 import UniversalKnob from './universalKnob';
 import MacrosSelector from './macrosSelector';
-import IosToggleBlowInMacros from './iosToggleBlowInMacros';
-import IosToggleMacrocInMacros from './iosToggleMacrosInMacros';
+import IosToggleBlowInMacros from './toggles/iosToggleBlowInMacros';
+import IosToggleMacrocInMacros from './toggles/iosToggleMacrosInMacros';
 import MacrosEditList from './macrosEditList';
 
 

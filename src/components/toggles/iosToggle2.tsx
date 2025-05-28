@@ -1,6 +1,6 @@
 import './IosToggle.css';
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import viewStore from '../../store/viewStore';
 import IosToggleForm from './iosToggleForm';
 
 const IosToggle1 = observer(() => {

@@ -1,21 +1,20 @@
+// IosToggle4.tsx
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import viewStore from '../../store/viewStore';
 import IosToggleGeneric from './iosToggleGeneric';
-
-const IosToggleBlowInMacros = observer(() => {
-
+ 
+const iosToggleMacrosInMacros = observer(() => {
 	const { selectedMacros, macrosProperties, isVertical, technology } = viewStore
-	const param: string = "cross_blow"
+	const param: string = "enabled"
 	const knob = technology.macros[selectedMacros]
 	const property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 	const { title } = property;
-
 
 	let val = Boolean(knob.cutting[param as keyof typeof knob.cutting]);
 	const setVal = () => {
 		viewStore.setValBoolean(param, !val)
 	}
-
+	
 	return (
 		<IosToggleGeneric
 			title={title}
@@ -26,4 +25,4 @@ const IosToggleBlowInMacros = observer(() => {
 	);
 });
 
-export default IosToggleBlowInMacros;
+export default iosToggleMacrosInMacros;

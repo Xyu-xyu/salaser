@@ -7,7 +7,7 @@ import Stepper from './stepper';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
 import MacrosEditList from './macrosEditList';
 import StringComponent from './stringComponent';
-import IosToggleBlowInPiercing from './iosToggleBlowInPiercing'
+import IosToggleBlowInPiercing from './toggles/iosToggleBlowInPiercing'
 
 
 const PiercingEditModalPanel = observer(() => {
