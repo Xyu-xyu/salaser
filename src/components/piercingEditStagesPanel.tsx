@@ -18,7 +18,7 @@ const piercingEditStagesPanel = observer(() => {
 				].map((a: string, i: number) => (
 					<div className="" key={i}>
 						<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-							<UniversalKnob param={a} keyParam={'piercingStages'} />
+							<UniversalKnob param={a} keyParam={'stages'} />
 						</div>
 					</div>
 				))}
@@ -33,7 +33,7 @@ const piercingEditStagesPanel = observer(() => {
 				].map((a: string, i: number) => (
 					<div className="" key={i}>
 						<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-							<UniversalKnob param={a} keyParam={'piercingStages'} />
+							<UniversalKnob param={a} keyParam={'stages'} />
 						</div>
 					</div>
 				))}

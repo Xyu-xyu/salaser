@@ -635,6 +635,11 @@ body {
   color: black;
 }
 
+.currentMacros {
+  background-color:  rgba(19,191,17,1);
+  color: white;
+}
+
 .modal-content {
   background-color: rgb(244, 244, 247);
 }

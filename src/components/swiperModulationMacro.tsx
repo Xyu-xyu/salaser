@@ -14,7 +14,7 @@ import SwiperStringComponent from './swiperStringComponent';
 
 const swiperModulationMacro = observer(() => {
 	const swiperRef = useRef<SwiperClass | null>(null);
-	const { isVertical, modulationMacroinUse, technology  } = viewStore
+	const { isVertical, modulationMacroinUse, technology , selectedModulationMacro  } = viewStore
 	let arr = Array.from({ length: technology.modulationMacros.length })
 	useEffect(()=>{
 		viewStore.setSelectedSlide (viewStore.selectedModulationMacro)
@@ -62,7 +62,7 @@ const swiperModulationMacro = observer(() => {
 						<SwiperSlide>
 							<div className="swiperSlide position-absolute top-50 start-50 translate-middle fs-4">
 							<div 
-								className={"text-center swiperSlideName "   +( modulationMacroinUse.includes( ii ) ?  "" : "notInUse") }
+								className={"text-center swiperSlideName "   +( modulationMacroinUse.includes( ii ) ?  (ii === selectedModulationMacro ? "currentMacros":"") : "notInUse") }
 								> 
 						            <div className='text-center'>
 										<p className=''>

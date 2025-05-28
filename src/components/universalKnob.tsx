@@ -49,7 +49,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 			val = technology.modulationMacros[keyInd][param]
 		} else if (keyParam === 'piercingMacros') {
 			val = technology.piercingMacros[keyInd][param]
-		} else if ('piercingStages') {
+		} else if (keyParam === 'stages') {
 			val = viewStore.getTecnologyValue (param, keyParam, keyInd)
 		}
 
@@ -64,7 +64,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 			val = technology.modulationMacros[selectedModulationMacro][param]
 		} else if (keyParam === 'piercingMacros') {
 			val = technology.piercingMacros[selectedPiercingMacro][param]
-		} else if ('piercingStages') {
+		} else if (keyParam === 'stages') {
 			val = viewStore.getTecnologyValue (param, keyParam, keyInd)
 		}
 	}

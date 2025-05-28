@@ -5,8 +5,8 @@ import IosToggleGeneric from './iosToggleGeneric';
 const IosToggleBlowInStage = observer(() => {
 	const { isVertical  } = viewStore;
 	const param = 'cross_blow';
- 	const val = viewStore.getTecnologyValue (param, 'piercingStages')
-	const setVal = () => viewStore.setTecnologyValueBoolean( !val, param, 'piercingStages');
+ 	const val = viewStore.getTecnologyValue (param, 'stages')
+	const setVal = () => viewStore.setTecnologyValueBoolean( !val, param, 'stages');
 
 	return (
 		<IosToggleGeneric
