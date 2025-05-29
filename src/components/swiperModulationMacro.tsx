@@ -3,8 +3,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/scrollbar';
-import { EffectCoverflow, Scrollbar } from 'swiper/modules';
 import { Swiper as SwiperClass } from 'swiper/types';
+import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 //import StringComponent from './stringComponent';
 import UniversalKnob from './universalKnob';
 import viewStore from '../store/viewStore';
@@ -27,6 +27,7 @@ const swiperModulationMacro = observer(() => {
 				onSwiper={(swiper) => {
 					swiperRef.current = swiper;
 				}}
+				modules={[EffectCoverflow, /* Mousewheel */]}
 				direction={isVertical ? 'vertical' : 'horizontal'}
 				effect="coverflow"
 				loop={false}
@@ -36,7 +37,6 @@ const swiperModulationMacro = observer(() => {
 				slidesPerView={5}
 				initialSlide={ viewStore.selectedModulationMacro } // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
 				freeMode={false}
-				scrollbar={{ el: '.swiper-scrollbar', draggable: true }}
 				coverflowEffect={{
 					rotate: 0,
 					stretch: 0,
@@ -44,7 +44,13 @@ const swiperModulationMacro = observer(() => {
 					modifier: isVertical ? 1 : 0.8,
 					slideShadows: false,
 				}}
-				modules={[EffectCoverflow, Scrollbar]}
+
+/* 				mousewheel={{ // ✅ Настройки mousewheel
+					forceToAxis: true,
+					sensitivity: 1,
+					releaseOnEdges: true, // Добавьте, если нужно плавное поведение на крайних слайдах
+				}} */
+
 				style={{
 					height:'100%',
 					width:'100%', 

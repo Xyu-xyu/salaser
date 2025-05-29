@@ -26,15 +26,6 @@ const NavigationModal = observer(() => {
 	return (
 		<>
 			<div className="mt-2">
-			{ carouselMode && <button className="carousel_btn violet_button m-2">
-					<div className="d-flex align-items-center justify-content-center"
-						onMouseDown={ cloneThis }>
-						<Icon icon="fa-regular:clone"
-							width="36"
-							height="48"
-							style={{ color: 'white' }} />
-					</div>
-				</button>}
 				<button className="carousel_btn violet_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
 							onMouseDown={ carousel }>
@@ -51,7 +42,7 @@ const NavigationModal = observer(() => {
 							style={{ color: 'white' }} />
 						}
 					</div>
-				</button>
+				</button>	
 				{ carouselMode && <button className="carousel_btn violet_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
 						onMouseDown={ setThis }>
@@ -64,6 +55,15 @@ const NavigationModal = observer(() => {
 					</div>
 				</button>}
 				{ carouselMode && <button className="carousel_btn violet_button m-2">
+					<div className="d-flex align-items-center justify-content-center"
+						onMouseDown={ cloneThis }>
+						<Icon icon="fa-regular:clone"
+							width="36"
+							height="48"
+							style={{ color: 'white' }} />
+					</div>
+				</button>}				
+				{ carouselMode && <button className="carousel_btn  m-2">
 					<div className="d-flex align-items-center justify-content-center"
 						onMouseDown={ deleteThis }>
 						<Icon

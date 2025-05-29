@@ -51,6 +51,13 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
                 { viewStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', selectedModulationMacro)}Hz
                 </p>
             </div>}
+            { keyParam === 'piercingMacros' && <div className='text-center'>
+                <p className="modulatiomNacroName">
+                { viewStore.getTecnologyValue('name', 'piercingMacros',selectedPiercingMacro )}:&nbsp;  
+                { viewStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', selectedPiercingMacro)}&nbsp;Hz,&nbsp;
+                { viewStore.getTecnologyValue('stages', 'piercingMacros', selectedPiercingMacro).length}&nbsp;stages 
+                </p>
+            </div>}
             <div className='stringComponentContainer px-2'>
                 <div className='stringComponentLabel mx-2' >
                     {'Name'}

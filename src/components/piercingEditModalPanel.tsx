@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
-import PiercingMacroSelector from './piercingMacroSelector';
+//import PiercingMacroSelector from './piercingMacroSelector';
 import UniversalKnob from './universalKnob';
 import Stepper from './stepper';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
@@ -29,9 +29,9 @@ const PiercingEditModalPanel = observer(() => {
 					<div className="container-fluid">
 						<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
 
-							<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+{/* 							<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 								<PiercingMacroSelector />
-							</div>
+							</div> */}
 							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 								<StringComponent param={'name'} keyParam={'piercingMacros'} />
 							</div>

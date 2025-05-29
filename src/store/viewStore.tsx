@@ -146,31 +146,33 @@ class ViewStore {
 
     setModal (val:boolean, modal:string ) {
         console.log ('setModalEdit  '+ modal)
+        this.setCarouselMode( false )
         if (modal === 'macros') {
 
             this.macrosModalEdit = val
-            setTimeout (()=>{
+           /*  setTimeout (()=>{
                 this.piercingMacroModalEdit = false
                 this.modulationMacroModalEdit = false
-            },200)
+            },200) */
 
         } else if (modal === 'modulationMacro'  
             || modal === 'initial_modulationMacro') {
 
             this.modulationMacroModalEdit = val
-            setTimeout (()=>{
+/*             setTimeout (()=>{
                 this.macrosModalEdit = false
                 this.piercingMacroModalEdit = false
-            },200)
+            },200) */
           
             
         } else if (modal === 'piercingMacro') {
 
             this.piercingMacroModalEdit = val
-            setTimeout (()=>{
+/*             setTimeout (()=>{
                 this.modulationMacroModalEdit = false
                 this.macrosModalEdit = false
-            },200)
+            },200) */
+
         }
     }
 
@@ -338,11 +340,9 @@ class ViewStore {
     }
 
     deleteAndUpdate ( deleteKey: string, deleteIndex: number, adjustKey: string) {
-		// Проверяем, существует ли ключ для удаления и его значение - массив
 		if (this.technology[deleteKey] 
             && Array.isArray(this.technology[deleteKey]) 
             && this.technology[deleteKey].length > 1) {
-			// Удаляем элемент по индексу
 			this.technology[deleteKey].splice(deleteIndex, 1);
 		}
 	
@@ -353,7 +353,7 @@ class ViewStore {
  						adjustValues(currentObj[key]);
 					} else if (key === adjustKey 
                             && typeof currentObj[key] === 'number'
-                            && currentObj[key] > deleteIndex) {
+                            && currentObj[key] >= deleteIndex) {
 						currentObj[key] -=1 ;
 					}
 				}
@@ -363,21 +363,31 @@ class ViewStore {
 	};
 
     AddAndUpdate(key: string, selectedSlide: number, adjustKey: string) {
-        let max= utils.deepFind(false, [adjustKey, 'maximum'])
+        const max = utils.deepFind(false, [adjustKey, 'maximum']);
         if (this.technology[key] 
             && Array.isArray(this.technology[key]) 
-            && this.technology[key].length < max) {
+            && this.technology[key].length < max+1) {
             
-            // Создаем копию выбранного элемента
             const itemCopy = { ...this.technology[key][selectedSlide] };
-    
-            // Добавляем копию в массив
-            this.technology[key].push(itemCopy);
-        } else  {
-            console.log ("Перебор!")
+            this.technology[key].splice(selectedSlide + 1, 0, itemCopy);
+            const adjustValues = (currentObj: any) => {
+                for (const key in currentObj) {
+                    if (currentObj.hasOwnProperty(key)) {
+                        if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
+                            adjustValues(currentObj[key]);
+                        } else if (key === adjustKey 
+                                  && typeof currentObj[key] === 'number'
+                                  && currentObj[key] > selectedSlide) {
+                            currentObj[key] += 1;
+                        }
+                    }
+                }
+            };
+            adjustValues(this.technology);
+        } else {
+            console.log("Превышен максимальный размер массива!");
         }
     }
-
 }
 
 const viewStore = new ViewStore();

@@ -79,11 +79,11 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 	};
 
 	const increase = () => {
-		setVal( stepBig );
+		setVal( step );
 	}
 
 	const decrease = () => {
-		setVal( -stepBig);
+		setVal( -step);
 	}
 
 	const setVal =(step:number) =>{
@@ -98,7 +98,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
-			setVal( (e.deltaY < 0 ? step : -step));
+			setVal( (e.deltaY < 0 ? stepBig : -stepBig));
 		};
 
 		svg.addEventListener('wheel', handleWheel);
