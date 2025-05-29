@@ -36,8 +36,27 @@ export interface Makro {
     cutting: CuttingSettings;
 }
 
+export interface ModalProps {
+    show: boolean;
+     modalBody: string;
+    confirmText: string;
+    cancelText: string;
+    func: (...args: any[]) => void;
+    args?: any[];
+}
+
+
 
 class ViewStore {
+
+    modalProps: ModalProps = {
+        show: false,
+        modalBody: 'This is the body of the modal.',
+        confirmText: 'Confirm',
+        cancelText: 'Cancel',
+        func: () => {},
+        args: []
+    };
 
     macrosModalEdit:boolean = false;
     carouselMode:boolean = false;
@@ -124,6 +143,10 @@ class ViewStore {
         return Boolean(window.innerHeight > window.innerWidth)
     }
 
+    setModalProps (val:ModalProps) {
+       // console.log (JSON.stringify(val))
+        this.modalProps  =  val;
+    }
           
     setTheme(theme:string ) {
        this.theme =theme
@@ -227,7 +250,7 @@ class ViewStore {
     }
 
     getTecnologyValue (param:string, keyParam:string, keyInd:number|boolean=false) {
-        console.log ( arguments )
+        //console.log ( arguments )
         if (typeof keyInd === 'number') {
             if (keyParam === 'macros') {
             
@@ -266,7 +289,7 @@ class ViewStore {
     }
 
     setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number,  keyInd:number|boolean=false) {
-        console.log ( arguments )
+       // console.log ( arguments )
         
         if (newVal < minimum) newVal = minimum
         if (newVal > maximum) newVal = maximum
@@ -341,10 +364,11 @@ class ViewStore {
     }
 
     deleteAndUpdate ( deleteKey: string, deleteIndex: number, adjustKey: string) {
-		if (this.technology[deleteKey] 
-            && Array.isArray(this.technology[deleteKey]) 
-            && this.technology[deleteKey].length > 1) {
-			this.technology[deleteKey].splice(deleteIndex, 1);
+        //console.log ( arguments )
+		if (viewStore.technology[deleteKey] 
+            && Array.isArray(viewStore.technology[deleteKey]) 
+            && viewStore.technology[deleteKey].length > 1) {
+			viewStore.technology[deleteKey].splice(deleteIndex, 1);
 		} else {
             showToast({
                 type: 'warning',
@@ -367,17 +391,17 @@ class ViewStore {
 				}
 			} 
 		};
- 		adjustValues(this.technology);
+ 		adjustValues(viewStore.technology);
 	};
 
     AddAndUpdate(key: string, selectedSlide: number, adjustKey: string) {
         const max = utils.deepFind(false, [adjustKey, 'maximum']);
-        if (this.technology[key] 
-            && Array.isArray(this.technology[key]) 
-            && this.technology[key].length < max+1) {
+        if (viewStore.technology[key] 
+            && Array.isArray(viewStore.technology[key]) 
+            && viewStore.technology[key].length < max+1) {
             
-            const itemCopy = { ...this.technology[key][selectedSlide] };
-            this.technology[key].splice(selectedSlide + 1, 0, itemCopy);
+            const itemCopy = { ...viewStore.technology[key][selectedSlide] };
+            viewStore.technology[key].splice(selectedSlide + 1, 0, itemCopy);
             const adjustValues = (currentObj: any) => {
                 for (const key in currentObj) {
                     if (currentObj.hasOwnProperty(key)) {
@@ -391,7 +415,7 @@ class ViewStore {
                     }
                 }
             };
-            adjustValues(this.technology);
+            adjustValues(viewStore.technology);
         } else {
             showToast({
                 type: 'warning',

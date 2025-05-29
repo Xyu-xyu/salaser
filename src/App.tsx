@@ -7,6 +7,7 @@ import IosToggle0 from './components/toggles/iosToggle0.js';
 import IosToggle1 from './components/toggles/iosToggle1.js';
 import IosToggle2 from './components/toggles/iosToggle2.js';
 import { ToastContainer } from 'react-toastify';
+import ModalGeneric from "./components/modalGeneric.js";
 
 
 const App = observer(() => {
@@ -32,6 +33,7 @@ const App = observer(() => {
 					fontSize: '20px'
 				}}/> 
 				{mode === 'main' ? <Main /> : <SidePanel />}
+				<ModalGeneric />
 			</div>
 
 		</>
