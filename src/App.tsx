@@ -6,6 +6,7 @@ import viewStore from './store/viewStore.js';
 import IosToggle0 from './components/toggles/iosToggle0.js';
 import IosToggle1 from './components/toggles/iosToggle1.js';
 import IosToggle2 from './components/toggles/iosToggle2.js';
+import { ToastContainer } from 'react-toastify';
 
 
 const App = observer(() => {
@@ -25,6 +26,11 @@ const App = observer(() => {
 				<IosToggle0 />
 				<IosToggle1 />
 				<IosToggle2 />
+				<ToastContainer toastStyle={{
+					minWidth: '450px',
+					minHeight: '150px',
+					fontSize: '20px'
+				}}/> 
 				{mode === 'main' ? <Main /> : <SidePanel />}
 			</div>
 

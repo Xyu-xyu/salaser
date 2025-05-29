@@ -5,7 +5,6 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/scrollbar';
 import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
-//import StringComponent from './stringComponent';
 import UniversalKnob from './universalKnob';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';

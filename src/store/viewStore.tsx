@@ -2,6 +2,7 @@ import { makeAutoObservable, computed } from "mobx";
 import cut_settings_schema from './cut_settings_schema'
 import cut_settings from "./cut_settings";
 import utils from "../scripts/util";
+import { showToast } from "../components/toast";
 
 export interface NestedObject {
     [key: string]: any; 
@@ -344,7 +345,14 @@ class ViewStore {
             && Array.isArray(this.technology[deleteKey]) 
             && this.technology[deleteKey].length > 1) {
 			this.technology[deleteKey].splice(deleteIndex, 1);
-		}
+		} else {
+            showToast({
+                type: 'warning',
+                message: "Достигнуто минимальное значение!",
+                position: 'bottom-right',
+                autoClose: 5000
+              });
+        }
 	
 		const adjustValues = (currentObj: NestedObject) => {
 			for (const key in currentObj) {
@@ -385,7 +393,12 @@ class ViewStore {
             };
             adjustValues(this.technology);
         } else {
-            console.log("Превышен максимальный размер массива!");
+            showToast({
+                type: 'warning',
+                message: "Достигнуто максиимальное значение!",
+                position: 'bottom-right',
+                autoClose: 5000
+              });
         }
     }
 }
