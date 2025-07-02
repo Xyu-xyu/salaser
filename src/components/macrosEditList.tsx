@@ -30,9 +30,9 @@ const MacrosEditList: React.FC<MacrosEditListInt> = observer(({ param, keyParam 
 						<ListGroup.Item key={option}>
 							<Form.Check
 								type="radio"
-								id={`radio-${option}-${title}`}
+								id={`radio-${option}-${title}-${keyParam}`}
 								label={option}
-								name={`${title}Options`}
+								name={`${title}-Options-${keyParam}`}
 								value={option}
 								checked={val === option}
 								onChange={(e) => setSelectedOption(e.target.value)}
