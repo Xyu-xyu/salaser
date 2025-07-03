@@ -629,6 +629,9 @@ body {
   color: white;
 }
 
+.swiperSlideLong {
+  width: 700px;
+}
 
 .notInUse {
   background-color: var(--grey-nav);  

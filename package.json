@@ -27,6 +27,7 @@
     "react-sortablejs": "^6.1.4",
     "react-svg": "^16.1.28",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.0.2",
     "sortablejs": "1.15.6",
     "swiper": "^11.2.6"
   },

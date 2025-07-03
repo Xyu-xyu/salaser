@@ -8,6 +8,7 @@ import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
+import { SwiperPiercingMacroTabs } from './swiperPiercingMacroTabs';
  
 
 const swiperPiercingMacro = observer(() => {
@@ -75,6 +76,9 @@ const swiperPiercingMacro = observer(() => {
 
 									<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 										<SwiperStringComponent param={'name'} keyParam={'piercingMacros'} keyInd={ii}/>
+									</div>
+									<div className={isVertical ? "editModal_col d-contents mt-2" : "editModal_col_hor d-contents mt-2"}>
+										<SwiperPiercingMacroTabs />
 									</div>
  								</div>
 							
