@@ -8,7 +8,7 @@ import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
-import { SwiperPiercingMacroTabs } from './swiperPiercingMacroTabs';
+import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
  
 
 const swiperPiercingMacro = observer(() => {
@@ -33,7 +33,7 @@ const swiperPiercingMacro = observer(() => {
 				slideToClickedSlide={true}
 				grabCursor={true}
 				centeredSlides={true}
-				slidesPerView={5}
+				slidesPerView={6}
 				initialSlide={ viewStore.selectedPiercingMacro } // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
 				freeMode={false}
 				coverflowEffect={{
@@ -78,7 +78,9 @@ const swiperPiercingMacro = observer(() => {
 										<SwiperStringComponent param={'name'} keyParam={'piercingMacros'} keyInd={ii}/>
 									</div>
 									<div className={isVertical ? "editModal_col d-contents mt-2" : "editModal_col_hor d-contents mt-2"}>
-										<SwiperPiercingMacroTabs />
+									<div style={{ width: '900px', margin: 'auto' }}>
+										<SwiperPiercingMacroCharts />
+									</div>
 									</div>
  								</div>
 							
