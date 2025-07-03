@@ -24,7 +24,7 @@ const SwiperStringComponent: React.FC<StringComponentInt> = observer(({param, ke
         } else {
             setError( false);
         }
-        viewStore.setValString( param, newValue, keyParam)
+        viewStore.setValString( param, newValue, keyParam, keyInd)
     };
 
 	let value = viewStore.getTecnologyValue( param, keyParam, keyInd)

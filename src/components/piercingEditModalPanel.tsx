@@ -8,7 +8,8 @@ import PiercingEditStagesPanel from './piercingEditStagesPanel'
 import MacrosEditList from './macrosEditList';
 import StringComponent from './stringComponent';
 import IosToggleBlowInPiercing from './toggles/iosToggleBlowInPiercing'
-
+import NavigationModalinStages from './navigationModalinStages';
+import SwiperPiercingMacro from './swiperPiercingMacro';
 
 const PiercingEditModalPanel = observer(() => {
 
@@ -16,7 +17,7 @@ const PiercingEditModalPanel = observer(() => {
 		viewStore.setModal(false, 'piercingMacro');
 	};
 
-	const { isVertical, selectedPiercingStage } = viewStore;
+	const { isVertical, selectedPiercingStage, carouselModeInPiercing } = viewStore;
 
 	return (
 		<>
@@ -26,12 +27,9 @@ const PiercingEditModalPanel = observer(() => {
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<div className="container-fluid">
+					{ !carouselModeInPiercing && <div className="container-fluid">
 						<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
 
-{/* 							<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-								<PiercingMacroSelector />
-							</div> */}
 							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 								<StringComponent param={'name'} keyParam={'piercingMacros'} />
 							</div>
@@ -39,7 +37,7 @@ const PiercingEditModalPanel = observer(() => {
 						</div>
 
 						<div>
-							<Stepper />
+							<Stepper keyInd ={ false }/>
 							{selectedPiercingStage !== 0 ? (
 								<PiercingEditStagesPanel />
 							) : (
@@ -84,30 +82,30 @@ const PiercingEditModalPanel = observer(() => {
 													<IosToggleBlowInPiercing />
 												</div>
 										</div>
-									</div>
-									{/* <div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
-										<div className="">
-											<div className="editModal_col">
-												<IosToggleBlowInPiercing />
-											</div>
-										</div>
-									</div> */}
+									</div>									
 								</div>
 							)}
 						</div>
 					</div>
+				}
+				{
+					carouselModeInPiercing && <SwiperPiercingMacro />
+				}
 				</Modal.Body>
 
-				<Modal.Footer>
-					<Button
+ 				<Modal.Footer className="position-relative">
+ 					<div className="position-absolute top-50 start-50 translate-middle fs-4">
+						<NavigationModalinStages />
+					</div>
+ 					<Button
 						variant="secondary"
 						onClick={handleClose}
-						className="mt-4 py-3 px-5 fs-3 close-button"
+						className="mt-4 py-3 px-5 fs-3 close-button ms-auto"
 					>
 						Close
 					</Button>
 				</Modal.Footer>
-			</Modal>
+ 			</Modal>
 		</>
 	);
 });

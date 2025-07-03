@@ -60,6 +60,7 @@ class ViewStore {
 
     macrosModalEdit:boolean = false;
     carouselMode:boolean = false;
+    carouselModeInPiercing:boolean = false;
     modulationMacroModalEdit:boolean = false;
     piercingMacroModalEdit:boolean = false;
     selectedPiercingStage:number = 0; 
@@ -123,6 +124,7 @@ class ViewStore {
             selectedPiercingMacro: computed,
             isVertical: computed,
             modulationMacroinUse:computed,
+            piercingMacroinUse:computed,
 
         });
     }
@@ -131,6 +133,10 @@ class ViewStore {
         return utils.extractValuesByKey(this.technology, 'modulationMacro')
     }
 
+    get piercingMacroinUse () {
+        return utils.extractValuesByKey(this.technology, 'piercingMacro')
+    }
+ 
     get selectedModulationMacro() {
         return this.technology.macros[this.selectedMacros].cutting.modulationMacro;
     }
@@ -225,16 +231,25 @@ class ViewStore {
         }  
     }
 
-    setValString(param: string, newVal: string, keyParam: string) {
+    setValString(param: string, newVal: string, keyParam: string, ind:number|boolean=false) {
         if (keyParam === 'macros') {
             const macro = this.technology.macros[this.selectedMacros];
             if (param in macro.cutting) {
                 (macro.cutting as any)[param] = newVal
             }
         } else if (keyParam === 'piercingMacros') {
+            if (typeof ind !== 'number') {
+                this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal    
+            } else {
+                this.technology.piercingMacros[ind][param] = newVal    
+            }
             this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
         } else if (keyParam === 'modulationMacros') {
-            this.technology.modulationMacros[this.selectedModulationMacro][param] = newVal
+            if (typeof ind !== 'number') {
+                this.technology.modulationMacros[this.selectedModulationMacro][param] = newVal
+            } else {
+                this.technology.modulationMacros[ind][param] = newVal
+            }
         }
     }
     
@@ -289,7 +304,7 @@ class ViewStore {
     }
 
     setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number,  keyInd:number|boolean=false) {
-       // console.log ( arguments )
+       console.log ( arguments )
         
         if (newVal < minimum) newVal = minimum
         if (newVal > maximum) newVal = maximum
@@ -315,7 +330,7 @@ class ViewStore {
         } else {
             if (keyParam === 'macros') {
                 if (param === 'piercingMacro') {
-                    this.technology.macros[keyInd][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);    return this.technology.macros[this.selectedMacros][param]	    
+                    this.technology.macros[keyInd][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);    
                 } else {
                     this.technology.macros[keyInd].cutting[param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
                 }               
@@ -359,16 +374,22 @@ class ViewStore {
         this.carouselMode = val
     }
 
+    setCarouselModeInPiercing (val:boolean) {
+        console.log ('setCarouselMode  to ' + val)
+        this.carouselModeInPiercing = val
+    }
+
     setSelectedSlide (num:number) {
         this.selectedSlide = num;
     }
 
     deleteAndUpdate ( deleteKey: string, deleteIndex: number, adjustKey: string) {
-        //console.log ( arguments )
+        console.log ( arguments )
 		if (viewStore.technology[deleteKey] 
             && Array.isArray(viewStore.technology[deleteKey]) 
             && viewStore.technology[deleteKey].length > 1) {
 			viewStore.technology[deleteKey].splice(deleteIndex, 1);
+            viewStore.setselectedPiercingStage (0)
 		} else {
             showToast({
                 type: 'warning',
@@ -385,8 +406,9 @@ class ViewStore {
  						adjustValues(currentObj[key]);
 					} else if (key === adjustKey 
                             && typeof currentObj[key] === 'number'
-                            && currentObj[key] >= deleteIndex) {
-						currentObj[key] -=1 ;
+                            && currentObj[key] >= deleteIndex
+                            && currentObj[key] > 0) {
+						currentObj[key] -=1;                     
 					}
 				}
 			} 
@@ -416,6 +438,7 @@ class ViewStore {
                 }
             };
             adjustValues(viewStore.technology);
+            viewStore.setselectedPiercingStage (0)
         } else {
             showToast({
                 type: 'warning',

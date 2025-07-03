@@ -2,10 +2,14 @@ import { Button } from 'react-bootstrap';
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 
+interface StepperComponentInt {
+    keyInd: number|boolean;
+}
 
-const Stepper = observer(() => {
+
+const Stepper: React.FC<StepperComponentInt>  = observer(({ keyInd }) => {
 	const {technology, selectedPiercingMacro} = viewStore
-	const length = technology.piercingMacros[selectedPiercingMacro].stages.length+1
+	const length = technology.piercingMacros[keyInd ? keyInd : selectedPiercingMacro].stages.length+1
 	const steps = Array.from({ length: length }, (_, i) => i);
 	const { selectedPiercingStage } = viewStore
 	const onStepChange = (step: number) => {
