@@ -1,8 +1,24 @@
 import cutting_settings_schema from '../store/cut_settings_schema';
+import viewStore from '../store/viewStore';
 
 interface NestedObject {
-    [key: string]: any; 
+	[key: string]: any;
 }
+
+type Stage = {
+	pressure: number;
+	power: number;
+	focus: number;
+	height: number;
+};
+
+type ResultItem = {
+	name: string;
+	focus: number;
+	height: number;
+	pressure: number;
+	power: number;
+};
 
 class Utils {
 	// Метод для преобразования полярных координат в декартовы
@@ -120,19 +136,19 @@ class Utils {
 		return fontSize;
 	}
 
-	getKnobLayout(isVertical: boolean)  {
+	getKnobLayout(isVertical: boolean) {
 		return {
-		  x1: isVertical ? 17 : -10,
-		  x2: isVertical ? 83 : 110,
-		  x4: isVertical ? 5 : -30,
-		  y1: isVertical ? 105 : 80,
-		  y2: 80,
-		  y3: isVertical ? -15 : 10,
-		  r1: 37.5,
-		  r2: 38.5,
-		  center: { x: 50, y: 50 },
-		  startAngle: 225,
-		  sweepAngle: 270,
+			x1: isVertical ? 17 : -10,
+			x2: isVertical ? 83 : 110,
+			x4: isVertical ? 5 : -30,
+			y1: isVertical ? 105 : 80,
+			y2: 80,
+			y3: isVertical ? -15 : 10,
+			r1: 37.5,
+			r2: 38.5,
+			center: { x: 50, y: 50 },
+			startAngle: 225,
+			sweepAngle: 270,
 		};
 	}
 
@@ -154,8 +170,8 @@ class Utils {
 		return results;
 	}
 
-	extractValuesByKey (obj: NestedObject, key: string): any[] {
-    	let result: any[] = [];
+	extractValuesByKey(obj: NestedObject, key: string): any[] {
+		let result: any[] = [];
 
 		const search = (currentObj: NestedObject) => {
 			for (const currentKey in currentObj) {
@@ -172,20 +188,20 @@ class Utils {
 		};
 
 		search(obj);
-		return [...new Set(result)].sort((a,b)=> a-b);
+		return [...new Set(result)].sort((a, b) => a - b);
 	};
 
-	deepFind(obj:  Record<string, any> | false, keys: string[]): any | false {
+	deepFind(obj: Record<string, any> | false, keys: string[]): any | false {
 		// If there are no keys to search or the object is empty, return false
 		if (!obj) obj = cutting_settings_schema;
 		if (!keys.length || !obj) return false
-		
-	
+
+
 		// Taking the first key from the array
 		const [currentKey, ...remainingKeys] = keys;
-	
+
 		// Recursive function to search for the key in the object at any depth
-		const findKey = (currentObj:  Record<string, any> | null): any | false => {
+		const findKey = (currentObj: Record<string, any> | null): any | false => {
 			if (currentObj && typeof currentObj === 'object') {
 				// If the current object contains the desired key
 				if (currentKey in currentObj) {
@@ -196,18 +212,46 @@ class Utils {
 					// Otherwise, continue searching with the remaining keys in the value of the found key
 					return utils.deepFind(currentObj[currentKey], remainingKeys);
 				}
-	
+
 				// Searching for the key in all values of the object (recursively)
 				for (const key of Object.keys(currentObj)) {
 					const result = findKey(currentObj[key]);
 					if (result !== false) return result;
 				}
 			}
-	
+
 			return false;
 		};
-	
+
 		return findKey(obj);
+	}
+
+
+
+	getChartData(keyInd: number ): ResultItem[] {
+		const result: ResultItem[] = [];
+		const data = viewStore.technology.piercingMacros[keyInd]
+
+		result.push({
+			name: '0',
+			focus: data.initial_focus,
+			height: data.initial_height,
+			pressure: data.initial_pressure,
+			power: data.initial_power
+		});
+
+		// Остальные из stages
+		data.stages.forEach((stage: Stage, index: number) => {
+			result.push({
+				name: String(index + 1), // +1 потому что initial уже под "0"
+				focus: stage.focus,
+				height: stage.height,
+				pressure: stage.pressure,
+				power: stage.power
+			});
+		});
+
+		return result;
 	}
 
 }

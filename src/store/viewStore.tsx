@@ -177,6 +177,7 @@ class ViewStore {
     setModal (val:boolean, modal:string ) {
         console.log ('setModalEdit  '+ modal)
         this.setCarouselMode( false )
+        this.setCarouselModeInPiercing ( false )
         if (modal === 'macros') {
 
             this.macrosModalEdit = val

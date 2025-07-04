@@ -33,7 +33,7 @@ const swiperPiercingMacro = observer(() => {
 				slideToClickedSlide={true}
 				grabCursor={true}
 				centeredSlides={true}
-				slidesPerView={6}
+				slidesPerView={isVertical ? 6 : 5}
 				initialSlide={ viewStore.selectedPiercingMacro } // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
 				freeMode={false}
 				coverflowEffect={{
@@ -79,7 +79,7 @@ const swiperPiercingMacro = observer(() => {
 									</div>
 									<div className={isVertical ? "editModal_col d-contents mt-2" : "editModal_col_hor d-contents mt-2"}>
 									<div style={{ width: '900px', margin: 'auto' }}>
-										<SwiperPiercingMacroCharts />
+										<SwiperPiercingMacroCharts keyInd={ii} />
 									</div>
 									</div>
  								</div>
