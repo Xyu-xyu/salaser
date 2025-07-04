@@ -119,7 +119,7 @@ const cut_settings= JSON.parse(`{
               "power_W_mm": 20000.0,
               "gas": "O2",
               "focus": 10.0,
-              "enabled": false,
+              "enabled": true,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
               "type": "PULSE",
@@ -135,7 +135,7 @@ const cut_settings= JSON.parse(`{
               "power_W_mm": 30000.0,
               "gas": "N2",
               "focus": -11.0,
-              "enabled": false,
+              "enabled": true,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
               "type": "ENGRAVING",
@@ -151,7 +151,7 @@ const cut_settings= JSON.parse(`{
               "power_W_mm": 40000.0,
               "gas": "AIR",
               "focus": 9.0,
-              "enabled": false,
+              "enabled": true,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
               "type": "VAPOR",
@@ -167,7 +167,7 @@ const cut_settings= JSON.parse(`{
               "power_W_mm": 50000.0,
               "gas": "AIR",
               "focus": -14.0,
-              "enabled": false,
+              "enabled": true,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
               "type": "EDGING",
@@ -183,7 +183,7 @@ const cut_settings= JSON.parse(`{
               "power_W_mm": 60000.0,
               "gas": "AIR",
               "focus": 15.0,
-              "enabled": false,
+              "enabled": true,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
               "type": "CW",
@@ -199,7 +199,7 @@ const cut_settings= JSON.parse(`{
               "power_W_mm": 70000.0,
               "gas": "AIR",
               "focus": -1.0,
-              "enabled": false,
+              "enabled": true,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
               "type": "CW",
@@ -215,7 +215,7 @@ const cut_settings= JSON.parse(`{
               "power_W_mm": 100000.0,
               "gas": "O2",
               "focus": 0,
-              "enabled": false,
+              "enabled": true,
               "feedLimit_mm_s": 50000,
               "cross_blow": false,
               "type": "CW",
@@ -230,45 +230,45 @@ const cut_settings= JSON.parse(`{
             "initial_modulationFrequency_Hz": 10000.0,
             "stages": [
               {
-                "pressure": 8.0,
+                "pressure": 1.0,
                 "power": 1000,
                 "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
-                "height": 1.0,
+                "height": 0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": true,
                 "modulationMacro": 0
               },
               {
-                "pressure": 8.0,
+                "pressure": 2.0,
                 "power": 2000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
-                "height": 1.0,
+                "height": 0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 1
               },
               {
-                "pressure": 8.0,
+                "pressure": 2.0,
                 "power": 3000,
-                "enabled": true,
+                "enabled": false,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
+                "focus": 1.1,
+                "height": 1.2,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": true,
                 "modulationMacro": 2
               },
               {
-                "pressure": 8.0,
+                "pressure": 2.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -278,21 +278,21 @@ const cut_settings= JSON.parse(`{
                 "modulationMacro": 3
               },
               {
-                "pressure": 8.0,
+                "pressure": 3.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
+                "focus": 1.2,
+                "height": 1.4,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 4
               },
               {
-                "pressure": 8.0,
+                "pressure": 4.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -302,36 +302,36 @@ const cut_settings= JSON.parse(`{
                 "modulationMacro": 6
               },
               {
-                "pressure": 8.0,
+                "pressure": 5.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
+                "focus": 1.3,
+                "height": 1.6,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 6
               },
               {
-                "pressure": 8.0,
+                "pressure": 6.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
+                "focus": 1.5,
+                "height": 1.8,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 7
               },
               {
-                "pressure": 8.0,
+                "pressure": 7.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
+                "focus": 0,
                 "height": 1.0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
@@ -340,11 +340,11 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
+                "focus": -1.0,
+                "height": -1.5,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 9
@@ -352,23 +352,23 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
+                "focus": -1.0,
+                "height": -1.0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 10
               },
               {
-                "pressure": 8.0,
+                "pressure": 0.1,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
-                "height": 1.0,
+                "height": 0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 11
@@ -376,11 +376,11 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
+                "focus": 1.5,
+                "height": 1.5,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 12
@@ -388,7 +388,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -400,11 +400,11 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
-                "height": 1.0,
+                "height": 0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 14
@@ -426,7 +426,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -438,7 +438,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -450,7 +450,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -462,7 +462,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -474,7 +474,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -486,7 +486,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -498,7 +498,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -510,7 +510,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -522,7 +522,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -534,7 +534,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -546,7 +546,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -558,7 +558,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -570,7 +570,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -582,7 +582,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -607,7 +607,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -619,7 +619,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -631,7 +631,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -643,7 +643,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -655,7 +655,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -667,7 +667,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -679,7 +679,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -691,7 +691,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -703,7 +703,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -715,7 +715,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -727,7 +727,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -739,7 +739,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -751,7 +751,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -763,7 +763,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -775,7 +775,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -787,7 +787,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -812,7 +812,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -824,7 +824,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -836,7 +836,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -848,7 +848,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -860,7 +860,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -872,7 +872,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -884,7 +884,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -896,7 +896,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -908,7 +908,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -920,7 +920,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -932,7 +932,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -944,7 +944,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -956,7 +956,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -968,7 +968,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -980,7 +980,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -992,7 +992,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1017,7 +1017,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1029,7 +1029,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1041,7 +1041,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1053,7 +1053,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1065,7 +1065,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1077,7 +1077,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1089,7 +1089,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1101,7 +1101,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1113,7 +1113,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1125,7 +1125,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1137,7 +1137,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1149,7 +1149,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1161,7 +1161,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1173,7 +1173,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1185,7 +1185,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1197,7 +1197,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1222,7 +1222,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1234,7 +1234,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1246,7 +1246,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1258,7 +1258,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1270,7 +1270,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1282,7 +1282,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1294,7 +1294,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1306,7 +1306,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1318,7 +1318,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1330,7 +1330,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1342,7 +1342,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1354,7 +1354,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1366,7 +1366,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1378,7 +1378,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1390,7 +1390,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1402,7 +1402,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1427,7 +1427,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1439,7 +1439,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1451,7 +1451,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1463,7 +1463,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1475,7 +1475,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1487,7 +1487,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1499,7 +1499,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1511,7 +1511,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1523,7 +1523,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1535,7 +1535,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1547,7 +1547,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1559,7 +1559,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1571,7 +1571,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1583,7 +1583,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1595,7 +1595,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1607,7 +1607,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1632,7 +1632,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1644,7 +1644,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1656,7 +1656,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1668,7 +1668,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1680,7 +1680,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1692,7 +1692,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1704,7 +1704,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1716,7 +1716,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1728,7 +1728,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1740,7 +1740,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1752,7 +1752,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1764,7 +1764,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1776,7 +1776,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1788,7 +1788,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1800,7 +1800,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,
@@ -1812,7 +1812,7 @@ const cut_settings= JSON.parse(`{
               {
                 "pressure": 8.0,
                 "power": 1000,
-                "enabled": false,
+                "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": 1.0,

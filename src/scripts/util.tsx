@@ -10,14 +10,15 @@ type Stage = {
 	power: number;
 	focus: number;
 	height: number;
+	enabled: boolean;
 };
 
 type ResultItem = {
 	name: string;
-	focus: number;
-	height: number;
-	pressure: number;
-	power: number;
+	'focus, mm'?: number,
+	'height, mm'?: number,
+	'pressure, bar'?: number,
+	'power, kWt'?: number
 };
 
 class Utils {
@@ -234,22 +235,29 @@ class Utils {
 
 		result.push({
 			name: '0',
-			focus: data.initial_focus,
-			height: data.initial_height,
-			pressure: data.initial_pressure,
-			power: data.initial_power
+			'focus, mm': data.initial_focus,
+			'height, mm': data.initial_height,
+			'pressure, bar': data.initial_pressure,
+			'power, kWt': data.initial_power/1000
 		});
 
 		// Остальные из stages
 		data.stages.forEach((stage: Stage, index: number) => {
-			result.push({
+			if (stage.enabled) {
+			  result.push({
 				name: String(index + 1), // +1 потому что initial уже под "0"
-				focus: stage.focus,
-				height: stage.height,
-				pressure: stage.pressure,
-				power: stage.power
-			});
-		});
+				'focus, mm': stage.focus,
+				'height, mm': stage.height,
+				'pressure, bar': stage.pressure,
+				'power, kWt': stage.power / 1000,
+			  });
+			} else {
+			  result.push({	name: String(index + 1) });
+			}
+		  });
+
+		  console.log (result)
+		  
 
 		return result;
 	}

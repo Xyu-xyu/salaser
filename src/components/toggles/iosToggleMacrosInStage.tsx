@@ -11,7 +11,7 @@ const iosToggleMacrosInStage = observer(() => {
 
 	return (
 		<IosToggleGeneric
-			title="Stage"
+			title="Enabled"
 			checked={val}
 			onChange={setVal}
 			isVertical={isVertical}
