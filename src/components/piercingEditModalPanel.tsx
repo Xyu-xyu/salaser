@@ -10,6 +10,7 @@ import StringComponent from './stringComponent';
 import IosToggleBlowInPiercing from './toggles/iosToggleBlowInPiercing'
 import NavigationModalinStages from './navigationModalinStages';
 import SwiperPiercingMacro from './swiperPiercingMacro';
+import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
 
 const PiercingEditModalPanel = observer(() => {
 
@@ -17,7 +18,7 @@ const PiercingEditModalPanel = observer(() => {
 		viewStore.setModal(false, 'piercingMacro');
 	};
 
-	const { isVertical, selectedPiercingStage, carouselModeInPiercing } = viewStore;
+	const { isVertical, selectedPiercingStage, carouselModeInPiercing, selectedPiercingMacro } = viewStore;
 
 	return (
 		<>
@@ -32,6 +33,9 @@ const PiercingEditModalPanel = observer(() => {
 
 							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 								<StringComponent param={'name'} keyParam={'piercingMacros'} />
+							</div>
+							<div style={{ width: '600px', height:'100px', margin: 'auto', position: 'absolute', right:'50px', top:'0px' }}>
+								<SwiperPiercingMacroCharts keyInd={ selectedPiercingMacro} height={250} />
 							</div>
 
 						</div>

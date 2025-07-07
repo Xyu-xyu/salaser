@@ -10,22 +10,24 @@ import {
 	ResponsiveContainer,
 } from 'recharts';
 import utils from '../scripts/util';
+import { observer } from 'mobx-react-lite';
 
 
 interface ComponentInt {
 	keyInd: number;
+	height: number;
 }
 
 
 
-export const SwiperPiercingMacroCharts: React.FC<ComponentInt> = ({ keyInd }) => {
+export const SwiperPiercingMacroCharts: React.FC<ComponentInt> = observer(({ keyInd, height }) => {
 
 	const data = utils.getChartData(keyInd)
 
 	return (
 		<div>
 			<div className='d-flex flex-column mt-4'>
- 				<ResponsiveContainer width="100%" height={400}>
+ 				<ResponsiveContainer width="100%" height={height}>
 					<LineChart
 						data={data}
 						margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -45,4 +47,4 @@ export const SwiperPiercingMacroCharts: React.FC<ComponentInt> = ({ keyInd }) =>
 		</div>
 
 	);
-};
+});

@@ -17,6 +17,15 @@ const NavigationModalinStages = observer(() => {
 				func: viewStore.AddAndUpdate,
 				args:['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
 			})
+		} else {
+			viewStore.setModalProps ({
+				show:true,
+				modalBody: 'Хотите скопировать и добавить шаг врезки ?',
+				confirmText: 'Clone',
+				cancelText:'Cancel',
+				func: viewStore.addStage,
+				args:[]
+			})
 		}
 	}
 
@@ -30,7 +39,16 @@ const NavigationModalinStages = observer(() => {
 				func: viewStore.deleteAndUpdate,
 				args:['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
 			})
-		} 		 
+		} else {
+			viewStore.setModalProps ({
+				show:true,
+				 modalBody: 'Хотите удалить этот шаг врезки ?',
+				confirmText: 'Delete',
+				cancelText:'Cancel',
+				func: viewStore.deleteStage,
+				args:[]
+			})
+		}	 
 	}
 
 	const carousel = () =>{

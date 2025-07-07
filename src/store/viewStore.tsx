@@ -297,8 +297,13 @@ class ViewStore {
             } else if (keyParam === 'piercingMacros') {
                 return this.technology.piercingMacros[this.selectedPiercingMacro][param]
             } else if (keyParam === 'stages') {
-                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
-                return this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param]
+                
+                if (this.selectedPiercingStage === 0 ) {
+                    return this.technology.piercingMacros[this.selectedPiercingMacro][param]
+                } else {
+                    return this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param]    
+                }
+                
             }
         }
         
@@ -418,6 +423,7 @@ class ViewStore {
 	};
 
     AddAndUpdate(key: string, selectedSlide: number, adjustKey: string) {
+        //console.log ( arguments )
         const max = utils.deepFind(false, [adjustKey, 'maximum']);
         if (viewStore.technology[key] 
             && Array.isArray(viewStore.technology[key]) 
@@ -443,11 +449,85 @@ class ViewStore {
         } else {
             showToast({
                 type: 'warning',
-                message: "Достигнуто максиимальное значение!",
+                message: "Достигнуто максимальное значение!",
                 position: 'bottom-right',
                 autoClose: 5000
               });
         }
+    }
+
+    deleteStage() {
+       
+        if (viewStore.selectedPiercingStage === 0) {
+            showToast({
+                type: 'warning',
+                message: "Нельзя удалить этот шаг врезки!",
+                position: 'bottom-right',
+                autoClose: 5000
+              });
+
+        } else {
+            if ( viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length > 1 &&
+                 typeof viewStore.selectedPiercingStage === 'number'
+            ) {
+
+                viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.splice(viewStore.selectedPiercingStage-1, 1);
+                if ( viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length < viewStore.selectedPiercingStage) {
+                    viewStore.setselectedPiercingStage(viewStore.selectedPiercingStage-1)
+                }
+
+                showToast({
+                    type: 'success',
+                    message: "Шаг удален!",
+                    position: 'bottom-right',
+                    autoClose: 5000
+                  });
+        
+            }
+        }      
+    }
+
+    addStage () {
+        const max = 16
+        if ( viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length >= max ) {
+            showToast({
+                type: 'warning',
+                message: "Достигнуто максимальное значение!",
+                position: 'bottom-right',
+                autoClose: 5000
+            });
+            return;
+        }      
+        let stages = viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages;
+
+        if (viewStore.selectedPiercingStage !==0) {
+            const index = viewStore.selectedPiercingStage - 1;
+            const stepPaste = stages[index];
+            stages.splice(index + 1, 0, { ...stepPaste });
+
+        } else {
+            let donor  = viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro]
+            const stepPaste = {
+                "pressure": donor.initial_pressure,
+                "power": donor.initial_power,
+                "enabled": true,
+                "delay_s": 0,
+                "power_W_s": donor.initial_pressure,
+                "focus": donor.initial_focus,
+                "height": donor.initial_height,
+                "modulationFrequency_Hz": donor.initial_modulationFrequency_Hz,
+                "cross_blow": false,
+                "modulationMacro": donor.initial_modulationMacro
+            }
+            stages.splice( 0, 0, stepPaste);
+        } 
+        
+        showToast({
+            type: 'success',
+            message: "Шаг добавлен!",
+            position: 'bottom-right',
+            autoClose: 5000
+          });
     }
 }
 
