@@ -36,7 +36,7 @@ export const SwiperPiercingMacroCharts: React.FC<ComponentInt> = observer(({ key
 						<XAxis dataKey="name" tick={{ fontSize: 12, fill: '#333' }}/>
 						<YAxis tick={{ fontSize: 12, fill: '#333' }} />
 						<Tooltip wrapperStyle={{ fontSize: 16, padding: 2, margin: 0 }}/>
-						<Legend wrapperStyle={{ fontSize: 20 }} />
+						<Legend wrapperStyle={{ fontSize: 20, marginLeft: 25 }} />
 						<Line type="monotone" dataKey="focus, mm" stroke="#8884d8" activeDot={{ r: 8 }}/>
 						<Line type="monotone" dataKey="height, mm" stroke="#82ca9d" activeDot={{ r: 8 }}/>
 						<Line type="monotone" dataKey="pressure, bar" stroke="#ffc658" activeDot={{ r: 8 }}/>

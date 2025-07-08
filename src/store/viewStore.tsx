@@ -76,7 +76,7 @@ class ViewStore {
         focus: 0.1,
         feedLimit_mm_s: 500,
         modulationMacro: 1,
-        height: 1,
+        height: 0.1,
         modulationFrequency_Hz: 1,
         piercingMacro: 1,
         pulseFill_percent:1,
@@ -86,7 +86,7 @@ class ViewStore {
         initial_modulationMacro:1,
         initial_power:100,
         initial_focus:0.1,
-        initial_height:1,
+        initial_height:0.1,
         delay_s:0.1,
         power_W_s:100,
         power:100

@@ -619,7 +619,7 @@ body {
   border-radius: 1em;
   width: 600px;
   height: 700px;
-  margin: 1em;
+  /* margin: 1em; */
   overflow: hidden;
   background-color: rgb(244, 244, 247);
 }
@@ -630,7 +630,8 @@ body {
 }
 
 .swiperSlideLong {
-  width: 1000px;
+  width: 800px;
+  height: 800px;
 }
 
 .notInUse {

@@ -34,13 +34,16 @@ const PiercingEditModalPanel = observer(() => {
 							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 								<StringComponent param={'name'} keyParam={'piercingMacros'} />
 							</div>
-							<div style={{ width: '600px', height:'100px', margin: 'auto', position: 'absolute', right:'50px', top:'0px' }}>
+							{!isVertical && <div style={{ width: '600px', height:'100px', margin: 'auto', position: 'absolute', right:'50px', top:'0px' }}>
 								<SwiperPiercingMacroCharts keyInd={ selectedPiercingMacro} height={250} />
-							</div>
+							</div>}
 
 						</div>
 
 						<div>
+							{isVertical && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
+								<SwiperPiercingMacroCharts keyInd={ selectedPiercingMacro} height={250} />
+							</div>}
 							<Stepper keyInd ={ false }/>
 							{selectedPiercingStage !== 0 ? (
 								<PiercingEditStagesPanel />

@@ -42,7 +42,7 @@ const modalGeneric = observer(() => {
 						variant="secondary"
 						onClick={handleClose}
  						size="lg"
-						className='violet_button m-2 p-3'
+						className='violet_button m-2 py-3 px-5'
 					>
 						{viewStore.modalProps.cancelText}
 					</Button>
@@ -50,7 +50,7 @@ const modalGeneric = observer(() => {
 						variant="primary"
 						onClick={handleSubmit}
 						size="lg"
-						className=' m-2 p-3'
+						className='ms-2 m-2 py-3 px-5'
  					>
 						{viewStore.modalProps.confirmText}
 					</Button>
