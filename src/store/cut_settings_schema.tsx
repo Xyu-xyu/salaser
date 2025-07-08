@@ -293,7 +293,9 @@ const cutting_settings = JSON.parse(`{
                                             "delay_s": {
                                                 "title": "Задержка перед шагом, с",
                                                 "type": "number",
-                                                "default": 0
+                                                "default": 0,
+                                                "minimum": 0,
+                                                "maximum": 10
                                             },
                                             "power_W_s": {
                                                 "type": "integer",

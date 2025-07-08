@@ -230,13 +230,13 @@ const cut_settings= JSON.parse(`{
             "initial_modulationFrequency_Hz": 10000.0,
             "stages": [
               {
-                "pressure": 1.0,
-                "power": 1000,
+                "pressure": 4.0,
+                "power": 2000,
                 "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 0,
+                "focus": 0,
+                "height": 1,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": true,
                 "modulationMacro": 0
@@ -247,20 +247,32 @@ const cut_settings= JSON.parse(`{
                 "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 0,
+                "focus": 1,
+                "height": 2,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 1
               },
               {
+                "pressure": 1.0,
+                "power": 2000,
+                "enabled": true,
+                "delay_s": 0,
+                "power_W_s": 1000,
+                "focus": 0,
+                "height": 1,
+                "modulationFrequency_Hz": 10000.0,
+                "cross_blow": true,
+                "modulationMacro": 0
+              },
+              {
                 "pressure": 2.0,
-                "power": 3000,
+                "power": 1300,
                 "enabled": false,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.1,
-                "height": 1.2,
+                "focus": 2,
+                "height": 3,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": true,
                 "modulationMacro": 2
@@ -271,15 +283,15 @@ const cut_settings= JSON.parse(`{
                 "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
-                "focus": 1.0,
-                "height": 1.0,
+                "focus": 3,
+                "height": 4,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 3
               },
               {
                 "pressure": 3.0,
-                "power": 1000,
+                "power": 1400,
                 "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
@@ -291,7 +303,7 @@ const cut_settings= JSON.parse(`{
               },
               {
                 "pressure": 4.0,
-                "power": 1000,
+                "power": 1500,
                 "enabled": true,
                 "delay_s": 0,
                 "power_W_s": 1000,
@@ -416,8 +428,8 @@ const cut_settings= JSON.parse(`{
             "name": "Unknown incut1",
             "initial_modulationMacro": 0,
             "initial_power": 1000,
-            "initial_focus": 1.0,
-            "initial_height": 1.0
+            "initial_focus": 0.5,
+            "initial_height": 0.8
           },
           {
             "initial_modulationFrequency_Hz": 10000.0,

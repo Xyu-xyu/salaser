@@ -1,6 +1,7 @@
 import cut_settings_schema from "../store/cut_settings_schema";
+import { useTranslation } from 'react-i18next';
+  
 
-// Рекурсивно собираем путь + значение
 const getAllEntries = (obj: any, parentKey = ''): { path: string, value: any }[] => {
     const entries: { path: string, value: any }[] = [];
 
@@ -25,10 +26,11 @@ const getAllEntries = (obj: any, parentKey = ''): { path: string, value: any }[]
 
 const Technology = () => {
     const entries = getAllEntries(cut_settings_schema.result);
+    const {t} = useTranslation();
 
     return (
         <>
-            <h1>Technology</h1>
+            <h1>{ t( "Technology" ) }</h1>
             <ul>
                 {entries.map((entry, index) => (
                     <li key={index} className="text-black">

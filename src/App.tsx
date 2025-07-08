@@ -8,6 +8,7 @@ import IosToggle1 from './components/toggles/iosToggle1.js';
 import IosToggle2 from './components/toggles/iosToggle2.js';
 import { ToastContainer } from 'react-toastify';
 import ModalGeneric from "./components/modalGeneric.js";
+import './scripts/i18n.tsx'; 
 
 
 const App = observer(() => {
