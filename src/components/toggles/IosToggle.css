@@ -14,13 +14,19 @@
   }
 
   #toggles1  {
-    right: 12%;
+    right: 8%;
     top: 5%;
     z-index: 10;
   }
 
   #toggles2  {
-    right: 20%;
+    right: 12%;
+    top: 5%;
+    z-index: 10;
+  }
+
+  #toggles3  {
+    right: 16%;
     top: 5%;
     z-index: 10;
   }

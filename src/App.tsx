@@ -6,6 +6,7 @@ import viewStore from './store/viewStore.js';
 import IosToggle0 from './components/toggles/iosToggle0.js';
 import IosToggle1 from './components/toggles/iosToggle1.js';
 import IosToggle2 from './components/toggles/iosToggle2.js';
+import IosToggle3 from './components/toggles/iosToggle3.tsx';
 import { ToastContainer } from 'react-toastify';
 import ModalGeneric from "./components/modalGeneric.js";
 import './scripts/i18n.tsx'; 
@@ -28,6 +29,7 @@ const App = observer(() => {
 				<IosToggle0 />
 				<IosToggle1 />
 				<IosToggle2 />
+				<IosToggle3 />
 				<ToastContainer toastStyle={{
 					minWidth: '450px',
 					minHeight: '150px',
