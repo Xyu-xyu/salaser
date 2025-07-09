@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-//import i18next from 'i18next';
+import i18next from 'i18next';
 
 type ToastType = 'info' | 'success' | 'warning' | 'error' | 'default';
 type ToastPosition = 
@@ -33,7 +33,7 @@ export const showToast = ({
   draggable = true,
   theme = 'light',
 }: ShowToastOptions): void => {
-  toast(message, {
+  toast(i18next.t(message), {
     type,
     position,
     autoClose,

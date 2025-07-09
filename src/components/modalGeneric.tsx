@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
- import viewStore from '../store/viewStore';
+import viewStore from '../store/viewStore';
+import { useTranslation } from 'react-i18next';
 
  
 const modalGeneric = observer(() => {
@@ -16,6 +17,8 @@ const modalGeneric = observer(() => {
 	const handleClose = () => {
  		viewStore.setModalProps ( def )
 	};
+
+	const { t } = useTranslation()
 
 	const handleSubmit = () => {
 		if (viewStore.modalProps.func && Array.isArray(viewStore.modalProps.args)) {
@@ -35,7 +38,7 @@ const modalGeneric = observer(() => {
  					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className="position-relative">
-					<div className='modulatiomNacroName text-center'>{viewStore.modalProps.modalBody}</div>
+					<div className='modulatiomNacroName text-center'>{t(viewStore.modalProps.modalBody)}</div>
 				</Modal.Body>
 				<Modal.Footer className="position-relative">
 					<Button
@@ -44,7 +47,7 @@ const modalGeneric = observer(() => {
  						size="lg"
 						className='violet_button m-2 py-3 px-5'
 					>
-						{viewStore.modalProps.cancelText}
+						{t(viewStore.modalProps.cancelText)}
 					</Button>
 					<Button
 						variant="primary"
@@ -52,7 +55,7 @@ const modalGeneric = observer(() => {
 						size="lg"
 						className='ms-2 m-2 py-3 px-5'
  					>
-						{viewStore.modalProps.confirmText}
+						{t(viewStore.modalProps.confirmText)}
 					</Button>
 				</Modal.Footer>
  			</Modal>

@@ -11,7 +11,7 @@ const NavigationModalinStages = observer(() => {
 		if (carouselModeInPiercing) {
 			viewStore.setModalProps ({
 				show:true,
-				 modalBody: 'Хотите скопировать этот макрос врезки ?',
+				 modalBody: 'Do you want to copy and add this piercing macro?',
 				confirmText: 'Clone',
 				cancelText:'Cancel',
 				func: viewStore.AddAndUpdate,
@@ -20,7 +20,7 @@ const NavigationModalinStages = observer(() => {
 		} else {
 			viewStore.setModalProps ({
 				show:true,
-				modalBody: 'Хотите скопировать и добавить шаг врезки ?',
+				modalBody: 'Do you want to copy and add this piercing macro step?',
 				confirmText: 'Clone',
 				cancelText:'Cancel',
 				func: viewStore.addStage,
@@ -33,7 +33,7 @@ const NavigationModalinStages = observer(() => {
 		if (carouselModeInPiercing) {
 			viewStore.setModalProps ({
 				show:true,
-				 modalBody: 'Хотите удалить этот макрос врезки ?',
+				modalBody: 'Do you want to delete this piercing macro ?',
 				confirmText: 'Delete',
 				cancelText:'Cancel',
 				func: viewStore.deleteAndUpdate,
@@ -42,7 +42,7 @@ const NavigationModalinStages = observer(() => {
 		} else {
 			viewStore.setModalProps ({
 				show:true,
-				 modalBody: 'Хотите удалить этот шаг врезки ?',
+				modalBody: 'Do you want to delete this piercing macro step?',
 				confirmText: 'Delete',
 				cancelText:'Cancel',
 				func: viewStore.deleteStage,

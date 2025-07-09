@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface StringComponentInt {
 	param:string;
@@ -12,7 +13,7 @@ interface StringComponentInt {
 const SwiperStringComponent: React.FC<StringComponentInt> = observer(({param, keyParam, keyInd}) => {
     const [error, setError] = useState<boolean>(false);
 	const { selectedPiercingMacro, selectedModulationMacro } = viewStore
-
+    const { t } = useTranslation()
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
         if (newValue.length < 1) {
@@ -46,14 +47,13 @@ const SwiperStringComponent: React.FC<StringComponentInt> = observer(({param, ke
     return (
         <div className='stringComponentContainer px-2'>
 			<div className='stringComponentLabel mx-2' >
-				{'Name'}
+				{t('Name')}
 			</div>
             <input 
                 type="text" 
                 value={value} 
                 onChange={handleChange} 
-                placeholder="Введите строку" 
-				className={`form-control stringComponent ${error ? 'is-invalid' : ''}`} 
+ 				className={`form-control stringComponent ${error ? 'is-invalid' : ''}`} 
             />
          </div>
     );

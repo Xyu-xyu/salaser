@@ -66,7 +66,6 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
                     type="text" 
                     value={value} 
                     onChange={handleChange} 
-                    placeholder="Введите строку" 
                     className={`form-control stringComponent ${error ? 'is-invalid' : ''}`} 
                 />
             </div>

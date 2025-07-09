@@ -399,7 +399,7 @@ class ViewStore {
 		} else {
             showToast({
                 type: 'warning',
-                message: "Достигнуто минимальное значение!",
+                message: "Minimum value reached!",
                 position: 'bottom-right',
                 autoClose: 5000
               });
@@ -449,7 +449,7 @@ class ViewStore {
         } else {
             showToast({
                 type: 'warning',
-                message: "Достигнуто максимальное значение!",
+                message: "Maximum value reached!",
                 position: 'bottom-right',
                 autoClose: 5000
               });
@@ -461,7 +461,7 @@ class ViewStore {
         if (viewStore.selectedPiercingStage === 0) {
             showToast({
                 type: 'warning',
-                message: "Нельзя удалить этот шаг врезки!",
+                message: "Cannot delete this splice step!",
                 position: 'bottom-right',
                 autoClose: 5000
               });
@@ -478,7 +478,7 @@ class ViewStore {
 
                 showToast({
                     type: 'success',
-                    message: "Шаг удален!",
+                    message: "Step removed!",
                     position: 'bottom-right',
                     autoClose: 5000
                   });
@@ -492,7 +492,7 @@ class ViewStore {
         if ( viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length >= max ) {
             showToast({
                 type: 'warning',
-                message: "Достигнуто максимальное значение!",
+                message: "Maximum value reached!",
                 position: 'bottom-right',
                 autoClose: 5000
             });
@@ -524,7 +524,7 @@ class ViewStore {
         
         showToast({
             type: 'success',
-            message: "Шаг добавлен!",
+            message: "Step added!",
             position: 'bottom-right',
             autoClose: 5000
           });

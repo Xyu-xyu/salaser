@@ -8,10 +8,9 @@ const NavigationModal = observer(() => {
   	const { carouselMode, selectedSlide  } = viewStore
  
 	const cloneThis = () => {
-		//viewStore.AddAndUpdate('modulationMacros', selectedSlide, 'modulationMacro' ) 
-		viewStore.setModalProps ({
+ 		viewStore.setModalProps ({
 			show:true,
- 			modalBody: 'Хотите скопировать этот чудесный макрос ?',
+ 			modalBody: 'Do you want to copy and add this macro?',
 			confirmText: 'Clone',
 			cancelText:'Cancel',
 			func: viewStore.AddAndUpdate,
@@ -20,10 +19,9 @@ const NavigationModal = observer(() => {
 	}
 
 	const deleteThis = () => {
-		//viewStore.deleteAndUpdate('modulationMacros', selectedSlide, 'modulationMacro') 
-		viewStore.setModalProps ({
+ 		viewStore.setModalProps ({
 			show:true,
- 			modalBody: 'Хотите удалить этот чудесный макрос ?',
+ 			modalBody: 'Do you want to delete this macro?',
 			confirmText: 'Delete',
 			cancelText:'Cancel',
 			func: viewStore.deleteAndUpdate,

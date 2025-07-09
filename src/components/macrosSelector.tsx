@@ -3,6 +3,7 @@ import viewStore from '../store/viewStore';
 import { useEffect, useRef } from 'react';
 import MacrosEditModalButton from './macrosEditModalButton';
 import utils from '../scripts/util';
+import { useTranslation } from 'react-i18next';
 
 
 const MacrosSelector = observer(() => {
@@ -10,10 +11,11 @@ const MacrosSelector = observer(() => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const { technology, selectedMacros, macrosModalEdit, isVertical } = viewStore
+	const { t } = useTranslation()
  
 	const minimum = 0 
 	const maximum = technology.macros.length-1  
-	const title = "Выбранный макрос, index"
+	const title = "Selected macros, index"
 	const step = 1
 	const stepBig = 1
 	
@@ -130,18 +132,14 @@ const MacrosSelector = observer(() => {
 							fill="var(--knobMainText)"
 							fontSize={isVertical ? 10 : 7 }
 						>
-							{a}
+							{t(a)}
 						</text>
 					))}
 					<text x={30} y={y2} className='moderat' 
 						fontSize={isVertical ? 10 : 7}
 						fill="var(--knobMainText)">
-						{title.split(', ')[1]}
+						{t(title.split(', ')[1])}
 					</text>
-{/* 					<text x={95} y={130} textAnchor="end" className='moderat' fontSize={8} fill="var(--paleColor)">
-						min:{minimum} max:{maximum}
-					</text> */}
-
 					<circle
 						cx={x1}
 						cy={y1}

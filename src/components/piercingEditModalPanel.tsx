@@ -11,12 +11,15 @@ import IosToggleBlowInPiercing from './toggles/iosToggleBlowInPiercing'
 import NavigationModalinStages from './navigationModalinStages';
 import SwiperPiercingMacro from './swiperPiercingMacro';
 import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
+import { useTranslation } from 'react-i18next';
 
 const PiercingEditModalPanel = observer(() => {
 
 	const handleClose = () => {
 		viewStore.setModal(false, 'piercingMacro');
 	};
+
+	const { t } = useTranslation()
 
 	const { isVertical, selectedPiercingStage, carouselModeInPiercing, selectedPiercingMacro } = viewStore;
 
@@ -109,7 +112,7 @@ const PiercingEditModalPanel = observer(() => {
 						onClick={handleClose}
 						className="mt-4 py-3 px-5 fs-3 close-button ms-auto"
 					>
-						Close
+						{ t('Close')}
 					</Button>
 				</Modal.Footer>
  			</Modal>

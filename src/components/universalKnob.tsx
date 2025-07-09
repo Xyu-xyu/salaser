@@ -3,6 +3,7 @@ import viewStore from '../store/viewStore';
 import { useRef, useEffect } from 'react';
 import utils from '../scripts/util';
 import MacrosEditModalButton from './macrosEditModalButton'
+import { useTranslation } from 'react-i18next';
 
 interface CustomKnobProps {
 	param: string;
@@ -14,6 +15,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 	
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const { t } = useTranslation()
 	
 	let minimum = utils.deepFind ( false, [keyParam, param, 'minimum'])
 	let title   = utils.deepFind ( false, [keyParam, param, 'title'])
@@ -163,7 +165,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 							{knobRound[param] !== 0 ? (Math.round(val) - val === 0 ? String(val) + '.0' : val) : val}
 						</text>
 					</g>
-					{title.split(', ')[0].split(' ').map((a: string, i: number) => (
+					{t(title).split(', ')[0].split(' ').map((a: string, i: number) => (
 						<text
 							key={i}
 							x={x4}
@@ -178,7 +180,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 					<text x="30" y={y2} className='moderat' 
 						fontSize={isVertical ? 10 : 7} 
 						fill="var(--knobMainText)">
-						{title.split(', ')[1]}
+						{t(title).split(', ')[1]}
 					</text>
 
 					<circle

@@ -41,19 +41,6 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 					filter="var(--shadow)"
 				/>
 				<svg x={x2} y={y2} width="26" height="26">
-					{/* <Icon
-						icon="fluent:document-edit-16-regular"
-						width="14"
-						height="14"
-						style={{
-							color: "var(--knobMainText)",
-							position: "absolute",
-							top: "50%",
-							left: "50%",
-							transform: "translate(50%, 50%)",
-						}}
-					/> */}
-
 					<Icon icon="fa:gear" 
 						width="14"
 						height="14"
@@ -66,23 +53,6 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 						}} />
 				</svg>
 			</g>
-
-			{/* <Modal show={show} onHide={handleClose} size="lg" centered>
-				<Modal.Header closeButton>
-					<Modal.Title></Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<h3>Do you want to start { param } editing ?</h3>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" className="mt-4 py-3 px-5 fs-3 close-button" onClick={handleClose}>
-						Close
-					</Button>
-					<Button variant="primary" className="mt-4 py-3 px-5 fs-3 close-button" onClick={handleContinue}>
-						Continue
-					</Button>
-				</Modal.Footer>
-			</Modal> */}
 		</>
 	);
 });

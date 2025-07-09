@@ -6,13 +6,14 @@ import MacrosSelector from './macrosSelector';
 import IosToggleBlowInMacros from './toggles/iosToggleBlowInMacros';
 import IosToggleMacrocInMacros from './toggles/iosToggleMacrosInMacros';
 import MacrosEditList from './macrosEditList';
+import { useTranslation } from 'react-i18next';
 
 
 const MacrosEditModalPanel = observer(() => {
 	const handleClose = () => {
 		viewStore.setModal(false, 'macros');
 	};
-
+	const { t } = useTranslation()
 	const { isVertical } = viewStore;
 
 	return (
@@ -94,7 +95,7 @@ const MacrosEditModalPanel = observer(() => {
 						onClick={handleClose}
 						className="mt-4 py-3 px-5 fs-3 close-button ms-auto"
 					>
-						Close
+						{t ('Close') }
 					</Button>
 				</Modal.Footer>
 			</Modal>

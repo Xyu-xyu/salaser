@@ -34,7 +34,7 @@ const Technology = () => {
             <ul>
                 {entries.map((entry, index) => (
                     <li key={index} className="text-black">
-                        <strong>{entry.path}</strong>: {String(entry.value)}
+                        <strong>{entry.path}</strong>: {t(String(entry.value))}
                     </li>
                 ))}
             </ul> 

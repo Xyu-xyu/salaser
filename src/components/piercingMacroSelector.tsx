@@ -3,6 +3,7 @@ import viewStore from '../store/viewStore';
 import { useEffect, useRef } from 'react';
 import utils from '../scripts/util';
 import cut_settings from '../store/cut_settings';
+import { useTranslation } from 'react-i18next';
 
 
 const piercingMacroSelector = observer(() => {
@@ -10,6 +11,7 @@ const piercingMacroSelector = observer(() => {
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const { selectedMacros, isVertical, selectedPiercingMacro, technology } = viewStore
+	const { t } = useTranslation()
 
  	let minimum:number = 0 
 	let maximum:number = 0
@@ -137,17 +139,14 @@ const piercingMacroSelector = observer(() => {
 							fill="var(--knobMainText)"
 							fontSize={isVertical ? 10 : 7 }
 						>
-							{a}
+							{t(a)}
 						</text>
 					))}
 					<text x={30} y={y2} className='moderat' 
 						fontSize={isVertical ? 10 : 7}
 						fill="var(--knobMainText)">
-						{title.split(', ')[1]}
+						{ t(title.split(', ')[1])}
 					</text>
-{/* 					<text x={95} y={130} textAnchor="end" className='moderat' fontSize={8} fill="var(--paleColor)">
-						min:{minimum} max:{maximum}
-					</text> */}
 
 					<circle
 						cx={x1}

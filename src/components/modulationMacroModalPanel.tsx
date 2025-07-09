@@ -6,6 +6,8 @@ import UniversalKnob from './universalKnob';
 import StringComponent from './stringComponent';
 import NavigationModal from './navigationModal';
 import SwiperModulationMacro from './swiperModulationMacro'
+import { useTranslation } from 'react-i18next';
+
 
 
 const ModulationMacroModalPanel = observer(() => {
@@ -13,6 +15,7 @@ const ModulationMacroModalPanel = observer(() => {
 	const handleClose = () => {
 		viewStore.setModal(false, 'modulationMacro');
 	};
+	const { t } = useTranslation()
 
 	const { isVertical, carouselMode } = viewStore;
 
@@ -58,7 +61,7 @@ const ModulationMacroModalPanel = observer(() => {
 						onClick={handleClose}
 						className="mt-4 py-3 px-5 fs-3 close-button ms-auto"
 					>
-						Close
+						{t('Close')}
 					</Button>
 				</Modal.Footer>
 			</Modal>

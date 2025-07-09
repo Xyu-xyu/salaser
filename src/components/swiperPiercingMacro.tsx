@@ -78,7 +78,7 @@ const swiperPiercingMacro = observer(() => {
 										<SwiperStringComponent param={'name'} keyParam={'piercingMacros'} keyInd={ii}/>
 									</div>
 									<div className={isVertical ? "editModal_col d-contents mt-2" : "editModal_col_hor d-contents mt-2"}>
-									<div style={{ width: '900px', margin: 'auto' }}>
+									<div style={{ width: '700px', margin: 'auto' }}>
 										<SwiperPiercingMacroCharts keyInd={ii} height={400} />
 									</div>
 									</div>
