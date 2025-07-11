@@ -11,6 +11,7 @@ import IosToggleBlowInPiercing from './toggles/iosToggleBlowInPiercing'
 import NavigationModalinStages from './navigationModalinStages';
 import SwiperPiercingMacro from './swiperPiercingMacro';
 import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
+import { CustomChart } from './chart/customChart'
 import { useTranslation } from 'react-i18next';
 
 const PiercingEditModalPanel = observer(() => {
@@ -44,9 +45,14 @@ const PiercingEditModalPanel = observer(() => {
 						</div>
 
 						<div>
-							{isVertical && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
-								<SwiperPiercingMacroCharts keyInd={ selectedPiercingMacro} height={250} />
-							</div>}
+							<div className='d-flex'>
+								{isVertical && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
+									<CustomChart keyInd={ selectedPiercingMacro} height={250} />
+								</div>}
+								{isVertical && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
+									<SwiperPiercingMacroCharts keyInd={ selectedPiercingMacro} height={250} /> 
+								</div>}
+							</div>
 							<Stepper keyInd ={ false }/>
 							{selectedPiercingStage !== 0 ? (
 								<PiercingEditStagesPanel />

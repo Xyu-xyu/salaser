@@ -18,8 +18,18 @@ type ResultItem = {
 	'focus, mm'?: number,
 	'height, mm'?: number,
 	'pressure, bar'?: number,
-	'power, kWt'?: number
+	'power, kWt'?: number,
+	'enabled': boolean;
 };
+
+type MinMax = {
+	[key: string]: {
+	  min: number;
+	  max: number;
+	};
+  };
+  
+
 
 class Utils {
 	// Метод для преобразования полярных координат в декартовы
@@ -227,18 +237,34 @@ class Utils {
 		return findKey(obj);
 	}
 
+	getPercentage(current: number, min: number, max: number): number {
+		if (max === min) return 0; // защита от деления на 0
+		return ((current - min) / (max - min)) * 100;
+	}
 
 
 	getChartData(keyInd: number ): ResultItem[] {
 		const result: ResultItem[] = [];
 		const data = viewStore.technology.piercingMacros[keyInd]
+		const chartKeys: string[] = ['focus','initial_focus','height','initial_height','pressure', 'initial_pressure','power','initial_power'];
+		const minmax: MinMax = {};
+
+		chartKeys.forEach(i => {
+			const minValue = utils.deepFind(false, ['piercingMacros', i, 'minimum']) ?? 0;
+			const maxValue = utils.deepFind(false, ['piercingMacros', i, 'maximum']) ?? 0;
+			const key:string = String(i)		  
+			minmax[key]= {min: minValue,max: maxValue}
+  		});	
+
+		console.log ( minmax )
 
 		result.push({
 			name: '0',
-			'focus, mm': data.initial_focus,
-			'height, mm': data.initial_height,
-			'pressure, bar': data.initial_pressure,
-			'power, kWt': data.initial_power/1000
+			'focus, mm': this.getPercentage( data.initial_focus,minmax.initial_focus.min, minmax.initial_focus.max),
+			'height, mm': this.getPercentage( data.initial_height,minmax.initial_height.min, minmax.initial_height.max),
+			'pressure, bar': this.getPercentage( data.initial_pressure,minmax.initial_pressure.min, minmax.initial_pressure.max),
+			'power, kWt': this.getPercentage( data.initial_power,minmax.initial_power.min, minmax.initial_power.max),
+			'enabled': true,
 		});
 
 		// Остальные из stages
@@ -246,18 +272,14 @@ class Utils {
 			if (stage.enabled) {
 			  result.push({
 				name: String(index + 1), // +1 потому что initial уже под "0"
-				'focus, mm': stage.focus,
-				'height, mm': stage.height,
-				'pressure, bar': stage.pressure,
-				'power, kWt': stage.power / 1000,
+				'focus, mm': this.getPercentage( stage.focus, minmax.focus.min, minmax.focus.max),
+				'height, mm': this.getPercentage( stage.height, minmax.height.min, minmax.height.max),
+				'pressure, bar': this.getPercentage( stage.pressure, minmax.pressure.min, minmax.pressure.max),
+				'power, kWt': this.getPercentage( stage.power, minmax.power.min, minmax.power.max),
+				'enabled': stage.enabled
 			  });
-			} else {
-			  result.push({	name: String(index + 1) });
-			}
-		  });
-
-		  //console.log (result)
-		  
+			} 
+		  });	  
 
 		return result;
 	}
