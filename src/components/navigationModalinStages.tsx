@@ -33,7 +33,7 @@ const NavigationModalinStages = observer(() => {
 		if (carouselModeInPiercing) {
 			viewStore.setModalProps ({
 				show:true,
-				modalBody: 'Do you want to delete this piercing macro ?',
+				modalBody: 'Do you want to delete piercing macro?',
 				confirmText: 'Delete',
 				cancelText:'Cancel',
 				func: viewStore.deleteAndUpdate,

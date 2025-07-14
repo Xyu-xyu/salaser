@@ -356,7 +356,7 @@ const cut_settings= JSON.parse(`{
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": -1.0,
-                "height": -1.5,
+                "height": 1.5,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 9
@@ -368,7 +368,7 @@ const cut_settings= JSON.parse(`{
                 "delay_s": 0,
                 "power_W_s": 1000,
                 "focus": -1.0,
-                "height": -1.0,
+                "height": 1.1,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
                 "modulationMacro": 10

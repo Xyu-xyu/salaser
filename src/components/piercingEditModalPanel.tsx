@@ -10,7 +10,7 @@ import StringComponent from './stringComponent';
 import IosToggleBlowInPiercing from './toggles/iosToggleBlowInPiercing'
 import NavigationModalinStages from './navigationModalinStages';
 import SwiperPiercingMacro from './swiperPiercingMacro';
-import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
+//import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
 import { CustomChart } from './chart/customChart'
 import { useTranslation } from 'react-i18next';
 
@@ -39,7 +39,7 @@ const PiercingEditModalPanel = observer(() => {
 								<StringComponent param={'name'} keyParam={'piercingMacros'} />
 							</div>
 							{!isVertical && <div style={{ width: '600px', height:'100px', margin: 'auto', position: 'absolute', right:'50px', top:'0px' }}>
-								<SwiperPiercingMacroCharts keyInd={ selectedPiercingMacro} height={250} />
+								<CustomChart keyInd={ selectedPiercingMacro} height={250} />
 							</div>}
 
 						</div>
@@ -48,10 +48,7 @@ const PiercingEditModalPanel = observer(() => {
 							<div className='d-flex'>
 								{isVertical && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
 									<CustomChart keyInd={ selectedPiercingMacro} height={250} />
-								</div>}
-								{isVertical && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
-									<SwiperPiercingMacroCharts keyInd={ selectedPiercingMacro} height={250} /> 
-								</div>}
+							</div>}
 							</div>
 							<Stepper keyInd ={ false }/>
 							{selectedPiercingStage !== 0 ? (

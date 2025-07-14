@@ -10,7 +10,30 @@ interface ComponentInt {
 export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height }) => {
 
 	const data = utils.getChartData(keyInd)
-	console.log(data)
+	console.log(data + ' ' + height)
+
+	const getPath = (key: string): string => {
+		let res = 'M';
+
+		const chartWidth = 490;
+		const startX = 80;
+		const step = chartWidth / data.length;
+
+		data.forEach((a, index) => {
+			const x = startX + index * step;
+			if (a['enabled'] || index === 0) {
+				// Безопасное извлечение и преобразование значения
+				const raw = a.hasOwnProperty(key) ? a[key] : 0;
+				const num = Number(raw);
+				const y = 185 - (isNaN(num) ? 0 : num * 1.5);
+				res += `${x} ${y} `;
+			}
+
+		});
+
+		return res.trim();
+	};
+
 
 	return (
 		<div className="recharts-responsive-container" style={{ width: '100%', height: '250px', minWidth: '0px' }}>
@@ -274,27 +297,35 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 					</g>
 					{
 						[
-							{ param: 'focus, mm', color: 'red' },
-							{ param: 'height, mm', color: 'green' },
-							{ param: 'pressure, bar', color: 'blue' },
-							{ param: 'power, kWt', color: 'red' }
+							{ param: 'focus, mm', color: '#8884d8' },
+							{ param: 'height, mm', color: '#82ca9d' },
+							{ param: 'pressure, bar', color: '#ffc658' },
+							{ param: 'power, kWt', color: '#ff7300' }
 						].map((p) => {
 
 							return (<g className="recharts-layer recharts-line">
+								<path
+									stroke={p.color}
+									fill="none"
+									stroke-width="1"
+									height="165" width="490"
+									className="recharts-curve recharts-line-curve"
+									d={getPath(p.param)}>
+
+								</path>
 								<g className="recharts-layer recharts-line-dots">
 									{data.map((a, index) => {
 										const chartWidth = 490;
 										const startX = 80;
 										const step = chartWidth / (data.length);
 										const x = startX + index * step;
-										const y = 185 - Number(a[p.param])*1.65
-
+										const y = 185 - Number(a[p.param]) * 1.5
 										return (
 
 											<circle
 												key={index}
 												r="3"
-												stroke={ p.color}
+												stroke={p.color}
 												fill="#fff"
 												strokeWidth="1"
 												height="165"
@@ -310,90 +341,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 							</g>
 							)
 						})
-
 					}
-
-
-					{/* <g className="recharts-layer recharts-line">
-						<path stroke="#8884d8" fill="none" stroke-width="1" height="165" width="490" className="recharts-curve recharts-line-curve" stroke-dasharray="426.5467529296875px 0px" d="M80,37.187C90.889,38.906,101.778,40.625,112.667,40.625C123.556,40.625,134.444,33.75,145.333,33.75C156.222,33.75,167.111,37.187,178,40.625M243.333,20C254.222,25.729,265.111,31.458,276,32.375C286.889,33.292,297.778,33.75,308.667,33.75C319.556,33.75,330.444,32.26,341.333,31.687C352.222,31.115,363.111,30.313,374,30.313C384.889,30.313,395.778,37.76,406.667,40.625C417.556,43.49,428.444,47.5,439.333,47.5C450.222,47.5,461.111,47.5,472,47.5C482.889,47.5,493.778,36.042,504.667,33.75C515.556,31.458,526.444,30.313,537.333,30.313C548.222,30.313,559.111,32.031,570,33.75"></path>
-						<g className="recharts-layer recharts-line-dots">
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="80.00000000000003" cy="37.18749999999999" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="112.66666666666669" cy="40.625" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="145.33333333333337" cy="33.749999999999986" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="178.00000000000003" cy="40.625" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="243.33333333333334" cy="20" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="276" cy="32.37499999999999" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="308.6666666666667" cy="33.749999999999986" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="341.33333333333337" cy="31.68749999999998" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="374" cy="30.3125" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="406.66666666666663" cy="40.625" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="439.33333333333337" cy="47.500000000000014" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="472" cy="47.500000000000014" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="504.66666666666663" cy="33.749999999999986" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="537.3333333333334" cy="30.3125" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#8884d8" fill="#fff" stroke-width="1" height="165" width="490" cx="570" cy="33.749999999999986" className="recharts-dot recharts-line-dot"></circle>
-						</g>
-					</g>
-					<g className="recharts-layer recharts-line">
-						<path stroke="#82ca9d" fill="none" stroke-width="1" height="165" width="490" className="recharts-curve recharts-line-curve" stroke-dasharray="439.7048645019531px 0px" d="M80,136.495C90.889,136.149,101.778,135.804,112.667,134.422C123.556,133.04,134.444,124.058,145.333,124.058C156.222,124.058,167.111,129.24,178,134.422M243.333,103.329C254.222,115.421,265.111,127.513,276,130.276C286.889,133.04,297.778,134.422,308.667,134.422C319.556,134.422,330.444,129.585,341.333,128.204C352.222,126.822,363.111,126.131,374,126.131C384.889,126.131,395.778,134.422,406.667,134.422C417.556,134.422,428.444,129.24,439.333,129.24C450.222,129.24,461.111,131.831,472,134.422C482.889,137.013,493.778,144.786,504.667,144.786C515.556,144.786,526.444,129.24,537.333,129.24C548.222,129.24,559.111,131.831,570,134.422"></path>
-						<g className="recharts-layer recharts-line-dots">
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="80.00000000000003" cy="136.49497487437185" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="112.66666666666669" cy="134.4221105527638" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="145.33333333333337" cy="124.05778894472363" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="178.00000000000003" cy="134.4221105527638" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="243.33333333333334" cy="103.32914572864323" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="276" cy="130.27638190954775" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="308.6666666666667" cy="134.4221105527638" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="341.33333333333337" cy="128.2035175879397" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="374" cy="126.13065326633166" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="406.66666666666663" cy="134.4221105527638" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="439.33333333333337" cy="129.23994974874373" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="472" cy="134.4221105527638" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="504.66666666666663" cy="144.78643216080403" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="537.3333333333334" cy="129.23994974874373" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#82ca9d" fill="#fff" stroke-width="1" height="165" width="490" cx="570" cy="134.4221105527638" className="recharts-dot recharts-line-dot"></circle>
-						</g>
-					</g>
-					<g className="recharts-layer recharts-line">
-						<path stroke="#ffc658" fill="none" stroke-width="1" height="165" width="490" className="recharts-curve recharts-line-curve" stroke-dasharray="482.284912109375px 0px" d="M80,97.063C90.889,105.928,101.778,114.792,112.667,120.702C123.556,126.612,134.444,129.567,145.333,132.521C156.222,135.476,167.111,136.954,178,138.431M243.333,132.521C254.222,130.552,265.111,128.582,276,126.612C286.889,124.642,297.778,122.672,308.667,120.702C319.556,118.732,330.444,116.762,341.333,114.792C352.222,112.822,363.111,110.852,374,108.883C384.889,106.913,395.778,104.943,406.667,102.973C417.556,101.003,428.444,97.063,439.333,97.063C450.222,97.063,461.111,97.063,472,97.063C482.889,97.063,493.778,143.75,504.667,143.75C515.556,143.75,526.444,97.063,537.333,97.063C548.222,97.063,559.111,97.063,570,97.063"></path>
-						<g className="recharts-layer recharts-line-dots">
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="80.00000000000003" cy="97.06303724928367" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="112.66666666666669" cy="120.70200573065904" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="145.33333333333337" cy="132.52148997134668" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="178.00000000000003" cy="138.43123209169053" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="243.33333333333334" cy="132.52148997134668" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="276" cy="126.61174785100287" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="308.6666666666667" cy="120.70200573065904" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="341.33333333333337" cy="114.79226361031519" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="374" cy="108.88252148997135" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="406.66666666666663" cy="102.9727793696275" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="439.33333333333337" cy="97.06303724928367" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="472" cy="97.06303724928367" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="504.66666666666663" cy="143.75" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="537.3333333333334" cy="97.06303724928367" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ffc658" fill="#fff" stroke-width="1" height="165" width="490" cx="570" cy="97.06303724928367" className="recharts-dot recharts-line-dot"></circle>
-						</g>
-					</g>
-					<g className="recharts-layer recharts-line">
-						<path stroke="#ff7300" fill="none" stroke-width="1" height="165" width="490" className="recharts-curve recharts-line-curve" stroke-dasharray="415.7308654785156px 0px" d="M80,141.708C90.889,140.677,101.778,139.645,112.667,139.645C123.556,139.645,134.444,139.645,145.333,139.645C156.222,139.645,167.111,139.645,178,139.645M243.333,141.708C254.222,141.364,265.111,141.02,276,140.883C286.889,140.745,297.778,140.677,308.667,140.677C319.556,140.677,330.444,141.708,341.333,141.708C352.222,141.708,363.111,141.708,374,141.708C384.889,141.708,395.778,141.708,406.667,141.708C417.556,141.708,428.444,141.708,439.333,141.708C450.222,141.708,461.111,141.708,472,141.708C482.889,141.708,493.778,141.708,504.667,141.708C515.556,141.708,526.444,141.708,537.333,141.708C548.222,141.708,559.111,141.708,570,141.708"></path>
-						<g className="recharts-layer recharts-line-dots">
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="80.00000000000003" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="112.66666666666669" cy="139.64521452145215" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="145.33333333333337" cy="139.64521452145215" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="178.00000000000003" cy="139.64521452145215" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="243.33333333333334" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="276" cy="140.8828382838284" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="308.6666666666667" cy="140.67656765676566" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="341.33333333333337" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="374" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="406.66666666666663" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="439.33333333333337" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="472" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="504.66666666666663" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="537.3333333333334" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-							<circle r="3" stroke="#ff7300" fill="#fff" stroke-width="1" height="165" width="490" cx="570" cy="141.7079207920792" className="recharts-dot recharts-line-dot"></circle>
-						</g>
-					</g> */}
 				</svg>
 			</div>
 		</div>
@@ -405,3 +353,43 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 
 
 export default CustomChart;
+
+
+{
+	<div xmlns="http://www.w3.org/1999/xhtml" tabindex="-1"
+	class="recharts-tooltip-wrapper recharts-tooltip-wrapper-left recharts-tooltip-wrapper-top"
+	style="visibility: visible; pointer-events: none; position: absolute; top: 0px; left: 0px; font-size: 16px; padding: 2px; margin: 0px; transition: transform 400ms ease 0s; transform: translate(80px, 20px);">
+	<div class="recharts-default-tooltip" role="status" aria-live="assertive"
+		style="margin: 0px; padding: 10px; background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); white-space: nowrap;">
+		<p class="recharts-tooltip-label" style="margin: 0px;">5</p>
+		<ul class="recharts-tooltip-item-list" style="padding: 0px; margin: 0px;">
+			<li class="recharts-tooltip-item"
+				style="display: block; padding-top: 4px; padding-bottom: 4px; color: rgb(136, 132, 216);"><span
+					class="recharts-tooltip-item-name">focus, mm</span><span class="recharts-tooltip-item-separator"> :
+				</span><span class="recharts-tooltip-item-value">60</span><span
+					class="recharts-tooltip-item-unit"></span></li>
+			<li class="recharts-tooltip-item"
+				style="display: block; padding-top: 4px; padding-bottom: 4px; color: rgb(130, 202, 157);">
+				<span class="recharts-tooltip-item-name">height, mm</span>
+				<span class="recharts-tooltip-item-separator"> : </span>
+				<span class="recharts-tooltip-item-value">19.597989949748744</span>
+				<span class="recharts-tooltip-item-unit"></span>
+			</li>
+			<li class="recharts-tooltip-item"
+				style="display: block; padding-top: 4px; padding-bottom: 4px; color: rgb(255, 115, 0);">
+				<span class="recharts-tooltip-item-name">power, kWt</span>
+				<span class="recharts-tooltip-item-separator"> : </span>
+				<span class="recharts-tooltip-item-value">0.9900990099009901</span><span
+					class="recharts-tooltip-item-unit"></span>
+			</li>
+			<li class="recharts-tooltip-item"
+				style="display: block; padding-top: 4px; padding-bottom: 4px; color: rgb(255, 198, 88);">
+				<span class="recharts-tooltip-item-name">pressure, bar</span>
+				<span class="recharts-tooltip-item-separator"> : </span>
+				<span class="recharts-tooltip-item-value">5.444126074498568</span>
+				<span class="recharts-tooltip-item-unit"></span>
+			</li>
+		</ul>
+	</div>
+</div>
+}

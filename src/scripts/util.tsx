@@ -269,7 +269,6 @@ class Utils {
 
 		// Остальные из stages
 		data.stages.forEach((stage: Stage, index: number) => {
-			if (stage.enabled) {
 			  result.push({
 				name: String(index + 1), // +1 потому что initial уже под "0"
 				'focus, mm': this.getPercentage( stage.focus, minmax.focus.min, minmax.focus.max),
@@ -278,9 +277,7 @@ class Utils {
 				'power, kWt': this.getPercentage( stage.power, minmax.power.min, minmax.power.max),
 				'enabled': stage.enabled
 			  });
-			} 
 		  });	  
-
 		return result;
 	}
 

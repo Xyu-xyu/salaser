@@ -8,7 +8,8 @@ import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
-import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
+//import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
+import { CustomChart } from './chart/customChart'
  
 
 const swiperPiercingMacro = observer(() => {
@@ -79,7 +80,7 @@ const swiperPiercingMacro = observer(() => {
 									</div>
 									<div className={isVertical ? "editModal_col d-contents mt-2" : "editModal_col_hor d-contents mt-2"}>
 									<div style={{ width: '700px', margin: 'auto' }}>
-										<SwiperPiercingMacroCharts keyInd={ii} height={400} />
+										<CustomChart keyInd={ii} height={400} />
 									</div>
 									</div>
  								</div>
