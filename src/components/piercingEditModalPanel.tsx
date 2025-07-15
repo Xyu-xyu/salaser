@@ -57,9 +57,24 @@ const PiercingEditModalPanel = observer(() => {
 								<div>
 									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 										{[
-											"initial_modulationMacro",
-											"initial_modulationFrequency_Hz",
+										
+ 											"initial_focus",
+											"initial_height",
+											"initial_power",
 											"initial_pressure",
+										].map((a: string, i: number) => (
+											<div className="" key={i}>
+												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+													<UniversalKnob param={a} keyParam={'piercingMacros'} />
+												</div>
+											</div>
+										))}									
+									</div>
+
+									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+										{[
+												"initial_modulationMacro",
+												"initial_modulationFrequency_Hz",
 										].map((a: string, i: number) => (
 											<div className="" key={i}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
@@ -73,20 +88,6 @@ const PiercingEditModalPanel = observer(() => {
 											<div className="" key={i + 10}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 													<MacrosEditList param={a} keyParam={'piercingMacros'} />
-												</div>
-											</div>
-										))}
-									</div>
-
-									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
-										{[
-											"initial_power",
-											"initial_focus",
-											"initial_height",
-										].map((a: string, i: number) => (
-											<div className="" key={i}>
-												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-													<UniversalKnob param={a} keyParam={'piercingMacros'} />
 												</div>
 											</div>
 										))}

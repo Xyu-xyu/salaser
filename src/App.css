@@ -666,3 +666,9 @@ body {
 .transparentBack:hover {
   fill: rgba(223, 223, 226, 0.75 );
 }
+
+.recharts-responsive-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -10,11 +10,11 @@ const piercingEditStagesPanel = observer(() => {
 	return (
 		<>
 			<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
-				{[
-	 	  		    "modulationMacro",
-					"modulationFrequency_Hz",
-					"pressure",					
-					"delay_s",					
+				{[	  		    
+					   "focus",
+					   "height",
+					   "power",
+					   "pressure",					
 				].map((a: string, i: number) => (
 					<div className="" key={i}>
 						<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
@@ -26,9 +26,9 @@ const piercingEditStagesPanel = observer(() => {
 			<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 				{[
 					
-					"power",
-					"focus",
-					"height",
+					"modulationMacro",
+					"modulationFrequency_Hz",
+					"delay_s",
 					"power_W_s",
 				].map((a: string, i: number) => (
 					<div className="" key={i}>
