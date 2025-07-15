@@ -55,10 +55,6 @@ const NavigationModalinStages = observer(() => {
 		viewStore.setCarouselModeInPiercing ( !carouselModeInPiercing)
 	}
 
-	const setThis =() =>{
-		viewStore.setTecnologyValue( selectedSlide, 'piercingMacro', 'macros', 0, 7, false  )
-	}
-
 	return (
 		<>
 			<div className="mt-2">
@@ -79,17 +75,6 @@ const NavigationModalinStages = observer(() => {
 						}
 					</div>
 				</button>	
-				<button className="carousel_btn violet_button m-2">
-					<div className="d-flex align-items-center justify-content-center"
-						onMouseDown={ setThis }>
-						<Icon
-							icon="charm:square-tick"
-							width="48"
-							height="48"
-							style={{ color: 'white' }}/>
-						
-					</div>
-				</button>
 				<button className="carousel_btn violet_button m-2">
 					<div className="d-flex align-items-center justify-content-center"
 						onMouseDown={ cloneThis }>
