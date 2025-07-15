@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import utils from '../../scripts/util';
+import viewStore from '../../store/viewStore';
 
 interface ComponentInt {
 	keyInd: number;
@@ -10,8 +11,7 @@ interface ComponentInt {
 export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height }) => {
 
 	const data = utils.getChartData(keyInd)
-	console.log(data + ' ' + height)
-
+	const {t} = useTranslation()
 	const getPath = (key: string): string => {
 		let res = 'M';
 
@@ -34,9 +34,15 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 		return res.trim();
 	};
 
+	const showToolTip = (index:number) =>{
+		console.log ("Show tooltip for step: " + index)
+		viewStore.setselectedPiercingStage(index)
+	}
+
+	const { selectedPiercingStage } =viewStore
 
 	return (
-		<div className="recharts-responsive-container" style={{ width: '100%', height: '250px', minWidth: '0px' }}>
+		<div className="recharts-responsive-container" style={{ width: '100%', height: '250px', minWidth: '0px', transition: 'none' }}>
 			<div
 				className="recharts-wrapper"
 				role="application"
@@ -100,10 +106,10 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 						}}
 					>
 						{[
-							{ color: '#8884d8', label: 'focus, mm' },
-							{ color: '#82ca9d', label: 'height, mm' },
-							{ color: '#ff7300', label: 'power, kWt' },
-							{ color: '#ffc658', label: 'pressure, bar' },
+							{ color: '#8884d8', param: 'focus, mm' },
+							{ color: '#82ca9d', param: 'height, mm' },
+							{ color: '#ff7300', param: 'power, kWt' },
+							{ color: '#ffc658', param: 'pressure, bar' },
 						].map((item, index) => (
 							<li
 								key={index}
@@ -111,7 +117,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 								style={{ display: 'inline-block', marginRight: '10px' }}
 							>
 								<svg
-									aria-label={`${item.label} legend icon`}
+									aria-label={`${item.param} legend icon`}
 									className="recharts-surface"
 									width="14"
 									height="14"
@@ -128,10 +134,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 										strokeWidth="4"
 										fill="none"
 										stroke={item.color}
-										d="M0,16h10.666666666666666
-                         A5.333333333333333,5.333333333333333,0,1,1,21.333333333333332,16
-                         H32M21.333333333333332,16
-                         A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
+										d="M0,16h10.666666666666666   A5.333333333333333,5.333333333333333,0,1,1,21.333333333333332,16                   H32M21.333333333333332,16  A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
 										className="recharts-legend-icon"
 									></path>
 								</svg>
@@ -139,7 +142,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 									className="recharts-legend-item-text"
 									style={{ color: item.color }}
 								>
-									{item.label}
+									{ t(item.param)}
 								</span>
 							</li>
 						))}
@@ -260,7 +263,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 						<line orientation="left" width="60" x="20" y="20" height="165" className="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="80" y1="20" x2="80" y2="185"></line>
 						<g className="recharts-cartesian-axis-ticks">
 							{
-								Array.from({ length: 6 }).map((_, index) => (
+								Array.from({ length: 6 }).map((_, index, arr) => (
 									<g key={index} className="recharts-layer recharts-cartesian-axis-tick">
 										<line
 											orientation="left"
@@ -276,7 +279,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 											x2="80"
 											y2={185 - index * 30}
 										/>
-										<text
+										{(index == 0 || index=== arr.length-1) && <text
 											orientation="left"
 											width="60"
 											height="165"
@@ -288,8 +291,8 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 											textAnchor="end"
 											fill="#333"
 										>
-											<tspan x="72" dy="0.355em">{index * 20}</tspan>
-										</text>
+											<tspan x="72" dy="0.355em">{index ===0 ? "min" : 'max'}</tspan>
+										</text> }
 									</g>
 								))
 							}
@@ -297,17 +300,42 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 					</g>
 					{
 						[
-							{ param: 'focus, mm', color: '#8884d8' },
-							{ param: 'height, mm', color: '#82ca9d' },
-							{ param: 'pressure, bar', color: '#ffc658' },
-							{ param: 'power, kWt', color: '#ff7300' }
-						].map((p) => {
+							{ color: '#8884d8', param: 'focus, mm' },
+							{ color: '#82ca9d', param: 'height, mm' },
+							{ color: '#ff7300', param: 'power, kWt' },
+							{ color: '#ffc658', param: 'pressure, bar' }
+						].map((p, i) => {
 
-							return (<g className="recharts-layer recharts-line">
+							return (
+							<g className="recharts-layer recharts-line"	key={"recharts-layer_recharts-line"+i}>
+								<g className="recharts-layer recharts-line-dots">
+									{data.map((a, index) => {
+										const chartWidth = 490;
+										const startX = 80;
+										const step = chartWidth / (data.length);
+										const x = startX + index * step;
+										const y = 185 - Number(a[p.param]) * 1.5
+										return (
+											<g key={'layerback'+index} onMouseDown={ ()=>{ showToolTip(index) } }>
+												 {i === 0 && <rect 
+												 	x={x-15 < 79 ? 80 :x-15} 
+													y="35"
+        											width={ x-15 < 79 ? 15 : 30}
+													height="155"
+													stroke='transparent'
+													fill='transparent'
+													className='transparentBack' 
+												/>}
+												 
+											</g>
+										)
+									})
+									}
+								</g>
 								<path
 									stroke={p.color}
 									fill="none"
-									stroke-width="1"
+									strokeWidth="1"
 									height="165" width="490"
 									className="recharts-curve recharts-line-curve"
 									d={getPath(p.param)}>
@@ -321,19 +349,20 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 										const x = startX + index * step;
 										const y = 185 - Number(a[p.param]) * 1.5
 										return (
-
-											<circle
-												key={index}
-												r="3"
-												stroke={p.color}
-												fill="#fff"
-												strokeWidth="1"
-												height="165"
-												width="490"
-												cx={x}
-												cy={y}
-												className="recharts-dot recharts-line-dot"
-											/>
+											<g onMouseDown={ ()=>{ showToolTip(index) } } key={Math.random()}>
+												<circle
+													key={10+index}
+													r="5"
+													stroke={p.color}
+													fill={selectedPiercingStage === index ? p.color : '#fff'}
+													strokeWidth="1"
+													height="165"
+													width="490"
+													cx={x}
+													cy={y}
+													className="recharts-dot recharts-line-dot"
+												/>
+											</g>
 										)
 									})
 									}
@@ -345,51 +374,8 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 				</svg>
 			</div>
 		</div>
-
 	)
-
-
 });
 
 
 export default CustomChart;
-
-
-{
-	<div xmlns="http://www.w3.org/1999/xhtml" tabindex="-1"
-	class="recharts-tooltip-wrapper recharts-tooltip-wrapper-left recharts-tooltip-wrapper-top"
-	style="visibility: visible; pointer-events: none; position: absolute; top: 0px; left: 0px; font-size: 16px; padding: 2px; margin: 0px; transition: transform 400ms ease 0s; transform: translate(80px, 20px);">
-	<div class="recharts-default-tooltip" role="status" aria-live="assertive"
-		style="margin: 0px; padding: 10px; background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); white-space: nowrap;">
-		<p class="recharts-tooltip-label" style="margin: 0px;">5</p>
-		<ul class="recharts-tooltip-item-list" style="padding: 0px; margin: 0px;">
-			<li class="recharts-tooltip-item"
-				style="display: block; padding-top: 4px; padding-bottom: 4px; color: rgb(136, 132, 216);"><span
-					class="recharts-tooltip-item-name">focus, mm</span><span class="recharts-tooltip-item-separator"> :
-				</span><span class="recharts-tooltip-item-value">60</span><span
-					class="recharts-tooltip-item-unit"></span></li>
-			<li class="recharts-tooltip-item"
-				style="display: block; padding-top: 4px; padding-bottom: 4px; color: rgb(130, 202, 157);">
-				<span class="recharts-tooltip-item-name">height, mm</span>
-				<span class="recharts-tooltip-item-separator"> : </span>
-				<span class="recharts-tooltip-item-value">19.597989949748744</span>
-				<span class="recharts-tooltip-item-unit"></span>
-			</li>
-			<li class="recharts-tooltip-item"
-				style="display: block; padding-top: 4px; padding-bottom: 4px; color: rgb(255, 115, 0);">
-				<span class="recharts-tooltip-item-name">power, kWt</span>
-				<span class="recharts-tooltip-item-separator"> : </span>
-				<span class="recharts-tooltip-item-value">0.9900990099009901</span><span
-					class="recharts-tooltip-item-unit"></span>
-			</li>
-			<li class="recharts-tooltip-item"
-				style="display: block; padding-top: 4px; padding-bottom: 4px; color: rgb(255, 198, 88);">
-				<span class="recharts-tooltip-item-name">pressure, bar</span>
-				<span class="recharts-tooltip-item-separator"> : </span>
-				<span class="recharts-tooltip-item-value">5.444126074498568</span>
-				<span class="recharts-tooltip-item-unit"></span>
-			</li>
-		</ul>
-	</div>
-</div>
-}

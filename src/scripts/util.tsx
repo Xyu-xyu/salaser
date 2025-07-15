@@ -256,7 +256,7 @@ class Utils {
 			minmax[key]= {min: minValue,max: maxValue}
   		});	
 
-		console.log ( minmax )
+		//console.log ( minmax )
 
 		result.push({
 			name: '0',

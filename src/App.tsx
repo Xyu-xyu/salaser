@@ -23,13 +23,15 @@ const App = observer(() => {
 		<>
 			<div
 				id="App"
-				className={viewStore.theme}
+				className={"d-flex flex-column min-vh-100 "+ viewStore.theme}
 				onContextMenu={handleContextMenu}
 			>
-				<IosToggle0 />
-				<IosToggle1 />
-				<IosToggle2 />
-				<IosToggle3 />
+				<div className='d-none'>
+					<IosToggle0 />
+					<IosToggle1 />
+					<IosToggle2 />
+					<IosToggle3 />
+				</div>
 				<ToastContainer toastStyle={{
 					minWidth: '450px',
 					minHeight: '150px',

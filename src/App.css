@@ -88,9 +88,9 @@ body {
   font-family: '7SegBoldItalic', monospace !important;
 }
 
-.moderat {
+/* .moderat {
   font-family: 'Moderat', Arial, sans-serif  !important;
-}
+} */
 
 
 @media (orientation: portrait) {
@@ -103,9 +103,10 @@ body {
 
   .fade-toggle.visible {
     opacity: 1;
-    width: 300px !important; /* или фиксированная ширина, если нужно */
-    min-width: 150px !important;
-    max-height: 1900px;
+    width: 175px !important; 
+    /*  min-width: 150px !important; */
+    /* max-height: 1980px; */
+    padding: 0.25em 0 0 0.25em;
   }
   
 }
@@ -121,9 +122,11 @@ body {
 
   .fade-toggle.visible {
     opacity: 1;
-    width: 300px !important; /* или фиксированная ширина, если нужно */
-    min-width: 250px !important;
-    max-height: 1060px;
+    width: 300px !important; 
+    /*     min-width: 250px !important; */    
+    padding: 0.25em 0 0 0.25em;
+    
+
   }  
 
 }
@@ -436,13 +439,14 @@ body {
  }
 
  .fade-toggle {
-  opacity: 0;
-  width: 0;
+/*   opacity: 0;
+ */  width: 0;
   overflow: hidden;
   white-space: nowrap; /* предотвращает перенос */
-  transition: none;
-/*   transition: opacity 1s ease, width 1s ease;
- */}
+ /*  transition: none; */
+   transition: /* opacity 1s ease, */ width 0.2s ease;
+   background-color: var(--white);
+ }
 
 
 
@@ -657,4 +661,8 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+}
+
+.transparentBack:hover {
+  fill: rgba(223, 223, 226, 0.75 );
 }

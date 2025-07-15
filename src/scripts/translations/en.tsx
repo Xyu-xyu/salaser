@@ -87,7 +87,11 @@ const en: Record<string, string> = {
 	"Maximum value reached!": "Maximum value reached!",
 	"Step added!": "Step added!",
 	"Cannot delete this splice step!": "Cannot delete this splice step!",
-	"Step removed!": "Step removed!"
+	"Step removed!": "Step removed!",
+	"focus, mm":"focus",
+	"height, mm":"height",
+	"power, kWt":"power",
+	"pressure, bar":"pressure",
 
 
 

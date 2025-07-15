@@ -87,7 +87,11 @@ const ru: Record<string, string> = {
 	"Maximum value reached!": "Достигнуто максимальное значение!",
 	"Step added!": "Шаг добавлен!",
 	"Cannot delete this splice step!": "Нельзя удалить этот шаг врезки!",
-	"Step removed!": "Шаг удален!"
+	"Step removed!": "Шаг удален!",
+	"focus, mm":"фокус",
+	"height, mm":"высота",
+	"power, kWt":"энергия",
+	"pressure, bar":"давление",
 
 };
 

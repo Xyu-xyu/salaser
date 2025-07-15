@@ -310,7 +310,7 @@ class ViewStore {
     }
 
     setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number,  keyInd:number|boolean=false) {
-       console.log ( arguments )
+       //console.log ( arguments )
         
         if (newVal < minimum) newVal = minimum
         if (newVal > maximum) newVal = maximum
