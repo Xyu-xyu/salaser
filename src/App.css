@@ -582,7 +582,7 @@ body {
   border: 1px solid var(--grey-nav) !important;
   border-radius: 0.75em;
   background-color: var(--grey-nav);
-  margin-top: 50px;
+  margin-top: 25px;
  }
 
 .stringComponentLabel {
@@ -671,4 +671,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.mt-50 {
+  margin-top: 50px !important;
 }

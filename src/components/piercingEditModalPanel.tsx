@@ -32,30 +32,24 @@ const PiercingEditModalPanel = observer(() => {
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					{ !carouselModeInPiercing && <div className="container-fluid">
-						<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
+					{ !carouselModeInPiercing && 
+					<div className="container-fluid">
+						<div className={'d-flex justify-content-evenly align-items-center flex-column ' + (isVertical ? "mt-10" : "mt-0")}>
 
 							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 								<StringComponent param={'name'} keyParam={'piercingMacros'} />
-							</div>
-							{!isVertical && <div style={{ width: '600px', height:'100px', margin: 'auto', position: 'absolute', right:'50px', top:'0px' }}>
-								<CustomChart keyInd={ selectedPiercingMacro} height={250} />
-							</div>}
-
-						</div>
-
-						<div>
-							<div className='d-flex'>
-								{isVertical && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
+							</div>	
+							<div className={'d-flex '+(isVertical ? "mt-4" : "")}>
+								{true && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
 									<CustomChart keyInd={ selectedPiercingMacro} height={250} />
-							</div>}
-							</div>
-							<Stepper keyInd ={ false }/>
-							{selectedPiercingStage !== 0 ? (
+							</div>}					
+						</div>
+						
+						{selectedPiercingStage !== 0 ? (
 								<PiercingEditStagesPanel />
 							) : (
-								<div>
-									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+								<div className='w-100'>
+									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-50")}>
 										{[
 										
  											"initial_focus",
@@ -101,10 +95,10 @@ const PiercingEditModalPanel = observer(() => {
 							)}
 						</div>
 					</div>
-				}
-				{
-					carouselModeInPiercing && <SwiperPiercingMacro />
-				}
+					}
+					{
+						carouselModeInPiercing && <SwiperPiercingMacro />
+					}
 				</Modal.Body>
 
  				<Modal.Footer className="position-relative">
