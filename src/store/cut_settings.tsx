@@ -239,7 +239,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": true,
-                "modulationMacro": 0
+                "modulationMacro": 1
               },
               {
                 "pressure": 2.0,
@@ -251,7 +251,7 @@ const cut_settings= JSON.parse(`{
                 "height": 2,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 1
+                "modulationMacro": 2
               },
               {
                 "pressure": 1.0,
@@ -263,7 +263,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": true,
-                "modulationMacro": 0
+                "modulationMacro": 3
               },
               {
                 "pressure": 2.0,
@@ -275,7 +275,7 @@ const cut_settings= JSON.parse(`{
                 "height": 3,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": true,
-                "modulationMacro": 2
+                "modulationMacro": 4
               },
               {
                 "pressure": 2.0,
@@ -287,7 +287,7 @@ const cut_settings= JSON.parse(`{
                 "height": 4,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 3
+                "modulationMacro": 5
               },
               {
                 "pressure": 3.0,
@@ -299,7 +299,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1.4,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 4
+                "modulationMacro": 6
               },
               {
                 "pressure": 4.0,
@@ -311,7 +311,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1.0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 6
+                "modulationMacro": 7
               },
               {
                 "pressure": 5.0,
@@ -323,7 +323,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1.6,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 6
+                "modulationMacro": 8
               },
               {
                 "pressure": 6.0,
@@ -335,7 +335,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1.8,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 7
+                "modulationMacro": 9
               },
               {
                 "pressure": 7.0,
@@ -347,7 +347,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1.0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 8
+                "modulationMacro": 10
               },
               {
                 "pressure": 8.0,
@@ -371,7 +371,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1.1,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 10
+                "modulationMacro": 8
               },
               {
                 "pressure": 0.1,
@@ -383,7 +383,7 @@ const cut_settings= JSON.parse(`{
                 "height": 0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 11
+                "modulationMacro": 7
               },
               {
                 "pressure": 8.0,
@@ -395,7 +395,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1.5,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 12
+                "modulationMacro": 6
               },
               {
                 "pressure": 8.0,
@@ -407,7 +407,7 @@ const cut_settings= JSON.parse(`{
                 "height": 1.0,
                 "modulationFrequency_Hz": 10000.0,
                 "cross_blow": false,
-                "modulationMacro": 13
+                "modulationMacro": 5
               },
               {
                 "pressure": 8.0,
@@ -426,7 +426,7 @@ const cut_settings= JSON.parse(`{
             "initial_pressure": 8.0,
             "gas": "AIR",
             "name": "Unknown incut1",
-            "initial_modulationMacro": 0,
+            "initial_modulationMacro": 15,
             "initial_power": 1000,
             "initial_focus": 0.5,
             "initial_height": 0.8

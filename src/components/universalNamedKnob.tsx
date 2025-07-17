@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import utils from '../scripts/util';
 import MacrosEditModalButton from './macrosEditModalButton'
 import { useTranslation } from 'react-i18next';
+import TextInCircle from './textInCircle';
 
 interface CustomKnobProps {
 	param: string;
@@ -11,35 +12,39 @@ interface CustomKnobProps {
 	keyInd?: number|boolean;
 }
 
-const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, keyInd=false }) => {
+const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, keyInd=false }) => {
 	
 	const svgRef = useRef<SVGGElement>(null);
-	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const { t } = useTranslation()
-	
+
 	let minimum = utils.deepFind ( false, [keyParam, param, 'minimum'])
 	let title   = utils.deepFind ( false, [keyParam, param, 'title'])
 	let maximum = utils.deepFind ( false, [keyParam, param, 'maximum'])
 	let isArray = utils.deepFind ( false, [keyParam, param, '$wvEnumRef'])
 
-	const {isVertical, knobStep, knobRound, selectedMacros, selectedModulationMacro, technology, selectedPiercingMacro } = viewStore	
+	const { knobStep, selectedMacros, selectedModulationMacro, technology, selectedPiercingMacro, isVertical} = viewStore	
 
 	if (isArray) {
 		let paramName = isArray.split('/').reverse()[0]		
 		maximum =utils.deepFind(technology, [paramName]).length-1
 	}
+
 	const knobStp = knobStep[param]
 	const step = Number(maximum - minimum) / 50 > 50 ? 50 : Number(knobStp)
 	const stepBig = Number(maximum - minimum) / Number(knobStp) > 50 ? Number(maximum - minimum) / 50 : Number(knobStp)
-	let fontSize = utils.calculateFontSize(minimum, maximum, step);
+	//let fontSize = utils.calculateFontSize(minimum, maximum, step);
+	
 	const {
 		x1, x2, x4,
 		y1, y2, y3,
- 		r1, r2, 
-		startAngle, sweepAngle
+ 		//r1, r2, 
+		//startAngle, sweepAngle
 	} = utils.getKnobLayout(isVertical);
 
+
+
 	let val=0;
+	console.log ('keyInd +' + keyInd)
 	if (typeof keyInd === 'number') {
 		if (keyParam === 'macros') {
 			let knob = technology.macros[keyInd]		
@@ -47,11 +52,12 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 			if (param === 'piercingMacro') {
 				val = Number(knob[param]);
 			}
-		} else if (keyParam === 'modulationMacros') {
+		} else if (keyParam === 'modulationMacro') {
 			val = technology.modulationMacros[keyInd][param]
 		} else if (keyParam === 'piercingMacros') {
 			val = technology.piercingMacros[keyInd][param]
 		} else if (keyParam === 'stages') {
+			console.log ("stages stages stages stages stages !!!")
 			val = viewStore.getTecnologyValue (param, keyParam, keyInd)
 		}
 
@@ -71,27 +77,37 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 		}
 	}
 
-	const handleMouseDown = (callback: () => void) => {
-		callback();
-		intervalRef.current = setInterval(callback, 50);
-	};
-
-	const handleMouseUp = () => {
-		if (intervalRef.current) clearInterval(intervalRef.current);
-	};
-
 	const increase = () => {
 		setVal( step );
 	}
 
 	const decrease = () => {
-		setVal( -step);
+		setVal( -step );
 	}
 
 	const setVal =(step:number) =>{
 		let currentValue= viewStore.getTecnologyValue(param, keyParam, keyInd)
 		let newValue = currentValue + step
-		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum, keyInd )
+		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum, keyInd )		
+	}
+
+	const createNote =()=>{
+		console.log ("Creating mod macro param "+ param )
+		let note:string=''
+		if ( param  === 'modulationMacro' || param === 'initial_modulationMacro') {
+		
+			 note+=viewStore.getTecnologyValue('name', 'modulationMacros', val )+ ": "
+			 note+=viewStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', val)+"% " 
+			 note+=viewStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', val)+"Hz"
+
+		} else if ( param === 'piercingMacro'){
+
+			note+= viewStore.getTecnologyValue('name', 'piercingMacros',selectedPiercingMacro )+": "
+			note+= viewStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', selectedPiercingMacro)+"Hz "
+			note+= viewStore.getTecnologyValue('stages', 'piercingMacros', selectedPiercingMacro).length+" stages" 
+
+		} 
+		return note
 	}
 
 	useEffect(() => {
@@ -136,34 +152,15 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 							filter="var(--shadow)"
 						/>
 
-						{ 
-							utils.getTicks(
-								minimum,
-								maximum,
-								stepBig,
-								r1,
-								r2
-							) 
-						}
-
-						<path
-							d={ utils.getPath(val, minimum, maximum, sweepAngle, r1, r2, startAngle) }
-							fill="var(--knobMainText)"
-							stroke="var(--knobMainText)"
-							strokeWidth="2"
-							style={{
-								filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",
-								transition: "none"
-							}}
-						/>
-						<text x={83} y={60} 
-							textAnchor="end" 
-							fontSize={fontSize} 
-							className='segments14 value' 
+						 <text x={50} y={45} 
+							textAnchor="middle" 
+							fontSize={10} 
+							className=''							 
 							fill="var(--knobMainText)"
 							>
-							{knobRound[param] !== 0 ? (Math.round(val) - val === 0 ? String(val) + '.0' : val) : val}
 						</text>
+						<TextInCircle text={  createNote() } maxLineLength={10} fontSize={10} radius={50} />
+
 					</g>
 					{t(title).split(', ')[0].split(' ').map((a: string, i: number) => (
 						<text
@@ -191,9 +188,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 						stroke="gray"
 						strokeWidth="1"
 						filter="var(--shadow)"
-						onPointerDown={() => handleMouseDown(decrease)}
-						onPointerUp={handleMouseUp}
-						onPointerLeave={handleMouseUp} 
+						onPointerDown={ decrease }
 					/>
 					<text
 						x={x1}
@@ -216,9 +211,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 						stroke="gray"
 						strokeWidth="1"
 						filter="var(--shadow)"
-						onPointerDown={() => handleMouseDown(increase)}
-						onPointerUp={handleMouseUp}
-						onPointerLeave={handleMouseUp}
+						onPointerDown={ increase }
 					/>
 					<text
 						x={x2}
@@ -239,4 +232,4 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 	);
 });
 
-export default UniversalKnob;
+export default UniversalNamedKnob;

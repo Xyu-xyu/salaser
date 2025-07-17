@@ -266,6 +266,7 @@ class ViewStore {
     }
 
     getTecnologyValue (param:string, keyParam:string, keyInd:number|boolean=false) {
+        //console.log ('getTecnologyValue')
         //console.log ( arguments )
         if (typeof keyInd === 'number') {
             if (keyParam === 'macros') {
@@ -310,6 +311,7 @@ class ViewStore {
     }
 
     setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number,  keyInd:number|boolean=false) {
+       //console.log ('setTecnologyValue')
        //console.log ( arguments )
         
         if (newVal < minimum) newVal = minimum

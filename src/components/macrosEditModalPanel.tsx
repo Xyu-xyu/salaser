@@ -7,6 +7,7 @@ import IosToggleBlowInMacros from './toggles/iosToggleBlowInMacros';
 import IosToggleMacrocInMacros from './toggles/iosToggleMacrosInMacros';
 import MacrosEditList from './macrosEditList';
 import { useTranslation } from 'react-i18next';
+import UniversalNamedKnob from './universalNamedKnob';
 
 
 const MacrosEditModalPanel = observer(() => {
@@ -53,11 +54,19 @@ const MacrosEditModalPanel = observer(() => {
  								"feedLimit_mm_s",
  							].map((a: string, i: number) => (
 
-								<div className="editModal_row" key={i + 1}>
-									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-										<UniversalKnob param={a} keyParam={'macros'}/>
+								(a === 'modulationMacro' || a === 'piercingMacro') ? (
+									<div className="editModal_row" key={i + 1}>
+										<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+											<UniversalNamedKnob param={a} keyParam={"macros"}/>
+										</div>
 									</div>
-								</div>
+								) : (
+									<div className="editModal_row" key={i + 1}>
+										<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+											<UniversalKnob param={a} keyParam={"macros"}/>
+										</div>
+									</div>
+								)
 							))}
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>

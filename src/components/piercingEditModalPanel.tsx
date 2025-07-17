@@ -3,7 +3,7 @@ import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 //import PiercingMacroSelector from './piercingMacroSelector';
 import UniversalKnob from './universalKnob';
-import Stepper from './stepper';
+//import Stepper from './stepper';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
 import MacrosEditList from './macrosEditList';
 import StringComponent from './stringComponent';
@@ -13,6 +13,7 @@ import SwiperPiercingMacro from './swiperPiercingMacro';
 //import { SwiperPiercingMacroCharts } from './swiperPiercingMacroCharts';
 import { CustomChart } from './chart/customChart'
 import { useTranslation } from 'react-i18next';
+import UniversalNamedKnob from './universalNamedKnob';
 
 const PiercingEditModalPanel = observer(() => {
 
@@ -66,9 +67,18 @@ const PiercingEditModalPanel = observer(() => {
 									</div>
 
 									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+										
 										{[
 												"initial_modulationMacro",
-												"initial_modulationFrequency_Hz",
+ 										].map((a: string, i: number) => (
+											<div className="" key={i}>
+												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+													<UniversalNamedKnob param={a} keyParam={'piercingMacros'} />
+												</div>
+											</div>
+										))}
+										{[
+ 												"initial_modulationFrequency_Hz",
 										].map((a: string, i: number) => (
 											<div className="" key={i}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
