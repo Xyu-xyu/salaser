@@ -7,14 +7,7 @@ interface MacrosEditModalButtonProps {
 }
 
 const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) => {
-	/* const [show, setShow] = useState(false);
 
-	const handleClose = () => setShow(false);
-	const handleShow = () => setShow(true);
-	const handleContinue = () => {
-		setShow(false)
-		viewStore.setModal (true, param)
-	} */
 
 	const { isVertical } = viewStore
 	const x1 = isVertical ? 83 : 110
@@ -37,13 +30,15 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 					r="15"
 					fill="url(#circleGradient)"
 					stroke="gray"
-					strokeWidth="1"
+					strokeWidth=".25"
 					filter="var(--shadow)"
 				/>
 				<svg x={x2} y={y2} width="26" height="26">
-					<Icon icon="fa:gear" 
+					<Icon icon="iwwa:settings"
 						width="14"
 						height="14"
+						stroke="var(--knobMainText)"
+						strokeWidth={2}
 						style={{
 							color: "var(--knobMainText)",
 							position: "absolute",

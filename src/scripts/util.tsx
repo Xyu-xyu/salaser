@@ -111,8 +111,8 @@ class Utils {
 					key={i}
 					cx={pos.x}
 					cy={pos.y}
-					r={1}
-					fill={'#aaa'}
+					r={0.5}
+					fill={'black'}
 				/>
 			);
 		});

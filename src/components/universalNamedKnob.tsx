@@ -134,12 +134,6 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 					width="100%" height="100%"
 					viewBox="0 0 100 100" overflow="hidden"
 				>
-					<defs>
-						<radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
-							<stop offset="0%" stopColor="#ffffff" />
-							<stop offset="100%" stopColor="#cccccc" />
-						</radialGradient>
-					</defs>
 					{ isArray && keyParam === 'macros' && <MacrosEditModalButton param={param} /> }
 					<g ref={svgRef}>
 						<circle
@@ -148,7 +142,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 							r="45"
 							fill={"url(#circleGradient)"}
 							stroke="gray"
-							strokeWidth="1"
+							strokeWidth=".25"
 							filter="var(--shadow)"
 						/>
 
@@ -159,7 +153,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 							fill="var(--knobMainText)"
 							>
 						</text>
-						<TextInCircle text={  createNote() } maxLineLength={10} fontSize={10} radius={50} />
+						<TextInCircle text={  createNote() } maxLineLength={8} fontSize={10} radius={50} />
 
 					</g>
 					{t(title).split(', ')[0].split(' ').map((a: string, i: number) => (
@@ -186,7 +180,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 						r="15"
 						fill={"url(#circleGradient)"}
 						stroke="gray"
-						strokeWidth="1"
+						strokeWidth=".25"
 						filter="var(--shadow)"
 						onPointerDown={ decrease }
 					/>
@@ -209,7 +203,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 						r="15"
 						fill={"url(#circleGradient)"}
 						stroke="gray"
-						strokeWidth="1"
+						strokeWidth=".25"
 						filter="var(--shadow)"
 						onPointerDown={ increase }
 					/>

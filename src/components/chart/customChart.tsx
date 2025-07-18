@@ -152,11 +152,6 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 				<svg role="application" className="recharts-surface" width="600" height="250" viewBox="0 0 600 250" style={{ width: '100%', height: '100%' }}>
 					<title></title>
 					<desc></desc>
-					<defs>
-						<clipPath id="recharts1-clip">
-							<rect x="80" y="20" height="165" width="490"></rect>
-						</clipPath>
-					</defs>
 					<g className="recharts-cartesian-grid">
 						<g className="recharts-cartesian-grid-horizontal">
 							{

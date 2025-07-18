@@ -88,7 +88,7 @@ const swiperPiercingMacro = observer(() => {
 											<CustomChart keyInd={ii} height={400} />
 										</div>
 										<div className='mt-50'>
-											<button className="carousel_btn violet_button m-2" 
+										{selectedPiercingMacro !==	ii && <button className="carousel_btn violet_button m-2" 
 /* 												onMouseDown={(e) => handleMouseDown(e)}
  */												onClick={(e) => handleMouseDown(e)}
 											>
@@ -100,7 +100,7 @@ const swiperPiercingMacro = observer(() => {
 														style={{ color: 'white' }} />
 
 												</div>
-											</button>
+											</button>}
 										</div>
 									</div>
 								</div>

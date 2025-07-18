@@ -97,7 +97,7 @@ const swiperModulationMacro = observer(() => {
 									}
 								</div>
 								<div className='mt-50 d-flex d-flex w-100 align-items-center justify-content-center'>
-									<button className="carousel_btn violet_button m-2"
+							{ viewStore.selectedModulationMacro !== ii &&		<button className="carousel_btn violet_button m-2"
 /* 												onMouseDown={(e) => handleMouseDown(e)}
  */												onClick={(e) => handleMouseDown(e)}
 									>
@@ -109,7 +109,7 @@ const swiperModulationMacro = observer(() => {
 												style={{ color: 'white' }} />
 
 										</div>
-									</button>
+									</button>}
 								</div>
 							</div>
 						</SwiperSlide>

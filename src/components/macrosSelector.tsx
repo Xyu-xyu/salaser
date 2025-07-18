@@ -80,12 +80,7 @@ const MacrosSelector = observer(() => {
 					width="100%" height="100%"
 					viewBox="0 0 100 100" overflow="hidden"
 				>
-					<defs>
-						<radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
-							<stop offset="0%" stopColor="#ffffff" />
-							<stop offset="100%" stopColor="#cccccc" />
-						</radialGradient>
-					</defs>
+		 
 					{ !macrosModalEdit && <MacrosEditModalButton param={"macros"} /> }
 
 					<g ref={svgRef}>
@@ -95,7 +90,7 @@ const MacrosSelector = observer(() => {
 							r="45"
 							fill={"url(#circleGradient)"}
 							stroke="gray"
-							strokeWidth="1"
+							strokeWidth=".25"
 							filter="var(--shadow)"
 						/>
 
@@ -115,7 +110,8 @@ const MacrosSelector = observer(() => {
 							stroke="var(--knobMainText)"
 							strokeWidth="2"
 							style={{
-								filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",
+								/* 								filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",
+ */
 								transition: "none"
 							}}
 						/>
@@ -146,7 +142,7 @@ const MacrosSelector = observer(() => {
 						r="15"
 						fill={"url(#circleGradient)"}
 						stroke="gray"
-						strokeWidth="1"
+						strokeWidth=".25"
 						filter="var(--shadow)"
 						onPointerDown={() => handleMouseDown(decrease)}
 						onPointerUp={handleMouseUp}
@@ -171,7 +167,7 @@ const MacrosSelector = observer(() => {
 						r="15"
 						fill={"url(#circleGradient)"}
 						stroke="gray"
-						strokeWidth="1"
+						strokeWidth=".25"
 						filter="var(--shadow)"
 						onPointerDown={() => handleMouseDown(increase)}
 						onPointerUp={handleMouseUp}
