@@ -17,18 +17,6 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 	const { isVertical } = viewStore
 	const { x1, x2, x4, y1, y2, y3 } = utils.getKnobLayout(isVertical);
 	const [rotation, setRotation] = useState(0);
-
-	const handleClick = (step: number) => {
-		console.log ('handleClick '  + step) 
-		setRotation(prevRotation => prevRotation + step);
-		if (step > 0) {
-			setSelectedOption (prev)
-		} else {
-			setSelectedOption (next)
-		}
-	};
-
-
 	const { macrosProperties } = viewStore
 	let property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 	const { title } = property;
@@ -41,17 +29,23 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 		throw new Error(`Value "${val}" not found in enum array`);
 	}
 
-	// Циклический переход:
-	let prev: string = values[(index - 1 + values.length) % values.length];
-	let next: string = values[(index + 1) % values.length];
-
-
- 	const setSelectedOption = (newVal: string) => {
-		console.log("newVal " + newVal)
-		viewStore.setValString(param, newVal, keyParam)
-		prev = values[(index - 1 + values.length) % values.length];
-		next = values[(index + 1) % values.length];
-	} 
+	const handleClick = (step: number) => {
+		const currentVal = viewStore.getTecnologyValue(param, keyParam);
+		const currentIndex = values.indexOf(currentVal);
+		if (currentIndex === -1) return;
+	
+		const newIndex = (step > 0)
+			? (currentIndex - 1 + values.length) % values.length // scroll up → prev
+			: (currentIndex + 1) % values.length;               // scroll down → next
+	
+		const newVal = values[newIndex];
+	
+		console.log("handleClick", step);
+		console.log("newVal", newVal);
+	
+		setRotation(prev => prev + step);
+		viewStore.setValString(param, newVal, keyParam);
+	};
 
 	useEffect(() => {
 		const svg = svgRef.current;

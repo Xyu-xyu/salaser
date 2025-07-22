@@ -95,6 +95,12 @@ const en: Record<string, string> = {
 	"AIR":"air",
 	"O2":"oxygen",
 	"N2":"nitrogen",
+	"VAPOR":"vaporisation",
+	"CW":"continious",
+	"PULSE":"pulse",
+	"ENGRAVING":"engraving",
+	"EDGING":"edging",
+	"":"",
 
 
 
