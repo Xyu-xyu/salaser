@@ -425,7 +425,7 @@ const cut_settings= JSON.parse(`{
             "initial_cross_blow": false,
             "initial_pressure": 8.0,
             "gas": "AIR",
-            "name": "Unknown incut1",
+            "name": "Врезка №1",
             "initial_modulationMacro": 15,
             "initial_power": 1000,
             "initial_focus": 0.5,
@@ -607,7 +607,7 @@ const cut_settings= JSON.parse(`{
             "initial_cross_blow": false,
             "initial_pressure": 8.0,
             "gas": "AIR",
-            "name": "Unknown incut2",
+            "name": "Врезка №2",
             "initial_modulationMacro": 0,
             "initial_power": 1000,
             "initial_focus": 1.0,
@@ -812,7 +812,7 @@ const cut_settings= JSON.parse(`{
             "initial_cross_blow": false,
             "initial_pressure": 8.0,
             "gas": "AIR",
-            "name": "Unknown incut3",
+            "name": "Врезка №3",
             "initial_modulationMacro": 0,
             "initial_power": 1000,
             "initial_focus": 1.0,
@@ -1017,7 +1017,7 @@ const cut_settings= JSON.parse(`{
             "initial_cross_blow": false,
             "initial_pressure": 8.0,
             "gas": "AIR",
-            "name": "Unknown incut4",
+            "name": "Врезка №4",
             "initial_modulationMacro": 0,
             "initial_power": 1000,
             "initial_focus": 1.0,
@@ -1222,7 +1222,7 @@ const cut_settings= JSON.parse(`{
             "initial_cross_blow": false,
             "initial_pressure": 8.0,
             "gas": "AIR",
-            "name": "Unknown incut5",
+            "name": "Врезка №5",
             "initial_modulationMacro": 0,
             "initial_power": 1000,
             "initial_focus": 1.0,
@@ -1427,7 +1427,7 @@ const cut_settings= JSON.parse(`{
             "initial_cross_blow": false,
             "initial_pressure": 8.0,
             "gas": "AIR",
-            "name": "Unknown incut6",
+            "name": "Врезка №6",
             "initial_modulationMacro": 0,
             "initial_power": 1000,
             "initial_focus": 1.0,
@@ -1632,7 +1632,7 @@ const cut_settings= JSON.parse(`{
             "initial_cross_blow": false,
             "initial_pressure": 8.0,
             "gas": "AIR",
-            "name": "Unknown incut7",
+            "name": "Врезка №7",
             "initial_modulationMacro": 0,
             "initial_power": 1000,
             "initial_focus": 1.0,
@@ -1837,7 +1837,7 @@ const cut_settings= JSON.parse(`{
             "initial_cross_blow": false,
             "initial_pressure": 8.0,
             "gas": "AIR",
-            "name": "Unknown incut8",
+            "name": "Врезка №8",
             "initial_modulationMacro": 0,
             "initial_power": 1000,
             "initial_focus": 1.0,
@@ -1847,82 +1847,82 @@ const cut_settings= JSON.parse(`{
         "modulationMacros": [
             {
               "pulseFill_percent": 0.0,
-              "name": "Unknown modulation macro0",
+              "name": "Режим импульса № 0",
               "pulseFrequency_Hz": 0
             },
             {
               "pulseFill_percent": 7.0,
-              "name": "Unknown modulation macro1",
+              "name": "Режим импульса № 1",
               "pulseFrequency_Hz": 67
             },
             {
               "pulseFill_percent": 13.0,
-              "name": "Unknown modulation macro2",
+              "name": "Режим импульса № 2",
               "pulseFrequency_Hz": 134
             },
             {
               "pulseFill_percent": 20.0,
-              "name": "Unknown modulation macro3",
+              "name": "Режим импульса № 3",
               "pulseFrequency_Hz": 201
             },
             {
               "pulseFill_percent": 27.0,
-              "name": "Unknown modulation macro4",
+              "name": "Режим импульса № 4",
               "pulseFrequency_Hz": 268
             },
             {
               "pulseFill_percent": 33.0,
-              "name": "Unknown modulation macro5",
+              "name": "Режим импульса № 5",
               "pulseFrequency_Hz": 335
             },
             {
               "pulseFill_percent": 40.0,
-              "name": "Unknown modulation macro6",
+              "name": "Режим импульса № 6",
               "pulseFrequency_Hz": 402
             },
             {
               "pulseFill_percent": 47.0,
-              "name": "Unknown modulation macro7",
+              "name": "Режим импульса № 7",
               "pulseFrequency_Hz": 469
             },
             {
               "pulseFill_percent": 53.0,
-              "name": "Unknown modulation macro8",
+              "name": "Режим импульса № 8",
               "pulseFrequency_Hz": 536
             },
             {
               "pulseFill_percent": 60.0,
-              "name": "Unknown modulation macro9",
+              "name": "Режим импульса № 9",
               "pulseFrequency_Hz": 603
             },
             {
               "pulseFill_percent": 67.0,
-              "name": "Unknown modulation macro10",
+              "name": "Режим импульса № 10",
               "pulseFrequency_Hz": 670
             },
             {
               "pulseFill_percent": 73.0,
-              "name": "Unknown modulation macro11",
+              "name": "Режим импульса № 11",
               "pulseFrequency_Hz": 737
             },
             {
               "pulseFill_percent": 80.0,
-              "name": "Unknown modulation macro12",
+              "name": "Режим импульса № 12",
               "pulseFrequency_Hz": 804
             },
             {
               "pulseFill_percent": 87.0,
-              "name": "Unknown modulation macro13",
+              "name": "Режим импульса № 13",
               "pulseFrequency_Hz": 871
             },
             {
               "pulseFill_percent": 93.0,
-              "name": "Unknown modulation macro14",
+              "name": "Режим импульса № 14",
               "pulseFrequency_Hz": 938
             },
             {
               "pulseFill_percent": 100.0,
-              "name": "Unknown modulation macro15",
+              "name": "Режим импульса № 15",
               "pulseFrequency_Hz": 1000
             }          
         ],

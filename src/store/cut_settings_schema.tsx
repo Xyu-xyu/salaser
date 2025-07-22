@@ -244,7 +244,7 @@ const cutting_settings = JSON.parse(`{
                                     "minLength": 1,
                                     "type": "string",
                                     "maxLength": 32,
-                                    "default": "Unknown incut",
+                                    "default": "Врезка №",
                                     "title": "Название"
                                 },
                                 "initial_power": {
@@ -393,7 +393,7 @@ const cutting_settings = JSON.parse(`{
                                     "minLength": 1,
                                     "type": "string",
                                     "maxLength": 32,
-                                    "default": "Unknown modulation macro",
+                                    "default": "Режим импульса № ",
                                     "title": "Название"
                                 },
                                 "pulseFrequency_Hz": {

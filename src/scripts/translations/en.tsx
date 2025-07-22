@@ -92,6 +92,9 @@ const en: Record<string, string> = {
 	"height, mm":"height",
 	"power, kWt":"power",
 	"pressure, bar":"pressure",
+	"AIR":"air",
+	"O2":"oxygen",
+	"N2":"nitrogen",
 
 
 

@@ -92,6 +92,9 @@ const ru: Record<string, string> = {
 	"height, mm":"высота",
 	"power, kWt":"энергия",
 	"pressure, bar":"давление",
+	"AIR":"воздух",
+	"O2":"кислород",
+	"N2":"азот",
 
 };
 
