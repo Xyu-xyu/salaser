@@ -33,16 +33,16 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 		const currentVal = viewStore.getTecnologyValue(param, keyParam);
 		const currentIndex = values.indexOf(currentVal);
 		if (currentIndex === -1) return;
-	
+
 		const newIndex = (step > 0)
 			? (currentIndex - 1 + values.length) % values.length // scroll up → prev
 			: (currentIndex + 1) % values.length;               // scroll down → next
-	
+
 		const newVal = values[newIndex];
-	
+
 		console.log("handleClick", step);
 		console.log("newVal", newVal);
-	
+
 		setRotation(prev => prev + step);
 		viewStore.setValString(param, newVal, keyParam);
 	};
@@ -53,9 +53,9 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
-			let wheelStep:number;
-			e.deltaY < 0 ? wheelStep =-120 : wheelStep =120;
-			handleClick ( wheelStep )
+			let wheelStep: number;
+			e.deltaY < 0 ? wheelStep = -120 : wheelStep = 120;
+			handleClick(wheelStep)
 		};
 
 		svg.addEventListener('wheel', handleWheel);
@@ -72,7 +72,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 				<svg id="svgChart"
 					className="svgChart" version="1.1"
 					width="100%" height="100%"
-					viewBox="0 0 100 100" overflow="hidden"
+					viewBox="0 0 100 100" overflow="hidden"					
 				>
 					<g ref={svgRef}>
 						<circle
@@ -175,25 +175,51 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 							pointerEvents="none"
 							className="moderat rotating-text"
 							style={{
-								transform: `rotate(${rotation}deg)`,
+								transform: `rotate(${0}deg)`,
 								transformOrigin: '50% 50%',
 								transition: 'transform 0.5s ease-in-out', // плавный переход
 							}}
 							fill="var(--knobMainText)"
 						>
-							{property.enum.map((option: string, index: number) => (
-								<textPath
-									key={`${param}-${keyParam}-${option}`}
-									href={`#arcPath${index}`}
-									startOffset="50%"
-									textAnchor="middle"
-									fontSize={10}
-									fill={ option === val ? 'var(--knobMainText)' : 'grey'}
-								>
-									{t(option)}
-								</textPath>
-							))} 							
-						</text>
+							<textPath
+								key={`${param}-${keyParam}-${index}`}
+								href={`#arcPath0`}
+								startOffset="50%"
+								textAnchor="middle"
+								fontSize={10}
+								fill={'var(--knobMainText)'}
+							>
+								{t(val)}
+							</textPath>
+							<textPath
+								key={`${param}-${keyParam}-${index + 1}`}
+								href={`#arcPath1`}
+								startOffset="50%"
+								textAnchor="middle"
+								fontSize={10}
+								fill={'grey'}
+							>
+								{t(values[(values.indexOf(val) + 1) % values.length])}
+							</textPath>
+							<textPath
+								key={`${param}-${keyParam}-${index - 1}`}
+								href={`#arcPath2`}
+								startOffset="50%"
+								textAnchor="middle"
+								fontSize={10}
+								fill={'grey'}
+							>
+								{t(values[(values.indexOf(val) - 1 + values.length) % values.length])}
+							</textPath>
+						</text>	
+						<g style={{
+								transform: `rotate(${rotation}deg)`,
+								transformOrigin: '50% 50%',
+								transition: 'transform 0.25s ease-in-out', // плавный переход
+							}}>
+							{utils.getSticks( 90, 30, 2)}					
+							{utils.getTicks( 0, 2, 1, 30, 30, 1, 120, 240)}					
+						</g>
 					</svg>
 				</svg>
 			</div>

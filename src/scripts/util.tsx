@@ -80,12 +80,15 @@ class Utils {
 		maximum: number,
 		stepBig: number,
 		r1: number,
-		r2: number
+		r2: number,
+		r3?: number,
+		sAngle?: number,
+		aPerStep?: number,
 	) {
 		const totalSteps = Math.floor((maximum - minimum) / stepBig);
-		const anglePerStep = 270 / totalSteps;
-		const startAngle = 225;
-		const endAngle = startAngle + 270;
+		const anglePerStep = ( aPerStep ? aPerStep :270)  / totalSteps;
+		const startAngle = sAngle ? sAngle :225;
+		const endAngle = startAngle + ( aPerStep ? aPerStep :270) ;
 
 		// Построение кольцевого сегмента от 225° до 135°
 		const startOuter = this.polarToCartesian(r2, startAngle);
@@ -111,7 +114,7 @@ class Utils {
 					key={i}
 					cx={pos.x}
 					cy={pos.y}
-					r={0.5}
+					r={ r3 ? r3 : 0.5}
 					fill={'black'}
 				/>
 			);
@@ -130,6 +133,42 @@ class Utils {
 			</>
 		);
 	}
+
+	getSticks(
+		steps: number,
+		radius: number,
+		tickLength: number
+	) {
+		const anglePerStep = 360 / steps;
+		const startAngle = 0;
+	
+		// Линии вместо кружков
+		const ticks = Array.from({ length: steps + 1 }).map((_, i) => {
+			const angle = startAngle + i * anglePerStep;
+	
+			const start = this.polarToCartesian(radius - tickLength / 2, angle);
+			const end = this.polarToCartesian(radius + tickLength / 2, angle);
+	
+			return (
+				<line
+					key={i}
+					x1={start.x}
+					y1={start.y}
+					x2={end.x}
+					y2={end.y}
+					stroke="gray"
+					strokeWidth=".75"
+				/>
+			);
+		});
+	
+		return (
+			<>
+				{ticks}
+			</>
+		);
+	}
+	
 
 	calculateFontSize(minimum: number, maximum: number, step: number): number {
 		const maxLength = Math.max(
