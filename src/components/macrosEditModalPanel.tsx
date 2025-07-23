@@ -5,9 +5,10 @@ import UniversalKnob from './universalKnob';
 import MacrosSelector from './macrosSelector';
 import IosToggleBlowInMacros from './toggles/iosToggleBlowInMacros';
 import IosToggleMacrocInMacros from './toggles/iosToggleMacrosInMacros';
-import MacrosEditList from './macrosEditList';
+//import MacrosEditList from './macrosEditList';
 import { useTranslation } from 'react-i18next';
 import UniversalNamedKnob from './universalNamedKnob';
+import UniversalKnobList from './universalKnobList';
 
 
 const MacrosEditModalPanel = observer(() => {
@@ -40,7 +41,7 @@ const MacrosEditModalPanel = observer(() => {
 
 								<div className="editModal_row" key={i + 10}>
 									<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-										<MacrosEditList param={a} keyParam={'macros'}/>
+										<UniversalKnobList param={a} keyParam={'macros'}/>
 									</div>
 								</div>
 							))}
