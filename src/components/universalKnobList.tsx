@@ -16,13 +16,16 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 	const { t } = useTranslation()
 	const { isVertical } = viewStore
 	const { x1, x2, x4, y1, y2, y3 } = utils.getKnobLayout(isVertical);
-	const [rotation, setRotation] = useState(0);
 	const { macrosProperties } = viewStore
 	let property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 	const { title } = property;
 	const values: string[] = property.enum;
 	const val: string = viewStore.getTecnologyValue(param, keyParam);
 	const index = values.indexOf(val);
+
+	const [rotation, setRotation] = useState(0);
+	let vrotIndex = Math.abs (rotation / 120 % 3)
+
 
 	// Проверка: если значение не найдено
 	if (index === -1) {
@@ -40,12 +43,11 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 
 		const newVal = values[newIndex];
 
-		console.log("handleClick", step);
-		console.log("newVal", newVal);
 
 		setRotation(prev => prev + step);
-			viewStore.setValString(param, newVal, keyParam);			
-		};
+		vrotIndex = Math.abs (rotation / 120 % 3)
+		viewStore.setValString(param, newVal, keyParam);			
+	};
 
 	useEffect(() => {
 		const svg = svgRef.current;
@@ -54,7 +56,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
 			let wheelStep: number;
-			e.deltaY < 0 ? wheelStep = -120 : wheelStep = 120;
+			e.deltaY <= 0 ? wheelStep = -120 : wheelStep = 120;
 			handleClick(wheelStep)
 		};
 
@@ -64,9 +66,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 		};
 	}, []);
 
-	let vrotIndex = Math.abs (rotation / 120 % 3)
-
-
+	console.log ( 'VALUE : '+ val)
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
@@ -113,7 +113,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 						fill="var(--knobMainText)">
 						{t(title).split(', ')[1]}
 					</text>
-					<g onClick={() => handleClick(-120)}>
+					<g>
 						<circle
 							cx={x1}
 							cy={y1}
@@ -122,7 +122,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 							stroke="gray"
 							strokeWidth=".25"
 							filter="var(--shadow)"
-							onPointerDown={() => { }}
+							onPointerDown={ () => handleClick(-120)}
 						/>
 						<text
 							x={x1}
@@ -137,7 +137,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 							-
 						</text>
 					</g>
-					<g onClick={() => handleClick(120)}>
+					<g >
 						<circle
 							cx={x2}
 							cy={y1}
@@ -146,7 +146,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 							stroke="gray"
 							strokeWidth=".25"
 							filter="var(--shadow)"
-							onPointerDown={() => { }}
+							onPointerDown={ () => handleClick(120)}
 						/>
 						<text
 							x={x2}
@@ -170,17 +170,20 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 						<path id="arcPath1" d="M67.5 19.6891C90.8333 33.1606 90.8333 66.8394 67.5 80.3109C56.671 86.563 43.329 86.563 32.5 80.3109" fill="none" />
 						<path id="arcPath2" d="M67.5 80.3109C44.1667 93.7824 15 76.943 15 50C15 37.4957 21.671 25.9413 32.5 19.6891" fill="none" />
 
-						<text
+
+						<g style={{
+								transform: `rotate(${rotation}deg)`,
+								transformOrigin: '50% 50%',
+								transition: 'transform 0.5s ease-in-out', // плавный переход
+							}}>
+							{utils.getSticks( 90, 30, 2)}					
+							{utils.getTicks( 0, 2, 1, 30, 30, 1, 120, 240)}
+							<text
 							textAnchor="middle"
 							alignmentBaseline="middle"
 							fontSize="10"
 							pointerEvents="none"
 							className="moderat rotating-text"
-							style={{
-								transform: `rotate(${rotation}deg)`,
-								transformOrigin: '50% 50%',
-								transition: 'transform 0.5s ease-in-out', 
-							}}
 							fill="var(--knobMainText)"
 						>
 							<textPath
@@ -229,14 +232,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 									
 								}
 							</textPath>
-						</text>	
-						<g style={{
-								transform: `rotate(${rotation}deg)`,
-								transformOrigin: '50% 50%',
-								transition: 'transform 0.25s ease-in-out', // плавный переход
-							}}>
-							{utils.getSticks( 90, 30, 2)}					
-							{utils.getTicks( 0, 2, 1, 30, 30, 1, 120, 240)}					
+						</text>
 						</g>
 					</svg>
 				</svg>
