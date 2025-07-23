@@ -44,8 +44,8 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 		console.log("newVal", newVal);
 
 		setRotation(prev => prev + step);
-		viewStore.setValString(param, newVal, keyParam);
-	};
+			viewStore.setValString(param, newVal, keyParam);			
+		};
 
 	useEffect(() => {
 		const svg = svgRef.current;
@@ -63,6 +63,8 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 			svg.removeEventListener('wheel', handleWheel);
 		};
 	}, []);
+
+	let vrotIndex = Math.abs (rotation / 120 % 3)
 
 
 
@@ -175,9 +177,9 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 							pointerEvents="none"
 							className="moderat rotating-text"
 							style={{
-								transform: `rotate(${0}deg)`,
+								transform: `rotate(${rotation}deg)`,
 								transformOrigin: '50% 50%',
-								transition: 'transform 0.5s ease-in-out', // плавный переход
+								transition: 'transform 0.5s ease-in-out', 
 							}}
 							fill="var(--knobMainText)"
 						>
@@ -187,9 +189,14 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 								startOffset="50%"
 								textAnchor="middle"
 								fontSize={10}
-								fill={'var(--knobMainText)'}
+								id="up"
+								fill={ vrotIndex === 0 ? 'var(--knobMainText)' : 'grey'}
 							>
-								{t(val)}
+								{ 
+								  vrotIndex === 0 && t(val) ||
+								  vrotIndex === 2 && t(values[(index - 1 + values.length) % values.length])||
+								  vrotIndex === 1 && t(values[(index + 1) % values.length])
+								}
 							</textPath>
 							<textPath
 								key={`${param}-${keyParam}-${index + 1}`}
@@ -197,9 +204,14 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 								startOffset="50%"
 								textAnchor="middle"
 								fontSize={10}
-								fill={'grey'}
+								fill={ vrotIndex === 2 ? 'var(--knobMainText)' : 'grey'}
+								id='right'
 							>
-								{t(values[(values.indexOf(val) + 1) % values.length])}
+								{
+									vrotIndex === 2 && t(val) ||
+									vrotIndex === 1 && t(values[(index - 1 + values.length) % values.length])||
+									vrotIndex === 0 && t(values[(index + 1) % values.length])
+								}
 							</textPath>
 							<textPath
 								key={`${param}-${keyParam}-${index - 1}`}
@@ -207,9 +219,15 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 								startOffset="50%"
 								textAnchor="middle"
 								fontSize={10}
-								fill={'grey'}
+								fill={ vrotIndex === 1 ? 'var(--knobMainText)' : 'grey'}
+								id='left'
 							>
-								{t(values[(values.indexOf(val) - 1 + values.length) % values.length])}
+								{ 
+									vrotIndex === 1 && t(val) ||
+									vrotIndex === 0 && t(values[(index - 1 + values.length) % values.length])||
+									vrotIndex === 2 && t(values[(index + 1) % values.length])
+									
+								}
 							</textPath>
 						</text>	
 						<g style={{
