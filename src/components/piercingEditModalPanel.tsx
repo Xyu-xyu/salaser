@@ -15,6 +15,7 @@ import { CustomChart } from './chart/customChart'
 import { useTranslation } from 'react-i18next';
 import UniversalNamedKnob from './universalNamedKnob';
 import UniversalKnobList from './universalKnobList';
+import CutHead from './laser_head/cutHead';
 
 const PiercingEditModalPanel = observer(() => {
 
@@ -44,6 +45,7 @@ const PiercingEditModalPanel = observer(() => {
 							<div className={'d-flex '+(isVertical ? "mt-4" : "")}>
 								{true && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
 									<CustomChart keyInd={ selectedPiercingMacro} height={250} />
+									<CutHead />
 							</div>}					
 						</div>
 						
