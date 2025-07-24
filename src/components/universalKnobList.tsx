@@ -10,7 +10,7 @@ interface CustomKnobProps {
     keyInd?: number | boolean;
 }
 
-const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, keyInd = false }) => {
+const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) => {
     const svgRef = useRef<SVGGElement>(null);
     const { t } = useTranslation();
     const { isVertical, macrosProperties } = viewStore;

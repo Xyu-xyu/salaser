@@ -5,7 +5,7 @@ import viewStore from '../store/viewStore';
 import UniversalKnob from './universalKnob';
 //import Stepper from './stepper';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
-import MacrosEditList from './macrosEditList';
+//import MacrosEditList from './macrosEditList';
 import StringComponent from './stringComponent';
 import IosToggleBlowInPiercing from './toggles/iosToggleBlowInPiercing'
 import NavigationModalinStages from './navigationModalinStages';
@@ -14,6 +14,7 @@ import SwiperPiercingMacro from './swiperPiercingMacro';
 import { CustomChart } from './chart/customChart'
 import { useTranslation } from 'react-i18next';
 import UniversalNamedKnob from './universalNamedKnob';
+import UniversalKnobList from './universalKnobList';
 
 const PiercingEditModalPanel = observer(() => {
 
@@ -91,7 +92,7 @@ const PiercingEditModalPanel = observer(() => {
 										].map((a: string, i: number) => (
 											<div className="" key={i + 10}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-													<MacrosEditList param={a} keyParam={'piercingMacros'} />
+													<UniversalKnobList param={a} keyParam={'piercingMacros'} />
 												</div>
 											</div>
 										))}
