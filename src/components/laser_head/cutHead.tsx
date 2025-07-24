@@ -19,79 +19,59 @@ const CutHead = observer (() => {
 		} 
 		return val;
 	}
+
 	const focusPosition = getValue('focus')
 	const headOffset = getValue ('height')
-	const [lenseOffset, setLenseOffset] = useState(0);
-	//const [focusOffset, setFocusOffset] = useState(0);
-	//const [sheetOffset, setSheetOffset] = useState(0);
-
-	const laserRef = useRef<SVGGElement>(null);
-	const laserPathRef = useRef<SVGPathElement>(null);
-	const lenseRef = useRef<SVGSVGElement>(null);
-	const cuttingHeadRef = useRef<SVGSVGElement>(null);
 
 
-	// --- обновление лазера
-/* 	useEffect(() => {
-		if (!laserRef.current || !laserPathRef.current || !lenseRef.current) return;
-
-		const lp = parseFloat(lenseRef.current.getAttribute("y") || "0");
-		const d = laserPathRef.current.getAttribute("d") || "";
-		const dd = d.split(" ");
-
-		const pl: string[][] = [];
-		let i = 0;
-		while (i < dd.length) {
-			if (dd[i] === "M") {
-				pl.push(["M", dd[i + 1], dd[i + 2]]);
-				i += 3;
-			} else if (dd[i] === "Z") {
-				pl.push(["Z"]);
-				i += 1;
-				break;
-			} else if (dd[i] === "L") {
-				pl.push(["L", dd[i + 1], dd[i + 2]]);
-				i += 3;
-			} else if (dd[i] === "C") {
-				pl.push([
-					"C",
-					dd[i + 1],
-					dd[i + 2],
-					dd[i + 3],
-					dd[i + 4],
-					dd[i + 5],
-					dd[i + 6],
-				]);
-				i += 7;
-			} else {
-				console.log("UNKNOWN SYMBOL:" + dd[i]);
-				break;
+	const degeneratePath =() =>{
+		let d:string  = "M 55 0 L 55 89.733 C 55 89.733 69.987 161.318 73 201.781 C 73.312 205.966 73 210.3 73 214.39 C 71.626 221.321 70 233.3 70 233.3 L 80 233.3 C 80 233.3 78.4 221.3 77 214.39 C 77 210.3 76.688 205.966 77 201.781 C 80.013 161.318 95 89.733 95 89.733 L 95 0 Z"
+		var foc=focusPosition * 5 ; 
+		var lp = focusPosition*2 //parseFloat($('#{{ head_id}}_lense').attr('y'));
+ 		var dd=d.split(' ');
+		var pl=[];
+		var i=0;
+		while (i<dd.length){
+			if ('M'==dd[i]){
+			  pl.push(['M',dd[i+1],dd[i+2]])
+			  i+=3;
+			}else
+			if ('Z'==dd[i]){
+			  pl.push(['Z'])
+			  i+=1;
+			  break
+			}else
+			if ('L'==dd[i]){
+			  pl.push(['L',dd[i+1],dd[i+2]])
+			  i+=3;
+			}else
+			if ('C'==dd[i]){
+			  pl.push(['C',dd[i+1],dd[i+2],dd[i+3],dd[i+4],dd[i+5],dd[i+6]])
+			  i+=7;
+			}else{
+			  console.log('UNKNOWN SYMBOL:'+dd[i]);
+			  break
 			}
 		}
-
-		const bs = 175.0;
-		pl[8][4] = pl[8][6] = pl[1][2] = pl[2][2] = `${89 + lp}`;
-		pl[7][6] = pl[2][6] = `${bs + focusPosition - 9}`;
-		pl[7][4] = pl[3][2] = `${bs + focusPosition - 4}`;
-		pl[7][2] = pl[3][4] = `${bs + focusPosition}`;
-		pl[6][6] = pl[3][6] = `${bs + focusPosition + 4}`;
-		pl[6][4] = pl[4][2] = `${bs + focusPosition + 11}`;
-		pl[6][2] = pl[4][4] = `${bs + focusPosition + 83}`;
-		pl[4][6] = `${bs + focusPosition + 83}`;
-		pl[5][2] = `${bs + focusPosition + 83}`;
-
-		const newD = pl.flat().join(" ");
-		laserPathRef.current.setAttribute("d", newD);
-
-		if (cuttingHeadRef.current) {
-			cuttingHeadRef.current.setAttribute(
-				"y",
-				`${28 - headOffset * 5}`
-			);
+		//console.log(pl);
+		var bs=175.0;
+		pl[8][4]=pl[8][6]=pl[1][2]=pl[2][2]=''+(89+lp);//lense position
+		pl[7][6]=pl[2][6]=''+(bs+foc-9)
+		pl[7][4]=pl[3][2]=''+(bs+foc-4)
+		pl[7][2]=pl[3][4]=''+(bs+foc)
+		pl[6][6]=pl[3][6]=''+(bs+foc+4)
+		pl[6][4]=pl[4][2]=''+(bs+foc+11)
+		pl[6][2]=pl[4][4]=''+(bs+foc+83)
+		pl[4][6]=''+(bs+foc+83)
+		pl[5][2]=''+(bs+foc+83)
+		i=0;
+		dd=[]
+		while(i<pl.length){
+		  for (let j in pl[i]) { dd.push(pl[i][j]); }
+		  i+=1;
 		}
-	}, [focusPosition, headOffset, lenseOffset]);
-
- */
+		return dd.join(' ');
+	}
 
 	return (
 		<div
@@ -110,7 +90,7 @@ const CutHead = observer (() => {
 					<rect
 						y={195}
 						width={150}
-						height={20}
+						height={7.65}
 						style={{
 							stroke: "rgb(0, 0, 0)",
 							strokeWidth: 0,
@@ -119,41 +99,8 @@ const CutHead = observer (() => {
 					/>
 				</svg>
 
-
-				<g id={`${selectedPiercingMacro}_${selectedPiercingStage}_laser`} ref={laserRef}>
-					<path
-						id={`${selectedPiercingMacro}_${selectedPiercingStage}_laserpath`}
-						ref={laserPathRef}
-						d="M 55 0 L 55 89.733 C 55 89.733 69.987 161.318 73 201.781 C 73.312 205.966 73 210.3 73 214.39 C 71.626 221.321 70 233.3 70 233.3 L 80 233.3 C 80 233.3 78.4 221.3 77 214.39 C 77 210.3 76.688 205.966 77 201.781 C 80.013 161.318 95 89.733 95 89.733 L 95 0 Z"
-						fill="red"
-					/>
-				</g>
-				<svg
-					id={`${selectedPiercingMacro}_${selectedPiercingStage}_lense`}
-					ref={lenseRef}
-					style={{ opacity: 0.7 }}
-					y="0.0"
-				>
-					<ellipse
-						cx="75"
-						cy="80"
-						rx="25"
-						ry="7.511"
-						fill="rgb(97, 217, 217)"
-						stroke="black"
-						strokeOpacity={0.05}
-					/>
-					<rect
-						x="50"
-						y="80"
-						width="50"
-						height="10"
-						fill="rgb(97, 217, 217)"
-						stroke="black"
-						strokeOpacity={0.08}
-					/>
-				</svg>
-				<svg id={`${selectedPiercingMacro}_${selectedPiercingStage}_cutting_head`} ref={cuttingHeadRef}>
+				<svg id={`${selectedPiercingMacro}_${selectedPiercingStage}_cutting_head`} 
+					y={28-headOffset*5} >
 					<g id={`${selectedPiercingMacro}_${selectedPiercingStage}_headbody`}>
 						<rect
 							x="55.292"
@@ -212,10 +159,10 @@ const CutHead = observer (() => {
 						<path
 							id={`${selectedPiercingMacro}_${selectedPiercingStage}_laserpath`}
 							style={{ stroke: "rgb(0, 0, 0)", strokeWidth: 0, fill: "red" }}
-							d="M 55 0 L 55 91 C 55 91 69.987 161.318 73 171 C 73.312 176 73 180 73 184 C 71.626 191 70 263 70 263 L 80 263 C 80 263 78.4 191 77 184 C 77 180 76.688 176 77 171 C 80.013 161.318 95 91 95 91 L 95 0 Z"
+							d={ degeneratePath() }
 						/>
 					</g>
-					<svg id={`${selectedPiercingMacro}_${selectedPiercingStage}_lense`} style={{ opacity: "0.7" }} y={2}>
+					<svg id={`${selectedPiercingMacro}_${selectedPiercingStage}_lense`} style={{ opacity: "0.7" }} y={focusPosition *2 }>
 						<ellipse
 							style={{
 								stroke: "rgb(0, 0, 0)",
@@ -316,7 +263,7 @@ const CutHead = observer (() => {
 						transform="matrix(1, 0, 0, 1, -2.258228, 4.100466)"
 					>
 						<tspan x="127.682" y="159.235" id={`${selectedPiercingMacro}_${selectedPiercingStage}_cutheadoffset_val`}>
-							{ headOffset }
+							{ headOffset.toFixed(1) }
 						</tspan>
 						<tspan x="127.682" dy="1em">
 
@@ -363,7 +310,7 @@ const CutHead = observer (() => {
 						origin="-0.137 0.929"
 					>
 						<tspan x="120.682" y="155.235" id={`${selectedPiercingMacro}_${selectedPiercingStage}_cutheadfocus_val`}>
-							{ focusPosition }
+							{ focusPosition.toFixed(1) }
 						</tspan>
 						<tspan x="127.682" dy="1em">
 
@@ -376,46 +323,3 @@ const CutHead = observer (() => {
 });
 
 export default CutHead;
-/*
-    $('#{{ head_id}}_cutheadoffset_dim .{{ head_id}}_lhor').attr({
-		
-		
-		y1:bs-{{ head_id}}_c_headoffset*5+18,
-		
-		y2:bs-{{ head_id}}_c_headoffset*5+18})
-
-
-      $('#{{ head_id}}_cutheadoffset_dim .{{ head_id}}_lver').attr({
-		
-		
-		y2:bs-{{ head_id}}_c_headoffset*5+18})
-
-
-      $('#{{ head_id}}_cutheadoffset_dim .{{ head_id}}_tri').attr({
-		
-		y:-{{ head_id}}_c_headoffset*5+28})
-     
-	 
-
-
-
-	  $('#{{ head_id}}_cutheadfocus_dim .{{ head_id}}_lhor')
-	 
-	  .attr({
-		y1:bs+foc-{{ head_id}}_c_headoffset*5+20,
-		y2:bs+foc-{{ head_id}}_c_headoffset*5+20})
-
-
-      $('#{{ head_id}}_cutheadfocus_dim .{{ head_id}}_lver').
-	  
-	  attr({
-		
-		y1:bs+foc-{{ head_id}}_c_headoffset*5+20})
-
-
-      $('#{{ head_id}}_cutheadfocus_dim .{{ head_id}}_tri').attr({
-		
-		y:foc-{{ head_id}}_c_headoffset*5-12})
-
-
-*/
