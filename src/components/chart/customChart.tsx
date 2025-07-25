@@ -309,13 +309,13 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 										const startX = 80;
 										const step = chartWidth / (data.length);
 										const x = startX + index * step;
-										const y = 185 - Number(a[p.param]) * 1.5
+										//const y = 185 - Number(a[p.param]) * 1.5
 										return (
 											<g key={'layerback'+index} onMouseDown={ ()=>{ showToolTip(index) } }>
 												 {i === 0 && <rect 
-												 	x={x-15 < 79 ? 80 :x-15} 
+												 	x={x-15 < 79 ? x-15 :x-15} 
 													y="35"
-        											width={ x-15 < 79 ? 15 : 30}
+        											width={ x-15 < 79 ? 30 : 30}
 													height="155"
 													stroke='transparent'
 													fill='transparent'

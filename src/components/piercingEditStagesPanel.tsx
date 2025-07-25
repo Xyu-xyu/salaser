@@ -10,7 +10,7 @@ const piercingEditStagesPanel = observer(() => {
 
 	return (
 		<>
-			<div className={'w-100 d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-50")}>
+			<div className={'w-100 d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-50")}>
 				{[	  		    
 					   "focus",
 					   "height",
@@ -24,7 +24,7 @@ const piercingEditStagesPanel = observer(() => {
 					</div>
 				))}
 			</div>
-			<div className={'w-100 d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>				
+			<div className={'w-100 d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-4")}>				
 				{[
 					"modulationMacro",
 					"modulationFrequency_Hz",
@@ -45,7 +45,7 @@ const piercingEditStagesPanel = observer(() => {
 					</div>
 				))}
 			</div>
-			<div className={'w-100 d-flex d-flex justify-content-evenly ' +  (isVertical ? "mt-10" : "mt-2")}>
+			<div className={'w-100 d-flex d-flex justify-content-evenly ' +  (isVertical ? "mt-4" : "mt-2")}>
 				<div className="">
 					<div className="editModal_col">
 						<IosToggleBlowInStage />

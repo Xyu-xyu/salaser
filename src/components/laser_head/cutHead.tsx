@@ -1,27 +1,75 @@
-import  { useRef, useState } from "react";
+import  { useState, useEffect } from "react";
 import { observer } from 'mobx-react-lite';
 //import { useTranslation } from 'react-i18next';
 //import utils from '../../scripts/util';
 import viewStore from '../../store/viewStore';
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 
 
 const CutHead = observer (() => {
-	const { technology, selectedPiercingStage, selectedPiercingMacro  } =  viewStore
-	const bs:number=175.0;
+    const { technology, selectedPiercingStage, selectedPiercingMacro } = viewStore;
+    const bs: number = 175.0;
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [animatedStage, setAnimatedStage] = useState(0);
+    const [animationProgress, setAnimationProgress] = useState(0); // 0 → 1
+ 
+    const toggleAnimation = () => {
+        if (!isAnimating) {
+            //setAnimatedStage(selectedPiercingStage);
+			setAnimatedStage(0);
+            setAnimationProgress(0);
+        }
+        setIsAnimating(!isAnimating);
+    };
+	const getValue = (param: string, stage = animatedStage, progress = animationProgress) => {
+		
+		if (!isAnimating) {
+            if (selectedPiercingStage === 0) {
+                return technology.piercingMacros[selectedPiercingMacro]['initial_' + param];
+            } else {
+                return technology.piercingMacros[selectedPiercingMacro].stages[selectedPiercingStage - 1][param];
+            }
+        }
+		const macro = technology.piercingMacros[selectedPiercingMacro];
+ 		const from = stage === 0 ? macro[`initial_${param}`] : macro.stages[stage - 1][param];
+		if (stage >= macro.stages.length) return from;
+		const to = macro.stages[stage][param];
+		return from + (to - from) * progress;
+	};
+ 
 
-	const getValue = (param:string)=> {
-		let val = 10;
-		if (selectedPiercingStage === 0) {
-			val = technology.piercingMacros[selectedPiercingMacro]['initial_'+param]
-		} else {
-			val = technology.piercingMacros[selectedPiercingMacro].stages[selectedPiercingStage-1][param]
-		} 
-		return val;
-	}
+	useEffect(() => {
+		if (!isAnimating) return;
+		if (animatedStage >= technology.piercingMacros[selectedPiercingMacro].stages.length) {
+			setIsAnimating(false);
+			viewStore.setselectedPiercingStage( selectedPiercingStage )
+			return;
+		}
+	
+		let start: number | null = null;
+		const duration = 1000; // 1 секунда
+	
+		const step = (timestamp: number) => {
+			if (!start) start = timestamp;
+			const progress = (timestamp - start) / duration;
+	
+			if (progress < 1) {
+				setAnimationProgress(progress);
+				requestAnimationFrame(step);
+			} else {
+				setAnimatedStage((s) => s + 1);
+				setAnimationProgress(0);
+			}
+		};
+	
+		requestAnimationFrame(step);
+	}, [isAnimating, animatedStage, selectedPiercingMacro]);
+	
+	
 
-	const focusPosition = getValue('focus')
-	const headOffset = getValue ('height')
+	let focusPosition = getValue('focus');
+    let headOffset = getValue('height')
 
 
 	const degeneratePath =() =>{
@@ -76,9 +124,30 @@ const CutHead = observer (() => {
 	return (
 		<div
 			className={selectedPiercingMacro + "_cuthead"}
-			style={{ width: 500, height: 500, position: "absolute", top: 1000, left: 250 }}
+			style={{ width: 400, height: 500, position: "absolute", top: 1200, left: 350 }}
 		>
-
+			<button className="carousel_btn  m-2"
+					                style={{
+										position: 'absolute',
+										top: 450,
+										right:311,
+										padding: '8px 16px',
+										color: 'white',
+										border: 'none',
+										borderRadius: '4px',
+										cursor: 'pointer'
+									}}>
+					<div className="d-flex align-items-center justify-content-center"
+						  onClick={toggleAnimation} >
+						{
+							isAnimating ? 
+							<Icon icon="fluent:stop-24-filled" width="36" height="36"  style={{color: 'white'}} />
+							: 
+							<Icon icon="fluent:play-24-filled" width="36" height="36"  style={{color: 'white'}} />
+						}
+					</div>
+				</button>
+			
 			<svg
 				id={`hd_${selectedPiercingMacro}_${selectedPiercingStage}_cutheadview`}
 				viewBox="0 40 150 230"
