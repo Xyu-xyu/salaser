@@ -1,7 +1,5 @@
 import  { useState, useEffect } from "react";
 import { observer } from 'mobx-react-lite';
-//import { useTranslation } from 'react-i18next';
-//import utils from '../../scripts/util';
 import viewStore from '../../store/viewStore';
 import { Icon } from "@iconify/react/dist/iconify.js";
 
@@ -13,15 +11,17 @@ const CutHead = observer (() => {
     const [isAnimating, setIsAnimating] = useState(false);
     const [animatedStage, setAnimatedStage] = useState(0);
     const [animationProgress, setAnimationProgress] = useState(0); // 0 → 1
+	const macroEnabled = technology.piercingMacros[selectedPiercingMacro]['stages'];
+	const macro = macroEnabled.filter(s => s.enabled !== false);
  
     const toggleAnimation = () => {
         if (!isAnimating) {
-            //setAnimatedStage(selectedPiercingStage);
-			setAnimatedStage(0);
+ 			setAnimatedStage(0);
             setAnimationProgress(0);
         }
         setIsAnimating(!isAnimating);
     };
+
 	const getValue = (param: string, stage = animatedStage, progress = animationProgress) => {
 		
 		if (!isAnimating) {
@@ -31,17 +31,17 @@ const CutHead = observer (() => {
                 return technology.piercingMacros[selectedPiercingMacro].stages[selectedPiercingStage - 1][param];
             }
         }
-		const macro = technology.piercingMacros[selectedPiercingMacro];
- 		const from = stage === 0 ? macro[`initial_${param}`] : macro.stages[stage - 1][param];
-		if (stage >= macro.stages.length) return from;
-		const to = macro.stages[stage][param];
+		//const macro = technology.piercingMacros[selectedPiercingMacro];
+		const from = stage === 0 ? technology.piercingMacros[selectedPiercingMacro][`initial_${param}`] : macro[stage - 1][param];
+		if (stage >= macro.length) return from;
+		const to = macro[stage][param];
 		return from + (to - from) * progress;
-	};
- 
+	}; 
 
+	
 	useEffect(() => {
 		if (!isAnimating) return;
-		if (animatedStage >= technology.piercingMacros[selectedPiercingMacro].stages.length) {
+		if (animatedStage >= macro.length) {
 			setIsAnimating(false);
 			viewStore.setselectedPiercingStage( selectedPiercingStage )
 			return;
@@ -65,8 +65,7 @@ const CutHead = observer (() => {
 	
 		requestAnimationFrame(step);
 	}, [isAnimating, animatedStage, selectedPiercingMacro]);
-	
-	
+		
 
 	let focusPosition = getValue('focus');
     let headOffset = getValue('height')
