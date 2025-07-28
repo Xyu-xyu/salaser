@@ -65,29 +65,43 @@ const CutHead = observer (() => {
 		if (!isAnimating) return;
 		if (animatedStage >= macro.length) {
 			setIsAnimating(false);
-			viewStore.setselectedPiercingStage( selectedPiercingStage )
+			viewStore.setselectedPiercingStage(selectedPiercingStage);
 			return;
 		}
 	
-		let start: number | null = null;
-		const duration = 1000; // 1 секунда
+		// --- Проверка на задержку перед этапом ---
+		const currentStage = macro[animatedStage];
+		if (currentStage.delay_s && currentStage.delay_s > 0 && animationProgress === 0) {
+			const delayMs = currentStage.delay_s * 1000;
+			const timer = setTimeout(() => {
+				startStageAnimation();
+			}, delayMs);
+			return () => clearTimeout(timer);
+		} else {
+			startStageAnimation();
+		}
 	
-		const step = (timestamp: number) => {
-			if (!start) start = timestamp;
-			const progress = (timestamp - start) / duration;
+		function startStageAnimation() {
+			let start: number | null = null;
+			const duration = 1000; // 1 секунда
 	
-			if (progress < 1) {
-				setAnimationProgress(progress);
-				requestAnimationFrame(step);
-			} else {
-				setAnimatedStage((s) => s + 1);
-				setAnimationProgress(0);
-			}
-		};
+			const step = (timestamp: number) => {
+				if (!start) start = timestamp;
+				const progress = (timestamp - start) / duration;
 	
-		requestAnimationFrame(step);
+				if (progress < 1) {
+					setAnimationProgress(progress);
+					requestAnimationFrame(step);
+				} else {
+					setAnimatedStage((s) => s + 1);
+					setAnimationProgress(0);
+				}
+			};
+	
+			requestAnimationFrame(step);
+		}
 	}, [isAnimating, animatedStage, selectedPiercingMacro]);
-		
+	
 
 	let focusPosition = getValue('focus');
     let headOffset = getValue('height')
