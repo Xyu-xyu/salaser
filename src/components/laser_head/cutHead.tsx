@@ -3,7 +3,30 @@ import { observer } from 'mobx-react-lite';
 import viewStore from '../../store/viewStore';
 import { Icon } from "@iconify/react/dist/iconify.js";
 
+interface PiercingStage {
+	pressure: number;
+	power: number;
+	enabled: boolean;
+	delay_s: number;
+	power_W_s: number;
+	focus: number;
+	height: number;
+	modulationFrequency_Hz: number;
+	cross_blow: boolean;
+	modulationMacro: number;
+  }
 
+  interface PiercingMacro {
+	initial_focus: number;
+	initial_height: number;
+	stages: PiercingStage[];
+	initial_cross_blow: boolean,
+    initial_pressure: number,
+    gas: string;
+    name: string;
+    initial_modulationMacro:number;
+    initial_power: number;      
+  }
 
 const CutHead = observer (() => {
     const { technology, selectedPiercingStage, selectedPiercingMacro } = viewStore;
@@ -12,7 +35,7 @@ const CutHead = observer (() => {
     const [animatedStage, setAnimatedStage] = useState(0);
     const [animationProgress, setAnimationProgress] = useState(0); // 0 → 1
 	const macroEnabled = technology.piercingMacros[selectedPiercingMacro]['stages'];
-	const macro = macroEnabled.filter(s => s.enabled !== false);
+	const macro: PiercingStage[] = macroEnabled.filter((s: PiercingStage) => s.enabled !== false);
  
     const toggleAnimation = () => {
         if (!isAnimating) {
@@ -21,8 +44,7 @@ const CutHead = observer (() => {
         }
         setIsAnimating(!isAnimating);
     };
-
-	const getValue = (param: string, stage = animatedStage, progress = animationProgress) => {
+ 	const getValue = (param: string, stage = animatedStage, progress = animationProgress) => {
 		
 		if (!isAnimating) {
             if (selectedPiercingStage === 0) {
@@ -32,9 +54,9 @@ const CutHead = observer (() => {
             }
         }
 		//const macro = technology.piercingMacros[selectedPiercingMacro];
-		const from = stage === 0 ? technology.piercingMacros[selectedPiercingMacro][`initial_${param}`] : macro[stage - 1][param];
+		const from = stage === 0 ? technology.piercingMacros[selectedPiercingMacro][`initial_${param}`] : macro[stage - 1][param as keyof PiercingStage] as number;
 		if (stage >= macro.length) return from;
-		const to = macro[stage][param];
+		const to = macro[stage][param as keyof PiercingStage] as number;
 		return from + (to - from) * progress;
 	}; 
 
@@ -69,13 +91,14 @@ const CutHead = observer (() => {
 
 	let focusPosition = getValue('focus');
     let headOffset = getValue('height')
+	let foc = focusPosition*5+ headOffset*5
 
 
 	const degeneratePath =() =>{
 		let d:string  = "M 55 0 L 55 89.733 C 55 89.733 69.987 161.318 73 201.781 C 73.312 205.966 73 210.3 73 214.39 C 71.626 221.321 70 233.3 70 233.3 L 80 233.3 C 80 233.3 78.4 221.3 77 214.39 C 77 210.3 76.688 205.966 77 201.781 C 80.013 161.318 95 89.733 95 89.733 L 95 0 Z"
-		var foc=focusPosition * 5 ; 
-		var lp = focusPosition*2 //parseFloat($('#{{ head_id}}_lense').attr('y'));
- 		var dd=d.split(' ');
+		var foc= focusPosition*5+ headOffset*5//focusPosition * 5 ; 
+		var lp = focusPosition*2 + headOffset*2 //parseFloat($('#{{ head_id}}_lense').attr('y'));
+		var dd=d.split(' ');
 		var pl=[];
 		var i=0;
 		while (i<dd.length){
@@ -230,7 +253,7 @@ const CutHead = observer (() => {
 							d={ degeneratePath() }
 						/>
 					</g>
-					<svg id={`${selectedPiercingMacro}_${selectedPiercingStage}_lense`} style={{ opacity: "0.7" }} y={focusPosition *2 }>
+					<svg id={`${selectedPiercingMacro}_${selectedPiercingStage}_lense`} style={{ opacity: "0.7" }} y={ focusPosition*2 + headOffset*2 }>
 						<ellipse
 							style={{
 								stroke: "rgb(0, 0, 0)",
@@ -342,26 +365,26 @@ const CutHead = observer (() => {
 				<g id={`${selectedPiercingMacro}_${selectedPiercingStage}_cutheadfocus_dim`}>
 					<line
 						className="hd_3_0_lhor"
-						style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
 						x1={75}
-						y1={ bs+focusPosition-headOffset*5+20}
+						y1={ bs+foc/* usPosition*5 */ - headOffset*5+20}
 						x2="35.408"
-						y2={bs+focusPosition-headOffset*5+20}
+						y2={bs+foc/* usPosition*5 */ - headOffset*5+20}
+						style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
 					/>
 					<line
 						className="hd_3_0_lver"
-						style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
 						x1="37.987"
-						y1={ bs + focusPosition - headOffset*5+20 }
+						y1={ bs + foc /* usPosition*5 */ - headOffset*5+20 }
 						x2="37.987"
 						y2={190}
+						style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
 					/>
 					<path
 						d="M 37.962 -193.858 L 39.974 -189.834 L 35.95 -189.834 L 37.962 -193.858 Z"
 						style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
 						transform="matrix(1, 0, 0, -1, 0, 0)"
 					/>
-					<svg className="hd_3_0_tri" y={ focusPosition - headOffset*5-12}>
+					<svg className="hd_3_0_tri" y={ foc /* usPosition*5 */ - headOffset*5-12}>
 						<path
 							d="M 37.999 208.197 L 40.011 212.221 L 35.987 212.221 L 37.999 208.197 Z"
 							style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
