@@ -11,14 +11,13 @@ interface ComponentInt {
 export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height }) => {
 
 	const data = utils.getChartData(keyInd)
+	const { animProgress } =  viewStore
 	const {t} = useTranslation()
+	const chartWidth = 580;
+	const startX = 80;
 	const getPath = (key: string): string => {
-		let res = 'M';
-
-		const chartWidth = 490;
-		const startX = 80;
-		const step = chartWidth / data.length;
-
+	let res = 'M';		
+		const step = chartWidth / (data.length);
 		data.forEach((a, index) => {
 			const x = startX + index * step;
 			if (a['enabled'] || index === 0) {
@@ -151,24 +150,32 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 
 				<svg role="application" className="recharts-surface" width="600" height="250" viewBox="0 0 600 250" style={{ width: '100%', height: '100%' }}>
 					<title></title>
-					<desc></desc>
+					<line
+						x1={startX + (chartWidth / data.length) * (animProgress.stage + animProgress.progress)}
+						y1={35}
+						x2={startX + (chartWidth / data.length) * (animProgress.stage + animProgress.progress)}
+						y2={185} // 35 + 150 (высота прямоугольника)
+						style={{
+ 							stroke: "rgba(255, 0, 0, 0.8)",
+							strokeWidth: 2
+						}}
+						/>
 					<g className="recharts-cartesian-grid">
 						<g className="recharts-cartesian-grid-horizontal">
 							{
 								Array.from({ length: 6 }).map((_, index) => {
 									const y = 185 - index * 30;
-
 									return (
 										<line
 											key={index}
 											strokeDasharray="3 3"
 											stroke="#ccc"
 											fill="none"
-											x="80"
+											x={startX}
 											y="20"
-											width="490"
+											width={ chartWidth }
 											height="165"
-											x1="80"
+											x1={startX}
 											y1={y}
 											x2="570"
 											y2={y}
@@ -182,20 +189,17 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 						<g className="recharts-cartesian-grid-vertical">
 							{
 								Array.from({ length: data.length }).map((_, index) => {
-									const chartWidth = 490;
-									const startX = 80;
-									const step = chartWidth / (data.length);
+ 									const step = chartWidth / (data.length);
 									const x = startX + index * step;
-
 									return (
 										<line
 											key={index}
 											strokeDasharray="3 3"
 											stroke="#ccc"
 											fill="none"
-											x="80"
+											x={startX}
 											y="20"
-											width="490"
+											width={ chartWidth }
 											height="165"
 											x1={x}
 											y1={20}
@@ -209,13 +213,11 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 						</g>
 					</g>
 					<g className="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">
-						<line height="30" orientation="bottom" x="80" y="185" width="490" className="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="80" y1="185" x2="570" y2="185"></line>
+						<line height="30" orientation="bottom" x={startX} y="185" width="490" className="recharts-cartesian-axis-line" stroke="#666" fill="none" x1={startX} y1="185" x2="570" y2="185"></line>
 						<g className="recharts-cartesian-axis-ticks">
 							{Array.from({ length: data.length }).map((_, i) => {
-								const startX = 80;
-								const totalWidth = 490;
-								const count = data.length;
-								const step = totalWidth / count;
+  								const count = data.length;
+								const step = chartWidth / count;
 								const x = startX + step * i;
 
 								return (
@@ -223,9 +225,9 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 										<line
 											height="30"
 											orientation="bottom"
-											x="80"
+											x={startX}
 											y="185"
-											width="490"
+											width={ chartWidth }
 											className="recharts-cartesian-axis-tick-line"
 											stroke="#666"
 											fill="none"
@@ -237,7 +239,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 										<text
 											height="30"
 											orientation="bottom"
-											width="490"
+											width={ chartWidth }
 											stroke="none"
 											fontSize="12"
 											x={x}
@@ -255,7 +257,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 						</g>
 					</g>
 					<g className="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">
-						<line orientation="left" width="60" x="20" y="20" height="165" className="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="80" y1="20" x2="80" y2="185"></line>
+						<line orientation="left" width="60" x="20" y="20" height="165" className="recharts-cartesian-axis-line" stroke="#666" fill="none" x1={startX} y1="20" x2={startX} y2="185"></line>
 						<g className="recharts-cartesian-axis-ticks">
 							{
 								Array.from({ length: 6 }).map((_, index, arr) => (
@@ -271,7 +273,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 											fill="none"
 											x1="74"
 											y1={185 - index * 30}
-											x2="80"
+											x2={startX}
 											y2={185 - index * 30}
 										/>
 										{(index == 0 || index=== arr.length-1) && <text
@@ -305,12 +307,9 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 							<g className="recharts-layer recharts-line"	key={"recharts-layer_recharts-line"+i}>
 								<g className="recharts-layer recharts-line-dots">
 									{data.map((a, index) => {
-										const chartWidth = 490;
-										const startX = 80;
-										const step = chartWidth / (data.length);
+ 										const step = chartWidth / (data.length);
 										const x = startX + index * step;
-										//const y = 185 - Number(a[p.param]) * 1.5
-										return (
+ 										return (
 											<g key={'layerback'+index} onMouseDown={ ()=>{ showToolTip(index) } }>
 												 {i === 0 && <rect 
 												 	x={x-15 < 79 ? x-15 :x-15} 
@@ -331,14 +330,14 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 									stroke={p.color}
 									fill="none"
 									strokeWidth="1"
-									height="165" width="490"
+									height="165" width={ chartWidth }
 									className="recharts-curve recharts-line-curve"
 									d={getPath(p.param)}>
 
 								</path>
 								<g className="recharts-layer recharts-line-dots">
 									{data.map((a, index) => {
-										const chartWidth = 490;
+										//const chartWidth = 490;
 										const startX = 80;
 										const step = chartWidth / (data.length);
 										const x = startX + index * step;
@@ -352,7 +351,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 													fill={selectedPiercingStage === index ? p.color : '#fff'}
 													strokeWidth="1"
 													height="165"
-													width="490"
+													width={ chartWidth }
 													cx={x}
 													cy={y}
 													className="recharts-dot recharts-line-dot"
@@ -367,7 +366,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 						})
 					}
 				</svg>
-			</div>
+			</div>	
 		</div>
 	)
 });

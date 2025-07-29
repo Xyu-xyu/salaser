@@ -16,7 +16,7 @@ interface PiercingStage {
 	modulationMacro: number;
   }
 
-  interface PiercingMacro {
+/*   interface PiercingMacro {
 	initial_focus: number;
 	initial_height: number;
 	stages: PiercingStage[];
@@ -27,9 +27,9 @@ interface PiercingStage {
     initial_modulationMacro:number;
     initial_power: number;      
   }
-
+ */
 const CutHead = observer (() => {
-    const { technology, selectedPiercingStage, selectedPiercingMacro } = viewStore;
+    const { technology, selectedPiercingStage, selectedPiercingMacro, animProgress, isVertical } = viewStore;
     const bs: number = 175.0;
     const [isAnimating, setIsAnimating] = useState(false);
     const [animatedStage, setAnimatedStage] = useState(0);
@@ -41,6 +41,7 @@ const CutHead = observer (() => {
         if (!isAnimating) {
  			setAnimatedStage(0);
             setAnimationProgress(0);
+			viewStore.setAnimProgress(0, 0)
         }
         setIsAnimating(!isAnimating);
     };
@@ -60,12 +61,19 @@ const CutHead = observer (() => {
 		return from + (to - from) * progress;
 	}; 
 
+	const stopAnimation = () => {
+		setIsAnimating( false );
+		setAnimatedStage(0);
+		setAnimationProgress(0);
+		viewStore.setAnimProgress(0, 0)
+	}
+
 	
 	useEffect(() => {
 		if (!isAnimating) return;
 		if (animatedStage >= macro.length) {
 			setIsAnimating(false);
-			viewStore.setselectedPiercingStage(selectedPiercingStage);
+			viewStore.setselectedPiercingStage(macro.length);
 			return;
 		}
 	
@@ -83,7 +91,7 @@ const CutHead = observer (() => {
 	
 		function startStageAnimation() {
 			let start: number | null = null;
-			const duration = 1000; // 1 секунда
+			const duration = 2000; // 1 секунда
 	
 			const step = (timestamp: number) => {
 				if (!start) start = timestamp;
@@ -92,9 +100,12 @@ const CutHead = observer (() => {
 				if (progress < 1) {
 					setAnimationProgress(progress);
 					requestAnimationFrame(step);
+					viewStore.setAnimProgress ( animProgress.stage , progress)
+
 				} else {
 					setAnimatedStage((s) => s + 1);
 					setAnimationProgress(0);
+					viewStore.setAnimProgress ( animProgress.stage+1 ,0)
 				}
 			};
 	
@@ -160,12 +171,19 @@ const CutHead = observer (() => {
 	return (
 		<div
 			className={selectedPiercingMacro + "_cuthead"}
-			style={{ width: 400, height: 500, position: "absolute", top: 1200, left: 350 }}
+			style={{
+				width: 300,
+				height: 400,
+				position: "absolute",
+				top: isVertical ? 1200 : 0,
+				left: isVertical ? 350 : 1600
+			}}
+			
 		>
-			<button className="carousel_btn  m-2"
+			<button className="m-2"
 					                style={{
 										position: 'absolute',
-										top: 450,
+										top: 0,
 										right:311,
 										padding: '8px 16px',
 										color: 'white',
@@ -176,17 +194,32 @@ const CutHead = observer (() => {
 					<div className="d-flex align-items-center justify-content-center"
 						  onClick={toggleAnimation} >
 						{
-							isAnimating ? 
-							<Icon icon="fluent:stop-24-filled" width="36" height="36"  style={{color: 'white'}} />
-							: 
 							<Icon icon="fluent:play-24-filled" width="36" height="36"  style={{color: 'white'}} />
+						}
+					</div>
+				</button>
+				<button className="m-2"
+					                style={{
+										position: 'absolute',
+										top: 0,
+										right:360,
+										padding: '8px 16px',
+										color: 'white',
+										border: 'none',
+										borderRadius: '4px',
+										cursor: 'pointer'
+									}}>
+					<div className="d-flex align-items-center justify-content-center"
+						  onClick={stopAnimation} >
+						{
+							<Icon icon="fluent:stop-24-filled" width="36" height="36"  style={{color: 'red'}} />
 						}
 					</div>
 				</button>
 			
 			<svg
 				id={`hd_${selectedPiercingMacro}_${selectedPiercingStage}_cutheadview`}
-				viewBox="0 40 150 230"
+				viewBox="0 40 150 300"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 

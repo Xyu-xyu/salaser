@@ -115,6 +115,7 @@ class ViewStore {
         power:0
     };
       
+    animProgress: {[key: string]: number } = { stage:0, progress:0}
     technology = cut_settings.result.technology
     macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
 
@@ -530,6 +531,11 @@ class ViewStore {
             position: 'bottom-right',
             autoClose: 5000
           });
+    }
+
+    setAnimProgress (stage:number, progress:number) {
+        this.animProgress.stage = stage
+        this.animProgress.progress= progress
     }
 }
 
