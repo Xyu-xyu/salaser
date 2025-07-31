@@ -65,7 +65,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 
     return (
         <div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
-            <div className='col-12 h-100 d-flex align-items-center justify-content-center overflow-hidden'>
+            <div className='col-12 h-100 d-flex align-items-center justify-content-center'>
                 <svg id="svgChart"
                     className="svgChart" version="1.1"
                     width="100%" height="100%"

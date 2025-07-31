@@ -1,52 +1,60 @@
 import React from 'react';
 
 interface Props {
-    text: string;
+    text: Array<string>;
     maxLineLength: number;
     fontSize: number;
     radius: number;
 }
 
-const TextInCircle: React.FC<Props> = ({ text, maxLineLength, fontSize, radius }) => {
-    // Функция для разбивки текста на строки
-	const breakTextIntoLines = (inputText: string, maxLength: number) => {
-		const words = inputText.split(' ');
-		let lines: string[] = [];
-		let currentLine = '';
+const TextInCircle: React.FC<Props> = ({ text, fontSize, radius }) => {
+ 	const breakTextIntoLines =  (input: string): string[] => {
+		const limits = [6, 9, 12]; 
+		let text = input.trim();
 	
-		words.forEach(word => {
-			// Если слово длиннее maxLength, делим его на части
-			while (word.length > maxLength) {
-				// Отрезаем часть слова длиной maxLength
-				currentLine += (currentLine ? ' ' : '') + word.slice(0, maxLength);
-				lines.push(currentLine);
-				currentLine = '';
-				word = word.slice(maxLength); // оставляем оставшуюся часть слова
+		const lines: string[] = [];
+		for (let i = 0; i < limits.length; i++) {
+			if (!text) break;
+	
+			let limit = limits[i];
+	
+ 			const isLast = i === limits.length - 1;
+			if (isLast && text.length > limit) {
+				// вычитаем 3 символа под многоточие
+				limit -= 3;
 			}
 	
-			if ((currentLine + word).length <= maxLength) {
-				currentLine += (currentLine ? ' ' : '') + word;
-			} else {
-				if (currentLine) {
-					lines.push(currentLine);
+			let segment = text.slice(0, limit);
+			if (!isLast) {
+				const lastSpace = segment.lastIndexOf(' ');
+				if (lastSpace > 0) {
+					segment = segment.slice(0, lastSpace);
 				}
-				currentLine = word;
 			}
-		});
 	
-		// Добавляем последнюю строку, если она не пустая
-		if (currentLine) {
-			lines.push(currentLine);
+			lines.push(segment);
+			text = text.slice(segment.length).trim();
+		}
+	
+		if (text.length > 0) {
+			const lastIndex = lines.length - 1;
+			lines[lastIndex] = lines[lastIndex] + "...";
+		}
+	
+		for (let i = 1; i < lines.length; i++) {
+			if (lines[i].length < lines[i - 1].length) {
+				lines[i] = lines[i].padEnd(lines[i - 1].length, ' ');
+			}
 		}
 	
 		return lines;
 	};
 
-    // Разбиваем текст на строки
-    const lines = breakTextIntoLines(text, maxLineLength);
-    const lineHeight = fontSize * 1.25; // высота строки
+    const lines = breakTextIntoLines( text[0] ) ;
+
+    const lineHeight = fontSize * 1.25; 
     const totalHeight = lines.length * lineHeight;
-    const startY = radius + (lineHeight / 2) - (totalHeight / 2)+2.5; // центрируем текст по Y
+    const startY = radius + (lineHeight / 2) - (totalHeight / 2)+2.5 - fontSize*2;
 
     return (
         <g>
@@ -54,7 +62,7 @@ const TextInCircle: React.FC<Props> = ({ text, maxLineLength, fontSize, radius }
                 <text 
                     key={index} 
                     x={50} 
-                    y={startY + index * lineHeight} 
+                    y={startY + (index) * lineHeight} 
                     textAnchor="middle" 
                     fontSize={fontSize} 
                     className='' 
@@ -62,7 +70,29 @@ const TextInCircle: React.FC<Props> = ({ text, maxLineLength, fontSize, radius }
                 >
                     {line}
                 </text>
-            ))}
+            ))}  
+			 <text 
+                    key={22} 
+                    x={50} 
+                    y={65} 
+                    textAnchor="middle" 
+                    fontSize={13} 
+                    className='' 
+                    fill="var(--knobMainText)"
+                >
+                    {text[2]}
+                </text>
+				<text 
+                    key={33} 
+                    x={50} 
+                    y={77.5} 
+                    textAnchor="middle" 
+                    fontSize={10} 
+                    className='' 
+                    fill="var(--knobMainText)"
+                >
+                    {text[1]}
+                </text>
         </g>
     );
 };

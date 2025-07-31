@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import utils from '../scripts/util';
 import MacrosEditModalButton from './macrosEditModalButton'
 import { useTranslation } from 'react-i18next';
@@ -44,7 +44,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 
 
 	let val=0;
-	console.log ('keyInd +' + keyInd)
+	//console.log ('keyInd +' + keyInd)
 	if (typeof keyInd === 'number') {
 		if (keyParam === 'macros') {
 			let knob = technology.macros[keyInd]		
@@ -86,25 +86,31 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 	}
 
 	const setVal =(step:number) =>{
+		console.log('step  ' + step )
 		let currentValue= viewStore.getTecnologyValue(param, keyParam, keyInd)
-		let newValue = currentValue + step
-		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum, keyInd )		
+		const range = maximum - minimum +1 // количество элементов
+		let newValue = ((currentValue - minimum + step) % range + range) % range + minimum;
+		//console.log (newValue, maximum, minimum )
+		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum, keyInd )
+		step > 0 ? setRotation(prev => prev + (360/(maximum+1))) : setRotation(prev => prev - (360/(maximum+1)));
+	
 	}
 
 	const createNote =()=>{
-		console.log ("Creating mod macro param "+ param )
-		let note:string=''
+		let note: Array<string> = [];
 		if ( param  === 'modulationMacro' || param === 'initial_modulationMacro') {
 		
-			 note+=viewStore.getTecnologyValue('name', 'modulationMacros', val )+ ": "
-			 note+=viewStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', val)+"% " 
-			 note+=viewStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', val)+"Hz"
+			 note.push(viewStore.getTecnologyValue('name', 'modulationMacros', val )+ ": ")
+			 note.push(viewStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', val)+"% ") 
+			 note.push(viewStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', val)+"Hz")
+
+
 
 		} else if ( param === 'piercingMacro'){
 
-			note+= viewStore.getTecnologyValue('name', 'piercingMacros',selectedPiercingMacro )+": "
-			note+= viewStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', selectedPiercingMacro)+"Hz "
-			note+= viewStore.getTecnologyValue('stages', 'piercingMacros', selectedPiercingMacro).length+" stages" 
+			note.push( viewStore.getTecnologyValue('name', 'piercingMacros',selectedPiercingMacro )+": ")
+			note.push(viewStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', selectedPiercingMacro)+"Hz ")
+			note.push( viewStore.getTecnologyValue('stages', 'piercingMacros', selectedPiercingMacro).length+" stages" )
 
 		} 
 		return note
@@ -124,11 +130,17 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 			svg.removeEventListener('wheel', handleWheel);
 		};
 	}, []);
+
+	const [rotation, setRotation] = useState(0);
+    const activeSegment = useMemo(() => {
+         return ((Math.round((rotation) / 120) % 3) + 3) % 3;
+    }, [rotation]);
+
 	
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
-			<div className='col-12 h-100 d-flex align-items-center justify-content-center overflow-hidden'>
+			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
 				<svg id="svgChart"
 					className="svgChart" version="1.1"
 					width="100%" height="100%"
@@ -153,8 +165,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 							fill="var(--knobMainText)"
 							>
 						</text>
-						<TextInCircle text={  createNote() } maxLineLength={8} fontSize={10} radius={50} />
-
+						<TextInCircle text={  createNote() } maxLineLength={8} fontSize={8} radius={50} />
 					</g>
 					{t(title).split(', ')[0].split(' ').map((a: string, i: number) => (
 						<text
@@ -196,7 +207,14 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 					>
 						-
 					</text>
-
+					<g style={{
+                            transform: `rotate(${rotation}deg)`,
+                            transformOrigin: '50% 50%',
+                            transition: 'transform 0.25s linear',
+                        }}>
+					{ utils.getSticks( (maximum+1) * 6 , 38, 2) }
+                    { utils.getTicks(0,maximum+1, 1, 38, 38, 1, 0, 360) }
+					</g>
 					<circle
 						cx={x2} 
 						cy={y1}
