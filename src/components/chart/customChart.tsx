@@ -41,7 +41,6 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 			}
 
 		});
-
 		return res.trim();
 	};
 
@@ -50,7 +49,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 		return acc + time;
 	}, 0);
 
-	console.log ("TotalTime: " + totalTime)
+	//console.log ("TotalTime: " + totalTime)
 	
 
 	const showToolTip = (index:number) =>{
@@ -64,6 +63,24 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 		data.map((a, index)=>{
 			if ( i>0 && i>=index ) {
 				res+= a['power_W_s'] / a['power'] || 0
+			}
+		})
+		return startX + activeField* (res/totalTime);;
+	}
+
+
+	const getMidX =()=> {
+		let stage:number = animProgress.stage
+		let prog:number = animProgress.progress
+		let res=0;
+
+		data.map((a, index)=>{
+			if (  stage >= index ) {
+				res+= a['power_W_s'] / a['power'] || 0
+			}
+
+			if (  stage === index ){
+				res+= prog
 			}
 		})
 		return startX + activeField* (res/totalTime);;
@@ -182,9 +199,9 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				<svg role="application" className="recharts-surface" width="600" height="250" viewBox="0 0 600 250" style={{ width: '100%', height: '100%' }}>
 					<title></title>
 					<line
-						x1={startX + ( chartWidth / data.length) * (animProgress.stage + animProgress.progress)}
+						x1={ getMidX ()}
 						y1={35}
-						x2={startX + ( chartWidth / data.length) * (animProgress.stage + animProgress.progress)}
+						x2={ getMidX ()}
 
 						y2={185} // 35 + 150 (высота прямоугольника)
 						style={{
