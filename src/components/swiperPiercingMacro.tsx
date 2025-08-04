@@ -85,7 +85,7 @@ const swiperPiercingMacro = observer(() => {
 									</div>
 									<div className={isVertical ? "editModal_col d-contents mt-2" : "editModal_col_hor d-contents mt-2"}>
 										<div style={{ width: '700px' }} className='mt-10'>
-											<CustomChart keyInd={ii} height={400} />
+											<CustomChart keyInd={ii} />
 										</div>
 										<div className='mt-50'>
 										{selectedPiercingMacro !==	ii && <button className="carousel_btn violet_button m-2" 

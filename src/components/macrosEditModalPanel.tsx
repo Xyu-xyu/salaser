@@ -26,8 +26,8 @@ const MacrosEditModalPanel = observer(() => {
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<div className="container-fluid">
-						<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+					<div className="container-fluid w-100 h-100 d-flex flex-column justify-content-evenly">
+						<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 							<div key={0} className="editModal_row">
 								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 									<MacrosSelector />
@@ -87,12 +87,12 @@ const MacrosEditModalPanel = observer(() => {
 						</div>
 						<div className={'d-flex d-flex justify-content-evenly ' +  (isVertical ? "mt-10" : "mt-4")}>
 							<div className="">
-								<div className="editModal_col">
+								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 									<IosToggleBlowInMacros />
 								</div>
 							</div>
 							<div className="">
-								<div className="editModal_col">
+								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 									<IosToggleMacrocInMacros />
 								</div>
 							</div>

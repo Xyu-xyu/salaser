@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useRef, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo  } from 'react';
 import utils from '../scripts/util';
 import MacrosEditModalButton from './macrosEditModalButton'
 import { useTranslation } from 'react-i18next';
@@ -92,6 +92,10 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 		let currentValue= viewStore.getTecnologyValue(param, keyParam, keyInd)
 		let newValue = currentValue + step
 		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum, keyInd )
+		if (newValue >= minimum && newValue <= maximum) {
+			const rotStep = 270 / (maximum - minimum); 
+			setRotation(prev => prev + (newValue - currentValue) * rotStep);
+		}		
 	}
 
 	useEffect(() => {
@@ -108,11 +112,18 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 			svg.removeEventListener('wheel', handleWheel);
 		};
 	}, []);
+
+	const [rotation, setRotation] = useState(0);
+    // Активный сегмент вычисляется автоматически
+    const activeSegment = useMemo(() => {
+        // нормализация и округление
+        return ((Math.round(rotation / 120) % 3) + 3) % 3;
+    }, [rotation]);
 	
 
 	return (
 		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
-			<div className='col-12 h-100 d-flex align-items-center justify-content-center overflow-hidden'>
+			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
 				<svg id="svgChart"
 					className="svgChart" version="1.1"
 					width="100%" height="100%"
@@ -131,13 +142,13 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 						/>
 
 						{ 
-							utils.getTicks(
+							 utils.getTicks(
 								minimum,
 								maximum,
 								stepBig,
 								r1,
 								r2
-							) 
+							)  
 						}
 
 						<path
@@ -225,7 +236,14 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 					>
 						+
 					</text>
-
+					<g style={{
+                            transform: `rotate(${rotation}deg)`,
+                            transformOrigin: '50% 50%',
+                            transition: 'transform 0.1s linear',
+                        }}>
+                            {utils.getSticks( 60, 44, 1)}
+{/*                             {utils.getTicks(0, 2, 1, 30, 30, 1, 120, 240)}
+ */}					</g>
 				</svg>
 			</div>
 		</div>

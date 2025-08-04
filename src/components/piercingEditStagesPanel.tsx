@@ -47,12 +47,12 @@ const piercingEditStagesPanel = observer(() => {
 			</div>
 			<div className={'w-100 d-flex d-flex justify-content-evenly ' +  (isVertical ? "mt-4" : "mt-2")}>
 				<div className="">
-					<div className="editModal_col">
+					<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 						<IosToggleBlowInStage />
 					</div>
 				</div>
 				<div className="">
-					<div className="editModal_col">
+					<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 						<IosToggleMacrosInStage />
 					</div>
 				</div>

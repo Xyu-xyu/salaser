@@ -5,21 +5,33 @@ import viewStore from '../../store/viewStore';
 
 interface ComponentInt {
 	keyInd: number;
-	height: number;
 }
 
-export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height }) => {
+type ResultItem = {
+	name: string;
+	'focus, mm'?: number,
+	'height, mm'?: number,
+	'pressure, bar'?: number,
+	'power, kWt'?: number,
+	'enabled': boolean;
+	'power': number,
+	'power_W_s': number
+};
 
-	const data = utils.getChartData(keyInd)
+
+export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
+
+	const data: ResultItem[] = utils.getChartData(keyInd);
 	const { animProgress } =  viewStore
 	const {t} = useTranslation()
 	const chartWidth = 580;
 	const startX = 80;
+	const activeField = 435;
 	const getPath = (key: string): string => {
-	let res = 'M';		
-		const step = chartWidth / (data.length);
+		let res = 'M';		
+		//const step = chartWidth / (data.length);
 		data.forEach((a, index) => {
-			const x = startX + index * step;
+			const x = getX( index );
 			if (a['enabled'] || index === 0) {
 				// Безопасное извлечение и преобразование значения
 				const raw = a.hasOwnProperty(key) ? a[key] : 0;
@@ -33,9 +45,28 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 		return res.trim();
 	};
 
+	const totalTime = data.reduce((acc, item) => {
+		const time =  item.power_W_s / item.power  ||0;
+		return acc + time;
+	}, 0);
+
+	console.log ("TotalTime: " + totalTime)
+	
+
 	const showToolTip = (index:number) =>{
 		console.log ("Show tooltip for step: " + index)
 		viewStore.setselectedPiercingStage(index)
+	}
+
+
+	const getX =(i:number)=> {
+		let res=0
+		data.map((a, index)=>{
+			if ( i>0 && i>=index ) {
+				res+= a['power_W_s'] / a['power'] || 0
+			}
+		})
+		return startX + activeField* (res/totalTime);;
 	}
 
 	const { selectedPiercingStage } =viewStore
@@ -151,9 +182,10 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 				<svg role="application" className="recharts-surface" width="600" height="250" viewBox="0 0 600 250" style={{ width: '100%', height: '100%' }}>
 					<title></title>
 					<line
-						x1={startX + (chartWidth / data.length) * (animProgress.stage + animProgress.progress)}
+						x1={startX + ( chartWidth / data.length) * (animProgress.stage + animProgress.progress)}
 						y1={35}
-						x2={startX + (chartWidth / data.length) * (animProgress.stage + animProgress.progress)}
+						x2={startX + ( chartWidth / data.length) * (animProgress.stage + animProgress.progress)}
+
 						y2={185} // 35 + 150 (высота прямоугольника)
 						style={{
  							stroke: "rgba(255, 0, 0, 0.8)",
@@ -189,8 +221,9 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 						<g className="recharts-cartesian-grid-vertical">
 							{
 								Array.from({ length: data.length }).map((_, index) => {
- 									const step = chartWidth / (data.length);
-									const x = startX + index * step;
+ 									
+									const x = getX( index )
+
 									return (
 										<line
 											key={index}
@@ -216,9 +249,8 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 						<line height="30" orientation="bottom" x={startX} y="185" width="490" className="recharts-cartesian-axis-line" stroke="#666" fill="none" x1={startX} y1="185" x2="570" y2="185"></line>
 						<g className="recharts-cartesian-axis-ticks">
 							{Array.from({ length: data.length }).map((_, i) => {
-  								const count = data.length;
-								const step = chartWidth / count;
-								const x = startX + step * i;
+  								
+								const x = getX(i)
 
 								return (
 									<g className="recharts-layer recharts-cartesian-axis-tick" key={i}>
@@ -307,8 +339,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 							<g className="recharts-layer recharts-line"	key={"recharts-layer_recharts-line"+i}>
 								<g className="recharts-layer recharts-line-dots">
 									{data.map((a, index) => {
- 										const step = chartWidth / (data.length);
-										const x = startX + index * step;
+										const x = getX ( index )
  										return (
 											<g key={'layerback'+index} onMouseDown={ ()=>{ showToolTip(index) } }>
 												 {i === 0 && <rect 
@@ -337,10 +368,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd, height })
 								</path>
 								<g className="recharts-layer recharts-line-dots">
 									{data.map((a, index) => {
-										//const chartWidth = 490;
-										const startX = 80;
-										const step = chartWidth / (data.length);
-										const x = startX + index * step;
+										const x = getX( index )
 										const y = 185 - Number(a[p.param]) * 1.5
 										return (
 											<g onMouseDown={ ()=>{ showToolTip(index) } } key={Math.random()}>

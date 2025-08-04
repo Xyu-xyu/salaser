@@ -44,7 +44,7 @@ const PiercingEditModalPanel = observer(() => {
 							</div>	
 							<div className={'d-flex '+(isVertical ? "mt-4" : "")}>
 								{true && <div style={{ width: '600px', height:'200px', margin: 'auto'  }}>
-									<CustomChart keyInd={ selectedPiercingMacro} height={250} />
+									<CustomChart keyInd={ selectedPiercingMacro} />
 									<CutHead />
 							</div>}					
 						</div>

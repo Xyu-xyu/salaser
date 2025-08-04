@@ -11,6 +11,7 @@ type Stage = {
 	focus: number;
 	height: number;
 	enabled: boolean;
+	power_W_s: number;
 };
 
 type ResultItem = {
@@ -20,6 +21,8 @@ type ResultItem = {
 	'pressure, bar'?: number,
 	'power, kWt'?: number,
 	'enabled': boolean;
+	'power': number,
+	'power_W_s': number
 };
 
 type MinMax = {
@@ -304,6 +307,8 @@ class Utils {
 			'pressure, bar': this.getPercentage( data.initial_pressure,minmax.initial_pressure.min, minmax.initial_pressure.max),
 			'power, kWt': this.getPercentage( data.initial_power,minmax.initial_power.min, minmax.initial_power.max),
 			'enabled': true,
+			'power': 0,
+			'power_W_s': 0,
 		});
 
 		// Остальные из stages
@@ -314,7 +319,9 @@ class Utils {
 				'height, mm': this.getPercentage( stage.height, minmax.height.min, minmax.height.max),
 				'pressure, bar': this.getPercentage( stage.pressure, minmax.pressure.min, minmax.pressure.max),
 				'power, kWt': this.getPercentage( stage.power, minmax.power.min, minmax.power.max),
-				'enabled': stage.enabled
+				'enabled': stage.enabled,
+				'power': stage.power,
+				'power_W_s': stage.power_W_s
 			  });
 		  });	  
 		return result;
