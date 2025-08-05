@@ -38,24 +38,33 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
     const { technology, selectedPiercingStage, selectedPiercingMacro, animProgress, isVertical } = viewStore;
     const bs: number = 175.0;
     const [isAnimating, setIsAnimating] = useState(false);
+	const [isPaused, setPaused] = useState(false);
+
  	const macroEnabled = technology.piercingMacros[selectedPiercingMacro]['stages'];
 	const macro: PiercingStage[] = macroEnabled.filter((s: PiercingStage) => s.enabled !== false);
  
     const toggleAnimation = () => {
-        if (!isAnimating) {
- 			viewStore.setAnimProgress(0, 0)
-        }
-        setIsAnimating(!isAnimating);
+		console.log (isAnimating, isPaused)
+        if (!isAnimating && !isPaused) {
+			 setIsAnimating( true );
+        } else if ( !isAnimating && isPaused) {
+			setPaused(false)
+			setIsAnimating( true );
+		} else if ( isAnimating && !isPaused) {
+			setPaused( true )
+			setIsAnimating( false );
+		}
     };
+
  	const getValue = (param: string, stage = animProgress.stage, progress = animProgress.progress) => {
 		
-		if (!isAnimating) {
+ 		if (!isAnimating && !isPaused) {
             if (selectedPiercingStage === 0) {
                 return technology.piercingMacros[selectedPiercingMacro]['initial_' + param];
             } else {
                 return technology.piercingMacros[selectedPiercingMacro].stages[selectedPiercingStage - 1][param];
             }
-        }
+        } 
  		const from = stage === 0 ? technology.piercingMacros[selectedPiercingMacro][`initial_${param}`] : macro[stage - 1][param as keyof PiercingStage] as number;
 		if (stage >= macro.length) return from;
 		const to = macro[stage][param as keyof PiercingStage] as number;
@@ -64,8 +73,9 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 		return from + (to - from) * progress/currentTime;
 	}; 
 
-	const stopAnimation = () => {
+	const rewind = () => {
 		setIsAnimating( false );
+		setPaused(false)
  		viewStore.setAnimProgress(0, 0)
 	}
 
@@ -80,42 +90,57 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 		if (!isAnimating) return;
 		if (animProgress.stage >= macro.length) {
 			setIsAnimating(false);
+			setPaused(false)
 			viewStore.setselectedPiercingStage(macro.length);
 			return;
 		}
 	
-		// --- Проверка на задержку перед этапом ---
 		const currentStage = macro[animProgress.stage];
-		if (currentStage.delay_s && currentStage.delay_s > 0 && animProgress.progress === 0) {
-			const delayMs = currentStage.delay_s * 1000;
-			const timer = setTimeout(() => {
-				startStageAnimation();
-			}, delayMs);
-			return () => clearTimeout(timer);
+		const duration = 1000; // 1 секунда (можно сделать из stageTime)
+		let animationFrameId: number | null = null;
+ 		let start: number | null = null;
+	
+		// --- Обработка задержки перед этапом ---
+		if (currentStage.delay_s && 
+			currentStage.delay_s > 
+			0 && animProgress.progress === 0) {
+			const timer = setTimeout(() => 
+				startStageAnimation(animProgress.progress), currentStage.delay_s * 1000);
+				return () => clearTimeout(timer);
 		} else {
-			startStageAnimation();
+			startStageAnimation(animProgress.progress);
 		}
 	
-		function startStageAnimation() {
-			let start: number | null = null;
-			const duration = 1000; // 1 секунда
-	
+		// --- Функция анимации этапа ---
+		function startStageAnimation(initialProgress: number) {
+			console.log ( initialProgress )
+
 			const step = (timestamp: number) => {
-				if (!start) start = timestamp;
+				if (isPaused) {
+					// Сохраняем текущий прогресс и выходим
+					viewStore.setAnimProgress(animProgress.stage,  animProgress.progress );
+					return;
+				}	
+ 
+				if (!start) start = timestamp - initialProgress * duration;;
 				const progress = (timestamp - start) / duration;
-	
+
 				if (progress  <  stageTime[animProgress.stage + 1] ) {
- 					requestAnimationFrame(step);
-					viewStore.setAnimProgress ( animProgress.stage, progress)
- 				} else {
- 					viewStore.setAnimProgress ( animProgress.stage + 1, 0)
+					viewStore.setAnimProgress(animProgress.stage, progress);
+					animationFrameId = requestAnimationFrame(step);
+				} else {
+					// этап закончен, переходим к следующему
+					viewStore.setAnimProgress(animProgress.stage + 1, 0);
 				}
 			};
-	
-			requestAnimationFrame(step);
+			animationFrameId = requestAnimationFrame(step);
 		}
-	}, [isAnimating, animProgress.stage, selectedPiercingMacro]);
 	
+		return () => {
+			if (animationFrameId) cancelAnimationFrame(animationFrameId);
+		};
+	}, [isAnimating, isPaused, animProgress.stage]);
+
 
 	let focusPosition = getValue('focus');
     let headOffset = getValue('height')
@@ -196,8 +221,10 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				}}>
 					<div className="d-flex align-items-center justify-content-center"
 						  onClick={toggleAnimation} >
-						{
-							<Icon icon="fluent:play-24-filled" width="36" height="36"  style={{color: 'white'}} />
+						{	!isAnimating ?
+							<Icon icon="fluent:play-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} /> :
+							<Icon icon="fluent:pause-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} />
+
 						}
 					</div>
 				</button>
@@ -213,9 +240,9 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 						cursor: 'pointer'
 					}}>
 					<div className="d-flex align-items-center justify-content-center"
-						  onClick={stopAnimation} >
+						  onClick={rewind} >
 						{
-							<Icon icon="fluent:stop-24-filled" width="36" height="36"  style={{color: 'red'}} />
+							<Icon icon="fluent:rewind-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} />
 						}
 					</div>
 				</button>
