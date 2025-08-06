@@ -1,11 +1,24 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useState } from 'react';
+import utils from '../scripts/util';
 
 interface StringComponentInt {
 	param:string;
 	keyParam:string
 }
+
+type ResultItem = {
+	name: string;
+	'focus, mm'?: number,
+	'height, mm'?: number,
+	'pressure, bar'?: number,
+	'power, kWt'?: number,
+	'enabled': boolean;
+	'power': number,
+	'power_W_s': number,
+	'delay_s':number	
+};
 
 
 const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam}) => {
@@ -42,6 +55,18 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
 
 	},[ selectedPiercingMacro, selectedModulationMacro ])
 
+
+    const stageTime: number[] = [];
+	const data: ResultItem[] = utils.getChartData(selectedPiercingMacro);
+	data.forEach(a => {
+		stageTime.push(a.power_W_s / a.power || 0 );
+	});
+	
+	const totalTime = data.reduce((acc, item) => {
+		const time =  item.delay_s + item.power_W_s / item.power  ||0;
+		return acc + time ;
+	}, 0);
+
     return (
         <div className='d-flex flex-column moderat'>
             { keyParam === 'modulationMacros' && <div className='text-center'>
@@ -55,7 +80,8 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
                 <p className="modulatiomNacroName">
                 { viewStore.getTecnologyValue('name', 'piercingMacros',selectedPiercingMacro )}:&nbsp;  
                 { viewStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', selectedPiercingMacro)}&nbsp;Hz,&nbsp;
-                { viewStore.getTecnologyValue('stages', 'piercingMacros', selectedPiercingMacro).length}&nbsp;stages 
+                { viewStore.getTecnologyValue('stages', 'piercingMacros', selectedPiercingMacro).length}&nbsp;stages,&nbsp; 
+                { totalTime.toFixed(1) }&nbsp;seconds 
                 </p>
             </div>}
             <div className='stringComponentContainer px-2'>

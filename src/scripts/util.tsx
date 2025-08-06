@@ -12,6 +12,7 @@ type Stage = {
 	height: number;
 	enabled: boolean;
 	power_W_s: number;
+	delay_s:number;
 };
 
 type ResultItem = {
@@ -22,7 +23,8 @@ type ResultItem = {
 	'power, kWt'?: number,
 	'enabled': boolean;
 	'power': number,
-	'power_W_s': number
+	'power_W_s': number,
+	'delay_s':number
 };
 
 type MinMax = {
@@ -309,6 +311,7 @@ class Utils {
 			'enabled': true,
 			'power': 0,
 			'power_W_s': 0,
+			'delay_s': 0 
 		});
 
 		// Остальные из stages
@@ -321,7 +324,8 @@ class Utils {
 				'power, kWt': this.getPercentage( stage.power, minmax.power.min, minmax.power.max),
 				'enabled': stage.enabled,
 				'power': stage.power,
-				'power_W_s': stage.power_W_s
+				'power_W_s': stage.power_W_s,
+				'delay_s': stage.delay_s
 			  });
 		  });	  
 		return result;

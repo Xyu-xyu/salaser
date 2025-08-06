@@ -15,7 +15,8 @@ type ResultItem = {
 	'power, kWt'?: number,
 	'enabled': boolean;
 	'power': number,
-	'power_W_s': number
+	'power_W_s': number,
+	'delay_s':number	
 };
 
 

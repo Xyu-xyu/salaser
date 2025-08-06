@@ -25,7 +25,8 @@ interface PiercingStage {
 	'power, kWt'?: number,
 	'enabled': boolean;
 	'power': number,
-	'power_W_s': number
+	'power_W_s': number,
+	'delay_s':number
 };
 
 
@@ -39,21 +40,27 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
     const bs: number = 175.0;
     const [isAnimating, setIsAnimating] = useState(false);
 	const [isPaused, setPaused] = useState(false);
+	const [atEnd, setAtEnd] = useState(false);
 
  	const macroEnabled = technology.piercingMacros[selectedPiercingMacro]['stages'];
 	const macro: PiercingStage[] = macroEnabled.filter((s: PiercingStage) => s.enabled !== false);
  
     const toggleAnimation = () => {
-		console.log (isAnimating, isPaused)
-        if (!isAnimating && !isPaused) {
-			 setIsAnimating( true );
-        } else if ( !isAnimating && isPaused) {
-			setPaused(false)
+		if (!atEnd) {
+			if (!isAnimating && !isPaused) {
+				setIsAnimating( true );
+		   } else if ( !isAnimating && isPaused) {
+			   setPaused(false)
+			   setIsAnimating( true );
+		   } else if ( isAnimating && !isPaused) {
+			   setPaused( true )
+			   setIsAnimating( false );
+		   }			
+		} else {
+			setAtEnd(!atEnd)
+			rewind()
 			setIsAnimating( true );
-		} else if ( isAnimating && !isPaused) {
-			setPaused( true )
-			setIsAnimating( false );
-		}
+		}        
     };
 
  	const getValue = (param: string, stage = animProgress.stage, progress = animProgress.progress) => {
@@ -62,7 +69,15 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
             if (selectedPiercingStage === 0) {
                 return technology.piercingMacros[selectedPiercingMacro]['initial_' + param];
             } else {
-                return technology.piercingMacros[selectedPiercingMacro].stages[selectedPiercingStage - 1][param];
+				try {
+					return technology.piercingMacros[selectedPiercingMacro].stages[selectedPiercingStage - 1][param];
+				} catch (e) {
+					if ( technology.piercingMacros[selectedPiercingMacro].stages.length < selectedPiercingStage ) {
+						let length = technology.piercingMacros[selectedPiercingMacro].stages.length - 1
+						viewStore.setselectedPiercingStage ( length )
+						return technology.piercingMacros[selectedPiercingMacro].stages[selectedPiercingStage - 1][param];
+					}
+				}
             }
         } 
  		const from = stage === 0 ? technology.piercingMacros[selectedPiercingMacro][`initial_${param}`] : macro[stage - 1][param as keyof PiercingStage] as number;
@@ -79,24 +94,24 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
  		viewStore.setAnimProgress(0, 0)
 	}
 
+	const stageTime: number[] = [];
 	const data: ResultItem[] = utils.getChartData(keyInd);
-	const stageTime: number[] = []; // массив чисел
 	data.forEach(a => {
 		stageTime.push(a.power_W_s / a.power || 0 );
 	});
 
-	
 	useEffect(() => {
 		if (!isAnimating) return;
 		if (animProgress.stage >= macro.length) {
 			setIsAnimating(false);
 			setPaused(false)
 			viewStore.setselectedPiercingStage(macro.length);
+			setAtEnd(!atEnd)
 			return;
 		}
 	
 		const currentStage = macro[animProgress.stage];
-		const duration = 1000; // 1 секунда (можно сделать из stageTime)
+		const duration = 1000;
 		let animationFrameId: number | null = null;
  		let start: number | null = null;
 	
@@ -200,54 +215,13 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 		<div
 			className={selectedPiercingMacro + "_cuthead"}
 			style={{
-				width: 300,
-				height: 400,
+				width: 200,
+				height: 300,
 				position: "absolute",
-				top: isVertical ? 1200 : 0,
-				left: isVertical ? 350 : 1600
+				top: isVertical ? 50 : 50,
+				left: isVertical ? 850 : 1492
 			}}
-			
 		>
-			<button className="m-2"
-				style={{
-					position: 'absolute',
-					top: 0,
-					right:311,
-					padding: '8px 16px',
-					color: 'white',
-					border: 'none',
-					borderRadius: '4px',
-					cursor: 'pointer'
-				}}>
-					<div className="d-flex align-items-center justify-content-center"
-						  onClick={toggleAnimation} >
-						{	!isAnimating ?
-							<Icon icon="fluent:play-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} /> :
-							<Icon icon="fluent:pause-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} />
-
-						}
-					</div>
-				</button>
-				<button className="m-2"
-					style={{
-						position: 'absolute',
-						top: 0,
-						right:360,
-						padding: '8px 16px',
-						color: 'white',
-						border: 'none',
-						borderRadius: '4px',
-						cursor: 'pointer'
-					}}>
-					<div className="d-flex align-items-center justify-content-center"
-						  onClick={rewind} >
-						{
-							<Icon icon="fluent:rewind-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} />
-						}
-					</div>
-				</button>
-				<h4> stage :{animProgress.stage}  prog :{animProgress.progress.toFixed(2)}</h4>
-			
 			<svg
 				id={`hd_${selectedPiercingMacro}_${selectedPiercingStage}_cutheadview`}
 				viewBox="0 40 150 300"
@@ -481,12 +455,30 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 						<tspan x="120.682" y="155.235" id={`${selectedPiercingMacro}_${selectedPiercingStage}_cutheadfocus_val`}>
 							{ focusPosition.toFixed(1) }
 						</tspan>
-						<tspan x="127.682" dy="1em">
-
-						</tspan>
 					</text>
 				</g>
 			</svg>
+			<button className="m-2"
+				onPointerDown={toggleAnimation}
+				style={{
+					position: 'absolute',
+					bottom: -50,
+					right: 133,
+					padding: '8px 16px',
+					color: 'white',
+					border: '1px solid black',
+					borderRadius: '4px',
+					cursor: 'pointer',
+				}}>
+					<div className="d-flex align-items-center justify-content-center"
+						   >
+						{	!isAnimating ?
+							<Icon icon="fluent:play-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} /> :
+							<Icon icon="fluent:pause-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} />
+
+						}
+					</div>
+				</button>
 		</div >
 	);
 });
