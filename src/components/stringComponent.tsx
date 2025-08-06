@@ -62,10 +62,11 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
 		stageTime.push(a.power_W_s / a.power || 0 );
 	});
 	
-	const totalTime = data.reduce((acc, item) => {
-		const time =  item.delay_s + item.power_W_s / item.power  ||0;
-		return acc + time ;
-	}, 0);
+    const totalTime = data.reduce((acc, item) => {
+        if (!item.enabled) return acc; // пропускаем неактивные элементы
+        const time = item.delay_s + (item.power_W_s / item.power || 0);
+        return acc + time;
+    }, 0);
 
     return (
         <div className='d-flex flex-column moderat'>

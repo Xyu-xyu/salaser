@@ -42,8 +42,8 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 	const [isPaused, setPaused] = useState(false);
 	const [atEnd, setAtEnd] = useState(false);
 
- 	const macroEnabled = technology.piercingMacros[selectedPiercingMacro]['stages'];
-	const macro: PiercingStage[] = macroEnabled.filter((s: PiercingStage) => s.enabled !== false);
+ 	const macro: PiercingStage[] = technology.piercingMacros[selectedPiercingMacro]['stages'];
+	//const macro: PiercingStage[] = macroEnabled.filter((s: PiercingStage) => s.enabled !== false);
  
     const toggleAnimation = () => {
 		if (!atEnd) {
@@ -136,17 +136,20 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 					viewStore.setAnimProgress(animProgress.stage,  animProgress.progress );
 					return;
 				}	
- 
-				if (!start) start = timestamp - initialProgress * duration;;
-				const progress = (timestamp - start) / duration;
 
-				if (progress  <  stageTime[animProgress.stage + 1] ) {
-					viewStore.setAnimProgress(animProgress.stage, progress);
-					animationFrameId = requestAnimationFrame(step);
-				} else {
-					// этап закончен, переходим к следующему
+				if (!currentStage.enabled) {
 					viewStore.setAnimProgress(animProgress.stage + 1, 0);
-				}
+				} else {
+					if (!start) start = timestamp - initialProgress * duration;;
+					const progress = (timestamp - start) / duration;
+
+					if (progress  <  stageTime[animProgress.stage + 1] ) {
+						viewStore.setAnimProgress(animProgress.stage, progress);
+						animationFrameId = requestAnimationFrame(step);
+					} else {
+						viewStore.setAnimProgress(animProgress.stage + 1, 0);
+					}
+				} 
 			};
 			animationFrameId = requestAnimationFrame(step);
 		}
@@ -463,8 +466,8 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				style={{
 					position: 'absolute',
 					bottom: -50,
-					right: 133,
-					padding: '8px 16px',
+					right: 150,
+					padding: '4px 8px',
 					color: 'white',
 					border: '1px solid black',
 					borderRadius: '4px',
@@ -473,8 +476,8 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 					<div className="d-flex align-items-center justify-content-center"
 						   >
 						{	!isAnimating ?
-							<Icon icon="fluent:play-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} /> :
-							<Icon icon="fluent:pause-24-filled" width="36" height="36"  style={{color: "var(--knobMainText)"}} />
+							<Icon icon="fluent:play-24-filled" width="24" height="24"  style={{color: "var(--knobMainText)"}} /> :
+							<Icon icon="fluent:pause-24-filled" width="24" height="24"  style={{color: "var(--knobMainText)"}} />
 
 						}
 					</div>

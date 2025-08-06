@@ -10,7 +10,7 @@ const piercingEditStagesPanel = observer(() => {
 
 	return (
 		<>
-			<div className={'w-100 d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-50")}>
+			<div className={'w-100 d-flex justify-content-evenly ' + (isVertical ? "mt-50" : "mt-50")}>
 				{[	  		    
 					   "focus",
 					   "height",
