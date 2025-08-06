@@ -37,7 +37,7 @@ const PiercingEditModalPanel = observer(() => {
 				<Modal.Body>
 					{ !carouselModeInPiercing && 
 					<div className="container-fluid">
-						<div className={'d-flex justify-content-evenly align-items-center flex-column ' + (isVertical ? "mt-4" : "mt-0")}>
+						<div className={'d-flex justify-content-evenly align-items-center flex-column ' + (isVertical ? "mt-50" : "mt-50")}>
 
 							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 								<StringComponent param={'name'} keyParam={'piercingMacros'} />
@@ -53,7 +53,7 @@ const PiercingEditModalPanel = observer(() => {
 								<PiercingEditStagesPanel />
 							) : (
 								<div className='w-100'>
-									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-50")}>
+									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-50" : "mt-50")}>
 										{[
 										
  											"initial_focus",

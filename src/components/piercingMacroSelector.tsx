@@ -15,7 +15,7 @@ const piercingMacroSelector = observer(() => {
 
  	let minimum:number = 0 
 	let maximum:number = 0
-	let title: string = "Индекс врезки";	
+	let title: string = "Врезка";	
 	const settings = utils.findByKey(cut_settings, param)[0];
 
 	if ( settings ) {
@@ -130,13 +130,13 @@ const piercingMacroSelector = observer(() => {
 							y={y3 + i * 9}
 							className="moderat"
 							fill="var(--knobMainText)"
-							fontSize={isVertical ? 10 : 7 }
+							fontSize={isVertical ? 10 : 9 }
 						>
 							{t(a)}
 						</text>
 					))}
 					<text x={30} y={y2} className='moderat' 
-						fontSize={isVertical ? 10 : 7}
+						fontSize={isVertical ? 10 : 9}
 						fill="var(--knobMainText)">
 						{ t(title.split(', ')[1])}
 					</text>

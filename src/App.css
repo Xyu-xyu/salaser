@@ -626,9 +626,6 @@ body {
   align-items: center;
 }
 
-.transparentBack:hover {
-  fill: rgba(223, 223, 226, 0.75 );
-}
 
 .recharts-responsive-container {
   display: flex;
@@ -639,3 +636,22 @@ body {
 .mt-50 {
   margin-top: 50px !important;
 }
+ 
+.dot-glow {
+  filter: drop-shadow(0 0 2px currentColor) brightness(1);
+  animation: glowPulse 1s linear infinite;
+}
+ 
+/* Пульсирующее свечение */
+@keyframes glowPulse {
+  0% {
+    filter: drop-shadow(0 0 2px currentColor) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 2px currentColor) brightness(1.2);
+  }
+  100% {
+    filter: drop-shadow(0 0 2px currentColor) brightness(1);
+  }
+}
+

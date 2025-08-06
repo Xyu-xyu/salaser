@@ -93,7 +93,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
                             y={y3 + i * 9}
                             className="moderat"
                             fill="var(--knobMainText)"
-                            fontSize={isVertical ? 10 : 7}>
+                            fontSize={isVertical ? 10 : 9}>
                             {a}
                         </text>
                     ))}

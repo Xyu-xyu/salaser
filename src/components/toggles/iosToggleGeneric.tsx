@@ -22,7 +22,7 @@ const IosToggleGeneric: React.FC<IosToggleGenericProps> = observer(({
 	const { t } = useTranslation()
 
 	return (
-		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
+		<div className='IosToggleGeneric w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
 			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
 				<svg
 					id={useId()}
@@ -35,10 +35,10 @@ const IosToggleGeneric: React.FC<IosToggleGenericProps> = observer(({
 						<text
 							key={i}
 							x="5"
-							y={5 + i * 9}
+							y={10 + i * 9}
 							className="moderat"
 							fill="var(--knobMainText)"
-							fontSize={isVertical ? 10 : 7}
+							fontSize={isVertical ? 10 : 9}
 						>
 							{a}
 						</text>

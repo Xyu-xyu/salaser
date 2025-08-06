@@ -12,11 +12,11 @@ const Main1 = observer(() => {
 	const { knobMode } = viewStore;
 
 	const handleRightClick = (event: React.MouseEvent) => {
-		if (event.clientX === event.clientY) {
+/* 		if (event.clientX === event.clientY) {
 			event.preventDefault(); // отключить стандартное контекстное меню
 		console.log("Правый клик по координатам:", event.clientX, event.clientY);
+		} */
 		viewStore.setKnobMode(!knobMode); // переключение состояния
-		}
 	};
 
 	return (
