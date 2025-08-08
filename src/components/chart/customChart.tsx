@@ -66,7 +66,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				res+= a['power_W_s'] / a['power'] || 0
 			}
 		})
-		return startX + activeField* (res/totalTime);;
+		return startX + activeField* (res/totalTime) || startX; 
 	}
 
 
@@ -84,7 +84,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				res+= prog
 			}
 		})
-		return startX + activeField* (res/totalTime);;
+		return startX + activeField* (res/totalTime) || startX;
 	}
 
 	const { selectedPiercingStage } =viewStore

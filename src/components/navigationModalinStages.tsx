@@ -44,9 +44,11 @@ const NavigationModalinStages = observer(() => {
 				show:true,
 				modalBody: 'Do you want to delete this piercing macro step?',
 				confirmText: 'Delete',
+				confirmText1: 'Delete all stages',
 				cancelText:'Cancel',
 				func: viewStore.deleteStage,
-				args:[]
+				func1: viewStore.deleteStage,
+				args:['all']
 			})
 		}	 
 	}

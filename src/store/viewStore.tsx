@@ -38,10 +38,12 @@ export interface Makro {
 
 export interface ModalProps {
     show: boolean;
-     modalBody: string;
-    confirmText: string;
+    modalBody: string;
     cancelText: string;
+    confirmText: string;
+    confirmText1?: string;
     func: (...args: any[]) => void;
+    func1?: (...args: any[]) => void;
     args?: any[];
 }
 
@@ -460,7 +462,13 @@ class ViewStore {
         }
     }
 
-    deleteStage() {
+    deleteStage(arg:string) {
+
+        if (arg==='all') {
+            viewStore.setselectedPiercingStage(0)
+            viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages=[]
+            return
+        }
        
         if (viewStore.selectedPiercingStage === 0) {
             showToast({
@@ -501,7 +509,10 @@ class ViewStore {
                 autoClose: 5000
             });
             return;
-        }      
+        }
+        
+        console.log ()
+
         let stages = viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages;
 
         if (viewStore.selectedPiercingStage !==0) {
@@ -516,12 +527,13 @@ class ViewStore {
                 "power": donor.initial_power,
                 "enabled": true,
                 "delay_s": 0,
-                "power_W_s": donor.initial_pressure,
+                "power_W_s": 1000,
                 "focus": donor.initial_focus,
                 "height": donor.initial_height,
                 "modulationFrequency_Hz": donor.initial_modulationFrequency_Hz,
                 "cross_blow": false,
                 "modulationMacro": donor.initial_modulationMacro
+             
             }
             stages.splice( 0, 0, stepPaste);
         } 

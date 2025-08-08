@@ -99,7 +99,7 @@ const swiperModulationMacro = observer(() => {
 												"pulseFill_percent",
 												"pulseFrequency_Hz",
 											].map((a: string, i: number) => (
-												<div className="editModal_row vidget m-1" key={i}>
+												<div className="editModal_row " key={i}>
 													<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 														<UniversalKnob param={a} keyParam={'modulationMacros'} keyInd={ii} />
 													</div>

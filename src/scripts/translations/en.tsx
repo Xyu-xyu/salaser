@@ -101,7 +101,7 @@ const en: Record<string, string> = {
 	"ENGRAVING":"engraving",
 	"EDGING":"edging",
 	"сross_blow":"сross blow",
-
+	"Delete all stages":"Delete all stages",
 
 
 };

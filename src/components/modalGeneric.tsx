@@ -27,6 +27,13 @@ const modalGeneric = observer(() => {
 		}
  	};
 
+	 const handleSubmit1 = () => {
+		if (viewStore.modalProps.func1 && Array.isArray(viewStore.modalProps.args)) {
+			viewStore.modalProps.func1(...viewStore.modalProps.args);
+			viewStore.setModalProps ( def )
+		}
+ 	};
+
 	return (
 		<>
 			<Modal show={ Boolean(viewStore.modalProps.show) }      
@@ -49,6 +56,16 @@ const modalGeneric = observer(() => {
 					>
 						{t(viewStore.modalProps.cancelText)}
 					</Button>
+					{ viewStore.modalProps.func1 && viewStore.modalProps.confirmText1 &&
+							<Button
+							variant="danger"
+							onClick={handleSubmit1}
+							size="lg"
+							className='ms-2 m-2 py-3 px-5'
+							>
+							{t(viewStore.modalProps.confirmText1)}
+						</Button>					
+					}
 					<Button
 						variant="primary"
 						onClick={handleSubmit}

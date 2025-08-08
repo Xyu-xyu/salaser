@@ -100,7 +100,7 @@ const ru: Record<string, string> = {
 	"PULSE":"импульс",
 	"ENGRAVING":"гравировка",
 	"EDGING":"окантовка",
-	"":"",
+	"Delete all stages":"Удалить все этапы",
 
 };
 
