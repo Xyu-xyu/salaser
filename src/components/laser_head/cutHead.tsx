@@ -221,8 +221,8 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				width: 200,
 				height: 300,
 				position: "absolute",
-				top: isVertical ? 50 : 50,
-				left: isVertical ? 850 : 1492
+				top: isVertical ? 1240 : 50,
+				left: isVertical ? 440 : 220
 			}}
 		>
 			<svg
@@ -283,14 +283,13 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 						/>
 						<path
 							style={{ stroke: "rgb(0, 0, 0)", fill: "rgb(56, 56, 56)" }}
-							d="M 29.999 9.76 L 30 100 L 35 100 L 35 140 L 55 140 L 55 132 L 49 132 L 49 80 L 40 80 L 40 3 L 30 3 L 30 10 L 29.999 9.76 Z"
+				 			d="M 29.999 9.76 L 30 100 L 35 100 L 35 140 L 55 140 L 55 132 L 49 132 L 49 80 L 40 80 L 40 3 L 30 3 L 30 10 L 29.999 9.76 Z"
 						/>
 						<path
 							style={{ stroke: "rgb(0, 0, 0)", fill: "rgb(56, 56, 56)" }}
 							d="M 93.027 132.596 L 93.028 42.356 L 98.028 42.356 L 98.028 2.356 L 118.028 2.356 L 118.028 10.356 L 112.028 10.356 L 112.028 62.356 L 103.028 62.356 L 103.028 139.356 L 93.028 139.356 L 93.028 132.356 L 93.027 132.596 Z"
 							transform="matrix(-1, 0, 0, -1, 213.028029, 142.3559)"
-/* 		bx:origin="0.539459 0.50235"
- */	  />
+						/>
 						<path
 							style={{ fill: "rgb(216, 216, 216)", stroke: "rgb(0, 0, 0)" }}
 							d="M 40 140 L 55 140 L 62 160 L 62 165 L 55 165 L 40 140 Z"
@@ -301,7 +300,7 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 							transform="matrix(-1, 0, 0, -1, 198, 305)"
 						/>
 					</g>
-					<g id={`${selectedPiercingMacro}_${selectedPiercingStage}_laser`} /* focus_position={5} */>
+					<g id={`${selectedPiercingMacro}_${selectedPiercingStage}_laser`}>
 						<path
 							id={`${selectedPiercingMacro}_${selectedPiercingStage}_laserpath`}
 							style={{ stroke: "rgb(0, 0, 0)", strokeWidth: 0, fill: "red" }}
@@ -374,7 +373,7 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				<g id={`${selectedPiercingMacro}_${selectedPiercingStage}_cutheadoffset_dim`}>
 					<line
 						className="hd_3_0_lhor"
-						style={{ stroke: "rgb(244, 155, 155)", fill: "rgb(244, 155, 155)" }}
+						style={{ stroke: " #82ca9d", fill: " #82ca9d" }}
 						x1={85}
 						y1={ bs-headOffset*5+18 }
 						x2={125}
@@ -383,13 +382,13 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 					<svg className="hd_3_0_tri" y={ -headOffset*5+28}>
 						<path
 							d="M 122.012 -164.024 L 124.024 -160 L 120 -160 L 122.012 -164.024 Z"
-							style={{ stroke: "rgb(244, 155, 155)", fill: "rgb(244, 155, 155)" }}
+							style={{ stroke: " #82ca9d", fill: " #82ca9d" }}
 							transform="matrix(1, 0, 0, -1, 0, 0)"
 						/>
 					</svg>
 					<line
 						className="hd_3_0_lver"
-						style={{ stroke: "rgb(244, 155, 155)", fill: "rgb(244, 155, 155)" }}
+						style={{ stroke: " #82ca9d", fill: " #82ca9d" }}
 						x1={122}
 						y1={195}
 						x2={122}
@@ -397,11 +396,11 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 					/>
 					<path
 						d="M 122.012 195 L 124.024 199.024 L 120 199.024 L 122.012 195 Z"
-						style={{ stroke: "rgb(244, 155, 155)", fill: "rgb(244, 155, 155)" }}
+						style={{ stroke: " #82ca9d", fill: " #82ca9d" }}
 					/>
 					<text
 						style={{
-							fill: "rgb(244, 155, 155)",
+							fill: " #82ca9d",
 							fontFamily: "Arial, sans-serif",
 							fontSize: 10,
 							whiteSpace: "pre"
@@ -424,7 +423,7 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 						y1={ bs+foc/* usPosition*5 */ - headOffset*5+20}
 						x2="35.408"
 						y2={bs+foc/* usPosition*5 */ - headOffset*5+20}
-						style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
+						style={{ fill: "#8884d8", stroke: "#8884d8" }}
 					/>
 					<line
 						className="hd_3_0_lver"
@@ -432,22 +431,22 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 						y1={ bs + foc /* usPosition*5 */ - headOffset*5+20 }
 						x2="37.987"
 						y2={190}
-						style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
+						style={{ fill: "#8884d8", stroke: "#8884d8" }}
 					/>
 					<path
 						d="M 37.962 -193.858 L 39.974 -189.834 L 35.95 -189.834 L 37.962 -193.858 Z"
-						style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
+						style={{ fill: "#8884d8", stroke: "#8884d8" }}
 						transform="matrix(1, 0, 0, -1, 0, 0)"
 					/>
 					<svg className="hd_3_0_tri" y={ foc /* usPosition*5 */ - headOffset*5-12}>
 						<path
 							d="M 37.999 208.197 L 40.011 212.221 L 35.987 212.221 L 37.999 208.197 Z"
-							style={{ fill: "rgb(155, 167, 244)", stroke: "rgb(155, 167, 244)" }}
+							style={{ fill: "#8884d8", stroke: "#8884d8" }}
 						/>
 					</svg>
 					<text
 						style={{
-							fill: "rgb(155, 167, 244)",
+							fill: "#8884d8",
 							fontFamily: "Arial, sans-serif",
 							fontSize: 10,
 							whiteSpace: "pre"

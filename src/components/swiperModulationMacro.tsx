@@ -78,28 +78,40 @@ const swiperModulationMacro = observer(() => {
 										</p>
 									</div>
 								</div>
+
+							{/* 	
 								<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
 									<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 										<SwiperStringComponent param={'name'} keyParam={'modulationMacros'} keyInd={ii} />
 									</div>
-								</div>
-								<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-4")} >
-									{[
-										"pulseFill_percent",
-										"pulseFrequency_Hz",
-									].map((a: string, i: number) => (
-										<div className="editModal_row" key={i}>
-											<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-												<UniversalKnob param={a} keyParam={'modulationMacros'} keyInd={ii} />
+								</div> */}
+
+								<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
+
+									<div>	
+										<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
+											<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
+												<SwiperStringComponent param={'name'} keyParam={'modulationMacros'} keyInd={ii} />
 											</div>
 										</div>
-									))
-									}
+										<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-4")} >
+											{[
+												"pulseFill_percent",
+												"pulseFrequency_Hz",
+											].map((a: string, i: number) => (
+												<div className="editModal_row vidget m-1" key={i}>
+													<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+														<UniversalKnob param={a} keyParam={'modulationMacros'} keyInd={ii} />
+													</div>
+												</div>
+											))
+											}
+										</div>
+									</div>	
 								</div>
 								<div className='mt-50 d-flex d-flex w-100 align-items-center justify-content-center'>
-							{ viewStore.selectedModulationMacro !== ii &&		<button className="carousel_btn violet_button m-2"
-/* 												onMouseDown={(e) => handleMouseDown(e)}
- */												onClick={(e) => handleMouseDown(e)}
+								{ viewStore.selectedModulationMacro !== ii &&		<button className="carousel_btn violet_button m-2"
+												onClick={(e) => handleMouseDown(e)}
 									>
 										<div className="d-flex align-items-center justify-content-center">
 											<Icon

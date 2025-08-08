@@ -17,6 +17,17 @@ import UniversalNamedKnob from './universalNamedKnob';
 import UniversalKnobList from './universalKnobList';
 import CutHead from './laser_head/cutHead';
 
+
+type Param = 'initial_focus' | 'initial_height' | 'initial_pressure' | 'initial_power';
+const data: Record<Param, string> = {
+	initial_focus: '#8884d8',
+	initial_height: '#82ca9d',
+	initial_pressure: '#ffc658',
+	initial_power: '#ff7300',
+};
+
+const params: Param[] = ['initial_focus', 'initial_height', 'initial_pressure', 'initial_power'];
+
 const PiercingEditModalPanel = observer(() => {
 
 	const handleClose = () => {
@@ -54,14 +65,8 @@ const PiercingEditModalPanel = observer(() => {
 							) : (
 								<div className='w-100'>
 									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-50" : "mt-50")}>
-										{[
-										
- 											"initial_focus",
-											"initial_height",
-											"initial_power",
-											"initial_pressure",
-										].map((a: string, i: number) => (
-											<div className="" key={i}>
+										{ params.map((a: string, i: number) => (
+											<div className="vidget" key={i} style={{ border: `4px solid ${data[a]}` }}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 													<UniversalKnob param={a} keyParam={'piercingMacros'} />
 												</div>

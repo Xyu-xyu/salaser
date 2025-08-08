@@ -58,6 +58,7 @@ class ViewStore {
         args: []
     };
 
+    diagActive:string=''
     macrosModalEdit:boolean = false;
     carouselMode:boolean = false;
     carouselModeInPiercing:boolean = false;
@@ -536,6 +537,11 @@ class ViewStore {
     setAnimProgress (stage:number, progress:number) {
         this.animProgress.stage = stage
         this.animProgress.progress= progress
+    }
+
+    setDiagActive (val:string) {
+        this.diagActive = val;
+
     }
 }
 

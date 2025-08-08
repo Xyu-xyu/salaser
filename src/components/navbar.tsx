@@ -1,6 +1,15 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { observer } from 'mobx-react-lite';
+import viewStore from "../store/viewStore";
 
-const NavBar = () => {
+
+const NavBar = observer(() => {
+
+    const { knobMode } =viewStore
+    const handleClick = () => {
+        //console.log ("   пиу  ")
+		viewStore.setKnobMode(!knobMode);
+    };
 
 	return (
 		
@@ -58,7 +67,7 @@ const NavBar = () => {
                 </button>
             </div>     
             <div className="ms-2">
-                <button className="grey_button navbar_button">
+                <button className="grey_button navbar_button"  onPointerDown={ handleClick }>
                     <div className="d-flex align-items-center justify-content-center">
                         <Icon icon="fluent:wrench-16-regular" 
                             width="36" 
@@ -114,6 +123,6 @@ const NavBar = () => {
             </div>                              
         </div>
         )
-    };
+    });
 
 export default NavBar;

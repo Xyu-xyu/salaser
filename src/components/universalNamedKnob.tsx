@@ -139,7 +139,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 	
 
 	return (
-		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
+		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column UniversalNamedKnob'>
 			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
 				<svg id="svgChart"
 					className="svgChart" version="1.1"
@@ -171,16 +171,16 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 						<text
 							key={i}
 							x={x4}
-							y={y3 + i * 9}
+							y={y3 + i * 12}
 							className="moderat"
 							fill="var(--knobMainText)"
-							fontSize={isVertical ? 10 : 9}
+							fontSize={isVertical ? 10 : 12}
 						>
 							{a}
 						</text>
 					))}
 					<text x="30" y={y2} className='moderat' 
-						fontSize={isVertical ? 10 : 9} 
+						fontSize={isVertical ? 10 : 12} 
 						fill="var(--knobMainText)">
 						{t(title).split(', ')[1]}
 					</text>

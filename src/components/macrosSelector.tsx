@@ -123,16 +123,16 @@ const MacrosSelector = observer(() => {
 						<text
 							key={i}
 							x={x4}
-							y={y3 + i * 9}
+							y={y3 + i * 12}
 							className="moderat"
 							fill="var(--knobMainText)"
-							fontSize={isVertical ? 10 : 9 }
+							fontSize={isVertical ? 10 : 12 }
 						>
 							{t(a)}
 						</text>
 					))}
 					<text x={30} y={y2} className='moderat' 
-						fontSize={isVertical ? 10 : 9}
+						fontSize={isVertical ? 10 : 12}
 						fill="var(--knobMainText)">
 						{t(title.split(', ')[1])}
 					</text>

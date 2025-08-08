@@ -23,7 +23,7 @@ type ResultItem = {
 export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 
 	const data: ResultItem[] = utils.getChartData(keyInd);
-	const { animProgress } =  viewStore
+	const { animProgress, diagActive, carouselModeInPiercing } =  viewStore
 	const {t} = useTranslation()
 	const chartWidth = 580;
 	const startX = 80;
@@ -145,7 +145,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 						marginLeft: '25px',
 					}}
 				>
-					<ul
+					{ carouselModeInPiercing &&  <ul
 						className="recharts-default-legend"
 						style={{
 							padding: 0,
@@ -194,7 +194,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 								</span>
 							</li>
 						))}
-					</ul>
+					</ul> }
 				</div>
 
 				<svg role="application" className="recharts-surface" width="600" height="250" viewBox="0 0 600 250" style={{ width: '100%', height: '100%' }}>
@@ -347,26 +347,32 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 					</g>
 					{
 						[
-							{ color: '#8884d8', param: 'focus, mm' },
-							{ color: '#82ca9d', param: 'height, mm' },
-							{ color: '#ff7300', param: 'power, kWt' },
-							{ color: '#ffc658', param: 'pressure, bar' }
+							{ color: '#8884d8', param: 'focus, mm',  title: 'focus'  },
+							{ color: '#82ca9d', param: 'height, mm', title: 'height'  },
+							{ color: '#ff7300', param: 'power, kWt', title: 'power' },
+							{ color: '#ffc658', param: 'pressure, bar', title: 'pressure' }
 						].map((p, i) => {
 
 							return (
 							<g className="recharts-layer recharts-line"	key={"recharts-layer_recharts-line"+i}>
 								<g className="recharts-layer recharts-line-dots">
-									{data.map((a, index) => {
-										const x = getX ( index )
- 										return (
+									{data.map((_, index) => {
+  										return (
 											<g key={'layerback'+index} onMouseDown={ ()=>{ showToolTip(index) } }>
-												 {i === 0 && <rect 
-												 	x={x-15 < 79 ? x-15 :x-15} 
+												 {i === 0 && index !==0 && <rect 
+												 	x={ getX(index-1)} 
 													y="35"
-        											width={ x-15 < 79 ? 30 : 30}
+        											width={ getX(index) - getX(index-1) }
 													height="155"
-													stroke='transparent'
-													fill='transparent'
+													fill={ selectedPiercingStage === index ? 'rgba(100, 100, 100, 0.1)' : 'transparent'}
+													className='transparentBack' 
+												/>}
+												{i === 0 && index ==0 && <rect 
+												 	x={ getX(index)-30} 
+													y="35"
+        											width={ 30 }
+													height="155"
+													fill={ selectedPiercingStage === index ? 'rgba(100, 100, 100, 0.1)' : 'transparent'}
 													className='transparentBack' 
 												/>}
 												 
@@ -378,7 +384,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 								<path
 									stroke={p.color}
 									fill="none"
-									strokeWidth="1"
+									strokeWidth={ diagActive.includes(p.title) ? 4 : 1}
 									height="165" width={ chartWidth }
 									className="recharts-curve recharts-line-curve"
 									d={getPath(p.param)}>
@@ -392,7 +398,9 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 											<g onMouseDown={ ()=>{ showToolTip(index) } } key={Math.random()}>
 												<circle
 													key={10+index}
-													r="5"
+													r={ selectedPiercingStage === index &&
+														diagActive.includes(p.title)														
+														? 10:5}
 													stroke={p.color}
 													fill={selectedPiercingStage === index ? p.color : '#fff'}
 													strokeWidth="1"
@@ -400,8 +408,11 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 													width={ chartWidth }
 													cx={x}
 													cy={y}
-													className="recharts-dot recharts-line-dot"
-												/>
+													className={`recharts-dot recharts-line-dot ${
+														selectedPiercingStage === index &&
+														diagActive.includes(p.title)														
+														? 'dot-glow' : 'dot-normal'}`}
+													/>
 											</g>
 										)
 									})

@@ -90,10 +90,10 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
                     {t(title).split(', ')[0].split(' ').map((a: string, i: number) => (
                         <text key={i}
                             x={x4}
-                            y={y3 + i * 9}
+                            y={y3 + i * 12}
                             className="moderat"
                             fill="var(--knobMainText)"
-                            fontSize={isVertical ? 10 : 9}>
+                            fontSize={isVertical ? 10 : 12}>
                             {a}
                         </text>
                     ))}

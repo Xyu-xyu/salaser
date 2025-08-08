@@ -119,10 +119,22 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
         // нормализация и округление
         return ((Math.round(rotation / 120) % 3) + 3) % 3;
     }, [rotation]);
-	
+
+	const onHover =()=> {
+		console.log (param)
+		viewStore.setDiagActive(param)
+	}
+
+	const onLeave =()=> {
+		console.log ('onLeave')
+		viewStore.setDiagActive('false')
+	}
 
 	return (
-		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
+		<div className='w-100 h-100 d-flex align-items-center justify-content-center flex-column'
+			onPointerOver={onHover}
+			onPointerLeave={onLeave}
+		>
 			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
 				<svg id="svgChart"
 					className="svgChart" version="1.1"
@@ -173,16 +185,16 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 						<text
 							key={i}
 							x={x4}
-							y={y3 + i * 9}
+							y={y3 + i * 12}
 							className="moderat"
 							fill="var(--knobMainText)"
-							fontSize={isVertical ? 10 : 9}
+							fontSize={isVertical ? 10 : 12}
 						>
 							{a}
 						</text>
 					))}
 					<text x="30" y={y2} className='moderat' 
-						fontSize={isVertical ? 10 : 9} 
+						fontSize={isVertical ? 10 : 12} 
 						fill="var(--knobMainText)">
 						{t(title).split(', ')[1]}
 					</text>
