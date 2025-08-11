@@ -217,12 +217,18 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 	return (
 		<div
 			className={selectedPiercingMacro + "_cuthead"}
-			style={{
+			style={ isVertical ? {
+				width: 200,
+				height: 360,
+				position: "absolute",
+				top: '68%',
+				left: '41%'
+			} : {
 				width: 200,
 				height: 300,
 				position: "absolute",
-				top: isVertical ? 1240 : 50,
-				left: isVertical ? 440 : 220
+				top: 25,
+				left: 170
 			}}
 		>
 			<svg
@@ -464,8 +470,8 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				onPointerDown={toggleAnimation}
 				style={{
 					position: 'absolute',
-					bottom: -50,
-					right: 150,
+					/* bottom: -50,
+					right: 150, */
 					padding: '4px 8px',
 					color: 'white',
 					border: '1px solid black',

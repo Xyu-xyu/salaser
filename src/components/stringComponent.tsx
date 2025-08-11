@@ -69,7 +69,7 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
     }, 0);
 
     return (
-        <div className='d-flex flex-column moderat'>
+        <>
             { keyParam === 'modulationMacros' && <div className='text-center'>
                 <p className="modulatiomNacroName">
                 { viewStore.getTecnologyValue('name', 'modulationMacros',selectedModulationMacro )}:&nbsp;  
@@ -97,7 +97,7 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
                 />
             </div>
 
-        </div>
+        </>
             );
 });
 

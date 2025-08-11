@@ -32,7 +32,7 @@ const ModulationMacroModalPanel = observer(() => {
 						:
 						<div className="position-absolute top-50 start-50 translate-middle fs-4">
 							<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
-								<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
+								<div className={""}>
 									<StringComponent param={'name'} keyParam={'modulationMacros'}/>
 								</div>
 							</div>

@@ -22,16 +22,16 @@ const piercingEditStagesPanel = observer(() => {
 
 	return (
 		<>
-			<div className={'w-100 d-flex justify-content-evenly ' + (isVertical ? "mt-50" : "mt-50")}>
+			<div className={'w-100 d-flex justify-content-evenly mt-50'}>
 				{params.map((a, i) => (
-					<div className="vidget" key={i} style={{ border: `4px solid ${data[a]}` }}>
+					<div className="vidget" key={i} style={{ border: `2px solid ${data[a]}` }}>
 						<div className={isVertical ? 'editModal_col' : 'editModal_col_hor'}>
 							<UniversalKnob param={a} keyParam="stages" />
 						</div>
 					</div>
 				))}
 			</div>
-			<div className={'w-100 d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-4")}>
+			<div className={'w-100 d-flex justify-content-evenly '}>
 				{[
 					"modulationMacro",
 					"modulationFrequency_Hz",

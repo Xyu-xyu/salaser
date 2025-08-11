@@ -122,6 +122,11 @@ body {
     width: 275px;
     padding: 0.5em;
   }   
+
+  .swiperSlide {
+    width: 780px;
+    height: 700px;
+  }
 }
 
 
@@ -154,6 +159,11 @@ body {
 
   .fade-toggle .h-125 {
     width: 0px;
+  }
+
+  .swiperSlide {
+    width: 700px;
+    height: 780px;
   }
 } 
 
@@ -573,8 +583,7 @@ body {
   border: 1px solid var(--grey-nav) !important;
   border-radius: 0.75em;
   background-color: var(--grey-nav);
-  margin-top: 25px;
- }
+}
 
 .stringComponentLabel {
   font-size:25px;
@@ -605,9 +614,8 @@ body {
   background-color: #fff;
   border: 1px solid black;
   border-radius: 1em;
-  width: 780px;
-  height: 700px;
-  /* margin: 1em; */
+ /*  width: 780px;
+  height: 700px; */
   overflow: hidden;
   background-color: rgb(244, 244, 247);
 }

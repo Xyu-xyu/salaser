@@ -87,10 +87,9 @@ const swiperPiercingMacro = observer(() => {
 										<div style={{ width: '700px' }} className='mt-10'>
 											<CustomChart keyInd={ii} />
 										</div>
-										<div className='mt-50'>
+										<div className=''>
 										{selectedPiercingMacro !==	ii && <button className="carousel_btn violet_button m-2" 
-/* 												onMouseDown={(e) => handleMouseDown(e)}
- */												onClick={(e) => handleMouseDown(e)}
+												onClick={(e) => handleMouseDown(e)}
 											>
 												<div className="d-flex align-items-center justify-content-center">
 													<Icon

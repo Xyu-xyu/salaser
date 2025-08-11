@@ -48,7 +48,7 @@ const PiercingEditModalPanel = observer(() => {
 				<Modal.Body>
 					{ !carouselModeInPiercing && 
 					<div className="container-fluid">
-						<div className={'d-flex justify-content-evenly align-items-center flex-column ' + (isVertical ? "mt-50" : "mt-50")}>
+						<div className={'d-flex justify-content-evenly align-items-center flex-column '}>
 
 							<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
 								<StringComponent param={'name'} keyParam={'piercingMacros'} />
@@ -64,9 +64,9 @@ const PiercingEditModalPanel = observer(() => {
 								<PiercingEditStagesPanel />
 							) : (
 								<div className='w-100'>
-									<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-50" : "mt-50")}>
+									<div className={'d-flex justify-content-evenly mt-50'}>
 										{ params.map((a: string, i: number) => (
-											<div className="vidget" key={i} style={{ border: `4px solid ${data[a]}` }}>
+											<div className="vidget" key={i} style={{ border: `2px solid ${data[a]}` }}>
 												<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
 													<UniversalKnob param={a} keyParam={'piercingMacros'} />
 												</div>
