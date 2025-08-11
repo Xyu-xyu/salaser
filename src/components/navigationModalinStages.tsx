@@ -1,102 +1,125 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
+import { useTranslation } from 'react-i18next';
 
 
 const NavigationModalinStages = observer(() => {
 
-  	const { carouselModeInPiercing, selectedSlide  } = viewStore
- 
+	const { carouselModeInPiercing } = viewStore
+	const { t } = useTranslation()
+
 	const cloneThis = () => {
 		if (carouselModeInPiercing) {
-			viewStore.setModalProps ({
-				show:true,
-				 modalBody: 'Do you want to copy and add this piercing macro?',
+			viewStore.setModalProps({
+				show: true,
+				modalBody: 'Do you want to copy and add this piercing macro?',
 				confirmText: 'Clone',
-				cancelText:'Cancel',
+				cancelText: 'Cancel',
 				func: viewStore.AddAndUpdate,
-				args:['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
+				args: ['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
 			})
 		} else {
-			viewStore.setModalProps ({
-				show:true,
+			viewStore.setModalProps({
+				show: true,
 				modalBody: 'Do you want to copy and add this piercing macro step?',
 				confirmText: 'Clone',
-				cancelText:'Cancel',
+				cancelText: 'Cancel',
 				func: viewStore.addStage,
-				args:[]
+				args: []
 			})
 		}
 	}
 
 	const deleteThis = () => {
 		if (carouselModeInPiercing) {
-			viewStore.setModalProps ({
-				show:true,
+			viewStore.setModalProps({
+				show: true,
 				modalBody: 'Do you want to delete piercing macro?',
 				confirmText: 'Delete',
-				cancelText:'Cancel',
+				cancelText: 'Cancel',
 				func: viewStore.deleteAndUpdate,
-				args:['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
+				args: ['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
 			})
 		} else {
-			viewStore.setModalProps ({
-				show:true,
+			viewStore.setModalProps({
+				show: true,
 				modalBody: 'Do you want to delete this piercing macro step?',
 				confirmText: 'Delete',
 				confirmText1: 'Delete all stages',
-				cancelText:'Cancel',
+				cancelText: 'Cancel',
 				func: viewStore.deleteStage,
 				func1: viewStore.deleteStage,
-				args:['all']
+				args: ['all']
 			})
-		}	 
+		}
 	}
 
-	const carousel = () =>{
-		viewStore.setCarouselModeInPiercing ( !carouselModeInPiercing)
+	const carousel = () => {
+		viewStore.setCarouselModeInPiercing(!carouselModeInPiercing)
 	}
 
 	return (
 		<>
-			<div className="mt-2">
-				<button className="carousel_btn violet_button m-2">
-					<div className="d-flex align-items-center justify-content-center"
-							onMouseDown={ carousel }>
-						{ carouselModeInPiercing ?  
+			<div className="ms-2">
+				<button className="carousel_btn violet_button mx-2">
+					<div
+						className="d-flex align-items-center justify-content-center mx-2"
+						onMouseDown={carousel}
+					>
+						{carouselModeInPiercing ? (
 							<Icon
-							icon="material-symbols:rectangle-outline-rounded"
-							width="48"
-							height="48"
-							style={{ color: 'white' }}/>
-							:
-						<Icon icon="hugeicons:carousel-horizontal-02"
-							width="48"
-							height="48"
-							style={{ color: 'white' }} />
-						}
+								icon="material-symbols:rectangle-outline-rounded"
+								width="48"
+								height="48"
+								style={{ color: 'white' }}
+							/>
+						) : (
+							<Icon
+								icon="hugeicons:carousel-horizontal-02"
+								width="48"
+								height="48"
+								style={{ color: 'white' }}
+							/>
+						)}
+						<div className="mx-4 d-flex align-items-center">
+							<p className="text-white mb-0">{('View')}</p>
+						</div>
 					</div>
-				</button>	
-				<button className="carousel_btn violet_button m-2">
-					<div className="d-flex align-items-center justify-content-center"
-						onMouseDown={ cloneThis }>
+				</button>
+
+				<button className="carousel_btn violet_button mx-2">
+					<div
+						className="d-flex align-items-center justify-content-center mx-2"
+						onMouseDown={cloneThis}
+					>
+
 						<Icon icon="fa-regular:clone"
 							width="36"
 							height="48"
 							style={{ color: 'white' }} />
+						<div className="mx-4 d-flex align-items-center">
+							<p className="text-white mb-0">{ t('Copy')}</p>
+						</div>
 					</div>
-				</button>				
-				<button className="carousel_btn  m-2">
-					<div className="d-flex align-items-center justify-content-center"
-						onMouseDown={ deleteThis }>
+				</button>
+
+				<button className="carousel_btn violet_button mx-2">
+					<div
+						className="d-flex align-items-center justify-content-center mx-2"
+						onMouseDown={deleteThis}>
 						<Icon
 							icon="ic:twotone-delete-outline"
 							width="48"
 							height="48"
-							style={{ color: 'white' }}/>
-						
+							style={{ color: 'white' }} />
+
+						<div className="mx-4 d-flex align-items-center">
+							<p className="text-white mb-0">{ !carouselModeInPiercing ? t('Delete stage') : t('Delete slide') }</p>
+						</div>
 					</div>
 				</button>
+
 			</div>
 		</>
 	)

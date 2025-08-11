@@ -102,6 +102,10 @@ const en: Record<string, string> = {
 	"EDGING":"edging",
 	"сross_blow":"сross blow",
 	"Delete all stages":"Delete all stages",
+	"Delete stage":"Delete stage",
+	"Delete slide":"Delete slide",
+	"View":"View",
+
 
 
 };

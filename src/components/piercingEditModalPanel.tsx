@@ -120,9 +120,10 @@ const PiercingEditModalPanel = observer(() => {
 				</Modal.Body>
 
  				<Modal.Footer className="position-relative">
- 					<div className="position-absolute top-50 start-50 translate-middle fs-4">
-						<NavigationModalinStages />
-					</div>
+				 <div className="position-absolute top-50 start-50 translate-middle fs-4 no-wrap">
+					<NavigationModalinStages />
+				</div>
+
  					<Button
 						variant="secondary"
 						onClick={handleClose}

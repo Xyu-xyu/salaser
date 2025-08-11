@@ -602,7 +602,7 @@ body {
   background-color: var(--violet);
   border: 1px solid var(--violet);
   border-radius: 5px;
-  width: 78px;
+  width: fit-content;
   height: 60px;
 }
 
@@ -683,3 +683,14 @@ body {
   }
 }
 
+.no-wrap {
+	white-space: nowrap; /* Запрет на перенос */
+}
+
+.modal.with-inner-backdrop::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+}

@@ -39,7 +39,8 @@ const modalGeneric = observer(() => {
 			<Modal show={ Boolean(viewStore.modalProps.show) }      
 				 size="lg" 
 				 centered 
-				 onHide={handleClose} >
+				 onHide={handleClose} 
+				 className="with-inner-backdrop">
 				<Modal.Header closeButton>
 					<Modal.Title>
  					</Modal.Title>

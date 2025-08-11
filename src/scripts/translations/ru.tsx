@@ -101,6 +101,9 @@ const ru: Record<string, string> = {
 	"ENGRAVING":"гравировка",
 	"EDGING":"окантовка",
 	"Delete all stages":"Удалить все этапы",
+	"Delete stage":"Удалить шаг",
+	"Delete slide":"Удалить врезку",
+	"View":"Вид",
 
 };
 
