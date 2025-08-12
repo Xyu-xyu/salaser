@@ -168,7 +168,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
                                     key={`${param}-${keyParam}-${index}`}
                                     href="#arcPath0"
                                     startOffset="50%"
-                                    fill={activeSegment === 0 ? 'var(--knobMainText)' : 'grey'}>
+                                    fill={activeSegment === 0 ? 'var(--knobSecText)' : 'grey'}>
                                     {activeSegment === 0 ? t(val)
                                         : activeSegment === 2 ? t(values[(index - 1 + values.length) % values.length])
                                             : t(values[(index + 1) % values.length])}
@@ -177,7 +177,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
                                     key={`${param}-${keyParam}-${index + 1}`}
                                     href="#arcPath1"
                                     startOffset="50%"
-                                    fill={activeSegment === 2 ? 'var(--knobMainText)' : 'grey'}>
+                                    fill={activeSegment === 2 ? 'var(--knobSecText)' : 'grey'}>
                                     {activeSegment === 2 ? t(val)
                                         : activeSegment === 1 ? t(values[(index - 1 + values.length) % values.length])
                                             : t(values[(index + 1) % values.length])}
@@ -186,7 +186,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
                                     key={`${param}-${keyParam}-${index - 1}`}
                                     href="#arcPath2"
                                     startOffset="50%"
-                                    fill={activeSegment === 1 ? 'var(--knobMainText)' : 'grey'}>
+                                    fill={activeSegment === 1 ? 'var(--knobSecText)' : 'grey'}>
                                     {activeSegment === 1 ? t(val)
                                         : activeSegment === 0 ? t(values[(index - 1 + values.length) % values.length])
                                             : t(values[(index + 1) % values.length])}

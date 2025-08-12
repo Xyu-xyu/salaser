@@ -139,6 +139,44 @@ class Utils {
 		);
 	}
 
+
+	getLampLine(
+		minimum: number,
+		maximum: number,
+		val: number,         // Текущее значение
+		stepBig: number,
+		r1: number,
+		r2: number,
+ 		sAngle?: number,
+		aPerStep?: number
+	) {
+		const totalSteps = Math.floor((maximum - minimum) / stepBig);
+		const anglePerStep = (aPerStep ?? 270) / totalSteps;
+		const startAngle = sAngle ?? 225;
+	
+		const ticks = Array.from({ length: totalSteps + 1 }).map((_, i) => {
+			const stepValue = minimum + i * stepBig; // значение на этом делении
+			const angle = startAngle + i * anglePerStep;
+			const r = (r1 + r2) / 2;
+			const pos = this.polarToCartesian(r, angle);
+	
+			return (
+				<circle
+					key={i}
+					cx={pos.x}
+					cy={pos.y}
+					r={stepValue <= val ? '1.5' : '1'}
+ 					fill={stepValue <= val ? 'orangered' : 'rgba(0,0,0,0.25)'}
+					 filter={stepValue <= val  ? 'brightness(120%)' : undefined}
+
+				/>
+			);
+		});
+	
+		return <>{ticks}</>;
+	}
+	
+
 	getSticks(
 		steps: number,
 		radius: number,

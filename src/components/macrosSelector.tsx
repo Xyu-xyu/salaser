@@ -106,8 +106,8 @@ const MacrosSelector = observer(() => {
 
 						<path
 							d={viewStore.getKnobPath(param) }
-							fill="var(--knobMainText)"
-							stroke="var(--knobMainText)"
+							fill="var(--knobSecText)"
+							stroke="var(--knobSecText)"
 							strokeWidth="2"
 							style={{
 								/* 								filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))",

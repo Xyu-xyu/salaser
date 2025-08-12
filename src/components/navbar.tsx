@@ -50,7 +50,7 @@ const NavBar = observer(() => {
 
             {/* LONG button start */ }
             <div className="ms-4 w-100" id='longButton'>
-                <h4 className="m-0">Produce</h4>
+                <h5 className="m-0">Produce</h5>
             </div>
 
             {/* LONG button end */ }

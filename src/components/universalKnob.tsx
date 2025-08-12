@@ -154,16 +154,17 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 						/>
 
 						{ 
-							 utils.getTicks(
+							 utils.getLampLine(
 								minimum,
 								maximum,
+								val,
 								stepBig,
 								r1,
-								r2
+								r2,								
 							)  
 						}
 
-						<path
+{/* 						<path
 							d={ utils.getPath(val, minimum, maximum, sweepAngle, r1, r2, startAngle) }
 							fill="var(--knobMainText)"
 							stroke="var(--knobMainText)"
@@ -171,7 +172,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 							style={{
 								transition: "none"
 							}}
-						/>
+						/> */}
 						<text x={83} y={60} 
 							textAnchor="end" 
 							fontSize={fontSize} 

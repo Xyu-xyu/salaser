@@ -36,7 +36,8 @@
   --color: #ffffff;        
   --transColor:none;
   --gridColorStroke:#FFFFFF;;
-  --knobMainText: orangered;
+  --knobMainText: rgba(0, 0, 0, 0.8);
+  --knobSecText: orangered;
 }
 
 .themeLight {
