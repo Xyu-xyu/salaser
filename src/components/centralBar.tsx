@@ -1,17 +1,15 @@
-import  SwiperPlan  from "./swiperPlan";
-const CentralBar = () => {
+import { observer } from "mobx-react-lite";
+import viewStore from "../store/viewStore";
+
+const CentralBar = observer(() => {
+
 
 	return (
 		
-		<div  
-            id="CentralBar"
-            >
-                <div id="SwiperContainer">
-                    <SwiperPlan />
-                </div>
-                
+		<div  id="CentralBar">
+          <>CentralBar</>              
         </div>
         )
-    };
+    });
 
 export default CentralBar;

@@ -2,9 +2,9 @@ import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 //import ModulationMacroSelector from './modulationMacroSelector';
-import UniversalKnob from './universalKnob';
-import StringComponent from './stringComponent';
-import NavigationModal from './navigationModal';
+//import UniversalKnob from './universalKnob';
+//import StringComponent from './stringComponent';
+//import NavigationModal from './navigationModal';
 import SwiperModulationMacro from './swiperModulationMacro'
 import { useTranslation } from 'react-i18next';
 
@@ -16,10 +16,7 @@ const ModulationMacroModalPanel = observer(() => {
 		viewStore.setModal(false, 'modulationMacro');
 	};
 	const { t } = useTranslation()
-
-	const { isVertical, carouselMode } = viewStore;
-
-	return (
+ 	return (
 		<>
 			<Modal show={viewStore.modulationMacroModalEdit} onHide={handleClose} fullscreen centered >
 				<Modal.Header closeButton>
@@ -27,10 +24,10 @@ const ModulationMacroModalPanel = observer(() => {
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className="position-relative">
-					{ carouselMode ? 
+					{ 
 						<SwiperModulationMacro />
-						:
-						<div className="position-absolute top-50 start-50 translate-middle fs-4">
+					
+					/* 	<div className="position-absolute top-50 start-50 translate-middle fs-4">
 							<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
 								<div className={""}>
 									<StringComponent param={'name'} keyParam={'modulationMacros'}/>
@@ -49,13 +46,13 @@ const ModulationMacroModalPanel = observer(() => {
 									))
 								} 
 							</div>
-						</div>
+						</div> */
 					}
 				</Modal.Body>
 				<Modal.Footer className="position-relative">
- 					<div className="position-absolute top-50 start-50 translate-middle fs-4">
+ 					{/* <div className="position-absolute top-50 start-50 translate-middle fs-4">
 						<NavigationModal />
-					</div>
+					</div> */}
  					<Button
 						variant="secondary"
 						onClick={handleClose}

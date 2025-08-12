@@ -10,12 +10,15 @@ import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
 import { Icon } from '@iconify/react/dist/iconify.js';
+import { useTranslation } from 'react-i18next';
 
 
 const swiperModulationMacro = observer(() => {
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const { isVertical, modulationMacroinUse, technology, selectedModulationMacro, selectedSlide } = viewStore
 	let arr = Array.from({ length: technology.modulationMacros.length })
+	const { t } = useTranslation()
+
 	useEffect(() => {
 		viewStore.setSelectedSlide(viewStore.selectedModulationMacro)
 	}, [])
@@ -24,6 +27,28 @@ const swiperModulationMacro = observer(() => {
 		e.stopPropagation(); 
 		viewStore.setTecnologyValue(selectedSlide, 'modulationMacro', 'macros', 0, 15, false)
 	};
+
+	const cloneThis = () => {
+		viewStore.setModalProps ({
+		   show:true,
+			modalBody: 'Do you want to copy and add this macro?',
+		   confirmText: 'Clone',
+		   cancelText:'Cancel',
+		   func: viewStore.AddAndUpdate,
+		   args:['modulationMacros', viewStore.selectedSlide, 'modulationMacro']
+	   })
+   }
+
+   const deleteThis = () => {
+		viewStore.setModalProps ({
+		   show:true,
+			modalBody: 'Do you want to delete this macro?',
+		   confirmText: 'Delete',
+		   cancelText:'Cancel',
+		   func: viewStore.deleteAndUpdate,
+		   args:['modulationMacros', viewStore.selectedSlide, 'modulationMacro']
+	   })
+   }
 
 	return (
 
@@ -79,13 +104,6 @@ const swiperModulationMacro = observer(() => {
 									</div>
 								</div>
 
-							{/* 	
-								<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
-									<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
-										<SwiperStringComponent param={'name'} keyParam={'modulationMacros'} keyInd={ii} />
-									</div>
-								</div> */}
-
 								<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
 
 									<div>	
@@ -110,18 +128,52 @@ const swiperModulationMacro = observer(() => {
 									</div>	
 								</div>
 								<div className='mt-50 d-flex d-flex w-100 align-items-center justify-content-center'>
-								{ viewStore.selectedModulationMacro !== ii &&		<button className="carousel_btn violet_button m-2"
-												onClick={(e) => handleMouseDown(e)}
-									>
+								{ viewStore.selectedModulationMacro !== ii &&		
+									<button className="carousel_btn violet_button m-2"	onClick={(e) => handleMouseDown(e)}>
 										<div className="d-flex align-items-center justify-content-center">
 											<Icon
 												icon="charm:square-tick"
 												width="48"
 												height="48"
 												style={{ color: 'white' }} />
-
+											<div className="mx-4 d-flex align-items-center">
+												<p className="text-white mb-0">{ t('Set') }</p>
+											</div>
 										</div>
 									</button>}
+									<button className="carousel_btn mx-2">
+										<div
+											className="d-flex align-items-center justify-content-center mx-2"
+											onMouseDown={deleteThis}
+										>
+											<Icon
+												icon="ic:twotone-delete-outline"
+												width="48"
+												height="48"
+												style={{ color: 'white' }}
+											/>
+											<div className="mx-4 d-flex align-items-center">
+												<p className="text-white mb-0">{ t('Delete') }</p>
+											</div>
+										</div>
+									</button>
+
+									<button className="carousel_btn violet_button mx-2">
+										<div
+											className="d-flex align-items-center justify-content-center mx-2"
+											onMouseDown={cloneThis}
+										>
+											<Icon
+												icon="fa-regular:clone"
+												width="36"
+												height="48"
+												style={{ color: 'white' }}
+											/>
+											<div className="mx-4 d-flex align-items-center">
+												<p className="text-white mb-0">{ t('Copy') }</p>
+											</div>
+										</div>
+									</button>
 								</div>
 							</div>
 						</SwiperSlide>

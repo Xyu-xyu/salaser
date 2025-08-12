@@ -7,6 +7,7 @@ import ModulationMacroModalPanel from "./modulationMacroModalPanel";
 import UniversalKnob from "./universalKnob";
 import NavBar from "./navbar";
 import UniversalNamedKnob from "./universalNamedKnob";
+import CentralBar from "./centralBar";
 
 const Main1 = observer(() => {
 	const { knobMode } = viewStore;	  
@@ -49,7 +50,10 @@ const Main1 = observer(() => {
 					)}
 				</div>
 			</div>
-			<NavBar />
+			<div className="d-flex flex-column w-100 h-100">
+ 				<NavBar />
+				<CentralBar />
+			</div>		
 			<MacrosEditModalPanel />
 			<PiercingEditModalPanel />
 			<ModulationMacroModalPanel />
