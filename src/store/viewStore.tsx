@@ -134,7 +134,9 @@ class ViewStore {
     }
 
     get modulationMacroinUse () {
-        return utils.extractValuesByKey(this.technology, 'modulationMacro')
+        let a = utils.extractValuesByKey(this.technology, 'modulationMacro')
+        let b = utils.extractValuesByKey(this.technology, 'initial_modulationMacro')
+        return [...a, ...b]
     }
 
     get piercingMacroinUse () {
@@ -396,8 +398,10 @@ class ViewStore {
     }
 
     deleteAndUpdate ( deleteKey: string, deleteIndex: number, adjustKey: string) {
-        console.log ( arguments )
-		if (viewStore.technology[deleteKey] 
+        //console.log ( arguments )
+        //console.log (JSON.stringify(viewStore.technology))
+        
+        if (viewStore.technology[deleteKey] 
             && Array.isArray(viewStore.technology[deleteKey]) 
             && viewStore.technology[deleteKey].length > 1) {
 			viewStore.technology[deleteKey].splice(deleteIndex, 1);
@@ -408,24 +412,40 @@ class ViewStore {
                 message: "Minimum value reached!",
                 position: 'bottom-right',
                 autoClose: 5000
-              });
+            });
+            return;
         }
 	
 		const adjustValues = (currentObj: NestedObject) => {
 			for (const key in currentObj) {
-				if (currentObj.hasOwnProperty(key)) {
+                
+                let altKey = key.replace('initial_', "")
+
+				if (currentObj.hasOwnProperty(key) /* || currentObj.hasOwnProperty(altKey) */ ) {
 		            if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
  						adjustValues(currentObj[key]);
 					} else if (key === adjustKey 
                             && typeof currentObj[key] === 'number'
                             && currentObj[key] >= deleteIndex
                             && currentObj[key] > 0) {
-						currentObj[key] -=1;                     
-					}
-				}
-			} 
-		};
+
+                      	currentObj[key] -=1;                     
+
+					} else if (altKey === adjustKey 
+
+                        && typeof currentObj[key] === 'number'
+                        && currentObj[key] >= deleteIndex
+                        && currentObj[key] > 0) {
+
+                        currentObj[key] -=1;   
+
+				    }
+			    } 
+		    }; 
+        }    
+        
  		adjustValues(viewStore.technology);
+        //console.log (JSON.stringify(viewStore.technology))
 	};
 
     AddAndUpdate(key: string, selectedSlide: number, adjustKey: string) {

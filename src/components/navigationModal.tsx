@@ -1,12 +1,14 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
+import { useTranslation } from 'react-i18next';
 
 
 const NavigationModal = observer(() => {
 
-  	const { carouselMode, selectedSlide  } = viewStore
- 
+	const { carouselMode, selectedSlide } = viewStore
+	const { t } = useTranslation()
+
 	const cloneThis = () => {
  		viewStore.setModalProps ({
 			show:true,
@@ -37,43 +39,70 @@ const NavigationModal = observer(() => {
 	return (
 		<>
 			<div className="mt-2">
-				<button className="carousel_btn violet_button m-2">
-					<div className="d-flex align-items-center justify-content-center"
-							onMouseDown={ carousel }>
-						{ carouselMode ?  
+				<button className="carousel_btn violet_button mx-2">
+					<div
+						className="d-flex align-items-center justify-content-center mx-2"
+						onMouseDown={carousel}
+					>
+						{carouselMode ? (
 							<Icon
-							icon="material-symbols:rectangle-outline-rounded"
-							width="48"
-							height="48"
-							style={{ color: 'white' }}/>
-							:
-						<Icon icon="hugeicons:carousel-horizontal-02"
-							width="48"
-							height="48"
-							style={{ color: 'white' }} />
-						}
+								icon="material-symbols:rectangle-outline-rounded"
+								width="48"
+								height="48"
+								style={{ color: 'white' }}
+							/>
+						) : (
+							<Icon
+								icon="hugeicons:carousel-horizontal-02"
+								width="48"
+								height="48"
+								style={{ color: 'white' }}
+							/>
+						)}
+						<div className="mx-4 d-flex align-items-center">
+							<p className="text-white mb-0">{ t('View') }</p>
+						</div>
 					</div>
-				</button>	
-				{ carouselMode && <button className="carousel_btn violet_button m-2">
-					<div className="d-flex align-items-center justify-content-center"
-						onMouseDown={ cloneThis }>
-						<Icon icon="fa-regular:clone"
-							width="36"
-							height="48"
-							style={{ color: 'white' }} />
-					</div>
-				</button>}				
-				{ carouselMode && <button className="carousel_btn  m-2">
-					<div className="d-flex align-items-center justify-content-center"
-						onMouseDown={ deleteThis }>
-						<Icon
-							icon="ic:twotone-delete-outline"
-							width="48"
-							height="48"
-							style={{ color: 'white' }}/>
-						
-					</div>
-				</button>}
+				</button>
+
+				{carouselMode && (
+					<button className="carousel_btn violet_button mx-2">
+						<div
+							className="d-flex align-items-center justify-content-center mx-2"
+							onMouseDown={cloneThis}
+						>
+							<Icon
+								icon="fa-regular:clone"
+								width="36"
+								height="48"
+								style={{ color: 'white' }}
+							/>
+							<div className="mx-4 d-flex align-items-center">
+								<p className="text-white mb-0">{ t('Clone') }</p>
+							</div>
+						</div>
+					</button>
+				)}
+
+				{carouselMode && (
+					<button className="carousel_btn mx-2">
+						<div
+							className="d-flex align-items-center justify-content-center mx-2"
+							onMouseDown={deleteThis}
+						>
+							<Icon
+								icon="ic:twotone-delete-outline"
+								width="48"
+								height="48"
+								style={{ color: 'white' }}
+							/>
+							<div className="mx-4 d-flex align-items-center">
+								<p className="text-white mb-0">{ t('Delete') }</p>
+							</div>
+						</div>
+					</button>
+				)}
+
 			</div>
 		</>
 	)
