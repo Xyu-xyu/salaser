@@ -2,17 +2,14 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import viewStore from "../store/viewStore";
 import { useTranslation } from 'react-i18next';
-import { useState } from "react";
-
+ 
 
 const NavigationButtonsInChartInStages = observer(() => {
-
 	const { t } = useTranslation()
-	const [isAnimating, setIsAnimating] = useState(false);
-	const [isPaused, setPaused] = useState(false);
-	const [atEnd, setAtEnd] = useState(false); 
+ 	const {  isAnimating,  isPaused, atEnd } = viewStore;
 
- 	const cloneThis = (e: React.MouseEvent<HTMLButtonElement>) => {	
+
+	const cloneThis = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
 		viewStore.setModalProps({
 			show: true,
@@ -21,10 +18,10 @@ const NavigationButtonsInChartInStages = observer(() => {
 			cancelText: 'Cancel',
 			func: viewStore.addStage,
 			args: []
-		})		
+		})
 	}
 
-	const deleteStage = (e: React.MouseEvent<HTMLButtonElement>) => {		 
+	const deleteStage = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
 		viewStore.setModalProps({
 			show: true,
@@ -33,11 +30,11 @@ const NavigationButtonsInChartInStages = observer(() => {
 			confirmText1: 'Delete all stages',
 			cancelText: 'Cancel',
 			func: viewStore.deleteStage,
- 			args: []
+			args: []
 		})
 	}
 
-	const deleteAllStages = (e: React.MouseEvent<HTMLButtonElement>) => { 
+	const deleteAllStages = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
 		viewStore.setModalProps({
 			show: true,
@@ -45,16 +42,40 @@ const NavigationButtonsInChartInStages = observer(() => {
 			confirmText: 'Delete all stages',
 			cancelText: 'Cancel',
 			func: viewStore.deleteStage,
- 			args: ['all']
+			args: ['all']
 		})
 	}
 
-	
+	const toggleAnimation = () => {
+		if (!atEnd) {
+			if (!isAnimating && !isPaused) {
+				viewStore.setIsAnimating(true);
+			} else if (!isAnimating && isPaused) {
+				viewStore.setPaused(false)
+				viewStore.setIsAnimating(true);
+			} else if (isAnimating && !isPaused) {
+				viewStore.setPaused(true)
+				viewStore.setIsAnimating(false);
+			}
+		} else {
+			viewStore.setAtEnd(!atEnd)
+			rewind()
+			viewStore.setIsAnimating(true);
+		}
+	};
+
+	const rewind = () => {
+		viewStore.setIsAnimating(false);
+		viewStore.setPaused(false)
+		viewStore.setAnimProgress(0, 0)
+	}
+ 
+
 	return (
 		<>
 			<div className="d-flex align-items-center mt-5">
 				<button className="carousel_btn mx-1"
-					onMouseDown={(e)=>{ deleteStage(e)}}
+					onMouseDown={(e) => { deleteStage(e) }}
 				>
 					<div className="d-flex align-items-center justify-content-center">
 						<Icon
@@ -69,11 +90,11 @@ const NavigationButtonsInChartInStages = observer(() => {
 					</div>
 				</button>
 				<button className="carousel_btn mx-1"
-					onMouseDown={(e)=>{ deleteAllStages(e)}}
+					onMouseDown={(e) => { deleteAllStages(e) }}
 				>
 					<div
 						className="d-flex align-items-center justify-content-center"
-						onMouseDown={()=>{}}
+						onMouseDown={() => { }}
 					>
 						<Icon
 							icon="ic:twotone-delete-outline"
@@ -87,11 +108,11 @@ const NavigationButtonsInChartInStages = observer(() => {
 					</div>
 				</button>
 				<button className="carousel_btn mx-1"
-					onMouseDown={(e)=>{ cloneThis(e)}}				
+					onMouseDown={(e) => { cloneThis(e) }}
 				>
 					<div
 						className="d-flex align-items-center justify-content-center"
-						onMouseDown={()=>{}}
+						onMouseDown={() => { }}
 					>
 						<Icon
 							icon="fluent:copy-add-20-regular"
@@ -105,16 +126,16 @@ const NavigationButtonsInChartInStages = observer(() => {
 					</div>
 				</button>
 				<button className="carousel_btn mx-1"
-					onMouseDown={(e)=>{ cloneThis(e)}}				
+					onPointerDown={toggleAnimation}
 				>
 					<div className="d-flex align-items-center justify-content-center">
-						{	!isAnimating ?
-							<Icon icon="fluent:play-24-filled" width="16" height="16"  
+						{!isAnimating ?
+							<Icon icon="fluent:play-24-filled" width="16" height="16"
 								style={{ color: 'white' }}
-								/> :
-							<Icon icon="fluent:pause-24-filled" width="16" height="16"  
+							/> :
+							<Icon icon="fluent:pause-24-filled" width="16" height="16"
 								style={{ color: 'white' }}
-								/>
+							/>
 
 						}
 						<div className="mx-1 d-flex align-items-center">

@@ -117,6 +117,11 @@ class ViewStore {
         power_W_s:0,
         power:0
     };
+
+
+    isAnimating: Boolean=false;
+	isPaused: Boolean = false;
+	atEnd: Boolean=false;
       
     animProgress: {[key: string]: number } = { stage:0, progress:0}
     technology = cut_settings.result.technology
@@ -574,6 +579,18 @@ class ViewStore {
     setDiagActive (val:string) {
         this.diagActive = val;
 
+    }
+
+    setIsAnimating (val:boolean) {
+        this.isAnimating = val;
+    }
+
+    setPaused (val:boolean) {
+        this.isPaused = val;
+    }
+
+    setAtEnd (val:boolean) {
+        this.atEnd = val;
     }
 }
 

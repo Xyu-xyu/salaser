@@ -106,6 +106,13 @@ const en: Record<string, string> = {
 	"Delete slide":"Delete slide",
 	"View":"View",
 	"Set":"Set",
+	"Delete step": "Delete step",
+	"Clear": "Clear",
+	"Copy step": "Copy step",
+	"Play demo": "Play demo",
+	"View all": "View all",
+	"Do you want to delete all steps in piercing macro?": "Do you want to delete all steps in piercing macro?",
+	"Edit":"Edit",
 
 
 

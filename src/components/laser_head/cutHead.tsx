@@ -1,8 +1,9 @@
-import  { useState, useEffect } from "react";
+import  {  useEffect } from "react";
 import { observer } from 'mobx-react-lite';
 import viewStore from '../../store/viewStore';
-import { Icon } from "@iconify/react/dist/iconify.js";
+//import { Icon } from "@iconify/react/dist/iconify.js";
 import utils from "../../scripts/util";
+
 
 interface PiercingStage {
 	pressure: number;
@@ -36,32 +37,34 @@ interface ComponentInt {
 
 export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 
-    const { technology, selectedPiercingStage, selectedPiercingMacro, animProgress, isVertical } = viewStore;
+    const { technology, selectedPiercingStage, selectedPiercingMacro, animProgress, isVertical, isAnimating,  isPaused , atEnd } = viewStore;
     const bs: number = 175.0;
-    const [isAnimating, setIsAnimating] = useState(false);
-	const [isPaused, setPaused] = useState(false);
-	const [atEnd, setAtEnd] = useState(false);
-
  	const macro: PiercingStage[] = technology.piercingMacros[selectedPiercingMacro]['stages'];
-	//const macro: PiercingStage[] = macroEnabled.filter((s: PiercingStage) => s.enabled !== false);
- 
-    const toggleAnimation = () => {
+  
+/*     const toggleAnimation = () => {
 		if (!atEnd) {
 			if (!isAnimating && !isPaused) {
-				setIsAnimating( true );
+				viewStore.setIsAnimating( true );
 		   } else if ( !isAnimating && isPaused) {
-			   setPaused(false)
-			   setIsAnimating( true );
+			   viewStore.setPaused(false)
+			   viewStore.setIsAnimating( true );
 		   } else if ( isAnimating && !isPaused) {
-			   setPaused( true )
-			   setIsAnimating( false );
+			   viewStore.setPaused( true )
+			   viewStore.setIsAnimating( false );
 		   }			
 		} else {
-			setAtEnd(!atEnd)
+			viewStore.setAtEnd(!atEnd)
 			rewind()
-			setIsAnimating( true );
+			viewStore.setIsAnimating( true );
 		}        
     };
+	
+	const rewind = () => {
+		viewStore.setIsAnimating( false );
+		viewStore.setPaused(false)
+ 		viewStore.setAnimProgress(0, 0)
+	} */
+
 
  	const getValue = (param: string, stage = animProgress.stage, progress = animProgress.progress) => {
 		
@@ -88,12 +91,6 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 		return from + (to - from) * progress/currentTime;
 	}; 
 
-	const rewind = () => {
-		setIsAnimating( false );
-		setPaused(false)
- 		viewStore.setAnimProgress(0, 0)
-	}
-
 	const stageTime: number[] = [];
 	const data: ResultItem[] = utils.getChartData(keyInd);
 	data.forEach(a => {
@@ -103,10 +100,10 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 	useEffect(() => {
 		if (!isAnimating) return;
 		if (animProgress.stage >= macro.length) {
-			setIsAnimating(false);
-			setPaused(false)
+			viewStore.setIsAnimating(false);
+			viewStore.setPaused(false)
 			viewStore.setselectedPiercingStage(macro.length);
-			setAtEnd(!atEnd)
+			viewStore.setAtEnd(!atEnd)
 			return;
 		}
 	
@@ -466,12 +463,9 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 					</text>
 				</g>
 			</svg>
-			<button className="m-2"
+		{/* 	<button className="m-2"
 				onPointerDown={toggleAnimation}
 				style={{
-					position: 'absolute',
-					/* bottom: -50,
-					right: 150, */
 					padding: '4px 8px',
 					color: 'white',
 					border: '1px solid black',
@@ -486,7 +480,7 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 
 						}
 					</div>
-				</button>
+				</button> */}
 		</div >
 	);
 });

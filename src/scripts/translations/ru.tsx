@@ -105,6 +105,13 @@ const ru: Record<string, string> = {
 	"Delete slide":"Удалить врезку",
 	"View":"Вид",
 	"Set":"Назначить",
+	"Delete step": "Удалить шаг",
+	"Clear": "Очистить",
+	"Copy step": "Копировать шаг",
+	"Play demo": "Демо",
+	"View all": "Все варианты",
+	"Do you want to delete all steps in piercing macro?": "Вы хотите удалить все шаги врезки?",
+	"Edit":"Редактировать"
 
 };
 

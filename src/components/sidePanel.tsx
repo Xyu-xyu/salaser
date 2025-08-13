@@ -8,9 +8,12 @@ import UniversalKnob from "./universalKnob";
 import NavBar from "./navbar";
 import UniversalNamedKnob from "./universalNamedKnob";
 import CentralBar from "./centralBar";
+import { useTranslation } from 'react-i18next';
+
 
 const Main1 = observer(() => {
 	const { knobMode } = viewStore;	  
+	const { t } = useTranslation()
 
 	return (
 		<main
@@ -23,7 +26,7 @@ const Main1 = observer(() => {
 				<h5 style={{
 						opacity: knobMode ? 1 : 0						
 					}}>
-					Макрос
+					{t('Макрос')}
 					</h5>
 
 					<div key={0} className="h-125 col-12 vidget">
