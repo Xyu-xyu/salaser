@@ -105,6 +105,7 @@ const en: Record<string, string> = {
 	"Delete stage":"Delete stage",
 	"Delete slide":"Delete slide",
 	"View":"View",
+	"Set":"Set",
 
 
 

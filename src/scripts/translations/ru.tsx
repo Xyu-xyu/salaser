@@ -104,6 +104,7 @@ const ru: Record<string, string> = {
 	"Delete stage":"Удалить шаг",
 	"Delete slide":"Удалить врезку",
 	"View":"Вид",
+	"Set":"Назначить",
 
 };
 

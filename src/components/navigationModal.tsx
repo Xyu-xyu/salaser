@@ -13,7 +13,7 @@ const NavigationModal = observer(() => {
  		viewStore.setModalProps ({
 			show:true,
  			modalBody: 'Do you want to copy and add this macro?',
-			confirmText: 'Clone',
+			confirmText: 'Copy',
 			cancelText:'Cancel',
 			func: viewStore.AddAndUpdate,
 			args:['modulationMacros', viewStore.selectedSlide, 'modulationMacro']
@@ -78,7 +78,7 @@ const NavigationModal = observer(() => {
 								style={{ color: 'white' }}
 							/>
 							<div className="mx-4 d-flex align-items-center">
-								<p className="text-white mb-0">{ t('Clone') }</p>
+								<p className="text-white mb-0">{ t('Copy') }</p>
 							</div>
 						</div>
 					</button>

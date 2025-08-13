@@ -14,7 +14,7 @@ const NavigationModalinStages = observer(() => {
 			viewStore.setModalProps({
 				show: true,
 				modalBody: 'Do you want to copy and add this piercing macro?',
-				confirmText: 'Clone',
+				confirmText: 'Copy',
 				cancelText: 'Cancel',
 				func: viewStore.AddAndUpdate,
 				args: ['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
@@ -23,7 +23,7 @@ const NavigationModalinStages = observer(() => {
 			viewStore.setModalProps({
 				show: true,
 				modalBody: 'Do you want to copy and add this piercing macro step?',
-				confirmText: 'Clone',
+				confirmText: 'Copy',
 				cancelText: 'Cancel',
 				func: viewStore.addStage,
 				args: []
@@ -83,43 +83,10 @@ const NavigationModalinStages = observer(() => {
 							/>
 						)}
 						<div className="mx-4 d-flex align-items-center">
-							<p className="text-white mb-0">{('View')}</p>
+							<p className="text-white mb-0">{!carouselModeInPiercing ? t('View all') : t('Edit')  }</p>
 						</div>
 					</div>
 				</button>
-
-				<button className="carousel_btn violet_button mx-2">
-					<div
-						className="d-flex align-items-center justify-content-center mx-2"
-						onMouseDown={cloneThis}
-					>
-
-						<Icon icon="fa-regular:clone"
-							width="36"
-							height="48"
-							style={{ color: 'white' }} />
-						<div className="mx-4 d-flex align-items-center">
-							<p className="text-white mb-0">{ t('Copy')}</p>
-						</div>
-					</div>
-				</button>
-
-				<button className="carousel_btn violet_button mx-2">
-					<div
-						className="d-flex align-items-center justify-content-center mx-2"
-						onMouseDown={deleteThis}>
-						<Icon
-							icon="ic:twotone-delete-outline"
-							width="48"
-							height="48"
-							style={{ color: 'white' }} />
-
-						<div className="mx-4 d-flex align-items-center">
-							<p className="text-white mb-0">{ !carouselModeInPiercing ? t('Delete stage') : t('Delete slide') }</p>
-						</div>
-					</div>
-				</button>
-
 			</div>
 		</>
 	)

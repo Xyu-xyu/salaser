@@ -28,18 +28,20 @@ const swiperModulationMacro = observer(() => {
 		viewStore.setTecnologyValue(selectedSlide, 'modulationMacro', 'macros', 0, 15, false)
 	};
 
-	const cloneThis = () => {
+	const cloneThis = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
 		viewStore.setModalProps ({
 		   show:true,
 			modalBody: 'Do you want to copy and add this macro?',
-		   confirmText: 'Clone',
+		   confirmText: 'Copy',
 		   cancelText:'Cancel',
 		   func: viewStore.AddAndUpdate,
 		   args:['modulationMacros', viewStore.selectedSlide, 'modulationMacro']
 	   })
    }
 
-   const deleteThis = () => {
+   const deleteThis = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
 		viewStore.setModalProps ({
 		   show:true,
 			modalBody: 'Do you want to delete this macro?',
@@ -141,10 +143,9 @@ const swiperModulationMacro = observer(() => {
 											</div>
 										</div>
 									</button>}
-									<button className="carousel_btn mx-2">
+									<button className="carousel_btn mx-2" onClick={ (e) => deleteThis(e)}>
 										<div
 											className="d-flex align-items-center justify-content-center mx-2"
-											onMouseDown={deleteThis}
 										>
 											<Icon
 												icon="ic:twotone-delete-outline"
@@ -158,10 +159,9 @@ const swiperModulationMacro = observer(() => {
 										</div>
 									</button>
 
-									<button className="carousel_btn violet_button mx-2">
+									<button className="carousel_btn violet_button mx-2" onClick={ (e)=> cloneThis(e) }>
 										<div
 											className="d-flex align-items-center justify-content-center mx-2"
-											onMouseDown={cloneThis}
 										>
 											<Icon
 												icon="fa-regular:clone"

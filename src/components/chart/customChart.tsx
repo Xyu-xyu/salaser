@@ -199,7 +199,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 
 				<svg role="application" className="recharts-surface" width="600" height="250" viewBox="0 0 600 250" style={{ width: '100%', height: '100%' }}>
 					<title></title>
-					<line
+					{! carouselModeInPiercing && <line
 						x1={ getMidX ()}
 						y1={35}
 						x2={ getMidX ()}
@@ -209,7 +209,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
  							stroke: "rgba(255, 0, 0, 0.8)",
 							strokeWidth: 2
 						}}
-						/>
+						/>}
 					<g className="recharts-cartesian-grid">
 						<g className="recharts-cartesian-grid-horizontal">
 							{
@@ -356,7 +356,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 							return (
 							<g className="recharts-layer recharts-line"	key={"recharts-layer_recharts-line"+i}>
 								<g className="recharts-layer recharts-line-dots">
-									{data.map((_, index) => {
+									{ !carouselModeInPiercing && data.map((_, index) => {
   										return (
 											<g key={'layerback'+index} onMouseDown={ ()=>{ showToolTip(index) } }>
 												 {i === 0 && index !==0 && <rect 
@@ -414,8 +414,8 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 														? 'dot-glow' : 'dot-normal'}`}
 													/>
 											</g>
-										)
-									})
+											)
+										})
 									}
 								</g>
 							</g>

@@ -10,10 +10,13 @@ import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
 import { CustomChart } from './chart/customChart'
 import { Icon } from '@iconify/react/dist/iconify.js';
+import { useTranslation } from 'react-i18next';
+
 
 
 const swiperPiercingMacro = observer(() => {
 	const swiperRef = useRef<SwiperClass | null>(null);
+	const { t } = useTranslation()
 	const { isVertical, piercingMacroinUse, technology, selectedPiercingMacro, selectedSlide } = viewStore
 	let arr = Array.from({ length: technology.piercingMacros.length })
 	useEffect(() => {
@@ -22,8 +25,33 @@ const swiperPiercingMacro = observer(() => {
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setTecnologyValue( selectedSlide, 'piercingMacro', 'macros', 0, 7, false  )
+		viewStore.setTecnologyValue(selectedSlide, 'piercingMacro', 'macros', 0, 7, false)
 	};
+
+
+	const cloneThis = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		viewStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to copy and add this piercing macro?',
+			confirmText: 'Clone',
+			cancelText: 'Cancel',
+			func: viewStore.AddAndUpdate,
+			args: ['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
+		})
+}
+
+	const deleteThis = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		viewStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to delete piercing macro?',
+			confirmText: 'Delete',
+			cancelText: 'Cancel',
+			func: viewStore.deleteAndUpdate,
+			args: ['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
+		})
+	}
 
 	return (
 
@@ -78,17 +106,19 @@ const swiperPiercingMacro = observer(() => {
 										</p>
 									</div>
 								</div>
-								<div className={'d-flex flex-column justify-content-evenly align-items-center ' + (isVertical ? "mt-10" : "mt-4")}>
+								<div className={'d-flex flex-column justify-content-evenly align-items-center ' + (isVertical ? "mt-5" : "mt-4")}>
 
 									<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
-										<SwiperStringComponent param={'name'} keyParam={'piercingMacros'} keyInd={ii} />
+										<div className='mt-5'>
+											<SwiperStringComponent param={'name'} keyParam={'piercingMacros'} keyInd={ii}/>
+										</div>
 									</div>
 									<div className={isVertical ? "editModal_col d-contents mt-2" : "editModal_col_hor d-contents mt-2"}>
-										<div style={{ width: '700px' }} className='mt-10'>
+										<div style={{ width: '700px' }} className='mt-5'>
 											<CustomChart keyInd={ii} />
 										</div>
-										<div className=''>
-										{selectedPiercingMacro !==	ii && <button className="carousel_btn violet_button m-2" 
+										<div className='mt-5'>
+											{selectedPiercingMacro !== ii && <button className="carousel_btn violet_button m-2"
 												onClick={(e) => handleMouseDown(e)}
 											>
 												<div className="d-flex align-items-center justify-content-center">
@@ -97,9 +127,45 @@ const swiperPiercingMacro = observer(() => {
 														width="48"
 														height="48"
 														style={{ color: 'white' }} />
-
+													<div className="mx-4 d-flex align-items-center">
+														<p className="text-white mb-0">{t('Set')}</p>
+													</div>
 												</div>
 											</button>}
+
+											<button className="carousel_btn violet_button mx-2" 
+												onClick={ (e)=> cloneThis(e)}>
+												<div
+													className="d-flex align-items-center justify-content-center mx-2"
+													
+												>
+
+													<Icon icon="fa-regular:clone"
+														width="36"
+														height="48"
+														style={{ color: 'white' }} />
+													<div className="mx-4 d-flex align-items-center">
+														<p className="text-white mb-0">{t('Copy')}</p>
+													</div>
+												</div>
+											</button>
+
+											<button className="carousel_btn violet_button mx-2"
+												onMouseDown={ (e) => deleteThis(e)}>
+												<div
+													className="d-flex align-items-center justify-content-center mx-2"
+													>
+													<Icon
+														icon="ic:twotone-delete-outline"
+														width="48"
+														height="48"
+														style={{ color: 'white' }} />
+
+													<div className="mx-4 d-flex align-items-center">
+														<p className="text-white mb-0">{t('Delete')}</p>
+													</div>
+												</div>
+											</button>
 										</div>
 									</div>
 								</div>
