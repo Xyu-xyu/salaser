@@ -604,8 +604,9 @@ body {
   border: 1px solid var(--violet);
   border-radius: 5px;
   width: fit-content;
-  height: 60px;
-}
+/*   height: 60px;
+ */
+height: fit-content;}
 
 .bigNum {
   font-size: 250px;
