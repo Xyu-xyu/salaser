@@ -36,7 +36,7 @@ const piercingEditStagesPanel = observer(() => {
 		<>
 			{selectedPiercingStage == 0 ?
 				(
-					<div className='w-100'>
+					<div className=''>
 						<div className={'d-flex justify-content-evenly mt-50'}>
 							{params0.map((a, i) => (
 								<div className="vidget" key={i+'0'} style={{ border: `2px solid ${data0[a]}` }}>
@@ -46,7 +46,7 @@ const piercingEditStagesPanel = observer(() => {
 								</div>
 							))}
 						</div>
-						<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-4")}>
+						<div className={'d-flex justify-content-evenly mt-4'}>
 
 							{[
 								"initial_modulationMacro",
@@ -85,7 +85,7 @@ const piercingEditStagesPanel = observer(() => {
 				) :
 
 				(
-					<div className='w-100'>
+					<div className=''>
 						<div className={'w-100 d-flex justify-content-evenly mt-50'}>
 							{params.map((a, i) => (
 								<div className="vidget" key={i+'1'} style={{ border: `2px solid ${data[a]}` }}>
@@ -95,7 +95,7 @@ const piercingEditStagesPanel = observer(() => {
 								</div>
 							))}
 						</div>
-						<div className={'w-100 d-flex justify-content-evenly '}>
+						<div className={'w-100 d-flex justify-content-evenly mt-4'}>
 							{[
 								"modulationMacro",
 								"modulationFrequency_Hz",

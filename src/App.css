@@ -586,6 +586,15 @@ body {
   background-color: var(--grey-nav);
 }
 
+.stringComponentWrapper  {
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: auto;
+}
+
+
 .stringComponentLabel {
   font-size:25px;
   color: var(--red);
@@ -702,4 +711,10 @@ height: fit-content;}
  display: flex;
  justify-content: center;
  align-items: center;
+}
+
+
+#cutHead {
+  width: 200px;
+  height:300px;
 }

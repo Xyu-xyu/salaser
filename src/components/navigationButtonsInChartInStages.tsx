@@ -74,7 +74,7 @@ const NavigationButtonsInChartInStages = observer(() => {
 
 	return (
 		<>
-			<div className="d-flex align-items-center mt-5">
+			<div className="d-flex align-items-center justify-content-center mt-5">
 				<button className="carousel_btn mx-1"
 					onMouseDown={(e) => { deleteStage(e) }}
 				>

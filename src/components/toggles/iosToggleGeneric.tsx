@@ -34,8 +34,8 @@ const IosToggleGeneric: React.FC<IosToggleGenericProps> = observer(({
 					{ (t(title)).split(', ')[0].split(' ').map((a: string, i: number) => (
 						<text
 							key={i}
-							x="5"
-							y={10 + i * 12}
+							x={isVertical ? "5" :"-28"}
+							y={isVertical ? (-15 + i * 12) : (15 + i * 12)}
 							className="moderat"
 							fill="var(--knobMainText)"
 							fontSize={isVertical ? 10 : 12}

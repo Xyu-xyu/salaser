@@ -214,19 +214,8 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 	return (
 		<div
 			className={selectedPiercingMacro + "_cuthead"}
-			style={ isVertical ? {
-				width: 200,
-				height: 360,
-				position: "absolute",
-				top: '68%',
-				left: '41%'
-			} : {
-				width: 200,
-				height: 300,
-				position: "absolute",
-				top: 25,
-				left: 205
-			}}
+			id="cutHead"
+	
 		>
 			<svg
 				id={`hd_${selectedPiercingMacro}_${selectedPiercingStage}_cutheadview`}

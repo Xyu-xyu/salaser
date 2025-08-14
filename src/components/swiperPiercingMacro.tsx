@@ -109,7 +109,7 @@ const swiperPiercingMacro = observer(() => {
 								<div className={'d-flex flex-column justify-content-evenly align-items-center ' + (isVertical ? "mt-5" : "mt-4")}>
 
 									<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
-										<div className='mt-5'>
+										<div className='mt-5 d-flex flex-column justify-content-center align-items-center'>
 											<SwiperStringComponent param={'name'} keyParam={'piercingMacros'} keyInd={ii}/>
 										</div>
 									</div>

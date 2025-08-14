@@ -32,21 +32,30 @@ const PiercingEditModalPanel = observer(() => {
 				<Modal.Body>
 					{!carouselModeInPiercing &&
 						<div className="container-fluid">
-							<div className={'d-flex justify-content-evenly align-items-center flex-column '}>
 
-								<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
-									<StringComponent param={'name'} keyParam={'piercingMacros'} />
-								</div>
-								<div className={'d-flex ' + (isVertical ? "mt-4" : "")}>
-									<div style={{ width: '600px', height: '200px', margin: 'auto' }}>
-										<CustomChart keyInd={selectedPiercingMacro} />
-										<CutHead keyInd={selectedPiercingMacro} />
+
+							<div className='d-flex flex-column'>
+								<div className='d-flex align-items-center justify-content-center'>
+
+
+									<div className={'d-flex justify-content-evenly align-items-center flex-column '}>
+										<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
+											<StringComponent param={'name'} keyParam={'piercingMacros'} />
+										</div>
+										<div className={'d-flex ' + (isVertical ? "mt-4" : "")}>
+											<div style={{ width: '600px', height: '200px', margin: 'auto' }}>
+												<CustomChart keyInd={selectedPiercingMacro} />
+											</div>
+										</div>
 									</div>
+									
+									<CutHead keyInd={selectedPiercingMacro} />
 								</div>
-								<NavigationButtonsInChartInStages />
-								<PiercingEditStagesPanel />
+ 								<NavigationButtonsInChartInStages />
+ 								<PiercingEditStagesPanel />
 
 							</div>
+
 						</div>
 					}
 					{
