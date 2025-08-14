@@ -122,6 +122,7 @@ class ViewStore {
     isAnimating: Boolean=false;
 	isPaused: Boolean = false;
 	atEnd: Boolean=false;
+    elapsed: number=0
       
     animProgress: {[key: string]: number } = { stage:0, progress:0}
     technology = cut_settings.result.technology
@@ -591,6 +592,10 @@ class ViewStore {
 
     setAtEnd (val:boolean) {
         this.atEnd = val;
+    }
+
+    setElapsed (val:number) {
+        this.elapsed = val;
     }
 }
 

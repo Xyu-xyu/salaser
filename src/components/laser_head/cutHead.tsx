@@ -225,7 +225,7 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				height: 300,
 				position: "absolute",
 				top: 25,
-				left: 170
+				left: 205
 			}}
 		>
 			<svg
@@ -306,7 +306,7 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 					<g id={`${selectedPiercingMacro}_${selectedPiercingStage}_laser`}>
 						<path
 							id={`${selectedPiercingMacro}_${selectedPiercingStage}_laserpath`}
-							style={{ stroke: "rgb(0, 0, 0)", strokeWidth: 0, fill: "red" }}
+							style={{ stroke: "rgb(0, 0, 0)", strokeWidth: 0, fill: "var(--red)" }}
 							d={ degeneratePath() }
 						/>
 					</g>

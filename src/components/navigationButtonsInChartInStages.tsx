@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import viewStore from "../store/viewStore";
 import { useTranslation } from 'react-i18next';
+import Timer from "./timer";
  
 
 const NavigationButtonsInChartInStages = observer(() => {
@@ -139,7 +140,10 @@ const NavigationButtonsInChartInStages = observer(() => {
 
 						}
 						<div className="mx-1 d-flex align-items-center">
-							<p className="text-white mb-0">{t('Play demo')}</p>
+							<div>
+								<p className="text-white mb-0">{t('Play demo')}</p> 
+							</div>
+							<Timer/>
 						</div>
 					</div>
 				</button>
