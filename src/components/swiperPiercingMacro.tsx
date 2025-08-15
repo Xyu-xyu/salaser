@@ -151,7 +151,7 @@ const swiperPiercingMacro = observer(() => {
 											</button>
 
 											<button className="carousel_btn violet_button mx-2"
-												onMouseDown={ (e) => deleteThis(e)}>
+												onClick={ (e) => deleteThis(e)}>
 												<div
 													className="d-flex align-items-center justify-content-center mx-2"
 													>

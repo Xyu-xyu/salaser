@@ -109,9 +109,14 @@ const ru: Record<string, string> = {
 	"Clear": "Очистить",
 	"Copy step": "Копировать шаг",
 	"Play demo": "Демо",
-	"View all": "Все варианты",
+	"View all": "Показать все",
 	"Do you want to delete all steps in piercing macro?": "Вы хотите удалить все шаги врезки?",
-	"Edit":"Редактировать"
+	"Edit":"Редактировать",
+	"Enter a number":"Введите число",
+	"Only single decimal place values are allowed":"Допускаются только значения с одним десятичным знаком",
+	"Only whole numbers are allowed":"Допускаются только целые числа",
+	"Value cannot be less than":"Значение не может быть меньше",
+	"Value cannot be greater than":"Значение не может быть больше",
 
 };
 

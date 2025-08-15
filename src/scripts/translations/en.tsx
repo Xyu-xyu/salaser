@@ -113,6 +113,12 @@ const en: Record<string, string> = {
 	"View all": "View all",
 	"Do you want to delete all steps in piercing macro?": "Do you want to delete all steps in piercing macro?",
 	"Edit":"Edit",
+	"Enter a number":"Enter a number",
+	"Only single decimal place values are allowed":"Only single decimal place values are allowed",
+	"Only whole numbers are allowed":"Only whole numbers are allowed",
+	"Value cannot be less than":"Value cannot be less than",
+	"Value cannot be greater than":"Value cannot be greater than",
+
 
 
 
