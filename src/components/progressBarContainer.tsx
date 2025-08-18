@@ -46,7 +46,7 @@ const ProgressBarContainer = () => {
 			/>
 			<div style={{
 				position: 'absolute',
-				top: '50%',
+				top: '40px',
 				left: '50%',
 				transform: 'translate(-50%, -50%)',
 				color: 'black', // или другой цвет для лучшей видимости

@@ -257,14 +257,13 @@ body {
 }
 
 #RightBar {
-/*   width: 166.5px; */
-  width: 9%;
-  height: 98%;
+  width: 300px;
+  height: 100%;
   background-color: var(--white) ;
   border: 1px solid var(--white) ;
   border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-}
+/*   border-bottom-left-radius: 10px;
+ */}
 
 .swiper {
   width: 100%;
@@ -318,13 +317,13 @@ body {
   position: absolute!important;
   justify-content: center!important;
   margin-top: 1.5rem!important;
-  bottom: 6%;
+  bottom: 10px;
   /* left: 45%; */
   z-index: 10;
 }
 
 #RightBar div {
-  margin:3%;
+  margin:5px;
 }
 
 #RightBar button {

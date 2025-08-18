@@ -118,6 +118,20 @@ const en: Record<string, string> = {
 	"Only whole numbers are allowed":"Only whole numbers are allowed",
 	"Value cannot be less than":"Value cannot be less than",
 	"Value cannot be greater than":"Value cannot be greater than",
+	"Add": "Add",
+	"Details": "Details",
+	"Functions": "Functions",
+	"Group": "Group",
+	"Language": "Language",
+	"New": "New",
+	"Parameters": "Parameters",
+ 	"Plan": "Plan",
+	"Plans": "Plans",
+	"Tidy up": "Tidy up",
+	"Введите значение": "Enter value",
+	"Макрос": "Macro"
+
+
 
 
 

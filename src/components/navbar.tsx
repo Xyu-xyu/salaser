@@ -5,11 +5,15 @@ import viewStore from "../store/viewStore";
 
 const NavBar = observer(() => {
 
-    const { knobMode } = viewStore
+    const { knobMode, rightMode } = viewStore
     const handleClick = () => {
-        //console.log ("   пиу  ")
-        viewStore.setKnobMode(!knobMode);
+         viewStore.setKnobMode(!knobMode);
     };
+
+    const handleClickRightMode = () => {
+         viewStore.setRightMode(!rightMode);
+    };
+
 
     return (
         <div>
@@ -100,7 +104,7 @@ const NavBar = observer(() => {
                     </button>
                 </div>
                 <div className="ms-2">
-                    <button className="white_button navbar_button">
+                    <button className="white_button navbar_button" onPointerDown={ handleClickRightMode }>
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="fluent:star-16-regular"
                                 width="36"

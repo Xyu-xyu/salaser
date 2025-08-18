@@ -117,6 +117,19 @@ const ru: Record<string, string> = {
 	"Only whole numbers are allowed":"Допускаются только целые числа",
 	"Value cannot be less than":"Значение не может быть меньше",
 	"Value cannot be greater than":"Значение не может быть больше",
+	"Add": "Добавить",
+	"Details": "Детали",
+	"Functions": "Функции",
+	"Group": "Группа",
+	"Language": "Язык",
+	"New": "Новый",
+	"Parameters": "Параметры",
+	"Plan": "План",
+	"Plans": "Планы",
+	"Tidy up": "Убрать",
+	"Введите значение": "Введите значение",
+	"Макрос": "Макрос"
+
 
 };
 

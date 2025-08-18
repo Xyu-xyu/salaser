@@ -1,146 +1,182 @@
+import { observer } from "mobx-react-lite";
+import viewStore from "../store/viewStore";
 import { Icon } from '@iconify/react';
-const RightBar = () => {
-
-    return (
-
-        <div id="RightBar" className="d-flex flex-column">
-            <div>
-                <div className="mt-2">
-                    <h5>Plans</h5>
-                </div>
-                <div>
-                    <button className="w-100">
-                        <div className="d-flex align-items-center">
-                             <Icon icon="fluent:copy-add-20-regular" 
-                                width="24" 
-                                height="24" 
-                                style={{ color: 'black' }}
-                                className='ms-1' />
-
-                             <div className="flex-grow-1 text-center">Add</div>
-                        </div>
-                    </button>
-                </div>
-                <div>
-                    <button className="w-100">
-                        <div className="d-flex align-items-center">
-                             <Icon icon="fluent:tab-new-24-filled" 
-                                width="24" 
-                                height="24" 
-                                style={{ color: 'black' }}
-                                className='ms-1' />
-
-                             <div className="flex-grow-1 text-center">New</div>
-                        </div>
-                    </button>
-                </div>
-                <div>
-                    <button className="w-100">
-                        <div className="d-flex align-items-center">
-                             <Icon icon="fluent-mdl2:remove-from-trash" 
-                                width="24" 
-                                height="24" 
-                                style={{ color: 'black' }}
-                                className='ms-1' />
-
-                             <div className="flex-grow-1 text-center">Tidy up</div>
-                        </div>
-                    </button>
-                </div>
-                <div>
-                    <button className="w-100">
-                        <div className="d-flex align-items-center">
-                             <Icon icon="fluent:group-24-regular" 
-                                width="24" 
-                                height="24" 
-                                style={{ color: 'black' }}
-                                className='ms-1' />
-
-                             <div className="flex-grow-1 text-center">Group</div>
-                        </div>
-                    </button>
-                </div>
-                <div className="mt-2">
-                    <h5>Plan</h5>
-                </div>
-                <div>
-                    <button className="w-100">
-                        <div className="d-flex align-items-center">
-                             <Icon icon="tabler:chart-dots-3" 
-                                width="24" 
-                                height="24" 
-                                style={{ color: 'black' }}
-                                className='ms-1' />
-
-                             <div className="flex-grow-1 text-center">Parameters</div>
-                        </div>
-                    </button>
-                </div>
-                <div>
-                    <button className="w-100">
-                        <div className="d-flex align-items-center">
-                             <Icon icon="ph:function" 
-                                width="24" 
-                                height="24" 
-                                style={{ color: 'black' }}
-                                className='ms-1' />
-
-                             <div className="flex-grow-1 text-center">Functions</div>
-                        </div>
-                    </button>
-                </div>
-                <div>
-                    <button className="w-100">
-                        <div className="d-flex align-items-center">
-                             <Icon icon="fluent:clipboard-more-20-regular" 
-                                width="24" 
-                                height="24" 
-                                style={{ color: 'black' }}
-                                className='ms-1' />
-
-                             <div className="flex-grow-1 text-center">Details</div>
-                        </div>
-                    </button>
-                </div>
-                <div>
-                    <button className="w-100">
-                        <div className="d-flex align-items-center">
-                             <Icon icon="fluent:edit-24-regular" 
-                                width="24" 
-                                height="24" 
-                                style={{ color: 'black' }}
-                                className='ms-1' />
-
-                             <div className="flex-grow-1 text-center">Edit</div>
-                        </div>
-                    </button>
-                </div>
-                <div className="mt-2">
-                    <h5>View</h5>
-                </div>
-                <div  className="dropdown">
-                    <button
-                        className="btn dropdown-toggle w-100 d-flex align-items-center"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                    >
-                         <div className="flex-grow-1 text-center">Carousel</div>
-                    </button>
-                    <ul className="dropdown-menu w-100 m-0">
-                        <li className="m-2"><button className="dropdown-item" type="button">1</button></li>
-                        <li className="m-2"><button className="dropdown-item" type="button">2</button></li>
-                        <li className="m-2"><button className="dropdown-item" type="button">3</button></li>
-                    </ul>
-                </div>               
-            </div>
+import { ListGroup, Form } from "react-bootstrap";
+import { useTranslation } from 'react-i18next';
 
 
 
+const RightBar = observer(() => {
+
+	const { rightMode } = viewStore
+	const { i18n } = useTranslation();
+	const { t } = useTranslation()
+	const languages = [
+		{ lang: 'ru', name: 'Русский' },
+		{ lang: 'en', name: 'English' }
+	]
+
+	const changeLanguage = () => {
+		const lng: string = i18n.language === 'en' ? 'ru' : 'en'
+		localStorage.setItem('lng', lng)
+		i18n.changeLanguage(lng);
+	};
 
 
-        </div>
-    )
-};
+	return (
+
+		<div id="RightBar" className={`d-flex flex-column ${rightMode ? "visible" : "d-none"}`}>
+			<div>
+				<div className="mt-2">
+					<h5>{t('Plans')}</h5>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="fluent:copy-add-20-regular"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Add')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="fluent:tab-new-24-filled"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('New')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="fluent-mdl2:remove-from-trash"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Tidy up')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="fluent:group-24-regular"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Group')}</div>
+						</div>
+					</button>
+				</div>
+				<div className="mt-2">
+					<h5>{t('Plan')}</h5>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="tabler:chart-dots-3"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Parameters')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="ph:function"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Functions')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="fluent:clipboard-more-20-regular"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Details')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="fluent:edit-24-regular"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Edit')}</div>
+						</div>
+					</button>
+				</div>
+				<div className="mt-2">
+					<h5>{t('View')}</h5>
+				</div>
+				<div className="dropdown">
+					<button
+						className="btn dropdown-toggle w-100 d-flex align-items-center"
+						type="button"
+						data-bs-toggle="dropdown"
+						aria-expanded="false">
+						<Icon icon="fluent-mdl2:world" width="24" height="24"  style={{'color': 'black'}} />
+						<div className="flex-grow-1 text-center">{t('Language')}</div>
+					</button>
+					<ul className="dropdown-menu w-100 m-0">
+						<ListGroup style={{'border': 'none'}}>
+							{languages.map((option) => (
+								<ListGroup.Item key={option.lang}>
+									<Form.Check
+										type="radio"
+										id={`radio-${option.lang}`}
+										label={option.name}
+										name={`${option.lang}-Options-${'lang'}`}
+										value={option.name}
+										checked={option.lang === i18n.language}
+										onChange={() => i18n.changeLanguage(option.lang)}
+									/>
+								</ListGroup.Item>
+							))}
+						</ListGroup>
+					</ul>
+				</div>
+				<div>
+				</div>
+			</div>
+
+
+
+
+
+		</div>
+	)
+});
 
 export default RightBar;

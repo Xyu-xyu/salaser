@@ -1,24 +1,70 @@
-import CentralBar from "./centralBar";
+import { observer } from "mobx-react-lite";
+import viewStore from "../store/viewStore";
+import MacrosSelector from "./macrosSelector";
+import MacrosEditModalPanel from "./macrosEditModalPanel";
+import PiercingEditModalPanel from "./piercingEditModalPanel";
+import ModulationMacroModalPanel from "./modulationMacroModalPanel";
+import UniversalKnob from "./universalKnob";
 import NavBar from "./navbar";
-import RightBar from "./rightBar";
-import LeftBar from "./leftBar";
+import UniversalNamedKnob from "./universalNamedKnob";
+import CentralBar from "./centralBar";
+import { useTranslation } from 'react-i18next';
 
-const Main = () => {
+
+const Main = observer(() => {
+	const { knobMode } = viewStore;
+	const { t } = useTranslation()
 
 	return (
-		<main id="main" className="w-100 h-100 lightTheme">
-			<NavBar />
-			<div className="dLine w-100" id="dLine"></div>
-				<div className="d-flex flex-row w-100" id="BarContainer">
-					<div className="d-flex flex-column" id="MidBarContainer">
- 						<div className="d-flex" id="LeftCentralBarContainer">
-							<LeftBar />
-							<CentralBar />
-						</div>  					
+		<main
+			id="main1"
+			className="h-100 overflow-hidden d-flex w-100"
+		>
+
+			<div className="d-flex flex-column">
+				<div id="sidePanelWrapper" className={`h-100 d-flex flex-column justify-content-evenly fade-toggle ${knobMode ? "visible" : ""}`}>
+					<h5 style={{
+						opacity: knobMode ? 1 : 0
+					}}>
+						{t('Макрос')}
+					</h5>
+
+					<div key={0} className="h-125 col-12 vidget">
+						<MacrosSelector />
 					</div>
-					<RightBar />
+					{[
+						"pressure",
+						"power_W_mm",
+						"focus",
+						"feedLimit_mm_s",
+						"modulationMacro",
+						"height",
+						"modulationFrequency_Hz",
+					].map((a: string, i: number) =>
+						a === "modulationMacro" ? (
+							<div key={i} className="h-125 col-12 vidget">
+								<UniversalNamedKnob param={a} keyParam={"macros"} />
+							</div>
+						) : (
+							<div key={i} className="h-125 col-12 vidget">
+								<UniversalKnob param={a} keyParam={"macros"} />
+							</div>
+						)
+					)}
 				</div>
-		</main>);
-};
+			</div>
+
+			<div className="d-flex flex-column w-100 h-100">
+				<NavBar />
+				<CentralBar />
+			</div>
+
+
+			<MacrosEditModalPanel />
+			<PiercingEditModalPanel />
+			<ModulationMacroModalPanel />
+		</main>
+	);
+});
 
 export default Main;
