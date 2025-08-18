@@ -106,75 +106,80 @@ const swiperModulationMacro = observer(() => {
 									</div>
 								</div>
 
-								<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
+								
+								<div className={'d-flex justify-content-center align-items-center flex-column'}>
+									<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
 
-									<div>	
-										<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
-											<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
-												<SwiperStringComponent param={'name'} keyParam={'modulationMacros'} keyInd={ii} />
-											</div>
-										</div>
-										<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-4")} >
-											{[
-												"pulseFill_percent",
-												"pulseFrequency_Hz",
-											].map((a: string, i: number) => (
-												<div className="editModal_row " key={i}>
-													<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
-														<UniversalKnob param={a} keyParam={'modulationMacros'} keyInd={ii} />
-													</div>
+										<div>	
+											<div className={'d-flex justify-content-evenly align-items-center ' + (isVertical ? "mt-50" : "mt-50")}>
+												<div className={isVertical ? "editModal_col d-contents" : "editModal_col_hor d-contents"}>
+													<SwiperStringComponent param={'name'} keyParam={'modulationMacros'} keyInd={ii} />
 												</div>
-											))
-											}
-										</div>
-									</div>	
-								</div>
-								<div className='mt-50 d-flex d-flex w-100 align-items-center justify-content-center'>
-								{ viewStore.selectedModulationMacro !== ii &&		
-									<button className="carousel_btn violet_button m-2"	onClick={(e) => handleMouseDown(e)}>
-										<div className="d-flex align-items-center justify-content-center">
-											<Icon
-												icon="charm:square-tick"
-												width="48"
-												height="48"
-												style={{ color: 'white' }} />
-											<div className="mx-4 d-flex align-items-center">
-												<p className="text-white mb-0">{ t('Set') }</p>
 											</div>
-										</div>
-									</button>}
-									<button className="carousel_btn mx-2" onClick={ (e) => deleteThis(e)}>
-										<div
-											className="d-flex align-items-center justify-content-center mx-2"
-										>
-											<Icon
-												icon="ic:twotone-delete-outline"
-												width="48"
-												height="48"
-												style={{ color: 'white' }}
-											/>
-											<div className="mx-4 d-flex align-items-center">
-												<p className="text-white mb-0">{ t('Delete') }</p>
+											<div className={'d-flex d-flex justify-content-evenly ' + (isVertical ? "mt-4" : "mt-4")} >
+												{[
+													"pulseFill_percent",
+													"pulseFrequency_Hz",
+												].map((a: string, i: number) => (
+													<div className="editModal_row " key={i}>
+														<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>
+															<UniversalKnob param={a} keyParam={'modulationMacros'} keyInd={ii} />
+														</div>
+													</div>
+												))
+												}
 											</div>
-										</div>
-									</button>
+										</div>	
+									</div>
+									<div className='mt-50 d-flex d-flex w-100 align-items-center justify-content-center'>
+									{ viewStore.selectedModulationMacro !== ii &&		
+										<button className="carousel_btn violet_button m-2"	onClick={(e) => handleMouseDown(e)}>
+											<div className="d-flex align-items-center justify-content-center">
+												<Icon
+													icon="charm:square-tick"
+													width="48"
+													height="48"
+													style={{ color: 'white' }} />
+												<div className="mx-4 d-flex align-items-center">
+													<p className="text-white mb-0">{ t('Set') }</p>
+												</div>
+											</div>
+										</button>}
+										<button className="carousel_btn mx-2" onClick={ (e) => deleteThis(e)}>
+											<div
+												className="d-flex align-items-center justify-content-center mx-2"
+											>
+												<Icon
+													icon="ic:twotone-delete-outline"
+													width="48"
+													height="48"
+													style={{ color: 'white' }}
+												/>
+												<div className="mx-4 d-flex align-items-center">
+													<p className="text-white mb-0">{ t('Delete') }</p>
+												</div>
+											</div>
+										</button>
 
-									<button className="carousel_btn violet_button mx-2" onClick={ (e)=> cloneThis(e) }>
-										<div
-											className="d-flex align-items-center justify-content-center mx-2"
-										>
-											<Icon
-												icon="fa-regular:clone"
-												width="36"
-												height="48"
-												style={{ color: 'white' }}
-											/>
-											<div className="mx-4 d-flex align-items-center">
-												<p className="text-white mb-0">{ t('Copy') }</p>
+										<button className="carousel_btn violet_button mx-2" onClick={ (e)=> cloneThis(e) }>
+											<div
+												className="d-flex align-items-center justify-content-center mx-2"
+											>
+												<Icon
+													icon="fa-regular:clone"
+													width="36"
+													height="48"
+													style={{ color: 'white' }}
+												/>
+												<div className="mx-4 d-flex align-items-center">
+													<p className="text-white mb-0">{ t('Copy') }</p>
+												</div>
 											</div>
-										</div>
-									</button>
+										</button>
+									</div>
 								</div>
+
+
 							</div>
 						</SwiperSlide>
 					)

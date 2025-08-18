@@ -26,7 +26,7 @@ const NavBar = observer(() => {
                     </button>
                 </div>
                 <div className="ms-2">
-                    <button className="grey_button navbar_button">
+                    <button className="white_button navbar_button">
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="fluent:circle-12-regular"
                                 width="36"
@@ -37,7 +37,7 @@ const NavBar = observer(() => {
                     </button>
                 </div>
                 <div className="ms-2">
-                    <button className="grey_button navbar_button">
+                    <button className="white_button navbar_button">
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="material-symbols:cancel-outline"
                                 width="36"
@@ -56,7 +56,7 @@ const NavBar = observer(() => {
                 {/* LONG button end */}
 
                 <div className="ms-2">
-                    <button className="grey_button navbar_button">
+                    <button className="white_button navbar_button">
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="fluent:play-circle-28-regular"
                                 width="36"
@@ -67,7 +67,7 @@ const NavBar = observer(() => {
                     </button>
                 </div>
                 <div className="ms-2">
-                    <button className="grey_button navbar_button" onPointerDown={handleClick}>
+                    <button className="white_button navbar_button" onPointerDown={handleClick}>
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="fluent:wrench-16-regular"
                                 width="36"
@@ -78,7 +78,7 @@ const NavBar = observer(() => {
                     </button>
                 </div>
                 <div className="ms-2">
-                    <button className="grey_button navbar_button">
+                    <button className="white_button navbar_button">
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="fluent:laser-tool-20-filled"
                                 width="36"
@@ -89,7 +89,7 @@ const NavBar = observer(() => {
                     </button>
                 </div>
                 <div className="ms-2">
-                    <button className="grey_button navbar_button">
+                    <button className="white_button navbar_button">
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="ic:round-cancel"
                                 width="36"
@@ -100,7 +100,7 @@ const NavBar = observer(() => {
                     </button>
                 </div>
                 <div className="ms-2">
-                    <button className="grey_button navbar_button">
+                    <button className="white_button navbar_button">
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="fluent:star-16-regular"
                                 width="36"
@@ -111,7 +111,7 @@ const NavBar = observer(() => {
                     </button>
                 </div>
                 <div className="ms-2">
-                    <button className="grey_button navbar_button me-1">
+                    <button className="white_button navbar_button me-1">
                         <div className="d-flex align-items-center justify-content-center">
                             <Icon icon="fluent:power-20-filled"
                                 width="36"

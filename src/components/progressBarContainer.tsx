@@ -36,26 +36,24 @@ const ProgressBarContainer = () => {
 
 
 	return (
-		<div id="ProgressBarContainer" className="m-0 mb-3 p-0" style={{ position: 'relative' }}>
+		<div id="ProgressBarContainer" className="w-100" style={{ position: 'relative' }}>
 			<ProgressBar
 				striped
 				variant="info"
 				now={progress}
-				id="ProgressBar"
 				className="m-2"
 				style={{ height: '66.6px' }}
 			/>
-			{/* Текст по центру */}
-			<div
-				style={{
-					position: 'absolute',
-					top: '50%',
-					left: '50%',
-					transform: 'translate(-40%, -33%)',
-					color: 'rgb(117, 117, 117)', 
-					fontSize: "20px"
-				}}
-			>
+			<div style={{
+				position: 'absolute',
+				top: '50%',
+				left: '50%',
+				transform: 'translate(-50%, -50%)',
+				color: 'black', // или другой цвет для лучшей видимости
+ 				width: '100%',
+				textAlign: 'center',
+				pointerEvents: 'none' // чтобы клики проходили сквозь текст
+			}}>
 				Current work 06.08 1,5мм-01 2 mm Steel {progress}%
 			</div>
 		</div>

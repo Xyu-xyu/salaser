@@ -125,8 +125,8 @@ body {
   }   
 
   .swiperSlide {
-    width: 780px;
-    height: 700px;
+    width: 800px;
+    height: 800px;
   }
 }
 
@@ -212,10 +212,6 @@ body {
   background-color: var(--grey-main);
 }
 
-#ProgressBarContainer {
-  height: 66.6px;
-}
-
 #BarContainer {
   height: calc( 100% - 66.6px);
   width: 100%;
@@ -235,13 +231,6 @@ body {
   border-top: 5px solid var(--grey-progress);
   width: 100%;
   height: 2px;
-}
-
-#CentralBar {
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  position: relative;
 }
 
 #SwiperContainer {
@@ -394,6 +383,11 @@ body {
 .grey_button {
   background-color: var(--grey-nav) !important;
   border: 1px solid var(--grey-nav) !important;
+}
+
+.white_button {
+  background-color: var(--white) !important;
+  border: 1px solid var(--white) !important;
 }
 
 .swipeButtons button {
@@ -628,8 +622,8 @@ height: fit-content;}
  /*  width: 780px;
   height: 700px; */
   overflow: hidden;
-  background-color: rgb(244, 244, 247);
-}
+/*   background-color: rgb(244, 244, 247);
+ */}
 
 .swiperSlideName {
   background-color: var(--violet);  
