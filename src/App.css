@@ -108,9 +108,10 @@ body {
   }
 
   .fade-toggle {
-    transform: translateX(-100%); 
+   /*  transform: translateX(-100%); 
     opacity: 1;
-    transition: transform 0.5s ease, opacity 0.5s ease;
+    transition: transform 0.5s ease, opacity 0.5s ease; */
+    display: none;
     background-color: var(--white);
     z-index: 10; 
     width: 0px;
@@ -118,9 +119,11 @@ body {
    }
 
   .fade-toggle.visible {
+    display: flex;
     transform: translateX(0);
     opacity: 1;
-    width: 275px;
+    max-width: 275px;
+    min-width: 275px;
     padding: 0.5em;
   }   
 
@@ -242,7 +245,7 @@ body {
   align-items: center;
 }
 
-#LeftBar {
+/* #LeftBar {
   width: 5.2%;
   min-width: 80px;
   height: 98%;
@@ -255,9 +258,10 @@ body {
   align-items: center;
   justify-content: flex-start;
 }
-
+ */
 #RightBar {
-  width: 300px;
+  min-width: 275px;
+  max-width: 275px;
   height: 100%;
   background-color: var(--white) ;
   border: 1px solid var(--white) ;
@@ -695,8 +699,22 @@ height: fit-content;}
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.15);
   z-index: -1;
+}
+
+.powerButton-navbar-modal .modal-dialog {
+  position: absolute;
+  top: 65px;
+  right: 0;
+  margin: 0;              /* убираем стандартные отступы */
+  width: fit-content;      /* ширина по содержимому */
+  max-width: none;         /* отключаем ограничение bootstrap */
+}
+
+.powerButton-navbar-modal .modal-content {
+  border-radius: 8px;      /* можно слегка скруглить */
+  padding: 0;              /* убрать лишние отступы */
 }
 
 #timer {
@@ -715,3 +733,4 @@ height: fit-content;}
 .font18 {
   font-size: 18px;
 }
+

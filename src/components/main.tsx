@@ -22,7 +22,7 @@ const Main = observer(() => {
 		>
 
 			<div className="d-flex flex-column">
-				<div id="sidePanelWrapper" className={`h-100 d-flex flex-column justify-content-evenly fade-toggle ${knobMode ? "visible" : ""}`}>
+				<div id="sidePanelWrapper" className={`h-100 d-flex flex-column justify-content-evenly fade-toggle ${knobMode ? "visible" : "d-none"}`}>
 					<h5 style={{
 						opacity: knobMode ? 1 : 0
 					}}>

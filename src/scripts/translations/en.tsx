@@ -122,7 +122,7 @@ const en: Record<string, string> = {
 	"Details": "Details",
 	"Functions": "Functions",
 	"Group": "Group",
-	"Language": "Language",
+	"Select language": "Select language",
 	"New": "New",
 	"Parameters": "Parameters",
  	"Plan": "Plan",

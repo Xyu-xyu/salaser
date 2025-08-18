@@ -1,9 +1,7 @@
-import { observer } from "mobx-react-lite";
-import viewStore from "../store/viewStore";
 import ProgressBarContainer from "./progressBarContainer";
 import RightBar from "./rightBar";
 
-const CentralBar = observer(() => {
+const CentralBar = () => {
 
 
 	return (
@@ -13,6 +11,6 @@ const CentralBar = observer(() => {
 			<RightBar />
 		</div>
 	)
-});
+};
 
 export default CentralBar;

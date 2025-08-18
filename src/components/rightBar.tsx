@@ -16,13 +16,6 @@ const RightBar = observer(() => {
 		{ lang: 'en', name: 'English' }
 	]
 
-	const changeLanguage = () => {
-		const lng: string = i18n.language === 'en' ? 'ru' : 'en'
-		localStorage.setItem('lng', lng)
-		i18n.changeLanguage(lng);
-	};
-
-
 	return (
 
 		<div id="RightBar" className={`d-flex flex-column ${rightMode ? "visible" : "d-none"}`}>
@@ -146,13 +139,13 @@ const RightBar = observer(() => {
 						type="button"
 						data-bs-toggle="dropdown"
 						aria-expanded="false">
-						<Icon icon="fluent-mdl2:world" width="24" height="24"  style={{'color': 'black'}} />
-						<div className="flex-grow-1 text-center">{t('Language')}</div>
+						<Icon icon="fluent-mdl2:world" width="24" height="24" style={{ 'color': 'black' }} />
+						<div className="flex-grow-1 text-center">{t('Select language')}</div>
 					</button>
-					<ul className="dropdown-menu w-100 m-0">
-						<ListGroup style={{'border': 'none'}}>
+					<ul className="dropdown-menu w-100 m-0" style={{ 'border': 'none' }}>
+						<ListGroup style={{ 'border': 'none' }}>
 							{languages.map((option) => (
-								<ListGroup.Item key={option.lang}>
+								<ListGroup.Item key={option.lang} >
 									<Form.Check
 										type="radio"
 										id={`radio-${option.lang}`}
@@ -167,14 +160,7 @@ const RightBar = observer(() => {
 						</ListGroup>
 					</ul>
 				</div>
-				<div>
-				</div>
 			</div>
-
-
-
-
-
 		</div>
 	)
 });

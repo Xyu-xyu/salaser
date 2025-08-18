@@ -121,7 +121,7 @@ const ru: Record<string, string> = {
 	"Details": "Детали",
 	"Functions": "Функции",
 	"Group": "Группа",
-	"Language": "Язык",
+	"Select language": "Выберите язык",
 	"New": "Новый",
 	"Parameters": "Параметры",
 	"Plan": "План",
