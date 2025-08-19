@@ -69,7 +69,7 @@ class ViewStore {
     selectedPiercingStage:number = 0; 
     selectedSlide:number = 0
     theme: string = 'themeLight'
-    knobMode: Boolean = true
+    knobMode: Boolean = false
     rightMode: Boolean = true
     selectedMacros:number=0
     knobPath: Record<string, string> = {};

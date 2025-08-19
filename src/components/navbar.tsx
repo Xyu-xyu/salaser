@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import viewStore from "../store/viewStore";
 import PowerButton from "./navbar/powerButton";
+import LaserIcon from "../../public/images/laserIcon";
 
 const NavBar = observer(() => {
 
@@ -20,23 +21,15 @@ const NavBar = observer(() => {
 			<div id="NavBar" className="w-100 mt-1">
 				<div className="ms-2">
 					<button className="violet_button navbar_button">
-						<div className="d-flex justify-content-center">
-							<Icon icon="fluent:circle-12-regular"
-								width="36"
-								height="36"
-								style={{ color: 'white' }}
-							/>
+						<div className="d-flex align-items-center justify-content-center">
+							<LaserIcon size={45} color="white" strokeWidth={1.5} />
 						</div>
 					</button>
 				</div>
 				<div className="ms-2">
 					<button className="white_button navbar_button">
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="fluent:circle-12-regular"
-								width="36"
-								height="36"
-								style={{ color: 'black' }}
-							/>
+						<Icon icon="mynaui:grid" width="48" height="48"  style={{color: 'black'}} strokeWidth={0.5}/>
 						</div>
 					</button>
 				</div>

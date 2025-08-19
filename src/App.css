@@ -245,20 +245,25 @@ body {
   align-items: center;
 }
 
-/* #LeftBar {
-  width: 5.2%;
-  min-width: 80px;
-  height: 98%;
-  background-color: var(--white);
-  border: 1px solid var(--white);
+* #LeftBar {
+  min-width: 100px;
+  max-width: 100px;
+  height: 100%;
+  height: 100%;
+  background-color: var(--grey-progress);
+  border: 1px solid var(--grey-progress);
   border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
- */
+ }
+
+#LeftBar button {
+  background-color: var(--violet);
+  border: 1px solid var(--violet);
+  border-radius: 5px;
+  width: 100%;
+  height: 58px;
+ }
+
+
 #RightBar {
   min-width: 275px;
   max-width: 275px;
@@ -268,6 +273,31 @@ body {
   border-top-left-radius: 10px;
   margin-top: 8px;
 }
+
+#RightBar div {
+  margin:5px;
+}
+
+#RightBar button {
+  background-color: var(--grey-progress);
+  border: 1px solid var(--grey-progress);
+  border-radius: 5px;
+  width: 100%;
+  height: 50px;
+  color: black;
+  transition: background-color 0.2s ease;
+}
+
+#RightBar button:active,
+#RightBar button:focus:active {
+  background-color: var(--grey-main) !important;
+}
+
+/* Чтобы dropdown-items тянулись на всю ширину */
+#RightBar .dropdown-menu {
+  width: 100%;
+}
+
 
 .swiper {
   width: 100%;
@@ -324,44 +354,6 @@ body {
   bottom: 10px;
   /* left: 45%; */
   z-index: 10;
-}
-
-#RightBar div {
-  margin:5px;
-}
-
-#RightBar button {
-  background-color: var(--grey-progress);
-  border: 1px solid var(--grey-progress);
-  border-radius: 5px;
-  width: 100%;
-  height: 50px;
-  color: black;
-  transition: background-color 0.2s ease;
-}
-
-#RightBar button:active,
-#RightBar button:focus:active {
-  background-color: var(--grey-main) !important;
-}
-
-/* Чтобы dropdown-items тянулись на всю ширину */
-#RightBar .dropdown-menu {
-  width: 100%;
-}
-
-#LeftBar div {
-  /* margin:5%; */
-  height: auto;  
-}
-
-#LeftBar button {
-  background-color: var(--violet);
-  border: 1px solid var(--violet);
-  border-radius: 5px;
-  width: 78px;
-  height: 60px;
-  color: white;
 }
 
 .swipeButtons {
