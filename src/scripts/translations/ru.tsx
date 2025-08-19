@@ -128,7 +128,9 @@ const ru: Record<string, string> = {
 	"Plans": "Планы",
 	"Tidy up": "Убрать",
 	"Введите значение": "Введите значение",
-	"Макрос": "Макрос"
+	"Макрос": "Макрос",
+	"Do you want to start laser reload?":"Начать перезагрузку лазера?",
+	"Do you want to power off?":"Выключить питание?"
 
 
 };

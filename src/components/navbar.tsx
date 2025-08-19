@@ -1,9 +1,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import viewStore from "../store/viewStore";
-import {  useState } from "react";
-import { Modal } from "react-bootstrap";
-
+import PowerButton from "./navbar/powerButton";
 
 const NavBar = observer(() => {
 
@@ -16,21 +14,10 @@ const NavBar = observer(() => {
 		viewStore.setRightMode(!rightMode);
 	};
 
-	const [show, setShow] = useState(false);
-
-	// Открыть модалку
-	const showModal = () => {
-		setShow(true);
-	};
-
-	// Закрыть модалку
-	const handleClose = () => setShow(false);
-
-
 
 	return (
 		<div>
-			<div id="NavBar" className="w-100">
+			<div id="NavBar" className="w-100 mt-1">
 				<div className="ms-2">
 					<button className="violet_button navbar_button">
 						<div className="d-flex justify-content-center">
@@ -84,12 +71,12 @@ const NavBar = observer(() => {
 					</button>
 				</div>
 				<div className="ms-2">
-					<button className="white_button navbar_button" onPointerDown={handleClick}>
+					<button className={`${knobMode ? "violet_button" : "white_button"} navbar_button`} onPointerDown={handleClick}>
 						<div className="d-flex align-items-center justify-content-center">
 							<Icon icon="fluent:wrench-16-regular"
 								width="36"
 								height="36"
-								style={{ color: 'red' }}
+								style={{ color: knobMode ? 'white':'red' }}
 							/>
 						</div>
 					</button>
@@ -116,10 +103,22 @@ const NavBar = observer(() => {
 						</div>
 					</button>
 				</div>
+
 				<div className="ms-2">
-					<button className="white_button navbar_button" onPointerDown={handleClickRightMode}>
+					<button className={`${rightMode ? "violet_button" : "white_button"} navbar_button`} onPointerDown={handleClickRightMode}>
 						<div className="d-flex align-items-center justify-content-center">
 							<Icon icon="fluent:star-16-regular"
+								width="36"
+								height="36"
+								style={{ color: rightMode ? 'white' : 'black' }}
+							/>
+						</div>
+					</button>
+				</div>
+				<div className="ms-2">
+					<button className="white_button navbar_button">
+						<div className="d-flex align-items-center justify-content-center">
+							<Icon icon="fluent:question-circle-12-regular"
 								width="36"
 								height="36"
 								style={{ color: 'black' }}
@@ -127,52 +126,13 @@ const NavBar = observer(() => {
 						</div>
 					</button>
 				</div>
-				<div className="ms-2" >
-					<button
-  						className={`navbar_button me-1 ${show ? "violet_button" : "white_button"}`}
-  						onClick={showModal}>
-						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="fluent:power-20-filled"
-								width="36"
-								height="36"
-								style={{ color: show ? "white" : "black" }}
-							/>
-						</div>
-					</button>
-					<Modal
-						show={show}
-						onHide={handleClose}
-						id="powerButtonModal"
-						className="with-inner-backdrop powerButton-navbar-modal"
- 						centered={false} // убираем выравнивание по центру
-					>
-						<div className="m-1">
-							<div className="d-flex flex-column">
-								<button className="white_button navbar_button m-1">
-									<div className="d-flex align-items-center justify-content-center">
-										<Icon icon="stash:user-cog" width="36" height="36" style={{ color: 'black' }} />
-									</div>
-								</button>
-
-								<button className="white_button navbar_button m-1">
-									<div className="d-flex align-items-center justify-content-center">
-										<Icon icon="fluent:power-20-filled" width="36" height="36" style={{ color: 'black' }} />
-									</div>
-								</button>
-
-								<button className="white_button navbar_button m-1">
-									<div className="d-flex align-items-center justify-content-center">
-										<Icon icon="ix:reboot" width="36" height="36" style={{ color: 'black' }} />
-									</div>
-								</button>
-							</div>
-						</div>
-					</Modal>
-
-				</div>
+				<PowerButton />
 			</div>
 		</div>
 	)
 });
 
 export default NavBar;
+
+
+//fluent:question-circle-12-regular

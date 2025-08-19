@@ -129,10 +129,10 @@ const en: Record<string, string> = {
 	"Plans": "Plans",
 	"Tidy up": "Tidy up",
 	"Введите значение": "Enter value",
-	"Макрос": "Macro"
-
-
-
+	"Макрос": "Macro",
+	"Do you want to start laser reload?":"Do you want to start laser reload?",
+	"Do you want to power off?":"Do you want to power off?",
+	
 
 
 

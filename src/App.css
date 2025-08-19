@@ -94,7 +94,7 @@ body {
 
 #NavBar {
   flex: 1;
-  height: 66.6px;
+  height: 58px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -174,7 +174,7 @@ body {
 #sidePanelWrapper {
   border: 1px solid white;
   border-top-right-radius: 10px;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .knob_name {
@@ -216,7 +216,7 @@ body {
 }
 
 #BarContainer {
-  height: calc( 100% - 66.6px);
+  height: calc( 100% - 58px);
   width: 100%;
 }
 
@@ -266,8 +266,8 @@ body {
   background-color: var(--white) ;
   border: 1px solid var(--white) ;
   border-top-left-radius: 10px;
-/*   border-bottom-left-radius: 10px;
- */}
+  margin-top: 8px;
+}
 
 .swiper {
   width: 100%;

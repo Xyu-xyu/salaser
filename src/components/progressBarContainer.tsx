@@ -42,11 +42,11 @@ const ProgressBarContainer = () => {
 				variant="info"
 				now={progress}
 				className="m-2"
-				style={{ height: '66.6px' }}
+				style={{ height: '58px' }}
 			/>
 			<div style={{
 				position: 'absolute',
-				top: '40px',
+				top: '37px',
 				left: '50%',
 				transform: 'translate(-50%, -50%)',
 				color: 'black', // или другой цвет для лучшей видимости
