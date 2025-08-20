@@ -1,18 +1,20 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
-import viewStore from "../store/viewStore";
 import PowerButton from "./navbar/powerButton";
 import LaserIcon from "../../public/images/laserIcon";
+import laserStore from "../store/laserStore";
 
 const NavBar = observer(() => {
 
-	const { knobMode, rightMode } = viewStore
+	const { rightMode, knobMode } = laserStore
+
+
 	const handleClick = () => {
-		viewStore.setKnobMode(!knobMode);
+		laserStore.setVal('knobMode', !knobMode);
 	};
 
 	const handleClickRightMode = () => {
-		viewStore.setRightMode(!rightMode);
+		laserStore.setVal( 'rightMode',!rightMode);
 	};
 
 

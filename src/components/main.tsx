@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import viewStore from "../store/viewStore";
+import laserStore from "../store/laserStore";
 import MacrosSelector from "./macrosSelector";
 import MacrosEditModalPanel from "./macrosEditModalPanel";
 import PiercingEditModalPanel from "./piercingEditModalPanel";
@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 
 const Main = observer(() => {
-	const { knobMode } = viewStore;
+	const { knobMode } = laserStore;
 	const { t } = useTranslation()
 
 	return (

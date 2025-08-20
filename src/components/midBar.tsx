@@ -1,6 +1,8 @@
+import { observer } from "mobx-react-lite";
+import laserStore from "../store/laserStore";
 
 
-const MidBar = () => {
+const MidBar = observer(() => {
 	let params = [
 		{ name: 'N2', measure: 'bar', val: 4.8 },
 		{ name: 'Nd', measure: 'mm', val: 12.7 },
@@ -13,11 +15,12 @@ const MidBar = () => {
 		{ name: 'Z', measure: 'mm', val: 28.77 },
 	]
 
+	const { mainMode, carouselInPlan } = laserStore
 
 	return (
 
-
-		<div className="d-flex flex-column">
+		<>
+		{ !carouselInPlan && <div className="d-flex flex-column">
 			<div className="d-flex mx-2 flex-wrap">
 				{
 					paramsLimit.map((item, i) => {
@@ -98,12 +101,15 @@ const MidBar = () => {
 					})
 				}
 			</div>
-			<div className="d-flex w-100 h-100 flex-start p-3">
+
+			{ !carouselInPlan && <div className="d-flex w-100 h-100 flex-start p-3">
 				<img src="/images/06.08 1,5мм-01.svg" alt="Plan Image" />
-			</div>
-		</div>
+			</div>}
+			
+		</div>}
+		</>
 
 	)
-};
+});
 
 export default MidBar;

@@ -1,15 +1,15 @@
 import './IosToggle.css';
 import { observer } from 'mobx-react-lite';
-import viewStore from '../../store/viewStore';
 import IosToggleForm from './iosToggleForm';
+import laserStore from '../../store/laserStore';
 
 const IosToggle1 = observer(() => {
-	const { knobMode } = viewStore
+	const { knobMode } = laserStore
 	const setChecked = () => {
 		if ( knobMode === true) {
-			viewStore.setKnobMode( false )
+			laserStore.setVal('knobMode', false);
 		} else {
-			viewStore.setKnobMode( true )
+ 			laserStore.setVal('knobMode', true);
 		}
 	}
 

@@ -69,8 +69,6 @@ class ViewStore {
     selectedPiercingStage:number = 0; 
     selectedSlide:number = 0
     theme: string = 'themeLight'
-    knobMode: Boolean = false
-    rightMode: Boolean = true
     selectedMacros:number=0
     knobPath: Record<string, string> = {};
     knobStep: { [key: string]: number } = {
@@ -178,14 +176,6 @@ class ViewStore {
         return this.knobPath[param] ?? "M0 0";
     }
  
-    setKnobMode(newMode: Boolean) {
-        this.knobMode = newMode;
-    }
-
-    setRightMode(newMode: Boolean) {
-        this.rightMode = newMode;
-    }
-
     setModal (val:boolean, modal:string ) {
         console.log ('setModalEdit  '+ modal)
         this.setCarouselMode( false )

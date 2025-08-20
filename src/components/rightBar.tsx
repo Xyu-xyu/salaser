@@ -1,14 +1,14 @@
 import { observer } from "mobx-react-lite";
-import viewStore from "../store/viewStore";
 import { Icon } from '@iconify/react';
 import { ListGroup, Form } from "react-bootstrap";
 import { useTranslation } from 'react-i18next';
+ import laserStore from "../store/laserStore";
 
 
 
 const RightBar = observer(() => {
 
-	const { rightMode } = viewStore
+	const { rightMode } = laserStore
 	const { i18n } = useTranslation();
 	const { t } = useTranslation()
 	const languages = [
