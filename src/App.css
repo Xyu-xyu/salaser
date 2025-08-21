@@ -131,6 +131,11 @@ body {
     width: 800px;
     height: 800px;
   }
+
+  .swiperSlideInTasks {
+    width: 600px;
+    height: 600px;
+  }
 }
 
 
@@ -168,6 +173,11 @@ body {
   .swiperSlide {
     width: 750px;
     height: 780px;
+  }
+
+  .swiperSlideInTasks {
+    width: 600px;
+    height: 600px;
   }
 } 
 

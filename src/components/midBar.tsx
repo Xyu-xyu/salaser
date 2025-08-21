@@ -1,7 +1,15 @@
-import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
-import { useEffect } from "react";
 import axios from "axios";
+import { useEffect, useRef } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/scrollbar';
+import { Swiper as SwiperClass } from 'swiper/types';
+import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
+import viewStore from '../store/viewStore';
+import { observer } from 'mobx-react-lite';
+import { useTranslation } from 'react-i18next';
 
 
 const MidBar = observer(() => {
@@ -18,24 +26,36 @@ const MidBar = observer(() => {
 	]
 
 	const { carouselInPlan, tasks } = laserStore
-
-
+	const swiperRef = useRef<SwiperClass | null>(null);
+	const { isVertical } = viewStore
 
 	useEffect(() => {
 		const fetchTasks = async () => {
-			laserStore.setLoading(true);
-			try {
-				const response = await axios.get("http://127.0.0.1/tasks-info");
-				laserStore.setTasks(response.data);
-			} catch (error: any) {
-				laserStore.setError(error.message);
-			} finally {
-				laserStore.setLoading(false);
-			}
+		  console.log ("fetchTasks")
+		  laserStore.setLoading(true);
+		  try {
+			const response = await axios.get("http://127.0.0.1/tasks-info");
+			laserStore.setTasks (response.data);
+		  } catch (error: any) {
+			laserStore.setError(error.message);
+		  } finally {
+			laserStore.setLoading(false);
+		  }
 		};
-
+	
+		// первый вызов сразу
 		fetchTasks();
-	}, []);
+	
+		// потом обновляем каждые 10 секунд
+		const intervalId = setInterval(fetchTasks, 10000);
+	
+		// очистка при размонтировании компонента
+		return () => clearInterval(intervalId);
+	  }, []);
+	
+	  if (laserStore.loading) return <div>Загрузка...</div>;
+	  if (laserStore.error) return <div>Ошибка: {laserStore.error}</div>;
+	
 
 
 
@@ -129,13 +149,61 @@ const MidBar = observer(() => {
 				</div>}
 
 			</div>}
-			{carouselInPlan && <div>
-			{/*{ <pre>{JSON.stringify( tasks.categories.active.items, null, 2)}</pre> }*/}
-				{ Object.keys(tasks.categories.active.items).map((key)=>{
-					return (<h4>{ key}</h4>)
-				}) }
-				
-			</div>
+			{carouselInPlan &&
+
+
+				<div>
+
+
+
+					<Swiper
+						onSwiper={(swiper) => {
+							swiperRef.current = swiper;
+						}}
+						modules={[EffectCoverflow, /* Mousewheel */]}
+						direction={'horizontal'}
+						effect="coverflow"
+						loop={false}
+						slideToClickedSlide={true}
+						grabCursor={true}
+						centeredSlides={true}
+						slidesPerView={5}
+						initialSlide={viewStore.selectedModulationMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
+						freeMode={false}
+						coverflowEffect={{
+							rotate: 0,
+							stretch: 0,
+							depth: 450,
+							modifier: isVertical ? 1 : 0.8,
+							slideShadows: false,
+						}}
+
+
+						style={{
+							height: '800px',
+							width: '1600px',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}
+						onSlideChange={(swiper) => {
+							const currentSlide = swiper.activeIndex;
+							viewStore.setSelectedSlide(currentSlide);
+						}}
+					>
+						{
+							Object.keys(tasks.categories.active.items).map((key) =>
+								<SwiperSlide>
+									<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
+										
+										<h4>{key}</h4>
+									</div>
+								</SwiperSlide>
+							)
+						}
+					</Swiper>
+
+				</div>
 			}
 		</>
 
