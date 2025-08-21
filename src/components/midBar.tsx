@@ -30,34 +30,13 @@ const MidBar = observer(() => {
 	const { isVertical } = viewStore
 
 	useEffect(() => {
-		const fetchTasks = async () => {
-		  console.log ("fetchTasks")
-		  laserStore.setLoading(true);
-		  try {
-			const response = await axios.get("http://127.0.0.1/tasks-info");
-			laserStore.setTasks (response.data);
-		  } catch (error: any) {
-			laserStore.setError(error.message);
-		  } finally {
-			laserStore.setLoading(false);
-		  }
-		};
-	
-		// первый вызов сразу
-		fetchTasks();
-	
-		// потом обновляем каждые 10 секунд
-		const intervalId = setInterval(fetchTasks, 10000);
-	
-		// очистка при размонтировании компонента
-		return () => clearInterval(intervalId);
+		laserStore.startPolling(10000);
+		return () => laserStore.stopPolling();
 	  }, []);
 	
 	  if (laserStore.loading) return <div>Загрузка...</div>;
 	  if (laserStore.error) return <div>Ошибка: {laserStore.error}</div>;
 	
-
-
 
 	return (
 
@@ -150,12 +129,7 @@ const MidBar = observer(() => {
 
 			</div>}
 			{carouselInPlan &&
-
-
 				<div>
-
-
-
 					<Swiper
 						onSwiper={(swiper) => {
 							swiperRef.current = swiper;
@@ -196,7 +170,21 @@ const MidBar = observer(() => {
 								<SwiperSlide>
 									<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
 										
-										<h4>{key}</h4>
+										<div className="ccard">
+											<div className="ccard-header">{ key } 00:08:10</div>
+											<div className="d-flex w-100 justify-content-center mt-50">
+												<div className="ccard-image card-image">
+													<img src="/images/06.08 1,5мм-01.svg" alt="Plan Image" />
+												</div>
+											</div>
+											
+
+											<div className="ccard-title">jia</div>
+											<div className="ccard-details">mr · 0.00 mm</div>
+											<div className="ccard-details">20# · 954.99×725.54 mm · 1000×1000 mm</div>
+											<div className="ccard-footer">大口有求</div>
+										</div>
+
 									</div>
 								</SwiperSlide>
 							)

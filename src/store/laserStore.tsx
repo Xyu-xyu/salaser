@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import axios from "axios";
 
 class LaserStore {
 	carouselInPlan: boolean = false;
@@ -8,6 +9,7 @@ class LaserStore {
 	tasks: any[] = []; // тут будут задачи с бэка
 	loading: boolean = false;
 	error: string | null = null;
+	private intervalId: ReturnType<typeof setInterval> | null = null;
 
 
 	constructor() {
@@ -30,6 +32,35 @@ class LaserStore {
 
 	setError(error: string | null) {
 		this.error = error;
+	}
+
+	async fetchTasks() {
+		this.setLoading(true);
+		try {
+			const response = await axios.get("http://127.0.0.1/tasks-info");
+			if (JSON.stringify(response.data) !== JSON.stringify(laserStore.tasks)){
+				this.setTasks(response.data);	
+			}		  
+		} catch (error: any) {
+		  this.setError(error.message);
+		} finally {
+		  this.setLoading(false);
+		}
+	  }
+	
+	  // запуск интервала (polling)
+	  startPolling(intervalMs: number = 10000) {
+		this.fetchTasks(); // первый вызов сразу
+		if (this.intervalId) clearInterval(this.intervalId);
+		this.intervalId = setInterval(() => this.fetchTasks(), intervalMs);
+	  }
+	
+	  // остановка интервала
+	  stopPolling() {
+		if (this.intervalId) {
+		  clearInterval(this.intervalId);
+		  this.intervalId = null;
+		}
 	}
 
 }
