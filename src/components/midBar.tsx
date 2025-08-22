@@ -1,6 +1,5 @@
 import laserStore from "../store/laserStore";
-import axios from "axios";
-import { useEffect, useRef } from 'react';
+ import { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -30,9 +29,11 @@ const MidBar = observer(() => {
 	const { isVertical } = viewStore
 
 	useEffect(() => {
-		laserStore.startPolling(10000);
+		//laserStore.startPolling(10000);
+		laserStore.fetchTasks()
 		return () => laserStore.stopPolling();
-	  }, []);
+	}, []);
+
 	
 	  if (laserStore.loading) return <div>Загрузка...</div>;
 	  if (laserStore.error) return <div>Ошибка: {laserStore.error}</div>;
@@ -172,17 +173,26 @@ const MidBar = observer(() => {
 										
 										<div className="ccard">
 											<div className="ccard-header">{ key } 00:08:10</div>
-											<div className="d-flex w-100 justify-content-center mt-50">
-												<div className="ccard-image card-image">
+											<div className="ccard-image-wrapper">
+												<div className="ccard-image">
 													<img src="/images/06.08 1,5мм-01.svg" alt="Plan Image" />
 												</div>
 											</div>
+									
+								
+											<div className="ccard-info-block">
+												<div className="ccard-title">{ key } </div>
+												<div className="ccard-details"> 
+												• { (tasks.categories.active.items[key].attributes.doc_attr.materialcode) ||'' } 
+												• { (tasks.categories.active.items[key].attributes.doc_attr.label)  ||''} 
+												• { (tasks.categories.active.items[key].attributes.doc_attr.thickness) ||0} mm
+												</div>
+												<div className="ccard-details">
+													• {(tasks.categories.active.items[key].attributes.doc_attr.dimx) || 0}  ×
+													{ (tasks.categories.active.items[key].attributes.doc_attr.dimy) || 0 } mm
+												</div>
+ 											</div>
 											
-
-											<div className="ccard-title">jia</div>
-											<div className="ccard-details">mr · 0.00 mm</div>
-											<div className="ccard-details">20# · 954.99×725.54 mm · 1000×1000 mm</div>
-											<div className="ccard-footer">大口有求</div>
 										</div>
 
 									</div>
