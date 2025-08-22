@@ -1,5 +1,5 @@
 import laserStore from "../store/laserStore";
- import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -34,15 +34,15 @@ const MidBar = observer(() => {
 		return () => laserStore.stopPolling();
 	}, []);
 
-	
-	  if (laserStore.loading) return <div>Загрузка...</div>;
-	  if (laserStore.error) return <div>Ошибка: {laserStore.error}</div>;
-	
+
+	if (laserStore.loading) return <div>Загрузка...</div>;
+	if (laserStore.error) return <div>Ошибка: {laserStore.error}</div>;
+
 
 	return (
 
 		<>
-			{!carouselInPlan && <div className="d-flex flex-column">
+			{!carouselInPlan && <div className="d-flex flex-column w-100">
 				<div className="d-flex mx-2 flex-wrap">
 					{
 						paramsLimit.map((item, i) => {
@@ -124,9 +124,26 @@ const MidBar = observer(() => {
 					}
 				</div>
 
-				{!carouselInPlan && <div className="d-flex w-100 h-100 flex-start p-3">
-					<img src="/images/06.08 1,5мм-01.svg" alt="Plan Image" />
-				</div>}
+				{!carouselInPlan && tasks?.categories?.active?.items && (
+					<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
+						<div className="planMain">
+							{Object.keys(tasks.categories.active.items).map((key, ind) =>
+								ind === 0 ? (
+									<img 
+										key={key}
+										src={`http://127.0.0.1/get_svg_card?folder=${encodeURIComponent(
+											key.replace('.ncp', '')
+										)}&filename=${encodeURIComponent(key.replace('.ncp', '.svg'))}`}
+										alt="svg"										
+									/>
+								) : null
+							)}
+						</div>
+
+					</div>
+				)}
+
+
 
 			</div>}
 			{carouselInPlan &&
@@ -170,29 +187,32 @@ const MidBar = observer(() => {
 							Object.keys(tasks.categories.active.items).map((key) =>
 								<SwiperSlide>
 									<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
-										
+
 										<div className="ccard">
-											<div className="ccard-header">{ key } 00:08:10</div>
+											<div className="ccard-header">{key} 00:08:10</div>
 											<div className="ccard-image-wrapper">
 												<div className="ccard-image">
-													<img src="/images/06.08 1,5мм-01.svg" alt="Plan Image" />
+													<img
+														src={`http://127.0.0.1/get_svg_card?folder=${encodeURIComponent(key.replace('.ncp', ''))}&filename=${encodeURIComponent(key.replace('.ncp', '.svg'))}`}
+														alt="svg"
+													/>
 												</div>
 											</div>
-									
-								
+
+
 											<div className="ccard-info-block">
-												<div className="ccard-title">{ key } </div>
-												<div className="ccard-details"> 
-												• { (tasks.categories.active.items[key].attributes.doc_attr.materialcode) ||'' } 
-												• { (tasks.categories.active.items[key].attributes.doc_attr.label)  ||''} 
-												• { (tasks.categories.active.items[key].attributes.doc_attr.thickness) ||0} mm
+												<div className="ccard-title">{key} </div>
+												<div className="ccard-details">
+													• {(tasks.categories.active.items[key].attributes.doc_attr.materialcode) || ''}
+													• {(tasks.categories.active.items[key].attributes.doc_attr.label) || ''}
+													• {(tasks.categories.active.items[key].attributes.doc_attr.thickness) || 0} mm
 												</div>
 												<div className="ccard-details">
 													• {(tasks.categories.active.items[key].attributes.doc_attr.dimx) || 0}  ×
-													{ (tasks.categories.active.items[key].attributes.doc_attr.dimy) || 0 } mm
+													{(tasks.categories.active.items[key].attributes.doc_attr.dimy) || 0} mm
 												</div>
- 											</div>
-											
+											</div>
+
 										</div>
 
 									</div>

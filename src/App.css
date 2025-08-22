@@ -949,3 +949,26 @@ height: fit-content;}
     font-size: 12px;
     color: #666;
 }
+
+.swiper-slide img {
+  display: block;
+  max-width: 400px;
+  max-height: 200px;     /* высота растягивается на 100% контейнера */
+  object-fit: contain;  /* сохраняет пропорции и помещает изображение полностью */
+}
+
+
+.planMain {
+  display: flex;
+  justify-content: center; 
+  align-items: center;    
+  width: 1200px;          
+  height: 800px;          
+  overflow:hidden;
+}
+
+.planMain img{ 
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
