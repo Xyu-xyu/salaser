@@ -369,6 +369,54 @@ class Utils {
 		return result;
 	}
 
+	round(i:number, pow:number = 6, format:boolean = false) {
+		if (!format) {
+			return (Math.round(Number(i) * 10 ** pow)) / 10 ** pow
+		} else {
+			let d = String((Math.round(Number(i) * 10 ** pow)) / 10 ** pow)
+			if (d.match(/\./)) {
+				let afderDot =  d.split('.').reverse()[0].length
+				return d +( afderDot < pow ? '0'.repeat(pow-afderDot) : '')
+			} else {
+				return (d + '.'+'0'.repeat(pow))
+			}
+		}
+	}
+
+	getLargeArcFlag(currentX:number, currentY:number, x:number, y:number, i:number, j:number, is_ccw:number) {
+		const cp = {
+			x: currentX + i,
+			y: currentY + j
+		};
+		const sp = {
+			x: currentX,
+			y: currentY
+		};
+		const ep = { x, y };
+
+		let sang = Math.atan2(sp.y - cp.y, sp.x - cp.x);
+		let eang = Math.atan2(ep.y - cp.y, ep.x - cp.x);
+
+		if (!is_ccw) {
+			while (sang < eang) {
+				sang += 2 * Math.PI;
+			}
+
+			if (sp.x === ep.x && sp.y === ep.y) {
+				eang += 2 * Math.PI;
+			}
+		} else {
+			while (sang > eang) {
+				eang += 2 * Math.PI;
+			}
+
+			if (sp.x === ep.x && sp.y === ep.y) {
+				sang += 2 * Math.PI;
+			}
+		}
+		return (eang * 180) / Math.PI - (sang * 180) / Math.PI <= 180 ? 0 : 1;
+	}
+
 }
 
 const utils = new Utils();

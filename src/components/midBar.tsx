@@ -9,6 +9,8 @@ import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
+import GCodeToSvg from "./gcodeToSvg";
+import listing from "../store/listing";
 
 
 const MidBar = observer(() => {
@@ -127,17 +129,7 @@ const MidBar = observer(() => {
 				{!carouselInPlan && tasks?.categories?.active?.items && (
 					<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
 						<div className="planMain">
-							{Object.keys(tasks.categories.active.items).map((key, ind) =>
-								ind === 0 ? (
-									<img 
-										key={key}
-										src={`http://127.0.0.1/get_svg_card?folder=${encodeURIComponent(
-											key.replace('.ncp', '')
-										)}&filename=${encodeURIComponent(key.replace('.ncp', '.svg'))}`}
-										alt="svg"										
-									/>
-								) : null
-							)}
+									<GCodeToSvg gcode={listing} />
 						</div>
 
 					</div>
@@ -147,7 +139,8 @@ const MidBar = observer(() => {
 
 			</div>}
 			{carouselInPlan &&
-				<div>
+				<div  className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
+					<div className="planMain">
 					<Swiper
 						onSwiper={(swiper) => {
 							swiperRef.current = swiper;
@@ -220,7 +213,7 @@ const MidBar = observer(() => {
 							)
 						}
 					</Swiper>
-
+					</div>
 				</div>
 			}
 		</>

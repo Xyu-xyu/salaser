@@ -967,8 +967,8 @@ height: fit-content;}
   overflow:hidden;
 }
 
-.planMain img{ 
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+.planMainImg{ 
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
