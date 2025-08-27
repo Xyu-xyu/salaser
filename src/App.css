@@ -38,14 +38,19 @@
   --gridColorStroke:#FFFFFF;;
   --knobMainText: rgba(0, 0, 0, 0.8);
   --knobSecText: orangered;
+  --default-stroke-width:10px;
+  --stroke-width:1000px;
+  --gridColorFill: rgb(65, 65, 65);
+  --gridColorStroke: rgb(155, 155, 155);
+  
 }
 
 .themeLight {
   --mainBg: rgb(244, 244, 247);
   --mainBg1: rgb(249, 223, 226);
   --darkBg: rgb(231, 231, 233);
-  --gridColorFill: rgb(223, 223, 226 );
-  --paleColor: #434343;  
+/*   --gridColorFill: rgb(223, 223, 226 );
+  --paleColor: #434343;  */ 
   --shadow: drop-shadow(0px 0px 0px rgb(0,0,0))
 }
 
@@ -53,8 +58,8 @@
   --mainBg: #383838;
   --mainBg1: #282828;
   --darkBg:#171717;
-  --gridColorFill:#333333;
-  --paleColor: #cccccc;    
+  /* --gridColorFill:#333333;
+  --paleColor: #cccccc;     */
   --shadow: drop-shadow(0px 2px 4px rgba(0,0,0,1))
 }
 
@@ -972,3 +977,203 @@ height: fit-content;}
   max-height: 100%;
   object-fit: contain;
 }
+
+/*  #workarea #workarea #workarea  start*/ 
+
+#listing_area {
+  max-height: unset;
+}
+
+#workarea {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  overflow: hidden;
+  --stroke-width-mul: 0.5%;
+  --default-stroke-width: 0.5%;
+  stroke-width: calc(var(--stroke-width) * var(--stroke-width-mul));
+}
+
+#workarea svg {
+  width: 100%;
+  height: 100%;
+  /* max-height: 80svh; */
+  /* xxxbackground: #111; */
+  stroke-linecap: round;
+}
+
+#listing {
+  min-width: max-content;
+  font-size: medium;
+  font-family: 'Liberation Mono', monospace;
+}
+
+#listing * {
+  font-size: medium;
+  font-family: 'Liberation Mono', monospace;
+}
+
+#listing div {
+  white-space: nowrap;
+}
+
+#listing em {
+  min-width: 4rem;
+  color: yellow;
+  text-align: right;
+  display: inline-block;
+  background: #444;
+}
+
+#listing span {
+  padding-left: 4px;
+  display: inline-block;
+}
+
+#listing .selected {
+  background: #fff;
+  color: #000;
+}
+
+#listing .gcomment {
+  background: #500;
+}
+
+#listing div:hover {
+  background: yellow;
+  color: #000;
+}
+
+#listing div:hover em {
+  background: yellow;
+  color: #000;
+}
+
+.sgn_fm, .sgn_brk, .sgn_mj, .sgn_mv {
+  --stroke-width-mul: 0.2%;
+  stroke-width: calc(var(--stroke-width) * var(--stroke-width-mul)) !important;
+}
+
+#workarea svg .sgn_fm {
+  --stroke-width-mul: 0.04%;
+  stroke-dasharray: calc(var(--stroke-width) * 0.2%);
+  stroke-opacity: 0.8;
+  stroke: #ccc !important;
+}
+
+#workarea svg .sgn_fm.selected {
+  --stroke-width-mul: 0.1%;
+}
+
+#workarea svg .sgn_mj {
+  --stroke-width-mul: 0.12%;
+}
+
+#workarea svg .sgn_mv {
+  --stroke-width-mul: 0.12%;
+}
+
+#workarea svg .sgn_mv:hover {
+  --stroke-width-mul: 0.4%;
+}
+
+#workarea svg .sgn_fm:hover {
+  --stroke-width-mul: 0.4%;
+  stroke-opacity: 1;
+  stroke: #fff;
+}
+
+#workarea svg .sgn_mj:hover {
+  --stroke-width-mul: 0.4%;
+  stroke-opacity: 1;
+  stroke: #fff;
+}
+
+#workarea svg .sgn_mv0 {
+  --stroke-width-mul: 0.12%;
+  stroke: rgb(211, 129, 18) !important;
+}
+
+#workarea svg .sgn_mv1 {
+  --stroke-width-mul: 0.04%;
+  stroke: rgb(244, 229, 125) !important;
+}
+
+#workarea svg .sgn_mv2 {
+  stroke: rgb(157, 181, 93) !important;
+  stroke-opacity: 0.7;
+}
+
+#workarea svg .sgn_mv3 {
+  stroke: rgb(126, 195, 193) !important;
+}
+
+#workarea svg .sgn_mv4 {
+  stroke: rgb(144, 165, 212) !important;
+}
+
+#workarea svg .sgn_mv5 {
+  stroke: rgb(56, 51, 172) !important;
+}
+
+#workarea svg .sgn_mv6 {
+  stroke: olive !important;
+}
+
+#workarea svg .sgn_mv7 {
+  stroke: white !important;
+}
+
+#workarea svg .sgn_brk {
+  --stroke-width-mul: 0.1%;
+  r: calc(var(--stroke-width) * var(--stroke-width-mul));
+  stroke: white !important;
+  fill: white !important;
+  stroke-opacity: 0.4;
+  fill-opacity: 0.1;
+}
+
+#workarea svg .sgn_brk:hover {
+  --stroke-width-mul: 0.2%;
+  stroke-opacity: 1;
+  stroke: yellow !important;
+  fill: yellow !important;
+  stroke-opacity: 0.9;
+  fill-opacity: 0.7;
+}
+
+#workarea svg .sgn_brk.selected {
+  --stroke-width-mul: 0.2%;
+  stroke: aqua !important;
+}
+
+#workarea svg .sgn_brk.selected:hover {
+  --stroke-width-mul: 0.4%;
+  stroke: yellow !important;
+}
+
+#workarea svg .selected {
+  stroke: white !important;
+  /* fill: white !important; */
+}
+
+
+.sgn_grid_pattern, .sgn_sheet {
+  stroke-width:var(--default-stroke-width);
+}
+
+.sgn_sheet {
+  fill: url(#grid_pattern);
+  stroke: var(--gridColorStroke);
+  stroke-width: calc(var(--default-stroke-width) * 0.35%);
+}
+
+.sgn_line_executed, .sgn_line_executed.selected {
+  filter: hue-rotate(180deg);
+}
+
+#content .card {
+  border: unset;
+}
+
+/*  #workarea #workarea #workarea  end */ 

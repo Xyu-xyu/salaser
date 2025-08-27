@@ -8,9 +8,10 @@ import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
-import { useTranslation } from 'react-i18next';
-import GCodeToSvg from "./gcodeToSvg";
-import listing from "../store/listing";
+import LoadSvg from './loadSvg'
+//import { useTranslation } from 'react-i18next';
+//import GCodeToSvg from "./gcodeToSvg";
+//import listing from "../store/listing";
 
 
 const MidBar = observer(() => {
@@ -129,7 +130,8 @@ const MidBar = observer(() => {
 				{!carouselInPlan && tasks?.categories?.active?.items && (
 					<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
 						<div className="planMain">
-									<GCodeToSvg gcode={listing} />
+{/* 									<GCodeToSvg gcode={listing} />
+ */}									<LoadSvg />
 						</div>
 
 					</div>
