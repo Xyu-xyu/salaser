@@ -19,14 +19,14 @@ const LoadSvg: React.FC = () => {
         clearTimeout(timeoutId); // ответ успел прийти → отменяем таймер
         if (data) {
           setSvg(data);
-        } else {
+        }/*  else {
           setSvg(SampleSvg);
-        }
+        } */
       })
       .catch((e) => {
         console.error("Ошибка загрузки SVG:", e);
         clearTimeout(timeoutId);
-        setSvg(SampleSvg);
+        //setSvg(SampleSvg);
       });
 
     return () => {

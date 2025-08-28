@@ -42,6 +42,8 @@
   --stroke-width:1000px;
   --gridColorFill: rgb(65, 65, 65);
   --gridColorStroke: rgb(155, 155, 155);
+  --stroke-width-mul:5000px;
+  --default-stroke-width:4000px;
   
 }
 
@@ -1002,7 +1004,7 @@ height: fit-content;}
   stroke-linecap: round;
 }
 
-#listing {
+/* #listing {
   min-width: max-content;
   font-size: medium;
   font-family: 'Liberation Mono', monospace;
@@ -1047,18 +1049,19 @@ height: fit-content;}
 #listing div:hover em {
   background: yellow;
   color: #000;
-}
+} */
 
 .sgn_fm, .sgn_brk, .sgn_mj, .sgn_mv {
   --stroke-width-mul: 0.2%;
-  stroke-width: calc(var(--stroke-width) * var(--stroke-width-mul)) !important;
+  stroke-width: 4000px/* calc(var(--stroke-width) * var(--stroke-width-mul)) !important */;
 }
 
 #workarea svg .sgn_fm {
-  --stroke-width-mul: 0.04%;
-  stroke-dasharray: calc(var(--stroke-width) * 0.2%);
+  /* --stroke-width-mul: 0.04%; */
+  stroke-dasharray: 10000px/* calc(var(--stroke-width) * 0.2%) */;
   stroke-opacity: 0.8;
-  stroke: #ccc !important;
+  stroke: var(--violet);
+  marker-end: url(#arrow);
 }
 
 #workarea svg .sgn_fm.selected {
@@ -1096,7 +1099,8 @@ height: fit-content;}
 
 #workarea svg .sgn_mv1 {
   --stroke-width-mul: 0.04%;
-  stroke: rgb(244, 229, 125) !important;
+/*stroke: rgb(244, 229, 125) !important;*/
+  stroke: var(--darkBlue);
 }
 
 #workarea svg .sgn_mv2 {
@@ -1125,8 +1129,9 @@ height: fit-content;}
 }
 
 #workarea svg .sgn_brk {
-  --stroke-width-mul: 0.1%;
-  r: calc(var(--stroke-width) * var(--stroke-width-mul));
+ /*  --stroke-width-mul: 0.1%;
+  r: calc(var(--stroke-width) * var(--stroke-width-mul)); */
+  stroke-width: 4000px;
   stroke: white !important;
   fill: white !important;
   stroke-opacity: 0.4;
@@ -1134,7 +1139,8 @@ height: fit-content;}
 }
 
 #workarea svg .sgn_brk:hover {
-  --stroke-width-mul: 0.2%;
+/*   --stroke-width-mul: 0.2%; */
+  stroke-width: 4000px;
   stroke-opacity: 1;
   stroke: yellow !important;
   fill: yellow !important;
@@ -1158,14 +1164,10 @@ height: fit-content;}
 }
 
 
-.sgn_grid_pattern, .sgn_sheet {
-  stroke-width:var(--default-stroke-width);
-}
-
 .sgn_sheet {
   fill: url(#grid_pattern);
   stroke: var(--gridColorStroke);
-  stroke-width: calc(var(--default-stroke-width) * 0.35%);
+  stroke-width: 4000px/*  calc(var(--default-stroke-width) * 0.35%) */; 
 }
 
 .sgn_line_executed, .sgn_line_executed.selected {

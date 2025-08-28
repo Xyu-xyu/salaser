@@ -57,21 +57,29 @@ const SvgDefs = () => (
 				y2="79.078"
 				gradientTransform="matrix(-0.008257, 0.340399, -0.517282, -0.004307, 97.191063, 126.303741)"
 				xlinkHref="#color-0"
-			/>			
+			/>
+			<marker id="arrow"
+				viewBox="0 0 1000 1000"
+				refX="1000" refY="250"
+				markerWidth="10" markerHeight="10"
+				orient="auto"
+				markerUnits="strokeWidth">
+				<path d="M 0 0 L 1000 250 L 0 500 z" fill="var(--violet)" />
+			</marker>
 		</defs>
 		<svg className="sgn_grid_pattern">
-				<pattern id="small_grid_pattern" width="2500" height="2500" fill="var(--gridColorFill)" patternUnits="userSpaceOnUse">
-					<path d="M 0 0 2500 0 2500 2500 0 2500 0 0" fill="var(--gridColorFill)" stroke="var(--gridColorStroke)" strokeWidth="calc(var(--default-strokeWidth) * 0.05%)"></path>
-				</pattern>
-				<pattern id="medium_grid_pattern" width="25000" height="25000" patternUnits="userSpaceOnUse">
-					<rect width="250000" height="250000" fill="url(#small_grid_pattern)"></rect>
-					<path d="M 25000 0 L 0 0 0 25000" fill="none" stroke="var(--gridColorStroke)" strokeWidth="calc(var(--default-strokeWidth) * 0.2%)"></path>
-				</pattern>
-				<pattern id="grid_pattern" width="250000" height="250000" patternUnits="userSpaceOnUse">
-					<rect width="250000" height="250000" fill="url(#medium_grid_pattern)"></rect>
-					<path d="M 250000 0 L 0 0 0 250000" fill="none" stroke="var(--gridColorStroke)" strokeWidth="calc(var(--default-strokeWidth) * 0.7%)"></path>
-				</pattern>
-			</svg>
+			{/* 		<pattern id="small_grid_pattern" width="2500" height="2500" fill="white" patternUnits="userSpaceOnUse">
+					<path d="M 0 0 2500 0 2500 2500 0 2500 0 0" fill="none" stroke="black" strokeWidth="1000"></path>
+				</pattern> */}
+			<pattern id="medium_grid_pattern" width="25000" height="25000" patternUnits="userSpaceOnUse">
+				<rect width="250000" height="250000" fill="var(--grey-main)"/* fill="url(#small_grid_pattern)" */></rect>
+				<path d="M 25000 0 L 0 0 0 25000" fill="none" stroke="var(--gridColorStroke)" strokeWidth="2000"></path>
+			</pattern>
+			<pattern id="grid_pattern" width="250000" height="250000" patternUnits="userSpaceOnUse">
+				<rect width="250000" height="250000" fill="url(#medium_grid_pattern)"></rect>
+				<path d="M 250000 0 L 0 0 0 250000" fill="none" stroke="var(--gridColorStroke)" strokeWidth="4000"></path>
+			</pattern>
+		</svg>
 	</svg>
 );
 
