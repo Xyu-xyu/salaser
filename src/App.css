@@ -1179,3 +1179,9 @@ height: fit-content;}
 }
 
 /*  #workarea #workarea #workarea  end */ 
+
+
+#wrapper_svg {
+  width: 100%;
+  height: 100%;
+}
