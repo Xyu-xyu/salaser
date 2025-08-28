@@ -6,6 +6,7 @@ import { observer } from "mobx-react-lite";
 
 
 const LoadSvg: React.FC = observer (() => {
+	const inMoveRef = useRef(0); 
 	const [svg, setSvg] = useState<string | null>(null);
 	const [ wh, setwh] = useState({w:0,h:0})
 	const {
@@ -108,6 +109,60 @@ const LoadSvg: React.FC = observer (() => {
 		return { x: x, y: y, width: width, height: height }
 	};
 
+	const getDistance = (touch1, touch2)=> {
+        let dx = touch1.clientX - touch2.clientX;
+        let dy = touch1.clientY - touch2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+	const startDrag = (e) =>{
+		//console.log ('startDrag' )
+		inMoveRef.current = 1;	
+		if ( true ) {    
+
+			let off = util.getMousePosition(e);
+			let transforms = groupMatrix
+            off.x -= transforms.e;
+            off.y -= transforms.f;
+			svgStore.setOffset({x:off.x,y:off.y})
+
+        }  
+	}
+
+	const endDrag =(e) =>{
+		inMoveRef.current = 0;	
+	}
+
+
+
+	const drag =(e) =>{
+
+ 		//let coords= util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+		//coordsStore.setCoords({ x: Math.round( coords.x*100) / 100, y: Math.round( coords.y*100) / 100 });
+		if ( true ) 
+		{
+			if (!inMoveRef.current) return;
+			var coord = util.getMousePosition(e);
+			if (e.target && (e.buttons === 4 || e.buttons === 1 )){
+				let e = (coord.x - offset.x)
+				let f = (coord.y - offset.y) 
+				svgStore.setGroupMatrix({
+					a: groupMatrix.a,
+					b: groupMatrix.b,
+					c: groupMatrix.c,
+					d: groupMatrix.d,
+					e: e,
+					f: f,
+				})
+
+				let attr = calculateRectAttributes()
+				svgStore.setRectParams( attr)
+			}
+			//editorStore.setMode('dragging')
+		} 
+	}
+ 
+
 	if (!svg) return <div>Загрузка…</div>;
 
 	const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
@@ -119,10 +174,10 @@ const LoadSvg: React.FC = observer (() => {
 			ref={wrapperSVG}
 			className={wrapperClass}
 			onWheel={handleMouseWheel}
-		/* onMouseDown={startDrag}
-		onMouseMove={drag}
-		onMouseUp={endDrag}
-		onMouseLeave={leave}
+		    onMouseDown={startDrag}
+			onMouseMove={drag}
+			onMouseUp={endDrag}
+			/*
 		onTouchStart={handleTouchStart}
 		onTouchMove={handleTouchMove}
 		onTouchEnd={handleTouchEnd}

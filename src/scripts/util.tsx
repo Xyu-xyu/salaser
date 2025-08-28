@@ -443,6 +443,15 @@ class Utils {
 		}
 	}
 
+	getMousePosition = (evt) => {
+		var svg = document.getElementById("svg")
+    	let CTM = svg.getScreenCTM();
+        
+        return   {
+            x: (evt.clientX + CTM.f)/ CTM.a,
+            y: (evt.clientY + CTM.e)/ CTM.d
+        }; 
+    }
 }
 
 const utils = new Utils();
