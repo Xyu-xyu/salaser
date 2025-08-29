@@ -3,6 +3,7 @@ import SampleSvg from "./../store/sampleSvg";
 import svgStore from "../store/svgStore";
 import util from "../scripts/util";
 import { observer } from "mobx-react-lite";
+import parse from "html-react-parser";
 
 
 const LoadSvg: React.FC = observer (() => {
@@ -13,18 +14,15 @@ const LoadSvg: React.FC = observer (() => {
 		matrix,
 		groupMatrix,
 		offset,
-		rectParams,
-		gridState,
-		svgParams,		 
-	} = svgStore
+  	} = svgStore
 
-
-	const { a, b, c, d, e, f } = matrix
+	//const { a, b, c, d, e, f } = matrix
 	const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${groupMatrix.a} ${groupMatrix.b} ${groupMatrix.c} ${groupMatrix.d} ${groupMatrix.e} ${groupMatrix.f}`;
 	 
 	const [wrapperClass, setWrapperClass] = useState('')
 	const wrapperSVG = useRef(null);
+	const SVG = useRef(null);
 
 	let evCache = []; // Список активных касаний
     let prevDiff = -1; // Предыдущее расстояние между пальцами
@@ -46,14 +44,11 @@ const LoadSvg: React.FC = observer (() => {
 				if (data) {
 					setSvg(data);
 					setWH (data)
-				}/*  else {
-          setSvg(SampleSvg);
-        } */
+				}
 			})
 			.catch((e) => {
 				console.error("Ошибка загрузки SVG:", e);
 				clearTimeout(timeoutId);
-				//setSvg(SampleSvg);
 			});
 
 		return () => {
@@ -90,31 +85,9 @@ const LoadSvg: React.FC = observer (() => {
 			e: comboMatrix.e,
 			f: comboMatrix.f
 		});
-		//let attr = calculateRectAttributes()
-		//svgStore.setRectParams(attr)
 	};
 
-/* 	const calculateRectAttributes = () => {
-		//debugger
-		const widthSVG = svgParams.width
-		const heightSVG = svgParams.height
-
-		// Ширина и высота исходя из scale
-		const combinedMatrix = util.multiplyMatrices(groupMatrix, matrix);
-		const scaleX = combinedMatrix.a;
-		const scaleY = combinedMatrix.d;
-
-		const width = widthSVG / scaleX;
-		const height = heightSVG / scaleY;
-
-		// Координаты x и y исходя из translate
-		const x = -combinedMatrix.e / scaleX;
-		const y = -combinedMatrix.f / scaleY;
-
-		return { x: x, y: y, width: width, height: height }
-	};
- */
-	const getDistance = (touch1, touch2)=> {
+ 	const getDistance = (touch1, touch2)=> {
         let dx = touch1.clientX - touch2.clientX;
         let dy = touch1.clientY - touch2.clientY;
         return Math.sqrt(dx * dx + dy * dy);
@@ -136,7 +109,6 @@ const LoadSvg: React.FC = observer (() => {
 	}
 
 	const drag =(e) =>{
-
 		if (!inMoveRef.current) return;
 		var coord = util.getMousePosition(e);
 		if (e.target && (e.buttons === 4 || e.buttons === 1 )){
@@ -150,19 +122,14 @@ const LoadSvg: React.FC = observer (() => {
 				e: e,
 				f: f,
 			})
-
-			//let attr = calculateRectAttributes()
-			//svgStore.setRectParams( attr)
 		}
-		//editorStore.setMode('dragging')
 	}
 
-    
     // Обработчик начала касания
     const handleTouchStart =(event)=> {
 		//event.preventDefault()
-		event.stopPropagation()
-		console.log ('handleTouchStart    '+ event.target.id )
+		//event.stopPropagation()
+		//console.log ('handleTouchStart    '+ event.target.id )
 		//if (event.target.id !== 'svg') return
 
 		if ( false /* ||editorStore.mode== 'drag' */) {
@@ -171,14 +138,14 @@ const LoadSvg: React.FC = observer (() => {
 		} else {
 			evCache = []; 
         	prevDiff = -1; 
-        	evCache.push(event.touches[0]);
+        	evCache.push(event);
 		}        
     }
 
 	const handleTouchMove =(event)=> {
 		//event.preventDefault()
-		event.stopPropagation()
-		console.log ('handleTouchMove  ' + event.target.classList )
+		//event.stopPropagation()
+		//console.log ('handleTouchMove  ' + event.target.classList )
 		//if (event.target.id !== 'svg') return
 		if ( false ) {
 			let ee = event.touches[0]	
@@ -204,7 +171,7 @@ const LoadSvg: React.FC = observer (() => {
 		//event.preventDefault()
 		//event.stopPropagation()
 		//if (event.target.id !== 'svg') return
-        console.log ('handleTouchEnd  ' + event.target.id )
+        //console.log ('handleTouchEnd  ' + event.target.id )
 		if ( false ) {
 			endDrag( e )
 		} else {
@@ -221,9 +188,9 @@ const LoadSvg: React.FC = observer (() => {
     }
 
 	const touchZoom = ( scale:number ) =>{
-		console.log ('** touchZoom **')
+		//console.log ('** touchZoom **')
+		//let scale = curDiff / prevDiff;
 		var svg = document.getElementById("svg")
-        //let scale = curDiff / prevDiff;
 		var group = document.getElementById("group").transform.baseVal.consolidate().matrix
 
         let x = (evCache[0].clientX + evCache[1].clientX) / 2;
@@ -244,9 +211,6 @@ const LoadSvg: React.FC = observer (() => {
 			e: comboMatrix.e,
 			f: comboMatrix.f
 		});
-
-        //let attr = calculateRectAttributes()
-		//svgStore.setRectParams( attr)
     }
     
 
@@ -262,34 +226,33 @@ const LoadSvg: React.FC = observer (() => {
 			<div
 				id="workarea"
 				className="planMain"
+				onWheel={handleMouseWheel}
+				
+				onMouseDown={startDrag}
+				onMouseMove={drag}
+				onMouseUp={endDrag}
+				
+				onTouchStart={handleTouchStart}
+				onTouchMove={handleTouchMove}
+				onTouchEnd={handleTouchEnd}
+				onTouchCancel={handleTouchEnd}
 			>
 				<svg
 					id="svg"
+					ref={SVG}
 					baseProfile="full"
 					viewBox={`0.00 0.00 ${wh.w} ${wh.h}`}
 					style={{ overflow: 'hidden', border: '1px solid var(--color)', touchAction: "none" }}
 					version="1.1"
 					stroke='var(--color)'
 					strokeWidth="0.2"
-					touch-action="none" 
-					pointer-events="all"
-
-					onWheel={handleMouseWheel}
-					onMouseDown={startDrag}
-					onMouseMove={drag}
-					onMouseUp={endDrag}
-					
-					onTouchStart={handleTouchStart}
-					onTouchMove={handleTouchMove}
-					onTouchEnd={handleTouchEnd}
-					onTouchCancel={handleTouchEnd}
-
-				   >
+					pointerEvents="all"				
+  			   >
 					<g id="group1" transform={`matrix(${matrixG})`}>
 						<g id="group" transform={`matrix(${matrixM})`} className="grab">
-							<g dangerouslySetInnerHTML={{ __html: svg.replace('<svg', '<svg touch-action="none" pointer-events="all"') }} />
+							{svg && parse(svg)}
 						</g>
-					</g>
+ 					</g>
 				</svg>
 			</div>
 		</div>

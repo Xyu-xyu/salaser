@@ -993,7 +993,9 @@ height: fit-content;}
   overflow: hidden;
   --stroke-width-mul: 0.5%;
   --default-stroke-width: 0.5%;
-  stroke-width: calc(var(--stroke-width) * var(--stroke-width-mul));
+  stroke-width: 1px;
+  border: 1px solid gray;
+  border-radius: 10px;
 }
 
 #workarea svg {
