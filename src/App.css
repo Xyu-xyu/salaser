@@ -225,7 +225,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  touch-action: manipulation;
+  touch-action: none;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -1168,6 +1168,7 @@ height: fit-content;}
   fill: url(#grid_pattern);
   stroke: var(--gridColorStroke);
   stroke-width: 4000px/*  calc(var(--default-stroke-width) * 0.35%) */; 
+  touch-action: none !important;
 }
 
 .sgn_line_executed, .sgn_line_executed.selected {
@@ -1184,4 +1185,5 @@ height: fit-content;}
 #wrapper_svg {
   width: 100%;
   height: 100%;
+ /*  touch-action: manipulation; */
 }
