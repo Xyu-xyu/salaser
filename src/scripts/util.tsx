@@ -428,7 +428,7 @@ class Utils {
         };
     };
 
-	convertScreenCoordsToSvgCoords(x, y) {
+	convertScreenCoordsToSvgCoords(x:number, y:number) {
 		var svg = document.getElementById("svg")
 		var group = document.getElementById("group");
 		var pt = svg.createSVGPoint();  // An SVGPoint SVG DOM object
@@ -439,7 +439,7 @@ class Utils {
 			pt = pt.matrixTransform(group.getScreenCTM().inverse());
 			return { 'x': pt.x, 'y': pt.y };
 		} catch (e) {
-			return false
+			return { 'x':0,'y': 0 }
 		}
 	}
 

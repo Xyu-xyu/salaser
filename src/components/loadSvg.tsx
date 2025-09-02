@@ -69,10 +69,17 @@ const LoadSvg: React.FC = observer(() => {
 	}
 
 	const handleMouseWheel = (event: React.WheelEvent) => {
-		var svg = document.getElementById("svg")
-		var gTransform = svg.createSVGMatrix()
-		var group = document.getElementById("group").transform.baseVal.consolidate().matrix
+		const svg = document.getElementById("svg") as SVGSVGElement | null;
+		const groupNode = document.getElementById("group") as SVGGElement | null;
 
+		if (!svg || !groupNode) return;
+
+		const baseVal = groupNode.transform.baseVal.consolidate();
+		if (!baseVal) return;
+
+		const group = baseVal.matrix;
+
+		let gTransform = svg.createSVGMatrix();
 		let coords = util.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
 		let scale = 1.0 + (-event.deltaY * 0.001);
 
@@ -132,7 +139,6 @@ const LoadSvg: React.FC = observer(() => {
 	let prevDiff: number = -1;
 
 	const handleTouchStart = (event: React.TouchEvent) => {
-		//console.log('handleTouchStart', event.target);
 
 		if (manual) {
 			if ('touches' in event) {
@@ -185,7 +191,6 @@ const LoadSvg: React.FC = observer(() => {
 	};
 
 	const handleTouchEnd = (event: React.TouchEvent) => {
-		//console.log('handleTouchEnd', event.target);
 		if (manual) {
 			endDrag();
 		} else {
@@ -205,8 +210,6 @@ const LoadSvg: React.FC = observer(() => {
 	};
 
 	const touchZoom = (scale: number) => {
-		//console.log('** touchZoom **');
-
 		const svg = document.getElementById("svg") as SVGSVGElement | null;
 		const groupNode = document.getElementById("group") as SVGGElement | null;
 
