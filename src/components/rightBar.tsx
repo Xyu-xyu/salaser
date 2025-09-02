@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 const RightBar = observer(() => {
 
-	const { rightMode } = laserStore
+	const { carouselInPlan, rightMode } = laserStore
 	const { i18n } = useTranslation();
 	const { t } = useTranslation()
 	const languages = [
@@ -19,8 +19,8 @@ const RightBar = observer(() => {
 	return (
 
 		<div id="RightBar" className={`d-flex flex-column ${rightMode ? "visible" : "d-none"}`}>
-			<div>
-				<div className="mt-2">
+			{ carouselInPlan && <div>
+				 <div className="mt-2">
 					<h5>{t('Plans')}</h5>
 				</div>
 				<div>
@@ -75,7 +75,7 @@ const RightBar = observer(() => {
 						</div>
 					</button>
 				</div>
-				<div className="mt-2">
+				<div className="mt-4">
 					<h5>{t('Plan')}</h5>
 				</div>
 				<div>
@@ -130,7 +130,7 @@ const RightBar = observer(() => {
 						</div>
 					</button>
 				</div>
-				<div className="mt-2">
+				<div className="mt-4">
 					<h5>{t('View')}</h5>
 				</div>
 				<div className="dropdown">
@@ -160,7 +160,128 @@ const RightBar = observer(() => {
 						</ListGroup>
 					</ul>
 				</div>
-			</div>
+			</div>}
+			{ !carouselInPlan && <div>
+				 <div className="mt-2">
+					<h5>{t('Parameters')}</h5>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="fa7-solid:list-check"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Select')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="fa7-solid:list-check"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Edit')}</div>
+						</div>
+					</button>
+				</div>
+
+				<div>
+					<button className="w-100 disabled" disabled>
+						<div className="d-flex align-items-center">
+							<Icon icon="fa7-solid:list-check"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Wizard')}</div>
+						</div>
+					</button>
+				</div>
+
+				<div className="mt-4">
+					<h5>{t('Functions')}</h5>
+				</div>
+
+
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="hugeicons:function"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Functions')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="solar:restart-bold"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Restart')}</div>
+						</div>
+					</button>
+				</div>
+
+
+				<div className="mt-4">
+					<h5>{t('Display')}</h5>
+				</div>
+
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="tabler:chart-dots-3"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('Display')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="carbon:view"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+
+							<div className="flex-grow-1 text-center">{t('View')}</div>
+						</div>
+					</button>
+				</div>
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon icon="flowbite:clipboard-list-outline"
+								width="24"
+								height="24"
+								style={{ color: 'black' }}
+								className='ms-1' />
+							<div className="flex-grow-1 text-center">{t('Key')}</div>
+						</div>
+					</button>
+				</div>
+			</div>}
 		</div>
 	)
 });

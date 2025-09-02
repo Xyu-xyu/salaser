@@ -32,8 +32,7 @@ const MidBar = observer(() => {
 	const { isVertical } = viewStore
 
 	useEffect(() => {
-		//laserStore.startPolling(10000);
-		laserStore.fetchTasks()
+ 		laserStore.fetchTasks()
 		return () => laserStore.stopPolling();
 	}, []);
 
