@@ -59,6 +59,7 @@ const swiperModulationMacro = observer(() => {
 				onSwiper={(swiper) => {
 					swiperRef.current = swiper;
 				}}
+				id="swiperModulationMacro"
 				modules={[EffectCoverflow, /* Mousewheel */]}
 				direction={isVertical ? 'vertical' : 'horizontal'}
 				effect="coverflow"

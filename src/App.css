@@ -135,13 +135,26 @@ body {
   }   
 
   .swiperSlide {
-    width: 800px;
-    height: 800px;
-  }
+    width: 650px;
+    height: 650px;
+    background-color: #fff;
+    border: 2px solid var(--grey-button-bottom);
+    border-radius: 10px;
+    overflow: hidden;
+   }
 
   .swiperSlideInTasks {
     width: 574px;
     height: 600px;
+  }
+
+  .planMain {
+    display: flex;
+    justify-content: center; 
+    align-items: center;    
+    width: 1300px;          
+    height: 650px;          
+    overflow:hidden;
   }
 }
 
@@ -178,13 +191,27 @@ body {
   }
 
   .swiperSlide {
-    width: 750px;
-    height: 780px;
+    width: 650px;
+    height: 650px;
+    background-color: #fff;
+    border: 2px solid var(--grey-button-bottom);
+    border-radius: 10px;
+    overflow: hidden;
+     
   }
 
   .swiperSlideInTasks {
     width: 574px;
     height: 600px;
+  }
+
+  .planMain {
+    display: flex;
+    justify-content: center; 
+    align-items: center;    
+    width: 650px;          
+    height: 1300px;          
+    overflow:hidden;
   }
 } 
 
@@ -192,6 +219,10 @@ body {
   border: 1px solid white;
   border-top-right-radius: 10px;
   margin-top: 5px;
+}
+
+#swiperModulationMacro .swiperSlide {
+  width: 750px;
 }
 
 .knob_name {
@@ -315,6 +346,24 @@ body {
   width: 100%;
 }
 
+#RightBar button:disabled {
+  background-color: var(--grey-main); /* Более тусклый фон */
+  border: 1px solid var(--grey-main);
+  color: #888; /* Блеклый текст */
+  cursor: not-allowed; /* Курсор "запрещено" */
+  opacity: 0.6; /* Прозрачность для визуального эффекта */
+  box-shadow: none; /* Убираем тень, если есть */
+}
+
+/* Чтобы при наведении или нажатии disabled не менялся */
+#RightBar button:disabled:hover,
+#RightBar button:disabled:active,
+#RightBar button:disabled:focus {
+  background-color: var(--grey-main);
+  border: 1px solid var(--grey-main);
+  color: #888;
+  cursor: not-allowed;
+}
 
 .swiper {
   width: 100%;
@@ -332,7 +381,12 @@ body {
 .swiper-slide img {
   display: block;
   width: 100%;
+  display: block;
+  max-width: 400px;
+  max-height: 200px;    
+  object-fit: contain;  
 }
+ 
 
 .planCard {
   width: 600px;
@@ -493,11 +547,6 @@ body {
   height: 150px;
 }
 
-.modal-content {
-  /* background-color: rgb(234, 234, 238); */
-  background-color: white;
-}
-
 .listMacrosEdit_title {
   margin-top: 12px;
   margin-bottom: 12px;
@@ -633,12 +682,6 @@ height: fit-content;}
   font-size: 250px;
 } 
 
-.swiperSlide {
-  background-color: #fff;
-  border: 1px solid (var(--darkBg));
-  border-radius: 10px;
-  overflow: hidden;
- }
 
 .swiperSlideName {
   background-color: var(--violet);  
@@ -646,8 +689,8 @@ height: fit-content;}
 }
 
 .swiperSlideLong {
-  width: 800px;
-  height: 800px;
+  width: 650px;
+  height: 650px;
 }
 
 .notInUse {
@@ -661,6 +704,7 @@ height: fit-content;}
 }
 
 .modal-content {
+  /* background-color: rgb(244, 244, 247); */
   background-color: rgb(244, 244, 247);
 }
 
@@ -672,7 +716,14 @@ height: fit-content;}
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  
 }
+
+
+.swiper-wrapper {
+  height: auto;
+}
+
 
 
 .recharts-responsive-container {
@@ -905,7 +956,7 @@ height: fit-content;}
   .ccard {
     width: 100%;
     height: 100%;
-    border: 1px solid black;
+    border: 2px solid var(--grey-button-bottom);
     border-radius: 10px;
     padding: 10px;
     text-align: center;
@@ -963,22 +1014,6 @@ height: fit-content;}
     color: #666;
 }
 
-.swiper-slide img {
-  display: block;
-  max-width: 400px;
-  max-height: 200px;     /* высота растягивается на 100% контейнера */
-  object-fit: contain;  /* сохраняет пропорции и помещает изображение полностью */
-}
-
-
-.planMain {
-  display: flex;
-  justify-content: center; 
-  align-items: center;    
-  width: 1300px;          
-  height: 650px;          
-  overflow:hidden;
-}
 
 .planMainImg{ 
   max-width: 100%;
@@ -1011,53 +1046,6 @@ height: fit-content;}
   /* xxxbackground: #111; */
   stroke-linecap: round;
 }
-
-/* #listing {
-  min-width: max-content;
-  font-size: medium;
-  font-family: 'Liberation Mono', monospace;
-}
-
-#listing * {
-  font-size: medium;
-  font-family: 'Liberation Mono', monospace;
-}
-
-#listing div {
-  white-space: nowrap;
-}
-
-#listing em {
-  min-width: 4rem;
-  color: yellow;
-  text-align: right;
-  display: inline-block;
-  background: #444;
-}
-
-#listing span {
-  padding-left: 4px;
-  display: inline-block;
-}
-
-#listing .selected {
-  background: #fff;
-  color: #000;
-}
-
-#listing .gcomment {
-  background: #500;
-}
-
-#listing div:hover {
-  background: yellow;
-  color: #000;
-}
-
-#listing div:hover em {
-  background: yellow;
-  color: #000;
-} */
 
 .sgn_fm, .sgn_brk, .sgn_mj, .sgn_mv {
   --stroke-width-mul: 0.2%;
