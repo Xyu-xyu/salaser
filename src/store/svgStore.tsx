@@ -89,8 +89,9 @@ class SvgStore {
 	}
 
 
-	setMatrix(val: Matrix) {
-		Object.assign(this.matrix, val)
+	setMatrix(val: Matrix|null, val1:Matrix|null) {
+		if(val)	Object.assign(this.matrix, val)
+		if(val1) Object.assign(this.groupMatrix, val1)
 	}
 }
 

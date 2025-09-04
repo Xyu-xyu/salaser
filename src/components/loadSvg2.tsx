@@ -163,7 +163,6 @@ const LoadSvg: React.FC = observer(() => {
 			const currentZoom = svgStore.matrix.a;
 			const newZoom = lerp(currentZoom, targetZoom.current, 0.2);
 
-			svgStore.setGroupMatrix({ ...svgStore.groupMatrix, e: newPan.x, f: newPan.y });
 			svgStore.setMatrix({
 				a: newZoom,
 				b: 0,
@@ -171,7 +170,7 @@ const LoadSvg: React.FC = observer(() => {
 				d: newZoom,
 				e: svgStore.matrix.e,
 				f: svgStore.matrix.f,
-			});
+			}, { ...svgStore.groupMatrix, e: newPan.x, f: newPan.y });
 
 			frameId = requestAnimationFrame(animate);
 		};
@@ -188,8 +187,7 @@ const LoadSvg: React.FC = observer(() => {
 	const fit = () => {
 		targetPan.current = { x: 0, y: 0 };
 		targetZoom.current = 1;
-		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
-		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
+		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }, { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	};
 
 	if (!svg) return <div>Загрузка…</div>;
