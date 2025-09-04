@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import PowerButton from "./navbar/powerButton";
-import LaserIcon from "../../public/images/laserIcon";
+import LaserIcon from "./../../public/images/laserIcon"
 import laserStore from "../store/laserStore";
 
 const NavBar = observer(() => {

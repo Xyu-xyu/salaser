@@ -29,12 +29,14 @@
     "react-svg": "^16.1.28",
     "react-toastify": "^11.0.5",
     "sortablejs": "1.15.6",
+    "svg-pan-zoom": "^3.6.2",
     "swiper": "^11.2.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/react-svg-pan-zoom": "^3.3.9",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
