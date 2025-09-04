@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import svgPanZoom, { fit } from "svg-pan-zoom";
+import svgPanZoom, { zoom } from "svg-pan-zoom";
 import SampleSvg from "../store/sampleSvg";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 
 const ZoomableSVG: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
+	const panZoomRef = useRef(null); // 🔹 Храним инстанс
 	const [svg, setSvg] = useState("");
 
 
@@ -48,6 +49,11 @@ const ZoomableSVG: React.FC = () => {
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
 
+		if (panZoomRef.current) {
+			panZoomRef.current.destroy();
+			panZoomRef.current = null;
+		}
+
 		var panZoomInstance = svgPanZoom(svgElement, {
  			zoomEnabled: true,
 			controlIconsEnabled: false,
@@ -57,12 +63,7 @@ const ZoomableSVG: React.FC = () => {
 			maxZoom: 10,
 		});
 
-		setTimeout(() => {
-			panZoomInstance.resize();
-			panZoomInstance.fit();
-			panZoomInstance.center();
-			console.log ("--------------")
-		  }, 3000);
+		panZoomRef.current = panZoomInstance;
 
 		return () => {
 			panZoomInstance.destroy();
@@ -70,7 +71,21 @@ const ZoomableSVG: React.FC = () => {
 	}, [svg]);
 
 	const fit =()=>{
-		console.log ( "Щука братт!!")
+ 		if (panZoomRef.current) {
+			panZoomRef.current.fit();
+			panZoomRef.current.center();
+		}
+	}
+
+
+	const zoom =(str:string)=>{
+ 		if (panZoomRef.current) {
+			if (str === '+') {
+				panZoomRef.current.zoomIn();
+			} else {
+				panZoomRef.current.zoomOut();
+			}
+		}
 	}
 
 	return (
@@ -82,6 +97,32 @@ const ZoomableSVG: React.FC = () => {
 						className={`violet_button navbar_button small_button40`} >
 						<div className="d-flex align-items-center justify-content-center">
 							<Icon icon="carbon:zoom-fit"
+								width="36"
+								height="36"
+								style={{ color: 'white' }}
+							/>
+						</div>
+					</button>
+				</div>
+				<div className="mx-2 mt-1">
+					<button
+						onClick={()=>zoom('-')}
+						className={`violet_button navbar_button small_button40`} >
+						<div className="d-flex align-items-center justify-content-center">
+							<Icon icon="carbon:zoom-fit"
+								width="36"
+								height="36"
+								style={{ color: 'white' }}
+							/>
+						</div>
+					</button>
+				</div>
+				<div className="mx-2 mt-1">
+					<button
+						onClick={()=>zoom('+')}
+						className={`violet_button navbar_button small_button40`} >
+						<div className="d-flex align-items-center justify-content-center">
+							<Icon icon="carbon:zoom-in"
 								width="36"
 								height="36"
 								style={{ color: 'white' }}
