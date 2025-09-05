@@ -1,21 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import svgPanZoom, { zoom } from "svg-pan-zoom";
+import svgPanZoom from "svg-pan-zoom";
 import SampleSvg from "../store/sampleSvg";
-import { Icon } from "@iconify/react/dist/iconify.js";
-
+import { Icon } from "@iconify/react";
+import parse from "html-react-parser";
 
 const ZoomableSVG: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
-	const panZoomRef = useRef(null); // 🔹 Храним инстанс
+	const panZoomRef = useRef(null);
 	const [svg, setSvg] = useState("");
 
-
-	// Загружаем SVG по сети
+	// === Загрузка SVG ===
 	useEffect(() => {
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
 			controller.abort();
-			//setSvg(SampleSvg);
+			setSvg(SampleSvg);
 		}, 2000);
 
 		fetch("http://192.168.11.250/gcore/0/preview.svg", {
@@ -24,14 +23,9 @@ const ZoomableSVG: React.FC = () => {
 			.then((r) => r.text())
 			.then((data) => {
 				clearTimeout(timeoutId);
-				if (data) {
-					setSvg(data);
-				} else {
-					setSvg(SampleSvg);
-				}
+				setSvg(data || SampleSvg);
 			})
-			.catch((e) => {
-				//console.error("Ошибка загрузки SVG:", e);
+			.catch(() => {
 				clearTimeout(timeoutId);
 				setSvg(SampleSvg);
 			});
@@ -42,20 +36,24 @@ const ZoomableSVG: React.FC = () => {
 		};
 	}, []);
 
-	// Подключаем svg-pan-zoom, когда svg обновляется
+	// === Инициализация svg-pan-zoom с кастомным pinch ===
 	useEffect(() => {
 		if (!containerRef.current || !svg) return;
-
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
 
-	/* 	if (panZoomRef.current) {
-			panZoomRef.current.destroy();
+		// Удаляем старый инстанс
+		if (panZoomRef.current) {
+			try {
+				panZoomRef.current.destroy();
+			} catch (e) {
+				console.warn("Ошибка destroy:", e);
+			}
 			panZoomRef.current = null;
-		} */
+		}
 
-		var panZoomInstance = svgPanZoom(svgElement, {
- 			zoomEnabled: true,
+ 		const panZoomInstance = svgPanZoom(svgElement, {
+			zoomEnabled: true,
 			controlIconsEnabled: false,
 			fit: true,
 			center: true,
@@ -65,40 +63,57 @@ const ZoomableSVG: React.FC = () => {
 
 		panZoomRef.current = panZoomInstance;
 
+		setTimeout(() => {
+			panZoomInstance.resize();
+			panZoomInstance.fit();
+			panZoomInstance.center();
+		}, 0);
+
 		return () => {
-			panZoomInstance.destroy();
+			try {
+				panZoomInstance.destroy();
+			} catch (e) {
+				console.warn("Ошибка destroy:", e);
+			}
 		};
 	}, [svg]);
 
-	const fit =()=>{
- 		if (panZoomRef.current) {
-			panZoomRef.current.fit();
-			panZoomRef.current.center();
-		}
-	}
+	// === Кнопки управления ===
+	const fit = () => {
+		if (!panZoomRef.current) return;
+		panZoomRef.current.fit();
+		panZoomRef.current.center();
+	};
 
+	const zoom = (dir: string) => {
+		if (!panZoomRef.current) return;
+		dir === "+" ? panZoomRef.current.zoomIn() : panZoomRef.current.zoomOut();
+	};
 
-	const zoom =(str:string)=>{
- 		if (panZoomRef.current) {
-			if (str === '+') {
-				panZoomRef.current.zoomIn();
-			} else {
-				panZoomRef.current.zoomOut();
-			}
-		}
-	}
-
-	const  removeCirclesFromSvg =(svgText: string): string =>{
-		let out = svgText.replace(/<circle\b[^>]*\/\s*>/gi, '');
-		out = out.replace(/<circle\b[^>]*>[\s\S]*?<\/circle>/gi, '');
-		out = out.replace(/width="[\d]+(\.[\d]+)?\s*"\s*height="[\d]+(\.[\d]+)?\s*"\s*viewBox="0\s*0\s*[\d]+(\.[\d]+)?\s*[\d]+(\.[\d]+)?"/gi, ' width="1300px" height="650px" ');
-		out = out.replace('transform: scale(1,-1);', '')
-
+	// === Очистка SVG ===
+	const cleanSvg = (svgText: string): string => {
+		let out = svgText.replace(/<circle\b[^>]*\/\s*>/gi, "");
+		out = out.replace(/<circle\b[^>]*>[\s\S]*?<\/circle>/gi, "");
+		out = out.replace(
+			/width="[\d]+(\.[\d]+)?\s*"\s*height="[\d]+(\.[\d]+)?\s*"\s*viewBox="0\s*0\s*[\d]+(\.[\d]+)?\s*[\d]+(\.[\d]+)?"/gi,
+			'width="1300px" height="650px"'
+		);
+		out = out.replace('transform: scale(1,-1);', "");
 		return out;
-	}
+	};
 
 	return (
-		<div style={{ border: "2px solid grey", borderRadius: '10px', width: "1300px", height: "650px" }}>
+		<div
+			style={{
+				border: "2px solid grey",
+				borderRadius: "10px",
+				width: "1300px",
+				height: "650px",
+				touchAction: "none", // 🔥 обязательно для pinch
+				position: "relative",
+			}}
+		>
+			{/* Кнопки */}
 			<div className="d-flex flex-column position-absolute">
 				<div className="mx-2 mt-1">
 					<button
@@ -140,13 +155,22 @@ const ZoomableSVG: React.FC = () => {
 					</button>
 				</div>
 			</div>
-			<div
-				ref={containerRef}
-				className="svg-pan-zoom_viewport"
-				style={{ border: "none", width: "1300px", height: "650px", display:'flex', alignItems:"center", justifyContent:	"center" }}
-				dangerouslySetInnerHTML={{ __html: removeCirclesFromSvg(svg) }}
 
-		/>
+			{/* SVG */}
+			<div
+				id="workarea"
+				ref={containerRef}
+				style={{
+					border: "none",
+					width: "1300px",
+					height: "650px",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				{parse(cleanSvg(svg))}
+			</div>
 		</div>
 	);
 };
