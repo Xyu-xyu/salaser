@@ -18,20 +18,20 @@ const ZoomableSVG: React.FC = () => {
 			//setSvg(SampleSvg);
 		}, 2000);
 
-		fetch("http://192.168.11.249/gcore/0/preview.svg", {
+		fetch("http://192.168.11.250/gcore/0/preview.svg", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
 			.then((data) => {
 				clearTimeout(timeoutId);
 				if (data) {
-					setSvg(data.replace('transform: scale(1,-1);', ''));
+					setSvg(data);
 				} else {
 					setSvg(SampleSvg);
 				}
 			})
 			.catch((e) => {
-				console.error("Ошибка загрузки SVG:", e);
+				//console.error("Ошибка загрузки SVG:", e);
 				clearTimeout(timeoutId);
 				setSvg(SampleSvg);
 			});
@@ -49,10 +49,10 @@ const ZoomableSVG: React.FC = () => {
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
 
-		if (panZoomRef.current) {
+	/* 	if (panZoomRef.current) {
 			panZoomRef.current.destroy();
 			panZoomRef.current = null;
-		}
+		} */
 
 		var panZoomInstance = svgPanZoom(svgElement, {
  			zoomEnabled: true,
@@ -88,6 +88,15 @@ const ZoomableSVG: React.FC = () => {
 		}
 	}
 
+	const  removeCirclesFromSvg =(svgText: string): string =>{
+		let out = svgText.replace(/<circle\b[^>]*\/\s*>/gi, '');
+		out = out.replace(/<circle\b[^>]*>[\s\S]*?<\/circle>/gi, '');
+		out = out.replace(/width="[\d]+(\.[\d]+)?\s*"\s*height="[\d]+(\.[\d]+)?\s*"\s*viewBox="0\s*0\s*[\d]+(\.[\d]+)?\s*[\d]+(\.[\d]+)?"/gi, ' width="1300px" height="650px" ');
+		out = out.replace('transform: scale(1,-1);', '')
+
+		return out;
+	}
+
 	return (
 		<div style={{ border: "2px solid grey", borderRadius: '10px', width: "1300px", height: "650px" }}>
 			<div className="d-flex flex-column position-absolute">
@@ -109,7 +118,7 @@ const ZoomableSVG: React.FC = () => {
 						onClick={()=>zoom('-')}
 						className={`violet_button navbar_button small_button40`} >
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="carbon:zoom-fit"
+							<Icon icon="carbon:zoom-out"
 								width="36"
 								height="36"
 								style={{ color: 'white' }}
@@ -135,8 +144,9 @@ const ZoomableSVG: React.FC = () => {
 				ref={containerRef}
 				className="svg-pan-zoom_viewport"
 				style={{ border: "none", width: "1300px", height: "650px", display:'flex', alignItems:"center", justifyContent:	"center" }}
-				dangerouslySetInnerHTML={{ __html: svg }}
-			/>
+				dangerouslySetInnerHTML={{ __html: removeCirclesFromSvg(svg) }}
+
+		/>
 		</div>
 	);
 };
