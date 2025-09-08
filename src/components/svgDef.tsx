@@ -66,20 +66,55 @@ const SvgDefs = () => (
 				markerUnits="strokeWidth">
 				<path d="M 0 0 L 1000 250 L 0 500 z" fill="var(--violet)" />
 			</marker>
-		</defs>
-		<svg className="sgn_grid_pattern">
-			{/* 		<pattern id="small_grid_pattern" width="2500" height="2500" fill="white" patternUnits="userSpaceOnUse">
-					<path d="M 0 0 2500 0 2500 2500 0 2500 0 0" fill="none" stroke="black" strokeWidth="1000"></path>
+			<svg className="grid">
+				{/* Мелкая сетка 1x1 */}
+				{/* <pattern
+					id="xsGrid"
+					width={1}
+					height={1}
+					patternUnits="userSpaceOnUse"
+				>
+					<path
+						d="M 0 0 L 1 0 L 1 1 L 0 1 Z"
+						fill="white"
+						stroke="black"
+						strokeWidth="0.5"
+					/>
 				</pattern> */}
-			<pattern id="medium_grid_pattern" width="25000" height="25000" patternUnits="userSpaceOnUse">
-				<rect width="250000" height="250000" fill="var(--grey-main)"/* fill="url(#small_grid_pattern)" */></rect>
-				<path d="M 25000 0 L 0 0 0 25000" fill="none" stroke="var(--gridColorStroke)" strokeWidth="2000"></path>
-			</pattern>
-			<pattern id="grid_pattern" width="250000" height="250000" patternUnits="userSpaceOnUse">
-				<rect width="250000" height="250000" fill="url(#medium_grid_pattern)"></rect>
-				<path d="M 250000 0 L 0 0 0 250000" fill="none" stroke="var(--gridColorStroke)" strokeWidth="4000"></path>
-			</pattern>
-		</svg>
+
+				{/* Средняя сетка 10x10 */}
+				<pattern
+					id="smallGrid"
+					width={10}
+					height={10}
+					patternUnits="userSpaceOnUse"
+				>
+					<rect width={10} height={10} fill="url(#xsGrid)" />
+					<path
+						d="M 0 0 L 10 0 L 10 10 L 0 10 Z"
+						fill="white"
+						stroke="black"
+						strokeWidth="0.1"
+					/>
+				</pattern>
+
+				{/* Крупная сетка 100x100 */}
+				<pattern
+					id="grid"
+					width={100}
+					height={100}
+					patternUnits="userSpaceOnUse"
+				>
+					<rect width={100} height={100} fill="url(#smallGrid)" />
+					<path
+						d="M 0 0 L 100 0 L 100 100 L 0 100 Z"
+						fill="none"
+						stroke="black"
+						strokeWidth="0.2"
+					/>
+				</pattern>
+			</svg>
+		</defs>
 	</svg>
 );
 
