@@ -1651,8 +1651,9 @@ function normalizeAngle(a) {
 }
 
 function makeGcodeParser() {
-	// Храним предыдущие значения для G, M, координат и др.
 	let last = { g: undefined, m: undefined, params: {} };
+	let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
+	let nextIsFirst = false; 
 
 	return function parseGcodeLine(raw) {
 		let s = String(raw).trim();
@@ -1660,21 +1661,23 @@ function makeGcodeParser() {
 
 		const out = { n: undefined, g: undefined, m: undefined, params: {} };
 
-		// Комментарий
-		const commentMatch = s.match(/\(([^)]*)\)/);
+ 		const commentMatch = s.match(/\(([^)]*)\)/);
 		if (commentMatch) {
 			out.comment = commentMatch[1];
 			s = s.replace(/\([^)]*\)/g, ' ');
+
+			// Если встретили Part code
+			if (/Part code=/i.test(out.comment)) {
+				nextIsFirst = true		
+			}
 		}
 
-		// N
 		const nMatch = s.match(/N(\d+)/i);
 		if (nMatch) out.n = parseInt(nMatch[1], 10);
 
 		// G/M
 		const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
-		out.g = gMatch ? Number(gMatch[1]) : last.g; // если нет — берём предыдущее
-
+		out.g = gMatch ? Number(gMatch[1]) : last.g;
 		const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
 		out.m = mMatch ? Number(mMatch[1]) : last.m;
 
@@ -1685,21 +1688,33 @@ function makeGcodeParser() {
 			const m = s.match(r);
 			if (m) {
 				out.params[k] = Number(m[1]);
-				last.params[k] = out.params[k]; // обновляем память
 			} else if (last.params[k] !== undefined) {
-				out.params[k] = last.params[k]; // если нет в строке — берём старое
+				out.params[k] = last.params[k];
 			}
 		}
+
+		if ( /(Part End)/i.test(s)) {
+			out.base = { X: 0, Y: 0, C: 0 };
+		}
+
+		// Если это строка с G52 — сохраняем её как базовую
+		if (/G52/i.test(s)) {
+			base.X = out.params.X;
+			base.Y = out.params.Y;
+			base.C = out.params.C;
+			out.base = base
+		} else {
+			out.base = {...base}
+		}
+
 		// Обновляем last
 		last.g = out.g;
 		last.m = out.m;
+		last.params = { ...last.params, ...out.params };
+		console.log (out)
 		return out;
 	};
 }
-
-// Использование:
-
-//console.log(cmds);
 
 function gcodeGenSVG(lines, opts = {}) {
 	const svgId = opts.svgId || null;
@@ -1762,7 +1777,7 @@ function gcodeGenSVG(lines, opts = {}) {
 	let pendingBreakCircle = null; // M4/M5 кружки в точке до следующего движения
 
 	// Хелперы рисования
-	const circ = (x, y, rPct, cls) => push(`<circle cx="${x}" cy="${y}" r="${rPct}%" class="${cls}"/>`);
+	//const circ = (x, y, rPct, cls) => push(`<circle cx="${x}" cy="${y}" r="${rPct}%" class="${cls}"/>`);
 	const line = (x1, y1, x2, y2, cls) => push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${cls}"/>`);
 	const cross = (x, y, size, cls) => {
 		push(`<path d="M${x - size},${y - size}L${x + size},${y + size}M${x - size},${y + size}L${x + size},${y - size}" class="${cls}"/>`);
@@ -1774,7 +1789,6 @@ function gcodeGenSVG(lines, opts = {}) {
 	// Обход команд
 	for (const c of cmds) {
 		// Комментарии вида (Part ...) нам не мешают — игнорируем в геометрии
-
 		// Обработка M-кодов (до движений)
 		if (typeof c.m === 'number') {
 			if (!pendingBreakCircle) {
@@ -1792,12 +1806,10 @@ function gcodeGenSVG(lines, opts = {}) {
 		// Обработка G-кодов
 		if (typeof c.g === 'number') {
 			const g = Math.floor(c.g);
-
 			// Моментальные маркеры «breaking»: G4 — как в C ведём крест и сбрасываем флаг
 			if (g === 4) {
-				cross(cx, cy, mjl, 'sgn_mj');
-				// После специального маркера не двигаем точку
-				continue;
+				cross(cx + c.base.X, cy + + c.base.Y, mjl, 'sgn_mj');
+ 				continue;
 			}
 
 			// Если был M4/M5 до движения — выведем маленький кружок один раз
@@ -1810,14 +1822,13 @@ function gcodeGenSVG(lines, opts = {}) {
 				pendingBreakCircle = null;
 			}
 
-			// Класс стиля в зависимости от "рез/холостой"
-			const cls = laserOn ? `sgn_mv sgn_mv${g} gline_${c.n ?? 0}` : `sgn_fm gline_${c.n ?? 0}`;
+ 			const cls = laserOn ? `sgn_mv sgn_mv${g} gline_${c.n ?? 0}` : `sgn_fm gline_${c.n ?? 0}`;
 
 			if (g === 0 || g === 1) {
 				// Линейное перемещение
 				const tx = (c.params.X !== undefined) ? toUnits(c.params.X, pulsesPerMM) : cx;
 				const ty = (c.params.Y !== undefined) ? toUnits(c.params.Y, pulsesPerMM) : cy;
-				line(cx, cy, tx, ty, cls);
+				line(cx + c.base.X, cy +  c.base.Y, tx+ c.base.X, ty  + c.base.Y, cls);
 				cx = tx; cy = ty;
 			} else if (g === 2 || g === 3) {
 				// Дуговое перемещение по центру I/J (версия без R-параметра)
@@ -1837,6 +1848,8 @@ function gcodeGenSVG(lines, opts = {}) {
 
 				let r = Math.round((Math.hypot(tx - ci, ty - cj)) * 1000) / 1000;
 
+				console.log(r)
+
 				// Углы старта/финиша
 				const a1 = Math.atan2(dys, dxs);
 				const a2 = Math.atan2(dye, dxe);
@@ -1847,17 +1860,13 @@ function gcodeGenSVG(lines, opts = {}) {
 				const large = 0//(Math.abs(d) > Math.PI) ? 1 : 0;
 				//const sweep = ccw ? 1 : 0;
 				const sweep = g === 3 ? 1 : 0;
-				arcPath(cx, cy, tx, ty, r, large, sweep, cls);
+				arcPath(cx+ c.base.X, cy + c.base.Y, tx+ c.base.X, ty + c.base.Y, r, large, sweep, cls,);
 				cx = tx; cy = ty;
 
 			} else if (g === 41 || g === 42 || g === 40) {
-				// Компенсация инструмента — геометрию здесь не меняем
-				// Ничего не рисуем
-			} else if (g === 28 || g === 52 || g === 99) {
-				// Служебные — в визуализацию не добавляем (дом, смещения, окончание и пр.)
-			} else {
-				// Неизвестное G — пропустим молча (в C-версии могли бы ставить предупреждение)
-			}
+ 			} else if (g === 28 || g === 52 || g === 99) {
+ 			} else {
+ 			}
 		}
 	}
 
@@ -1866,7 +1875,6 @@ function gcodeGenSVG(lines, opts = {}) {
 	push('</g>'); // .sgn_main_pv
 	push('</g>'); // .svg-pan-zoom_viewport
 	push('</svg>');
-
 	return out.join('\n');
 }
 
@@ -1879,9 +1887,7 @@ const GCodeToSvg1 = () => {
 	const [svg, setSvg] = useState("");
 
 	useEffect(() => {
-
 		setSvg(gcodeGenSVG(listing.trim().split(/\n+/), { svgId: 'xui', pulsesPerMM: 1000 }))
-
 	}, [])
 
 	useEffect(() => {
@@ -2013,3 +2019,28 @@ const GCodeToSvg1 = () => {
 
 export default GCodeToSvg1;
 
+
+const gcode = {
+width:700,
+height:700,
+// part делится командами (Part code" и 389(Part End)
+parts:[
+	{
+		part:"name....",
+		n:[201,225],//номера строк от перед  (Part code"  и  (Part End)
+		base: {X:0,Y:0,C:0},
+		// контуры делятся командами M4 M5
+		contours:{
+			cmd:[
+				{ g: 1, m: 0, params: {}},
+				{ g: 1, m: 0, params: {}},
+				{ g: 1, m: 0, params: {}},
+				{ g: 1, m: 0, params: {}},
+				{ g: 2, m: 0, params: {}},
+				{ g: 2, m: 0, params: {}},
+				{ g: 3, m: 0, params: {}},
+				
+			]
+		
+	}
+]}
