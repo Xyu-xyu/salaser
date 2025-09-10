@@ -176,16 +176,38 @@ const GCodeToSvg1 = () => {
 		let res = []; // массив путей
 		let newPath = { path: '', n: [0, 0], className: '' };
 
-		const line = (x1: number, y1: number, x2: number, y2: number) =>
-			`L${x2} ${height - y2}`;
-		
-		// Крест с инверсией Y
-		const cross = (x: number, y: number, size: number) => {
-			const yInv = height - y;
-			return `M${x - size},${yInv - size}L${x + size},${yInv + size}M${x - size},${yInv + size}L${x + size},${yInv - size}`;
+		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
+		const rotatePoint = (
+			x: number,
+			y: number,
+			cx: number,
+			cy: number,
+			angleDeg: number
+		): [number, number] => {
+			const theta = (angleDeg * Math.PI) / 180; // переводим угол в радианы
+			const dx = x - cx;
+			const dy = y - cy;
+
+			const xRot = cx + dx * Math.cos(theta) - dy * Math.sin(theta);
+			const yRot = cy + dx * Math.sin(theta) + dy * Math.cos(theta);
+
+			return [xRot, yRot];
 		};
-		
-		// Арка с инверсией Y
+
+		// Линия с учётом поворота и инверсии Y
+		const line = (x1: number, y1: number, x2: number, y2: number, c: any, height: number) => {
+			const [rx2, ry2] = rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
+			return `L${rx2} ${height - ry2}`;
+		};
+
+		// Крест с поворотом
+		const cross = (x: number, y: number, size: number, c: any, height: number) => {
+			const [rx, ry] = rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
+			const yInv = height - ry;
+			return `M${rx - size},${yInv - size}L${rx + size},${yInv + size}M${rx - size},${yInv + size}L${rx + size},${yInv - size}`;
+		};
+
+		// Арка с поворотом
 		const arcPath = (
 			sx: number,
 			sy: number,
@@ -193,18 +215,20 @@ const GCodeToSvg1 = () => {
 			ey: number,
 			r: number,
 			large: number,
-			sweep: number
-		) =>
-			`A${r},${r} 0,${large},${1-sweep} ${ex},${height - ey}`;
-		  
-	 
+			sweep: number,
+			c: any,
+			height: number
+		) => {
+			const [rxEnd, ryEnd] = rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
+			return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
+		};
 
 		for (const c of cmds) {
-			if ( c?.comment?.includes('Part code')) {
-		 		partStarted = true;
-			/*	if (newPath.path) res.push({ ...newPath });
-				newPath = { path: '', n: [c.n ?? 0, c.n ?? 0], className: '' };
-				continue; */
+			if (c?.comment?.includes('Part code')) {
+				partStarted = true;
+				/*	if (newPath.path) res.push({ ...newPath });
+					newPath = { path: '', n: [c.n ?? 0, c.n ?? 0], className: '' };
+					continue; */
 			} else if (c?.comment?.includes('Part end')) {
 				partStarted = false;
 				if (newPath.path) res.push({ ...newPath });
@@ -227,14 +251,14 @@ const GCodeToSvg1 = () => {
 			if (typeof c.g === 'number') {
 				const g = Math.floor(c.g);
 				if (g === 4) {
-					newPath.path += cross(cx + c.base.X, cy + c.base.Y, mjl);
+					newPath.path += cross(cx + c.base.X, cy + c.base.Y, 5, c, height);
 					continue;
 				}
 				if (g === 0 || g === 1) {
 					const tx = (c.params.X !== undefined) ? toUnits(c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? toUnits(c.params.Y) : cy;
 					if (!newPath.path) newPath.path = `M${cx + c.base.X} ${cy + c.base.Y}`;
-					newPath.path += line(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y);
+					newPath.path += line(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, c, height);
 					cx = tx; cy = ty;
 				} else if (g === 2 || g === 3) {
 					const tx = (c.params.X !== undefined) ? toUnits(c.params.X) : cx;
@@ -255,9 +279,9 @@ const GCodeToSvg1 = () => {
 					const large = 0;
 					const sweep = ccw ? 1 : 0;
 					if (!newPath.path) newPath.path = `M${cx + c.base.X} ${cy + c.base.Y}`;
-					newPath.path += arcPath(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, r, large, sweep);
+					newPath.path += arcPath(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, r, large, sweep, c, height);
 					cx = tx; cy = ty;
-				} else if ( g === 29) {
+				} else if (g === 29) {
 					newPath.path = `M${0} ${height}`;
 				}
 			}
