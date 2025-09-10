@@ -81,8 +81,8 @@ const GCodeToSvg1 = () => {
 	const cutSeg = 10;
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
-	const [width, setwidth] = useState("1300");
-	const [height, setHeigth] = useState("650");
+	const [width, setwidth] = useState("2500");
+	const [height, setHeigth] = useState("1250");
 
 
 	useEffect(() => {
@@ -176,9 +176,28 @@ const GCodeToSvg1 = () => {
 		let res = []; // массив путей
 		let newPath = { path: '', n: [0, 0], className: '' };
 
-		const line = (x1, y1, x2, y2) => `L${x2} ${y2}`;
-		const cross = (x, y, size) => `M${x - size},${y - size}L${x + size},${y + size}M${x - size},${y + size}L${x + size},${y - size}`;
-		const arcPath = (sx, sy, ex, ey, r, large, sweep) => `A${r},${r} 0,${large},${sweep} ${ex},${ey}`;
+		const line = (x1: number, y1: number, x2: number, y2: number) =>
+			`L${x2} ${height - y2}`;
+		
+		// Крест с инверсией Y
+		const cross = (x: number, y: number, size: number) => {
+			const yInv = height - y;
+			return `M${x - size},${yInv - size}L${x + size},${yInv + size}M${x - size},${yInv + size}L${x + size},${yInv - size}`;
+		};
+		
+		// Арка с инверсией Y
+		const arcPath = (
+			sx: number,
+			sy: number,
+			ex: number,
+			ey: number,
+			r: number,
+			large: number,
+			sweep: number
+		) =>
+			`A${r},${r} 0,${large},${1-sweep} ${ex},${height - ey}`;
+		  
+	 
 
 		for (const c of cmds) {
 			if ( c?.comment?.includes('Part code')) {
@@ -239,7 +258,7 @@ const GCodeToSvg1 = () => {
 					newPath.path += arcPath(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, r, large, sweep);
 					cx = tx; cy = ty;
 				} else if ( g === 29) {
-					newPath.path = `M${0} ${0}`;
+					newPath.path = `M${0} ${height}`;
 				}
 			}
 		}
