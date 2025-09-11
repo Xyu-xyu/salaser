@@ -4,16 +4,6 @@ import { Icon } from "@iconify/react";
 import sampleListing from '../store/listing'
 
 
-function toUnits(mm) {
-	return mm
-}
-
-function normalizeAngle(a) {
-	while (a > Math.PI) a -= 2 * Math.PI;
-	while (a < -Math.PI) a += 2 * Math.PI;
-	return a;
-}
-
 function makeGcodeParser() {
 	let last = { g: undefined, m: undefined, params: {} };
 	let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
@@ -60,7 +50,8 @@ function makeGcodeParser() {
 			base.X = out.params.X;
 			base.Y = out.params.Y;
 			base.C = out.params.C;
-			out.base = base
+			let nb = {X:out.params.X,Y:out.params.Y,C:out.params.C}
+			out.base = {...nb}
 		} else {
 			out.base = { ...base }
 		}
@@ -81,8 +72,8 @@ const GCodeToSvg1 = () => {
 	const cutSeg = 10;
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
-	const [width, setwidth] = useState("2500");
-	const [height, setHeigth] = useState("1250");
+	const [width, setwidth] = useState("700");
+	const [height, setHeigth] = useState("700");
 
 
 	useEffect(() => {
@@ -152,6 +143,12 @@ const GCodeToSvg1 = () => {
 		};
 	}, [listing]);
 
+	const normalizeAngle = (a:number) => {
+		while (a > Math.PI) a -= 2 * Math.PI;
+		while (a < -Math.PI) a += 2 * Math.PI;
+		return a;
+	}
+	
 	const fit = () => {
 		if (!panZoomRef.current) return;
 		panZoomRef.current.fit();
@@ -172,7 +169,7 @@ const GCodeToSvg1 = () => {
 		let cx = 0, cy = 0;
 		let laserOn = false;
 		let pendingBreakCircle = null;
-		let partStarted = false;
+		let partStarted = 'notStarted';// started, finished, notStarted
 		let res = []; // массив путей
 		let newPath = { path: '', n: [0, 0], className: '' };
 
@@ -223,48 +220,70 @@ const GCodeToSvg1 = () => {
 			return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
 		};
 
+		console.log (cmds)
+
 		for (const c of cmds) {
 			if (c?.comment?.includes('Part code')) {
-				partStarted = true;
-				/*	if (newPath.path) res.push({ ...newPath });
-					newPath = { path: '', n: [c.n ?? 0, c.n ?? 0], className: '' };
-					continue; */
-			} else if (c?.comment?.includes('Part end')) {
-				partStarted = false;
-				if (newPath.path) res.push({ ...newPath });
-				newPath = { path: '', n: [0, 0], className: '' };
+				console.log ('Part code')
+				partStarted = 'started';
+				continue; 
+
+			} else if (c?.comment?.includes('Part End')) {
+				console.log ('Part End')
+				partStarted = 'finished';
+				// тут уходим от относительных координат к абс...
+				cx =cx + c.base.X
+				cy =cy + c.base.Y
 				continue;
 			}
 
 			if (typeof c.m === 'number') {
+				
 				if (!pendingBreakCircle) {
 					if (c.m === 4) pendingBreakCircle = { type: 'in', n: c.n };
 					if (c.m === 5) pendingBreakCircle = { type: 'out', n: c.n };
 				}
-				if (c.m === 4) laserOn = true;
-				if (c.m === 5) laserOn = false;
-			}
 
-			const cls = laserOn ? `sgn_mv sgn_mv${c.g} gline_${c.n ?? 0}` : `sgn_fm gline_${c.n ?? 0}`;
-			newPath.className = cls;
+				if (c.m === 4) {
+					console.log ('laser on')
+					laserOn = true;
+				}
+
+				if (c.m === 5) {
+					console.log('laser off')
+					laserOn = false;
+				}
+			}
 
 			if (typeof c.g === 'number') {
 				const g = Math.floor(c.g);
 				if (g === 4) {
-					newPath.path += cross(cx + c.base.X, cy + c.base.Y, 5, c, height);
+
+					let crossPath = { 
+						path: cross(cx + c.base.X, cy + c.base.Y, 2.5, c, height), 
+						n: [c.n ?? 0, c.n ?? 0], 
+						className: 'g4' 
+					};
+					res.splice( 0, 0, crossPath);
 					continue;
 				}
 				if (g === 0 || g === 1) {
-					const tx = (c.params.X !== undefined) ? toUnits(c.params.X) : cx;
-					const ty = (c.params.Y !== undefined) ? toUnits(c.params.Y) : cy;
-					if (!newPath.path) newPath.path = `M${cx + c.base.X} ${cy + c.base.Y}`;
-					newPath.path += line(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, c, height);
+
+					console.log ( `g === 0 || g === 1`)
+
+					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
+					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;					
+					res[res.length-1].path += line(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, c, height);
 					cx = tx; cy = ty;
-				} else if (g === 2 || g === 3) {
-					const tx = (c.params.X !== undefined) ? toUnits(c.params.X) : cx;
-					const ty = (c.params.Y !== undefined) ? toUnits(c.params.Y) : cy;
-					const ci = (c.params.I !== undefined) ? toUnits(c.params.I) : 0;
-					const cj = (c.params.J !== undefined) ? toUnits(c.params.J) : 0;
+
+				} else if (g === 2 || g === 3 ) {
+
+					console.log ( `g === 2 || g === 3`)
+
+					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
+					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
+					const ci = (c.params.I !== undefined) ? (c.params.I) : 0;
+					const cj = (c.params.J !== undefined) ? (c.params.J) : 0;
 					const dxs = cx - (cx + ci);
 					const dys = cy - (cy + cj);
 					const dxe = tx - (cx + ci);
@@ -278,18 +297,41 @@ const GCodeToSvg1 = () => {
 					if (!ccw && d > 0) d -= 2 * Math.PI;
 					const large = 0;
 					const sweep = ccw ? 1 : 0;
-					if (!newPath.path) newPath.path = `M${cx + c.base.X} ${cy + c.base.Y}`;
-					newPath.path += arcPath(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, r, large, sweep, c, height);
+					res[res.length-1].path += arcPath(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, r, large, sweep, c, height);
 					cx = tx; cy = ty;
+
 				} else if (g === 29) {
-					newPath.path = `M${0} ${height}`;
+
+					console.log ('g === 29')
+
+				} else if (g === 28) {
+
+					console.log ('g === 28')
+
+				} else if (g === 52) {
+
+					console.log ('g === 52')
+					res.push({... newPath})  
+
+					if (!res[res.length-1].path.length) {
+						res[res.length-1].path = `M${cx} ${height - cy}`;	
+					}
+				
 				}
+				
+				//const cls = laserOn ? `sgn_mv sgn_mv${c.g} gline_${c.n ?? 0}` : `sgn_fm gline_${c.n ?? 0}`;
+				//res && res.length ? res[res.length-1].className = cls : ''
 			}
 		}
 
-		if (newPath.path) res.push({ ...newPath });
+		console.log (res)
 		return res;
 	};
+
+	// отдельный путь  - переходы между контурами
+	// отдельный путь от m===4 до m === 5
+	// отдельный путь переход между деталями когда Part PartEnd
+	// +отдельный путь - перемычкка
 
 
 
@@ -413,3 +455,5 @@ const GCodeToSvg1 = () => {
 export default GCodeToSvg1;
 
 
+//д.б.  19 - 162 
+//9.358167 172.198523L47
