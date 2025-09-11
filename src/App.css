@@ -39,11 +39,11 @@
   --knobMainText: rgba(0, 0, 0, 0.8);
   --knobSecText: orangered;
   --default-stroke-width:10px;
-  --stroke-width:1000px;
+  --stroke-width:1px;
   --gridColorFill: rgb(65, 65, 65);
   --gridColorStroke: rgb(155, 155, 155);
-  --stroke-width-mul:5000px;
-  --default-stroke-width:4000px;
+  --stroke-width-mul:2px;
+  --default-stroke-width:1px;
   
 }
 
@@ -1014,7 +1014,6 @@ height: fit-content;}
     color: #666;
 }
 
-
 .planMainImg{ 
   max-width: 100%;
   max-height: 100%;
@@ -1032,7 +1031,7 @@ height: fit-content;}
   height: 100%;
   text-align: center;
   overflow: hidden;
-  --stroke-width-mul: 0.5%;
+  --stroke-width-mul: 1px;
   --default-stroke-width: 0.5%;
   stroke-width: 1px;
   border: 1px solid gray;
@@ -1048,53 +1047,53 @@ height: fit-content;}
 }
 
 .sgn_fm, .sgn_brk, .sgn_mj, .sgn_mv {
-  --stroke-width-mul: 0.2%;
-  stroke-width: 4000px/* calc(var(--stroke-width) * var(--stroke-width-mul)) !important */;
+  --stroke-width-mul: 1px;
+  stroke-width: calc(var(--stroke-width) * var(--stroke-width-mul)) !important;
 }
 
 #workarea svg .sgn_fm {
-  /* --stroke-width-mul: 0.04%; */
-  stroke-dasharray: 10000px/* calc(var(--stroke-width) * 0.2%) */;
+  /* --stroke-width-mul: 1px; */
+  stroke-dasharray: 5px/* calc(var(--stroke-width) * 0.2%) */;
   stroke-opacity: 0.8;
   stroke: var(--violet);
   marker-end: url(#arrow);
 }
 
 #workarea svg .sgn_fm.selected {
-  --stroke-width-mul: 0.1%;
+  --stroke-width-mul: 1px;
 }
 
 #workarea svg .sgn_mj {
-  --stroke-width-mul: 0.12%;
+  --stroke-width-mul: 1px;
 }
 
 #workarea svg .sgn_mv {
-  --stroke-width-mul: 0.12%;
+  --stroke-width-mul: 1px;
 }
 
 #workarea svg .sgn_mv:hover {
-  --stroke-width-mul: 0.4%;
+  --stroke-width-mul: 1px;
 }
 
 #workarea svg .sgn_fm:hover {
-  --stroke-width-mul: 0.4%;
+  --stroke-width-mul: 1px;
   stroke-opacity: 1;
   stroke: #fff;
 }
 
 #workarea svg .sgn_mj:hover {
-  --stroke-width-mul: 0.4%;
+  --stroke-width-mul: 1px;
   stroke-opacity: 1;
   stroke: #fff;
 }
 
 #workarea svg .sgn_mv0 {
-  --stroke-width-mul: 0.12%;
+  --stroke-width-mul: 1px;
   stroke: rgb(211, 129, 18) !important;
 }
 
 #workarea svg .sgn_mv1 {
-  --stroke-width-mul: 0.04%;
+  --stroke-width-mul: 1px;
 /*stroke: rgb(244, 229, 125) !important;*/
   stroke: var(--darkBlue);
 }
@@ -1125,9 +1124,9 @@ height: fit-content;}
 }
 
 #workarea svg .sgn_brk {
- /*  --stroke-width-mul: 0.1%;
+ /*  --stroke-width-mul: 1px;
   r: calc(var(--stroke-width) * var(--stroke-width-mul)); */
-  stroke-width: 4000px;
+  stroke-width: 1px;
   stroke: white !important;
   fill: white !important;
   stroke-opacity: 0.4;
@@ -1135,8 +1134,8 @@ height: fit-content;}
 }
 
 #workarea svg .sgn_brk:hover {
-/*   --stroke-width-mul: 0.2%; */
-  stroke-width: 4000px;
+/*   --stroke-width-mul: 1px; */
+  stroke-width: 1px;
   stroke-opacity: 1;
   stroke: yellow !important;
   fill: yellow !important;
@@ -1145,12 +1144,12 @@ height: fit-content;}
 }
 
 #workarea svg .sgn_brk.selected {
-  --stroke-width-mul: 0.2%;
+  --stroke-width-mul: 1px;
   stroke: aqua !important;
 }
 
 #workarea svg .sgn_brk.selected:hover {
-  --stroke-width-mul: 0.4%;
+  --stroke-width-mul: 1px;
   stroke: yellow !important;
 }
 
@@ -1161,9 +1160,9 @@ height: fit-content;}
 
 
 .sgn_sheet {
-  fill: url(#grid_pattern);
-  stroke: var(--gridColorStroke);
-  stroke-width: 4000px/*  calc(var(--default-stroke-width) * 0.35%) */; 
+  fill: url(#grid);
+/*   stroke: var(--gridColorStroke);
+  stroke-width: 1px/*  calc(var(--default-stroke-width) * 0.35%) */;  
   touch-action: none !important;
 }
 
@@ -1184,3 +1183,76 @@ height: fit-content;}
   overflow: hidden;
  /*  touch-action: manipulation; */
 }
+
+.sgn_main_els {
+  stroke: black;            /* можно изменить */
+  stroke-width: 1.5px;         /* можно изменить */
+  fill: none;
+  stroke-linecap: round;
+
+}
+
+.sgn_main_els .g4 {
+  stroke: var(--red);            /* можно изменить */
+  stroke-width: 1.5px;         /* можно изменить */
+  fill: none;
+  marker-end: none;
+  marker-mid: none;
+  marker-start: none;
+
+}
+
+
+.sgn_main_els .laserOn{
+  stroke: brown;            /* можно изменить */
+  stroke-width: 1px;         /* можно изменить */
+  fill: none;
+ /*   marker-mid: url(#arrow);
+ */
+ }
+
+.sgn_main_els .laserOff{
+  stroke: var(--violet);            /* можно изменить */
+  stroke-width: 1px;         /* можно изменить */
+  fill: none;
+  stroke-dasharray: 4 2; 
+  marker-end: url(#arrow); 
+}
+
+
+/* Контур, который сейчас режется лазером */
+.sgn_main_els .currentCut {
+  stroke: orangered;        /* цвет лазера */
+  stroke-width: 2px;        /* толщина линии */
+  fill: none;
+
+  /* штриховка: длина штриха + пробел */
+  stroke-dasharray: 6 4;
+  stroke-dashoffset: 0;
+
+  /* анимация движения штрихов */
+  animation: laserCut 1s linear infinite;
+  stroke-linecap: round;
+}
+
+/* Анимация движения штрихов вдоль линии */
+@keyframes laserCut {
+  to {
+    stroke-dashoffset: -20; /* шаг анимации: двигаем штрихи */
+  }
+}
+
+.sgn_main_els .cutted.laserOn {
+  stroke: green; 
+  stroke-width: 1.5px;
+  marker-end: none;
+  marker-mid: none;
+  marker-start: none;
+  stroke-dasharray: none;
+
+}
+
+
+
+
+ 

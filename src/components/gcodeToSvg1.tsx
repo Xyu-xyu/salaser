@@ -27,7 +27,7 @@ function makeGcodeParser() {
 		const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
 		out.g = gMatch ? Number(gMatch[1]) : last.g;
 		const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
-		out.m = mMatch ? Number(mMatch[1]) : last.m;
+		out.m = mMatch ? Number(mMatch[1]) : false;
 
 		// Параметры
 		const keys = ['X', 'Y', 'I', 'J', 'S', 'P', 'H', 'A', 'L', 'C'];
@@ -50,8 +50,8 @@ function makeGcodeParser() {
 			base.X = out.params.X;
 			base.Y = out.params.Y;
 			base.C = out.params.C;
-			let nb = {X:out.params.X,Y:out.params.Y,C:out.params.C}
-			out.base = {...nb}
+			let nb = { X: out.params.X, Y: out.params.Y, C: out.params.C }
+			out.base = { ...nb }
 		} else {
 			out.base = { ...base }
 		}
@@ -69,7 +69,7 @@ function makeGcodeParser() {
 const GCodeToSvg1 = () => {
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
-	const cutSeg = 10;
+	const cutSeg = 3000;
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
 	const [width, setwidth] = useState("700");
@@ -143,12 +143,12 @@ const GCodeToSvg1 = () => {
 		};
 	}, [listing]);
 
-	const normalizeAngle = (a:number) => {
+	const normalizeAngle = (a: number) => {
 		while (a > Math.PI) a -= 2 * Math.PI;
 		while (a < -Math.PI) a += 2 * Math.PI;
 		return a;
 	}
-	
+
 	const fit = () => {
 		if (!panZoomRef.current) return;
 		panZoomRef.current.fit();
@@ -171,7 +171,7 @@ const GCodeToSvg1 = () => {
 		let pendingBreakCircle = null;
 		let partStarted = 'notStarted';// started, finished, notStarted
 		let res = []; // массив путей
-		let newPath = { path: '', n: [0, 0], className: '' };
+		let newPath = { path: '', n: [], className: '' };
 
 		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
 		const rotatePoint = (
@@ -197,6 +197,11 @@ const GCodeToSvg1 = () => {
 			return `L${rx2} ${height - ry2}`;
 		};
 
+		const start = (x1: number, y1: number, c: any, height: number) => {
+			const [rx2, ry2] = rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
+			return `M${rx2} ${height - ry2}`;
+		};
+
 		// Крест с поворотом
 		const cross = (x: number, y: number, size: number, c: any, height: number) => {
 			const [rx, ry] = rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
@@ -220,65 +225,83 @@ const GCodeToSvg1 = () => {
 			return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
 		};
 
-		console.log (cmds)
+		console.log(cmds)
 
 		for (const c of cmds) {
 			if (c?.comment?.includes('Part code')) {
-				console.log ('Part code')
+				console.log('Part code')
 				partStarted = 'started';
-				continue; 
+				continue;
 
 			} else if (c?.comment?.includes('Part End')) {
-				console.log ('Part End')
+				console.log('Part End')
 				partStarted = 'finished';
 				// тут уходим от относительных координат к абс...
-				cx =cx + c.base.X
-				cy =cy + c.base.Y
+				cx = cx + c.base.X
+				cy = cy + c.base.Y
 				continue;
 			}
 
 			if (typeof c.m === 'number') {
-				
+
 				if (!pendingBreakCircle) {
 					if (c.m === 4) pendingBreakCircle = { type: 'in', n: c.n };
 					if (c.m === 5) pendingBreakCircle = { type: 'out', n: c.n };
 				}
 
 				if (c.m === 4) {
-					console.log ('laser on')
+					console.log('laser on')
 					laserOn = true;
+
+					res[res.length - 1].className += "laserOff"
+
+					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
+					res[res.length - 1].path = start(cx + c.base.X, cy + c.base.Y, c, height);
 				}
 
 				if (c.m === 5) {
 					console.log('laser off')
 					laserOn = false;
+
+					res[res.length - 1].className += "laserOn"
+
+					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
+					res[res.length - 1].path = start(cx + c.base.X, cy + c.base.Y, c, height);
+
 				}
 			}
 
 			if (typeof c.g === 'number') {
 				const g = Math.floor(c.g);
+				const n = c.n
 				if (g === 4) {
 
-					let crossPath = { 
-						path: cross(cx + c.base.X, cy + c.base.Y, 2.5, c, height), 
-						n: [c.n ?? 0, c.n ?? 0], 
-						className: 'g4' 
+					let crossPath = {
+						path: cross(cx + c.base.X, cy + c.base.Y, 2.5, c, height),
+						n: [n ?? 0, n ?? 0],
+						className: 'g4'
 					};
-					res.splice( 0, 0, crossPath);
+					res.splice(0, 0, crossPath);
 					continue;
 				}
 				if (g === 0 || g === 1) {
 
-					console.log ( `g === 0 || g === 1`)
+					console.log(`g === 0 || g === 1`)
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
-					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;					
-					res[res.length-1].path += line(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, c, height);
+					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
+					res[res.length - 1].path += line(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, c, height);
+					if (n) {
+						let n0 = res[res.length - 1].n[0]
+						let n1 = res[res.length - 1].n[1]
+						n < n0 ? res[res.length - 1].n[0] = n : false;
+						n > n1 ? res[res.length - 1].n[1] = n : false;
+					}
 					cx = tx; cy = ty;
 
-				} else if (g === 2 || g === 3 ) {
+				} else if (g === 2 || g === 3) {
 
-					console.log ( `g === 2 || g === 3`)
+					console.log(`g === 2 || g === 3`)
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
@@ -297,34 +320,39 @@ const GCodeToSvg1 = () => {
 					if (!ccw && d > 0) d -= 2 * Math.PI;
 					const large = 0;
 					const sweep = ccw ? 1 : 0;
-					res[res.length-1].path += arcPath(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, r, large, sweep, c, height);
+					res[res.length - 1].path += arcPath(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, r, large, sweep, c, height);
+					if (n) {
+						let n0 = res[res.length - 1].n[0]
+						let n1 = res[res.length - 1].n[1]
+						n < n0 ? res[res.length - 1].n[0] = n : false;
+						n > n1 ? res[res.length - 1].n[1] = n : false;
+
+					}
+
 					cx = tx; cy = ty;
 
 				} else if (g === 29) {
 
-					console.log ('g === 29')
+					console.log('g === 29')
 
 				} else if (g === 28) {
 
-					console.log ('g === 28')
+					console.log('g === 28')
 
 				} else if (g === 52) {
 
-					console.log ('g === 52')
-					res.push({... newPath})  
+					console.log('g === 52')
+					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
+					res[res.length - 1].path = `M${cx} ${height - cy}`;
 
-					if (!res[res.length-1].path.length) {
-						res[res.length-1].path = `M${cx} ${height - cy}`;	
-					}
-				
 				}
-				
+
 				//const cls = laserOn ? `sgn_mv sgn_mv${c.g} gline_${c.n ?? 0}` : `sgn_fm gline_${c.n ?? 0}`;
 				//res && res.length ? res[res.length-1].className = cls : ''
 			}
 		}
 
-		console.log (res)
+		console.log(res)
 		return res;
 	};
 
@@ -421,27 +449,27 @@ const GCodeToSvg1 = () => {
 							/>
 							<g
 								className="sgn_main_els"
-								style={{ fill: "none", strokeWidth: 1, stroke: "red" }}
-							>
-								{getPath().map((a, i) => {
-									const { path, className, n } = a;
-									return (
-										<path
-											d={path}
-											key={i}
-											className={
-												className +
+								style={{ fill: "none", strokeWidth: 0.5, stroke: "black" }}
+							>{getPath().map((a, i) => {
+								const { path, className, n } = a;
+								return (
+									<path
+										d={path}
+										key={i}
+										className={
+											className +
+											(
+												n[0] <= cutSeg && cutSeg <= n[1]
+													? " currentCut "
+													: n[0] < cutSeg
+														? " cutted "
+														: " uncutted "
+											)
+										}
+									/>
+								);
+							})}
 
-													(n[0] < cutSeg && cutSeg < n[1])
-													?
-													" currentCut "
-													:
-													n[0] < cutSeg ? " cutted " : " uncutted "
-											}
-										/>
-									)
-								})
-								}
 							</g>
 						</g>
 					</g>
