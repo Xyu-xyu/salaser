@@ -5,6 +5,7 @@ import sampleListing from '../store/listing'
 
 
 function makeGcodeParser() {
+	console.log ('makeGcodeParser')
 	let last = { g: undefined, m: undefined, params: {} };
 	let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
 
@@ -20,8 +21,10 @@ function makeGcodeParser() {
 			s = s.replace(/\([^)]*\)/g, ' ');
 		}
 
-		const nMatch = s.match(/N(\d+)/i);
-		if (nMatch) out.n = parseInt(nMatch[1], 10);
+		const nMatch = raw.match(/(\d+)N/i);
+		if (nMatch) {
+		  out.n = parseInt(nMatch[1], 10); // используем первую группу
+		}
 
 		// G/M
 		const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
@@ -60,7 +63,7 @@ function makeGcodeParser() {
 		last.g = out.g;
 		last.m = out.m;
 		last.params = { ...last.params, ...out.params };
-		//console.log(out)
+		//// console.log(out)
 		return out;
 	};
 }
@@ -69,27 +72,28 @@ function makeGcodeParser() {
 const GCodeToSvg1 = () => {
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
-	const cutSeg = 3000;
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
-	const [width, setwidth] = useState("700");
-	const [height, setHeigth] = useState("700");
+	const [width, setwidth] = useState("3000");
+	const [height, setHeigth] = useState("1500");
+	const [cutSeg, setCutSeg] = useState(0);
+	const [paths, setPaths] = useState("");
 
 
 	useEffect(() => {
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
 			controller.abort();
-			setListing(sampleListing);
+			//setListing(sampleListing);
 		}, 2000);
 
-		fetch("http://192.168.11.251/gcore/0/listing", {
+		fetch("http://192.168.11.253/gcore/0/listing", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
 			.then((data) => {
 				clearTimeout(timeoutId);
-				setListing(data || sampleListing);
+				setListing(  extractGcodeLines(data) /* || sampleListing */ );
 			})
 			.catch(() => {
 				clearTimeout(timeoutId);
@@ -106,13 +110,14 @@ const GCodeToSvg1 = () => {
 		if (!containerRef.current || !listing) return;
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
+		setPaths( getPath() )
 
 		// Удаляем старый инстанс
 		if (panZoomRef.current) {
 			try {
 				panZoomRef.current.destroy();
 			} catch (e) {
-				console.warn("Ошибка destroy:", e);
+				// console.warn("Ошибка destroy:", e);
 			}
 			panZoomRef.current = null;
 		}
@@ -138,7 +143,7 @@ const GCodeToSvg1 = () => {
 			try {
 				panZoomInstance.destroy();
 			} catch (e) {
-				console.warn("Ошибка destroy:", e);
+				// console.warn("Ошибка destroy:", e);
 			}
 		};
 	}, [listing]);
@@ -160,8 +165,22 @@ const GCodeToSvg1 = () => {
 		dir === "+" ? panZoomRef.current.zoomIn() : panZoomRef.current.zoomOut();
 	};
 
-	// Дописанная версия getPath для сборки массива путей (PathData)
-	const getPath = () => {
+	const extractGcodeLines = (serverData: string): string =>{
+		// Регулярка достаёт номер и содержимое
+	   const regex = /<em>(\d+)<\/em>\s*<span>(.*?)<\/span>/g;
+	   let result = "";
+	   let match;
+	 
+	   while ((match = regex.exec(serverData)) !== null) {
+		 const lineNum = match[1];       // номер строки
+		 const content = match[2].trim();// содержимое
+		 result += `${lineNum}${content}\n`; // собираем строку с \n
+	   }	 
+	   return result;
+	}
+
+ 	const getPath = () => {
+		console.log (' getPath ')
 		const parseGcodeLine = makeGcodeParser();
 		const lines = listing.trim().split(/\n+/);
 		const cmds = lines.map(parseGcodeLine);
@@ -171,8 +190,7 @@ const GCodeToSvg1 = () => {
 		let pendingBreakCircle = null;
 		let partStarted = 'notStarted';// started, finished, notStarted
 		let res = []; // массив путей
-		let newPath = { path: '', n: [], className: '' };
-
+ 
 		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
 		const rotatePoint = (
 			x: number,
@@ -225,16 +243,16 @@ const GCodeToSvg1 = () => {
 			return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
 		};
 
-		console.log(cmds)
+		//console.log(cmds)
 
 		for (const c of cmds) {
 			if (c?.comment?.includes('Part code')) {
-				console.log('Part code')
+				// console.log('Part code')
 				partStarted = 'started';
 				continue;
 
 			} else if (c?.comment?.includes('Part End')) {
-				console.log('Part End')
+				// console.log('Part End')
 				partStarted = 'finished';
 				// тут уходим от относительных координат к абс...
 				cx = cx + c.base.X
@@ -250,7 +268,7 @@ const GCodeToSvg1 = () => {
 				}
 
 				if (c.m === 4) {
-					console.log('laser on')
+					// console.log('laser on')
 					laserOn = true;
 
 					res[res.length - 1].className += "laserOff"
@@ -260,7 +278,7 @@ const GCodeToSvg1 = () => {
 				}
 
 				if (c.m === 5) {
-					console.log('laser off')
+					// console.log('laser off')
 					laserOn = false;
 
 					res[res.length - 1].className += "laserOn"
@@ -286,7 +304,7 @@ const GCodeToSvg1 = () => {
 				}
 				if (g === 0 || g === 1) {
 
-					console.log(`g === 0 || g === 1`)
+					// console.log(`g === 0 || g === 1`)
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
@@ -301,7 +319,7 @@ const GCodeToSvg1 = () => {
 
 				} else if (g === 2 || g === 3) {
 
-					console.log(`g === 2 || g === 3`)
+					// console.log(`g === 2 || g === 3`)
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
@@ -333,15 +351,15 @@ const GCodeToSvg1 = () => {
 
 				} else if (g === 29) {
 
-					console.log('g === 29')
+					// console.log('g === 29')
 
 				} else if (g === 28) {
 
-					console.log('g === 28')
+					// console.log('g === 28')
 
 				} else if (g === 52) {
 
-					console.log('g === 52')
+					// console.log('g === 52')
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
 					res[res.length - 1].path = `M${cx} ${height - cy}`;
 
@@ -352,16 +370,9 @@ const GCodeToSvg1 = () => {
 			}
 		}
 
-		console.log(res)
+		// console.log(res)
 		return res;
 	};
-
-	// отдельный путь  - переходы между контурами
-	// отдельный путь от m===4 до m === 5
-	// отдельный путь переход между деталями когда Part PartEnd
-	// +отдельный путь - перемычкка
-
-
 
 	return (
 		<div
@@ -415,6 +426,27 @@ const GCodeToSvg1 = () => {
 						</div>
 					</button>
 				</div>
+				<div className="d-flex flex-column">
+					<input
+						type="range"
+						className="w-full cursor-pointer accent-orange-500"
+						min={0}
+						max={ listing.trim().split(/\n+/).length }
+						step={1}
+						value={cutSeg}
+						onChange={(e) => setCutSeg(Number(e.target.value))}
+					/>
+
+					{/* Поле ввода */}
+					<input
+						type="number"
+						className="w-full p-2 border rounded-md"
+						min={0}
+						step={1}
+						value={ cutSeg}
+						onChange={(e)=> setCutSeg(Number(e.target.value))}
+					/>
+				</div>
 			</div>
 			<div
 				id="workarea"
@@ -450,7 +482,7 @@ const GCodeToSvg1 = () => {
 							<g
 								className="sgn_main_els"
 								style={{ fill: "none", strokeWidth: 0.5, stroke: "black" }}
-							>{getPath().map((a, i) => {
+							>{  paths && paths.map((a, i) => {
 								const { path, className, n } = a;
 								return (
 									<path
@@ -481,7 +513,3 @@ const GCodeToSvg1 = () => {
 };
 
 export default GCodeToSvg1;
-
-
-//д.б.  19 - 162 
-//9.358167 172.198523L47
