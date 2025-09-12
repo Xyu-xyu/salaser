@@ -3,6 +3,16 @@ import svgPanZoom from "svg-pan-zoom";
 import { Icon } from "@iconify/react";
 import sampleListing from '../store/listing'
 
+function getLastTwoNumbers(str: string): number[] {
+	// Находим все числа с точкой или без
+	const numbers = str.match(/-?\d+(\.\d+)?/g);
+	if (!numbers) return [];
+	
+	// Берём последние два
+	const lastTwo = numbers.slice(-2).map(Number);
+	return lastTwo;
+  }
+  
 
 function makeGcodeParser() {
 	console.log ('makeGcodeParser')
@@ -74,8 +84,8 @@ const GCodeToSvg1 = () => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
-	const [width, setwidth] = useState("3000");
-	const [height, setHeigth] = useState("1500");
+	const [width, setwidth] = useState(3000);
+	const [height, setHeigth] = useState(1500);
 	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState("");
 
@@ -361,7 +371,15 @@ const GCodeToSvg1 = () => {
 
 					// console.log('g === 52')
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
-					res[res.length - 1].path = `M${cx} ${height - cy}`;
+
+ 
+					//yobanyi kostyl!!!!
+					if (res.length > 1) {
+						let [x1, y1] = getLastTwoNumbers( res[res.length - 2].path )
+						res[res.length - 1].path = `M${x1} ${y1}`;
+					} else {
+						res[res.length - 1].path = `M${cx} ${height - cy}`;
+					}
 
 				}
 
@@ -483,25 +501,25 @@ const GCodeToSvg1 = () => {
 								className="sgn_main_els"
 								style={{ fill: "none", strokeWidth: 0.5, stroke: "black" }}
 							>{  paths && paths.map((a, i) => {
-								const { path, className, n } = a;
-								return (
-									<path
-										d={path}
-										key={i}
-										className={
-											className +
-											(
-												n[0] <= cutSeg && cutSeg <= n[1]
-													? " currentCut "
-													: n[0] < cutSeg
-														? " cutted "
-														: " uncutted "
-											)
-										}
-									/>
-								);
-							})}
-
+									const { path, className, n } = a;
+									return (
+										<path
+											d={path}
+											key={i}
+											className={
+												className +
+												(
+													n[0] <= cutSeg && cutSeg <= n[1]
+														? " currentCut "
+														: n[0] < cutSeg
+															? " cutted "
+															: " uncutted "
+												)
+											}
+										/>
+									);
+								})
+								}
 							</g>
 						</g>
 					</g>

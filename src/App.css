@@ -1224,7 +1224,7 @@ height: fit-content;}
 .sgn_main_els .currentCut {
   stroke: orangered;        /* цвет лазера */
   stroke-width: 2px;        /* толщина линии */
-  fill: none;
+  fill: rgba(255, 69, 0, 0.75) ;
 
   /* штриховка: длина штриха + пробел */
   stroke-dasharray: 6 4;
@@ -1243,13 +1243,12 @@ height: fit-content;}
 }
 
 .sgn_main_els .cutted.laserOn {
-  stroke: green; 
+  stroke: green;             /* Зелёная линия */
   stroke-width: 1.5px;
-  marker-end: none;
-  marker-mid: none;
-  marker-start: none;
   stroke-dasharray: none;
-
+  marker: none;              /* Сократил marker-* */
+  fill: green;               /* Тот же цвет заливки */
+  opacity: 0.5;              /* Полупрозрачность всей фигуры */
 }
 
 
