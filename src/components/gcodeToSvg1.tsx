@@ -194,12 +194,12 @@ const GCodeToSvg1 = () => {
 		const parseGcodeLine = makeGcodeParser();
 		const lines = listing.trim().split(/\n+/);
 		const cmds = lines.map(parseGcodeLine);
+		//console.log (cmds)
 
 		let cx = 0, cy = 0;
 		let laserOn = false;
 		let pendingBreakCircle = null;
-		let partStarted = 'notStarted';// started, finished, notStarted
-		let res = []; // массив путей
+ 		let res = []; // массив путей
 
 		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
 		const rotatePoint = (
@@ -220,7 +220,7 @@ const GCodeToSvg1 = () => {
 		};
 
 		// Линия с учётом поворота и инверсии Y
-		const line = (x1: number, y1: number, x2: number, y2: number, c: any, height: number) => {
+		const line = ( x2: number, y2: number, c: any, height: number) => {
 			const [rx2, ry2] = rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
 			return `L${rx2} ${height - ry2}`;
 		};
@@ -239,8 +239,6 @@ const GCodeToSvg1 = () => {
 
 		// Арка с поворотом
 		const arcPath = (
-			sx: number,
-			sy: number,
 			ex: number,
 			ey: number,
 			r: number,
@@ -258,14 +256,12 @@ const GCodeToSvg1 = () => {
 		for (const c of cmds) {
 			if (c?.comment?.includes('Part code')) {
 				// console.log('Part code')
-				partStarted = 'started';
-				res[res.length - 1].className += " groupStart "
+ 				res[res.length - 1].className += " groupStart "
 				continue;
 
 			} else if (c?.comment?.includes('Part End')) {
 				// console.log('Part End')
-				partStarted = 'finished';
-				// тут уходим от относительных координат к абс...
+ 				// тут уходим от относительных координат к абс...
 				res[res.length - 1].className += " groupEnd "
 
 				cx = cx + c.base.X
@@ -283,9 +279,7 @@ const GCodeToSvg1 = () => {
 				if (c.m === 4) {
 					// console.log('laser on')
 					laserOn = true;
-
-					res[res.length - 1].className += "laserOff"
-
+					res[res.length - 1].className += " laserOff "
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
 					res[res.length - 1].path = start(cx + c.base.X, cy + c.base.Y, c, height);
 				}
@@ -293,9 +287,7 @@ const GCodeToSvg1 = () => {
 				if (c.m === 5) {
 					// console.log('laser off')
 					laserOn = false;
-
-					res[res.length - 1].className += "laserOn"
-
+					res[res.length - 1].className += " laserOn "
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
 					res[res.length - 1].path = start(cx + c.base.X, cy + c.base.Y, c, height);
 
@@ -321,7 +313,7 @@ const GCodeToSvg1 = () => {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-					res[res.length - 1].path += line(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, c, height);
+					res[res.length - 1].path += line( tx + c.base.X, ty + c.base.Y, c, height);
 					if (n) {
 						let n0 = res[res.length - 1].n[0]
 						let n1 = res[res.length - 1].n[1]
@@ -350,7 +342,7 @@ const GCodeToSvg1 = () => {
 					if (!ccw && d > 0) d -= 2 * Math.PI;
 					const large = 0;
 					const sweep = ccw ? 1 : 0;
-					res[res.length - 1].path += arcPath(cx + c.base.X, cy + c.base.Y, tx + c.base.X, ty + c.base.Y, r, large, sweep, c, height);
+					res[res.length - 1].path += arcPath(tx + c.base.X, ty + c.base.Y, r, large, sweep, c, height);
 					if (n) {
 						let n0 = res[res.length - 1].n[0]
 						let n1 = res[res.length - 1].n[1]
@@ -360,6 +352,9 @@ const GCodeToSvg1 = () => {
 					}
 
 					cx = tx; cy = ty;
+				} else if (g === 10) {
+					let macros = ' macros' + c.params.S + ' '
+					res[res.length - 1].className += macros
 
 				} else if (g === 29) {
 
@@ -385,9 +380,7 @@ const GCodeToSvg1 = () => {
 
 				}
 
-				//const cls = laserOn ? `sgn_mv sgn_mv${c.g} gline_${c.n ?? 0}` : `sgn_fm gline_${c.n ?? 0}`;
-				//res && res.length ? res[res.length-1].className = cls : ''
-			}
+ 			}
 		}
 
 		// console.log(res)
