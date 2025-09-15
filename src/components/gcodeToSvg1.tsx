@@ -15,7 +15,7 @@ function getLastTwoNumbers(str: string): number[] {
   
 
 function makeGcodeParser() {
-	console.log ('makeGcodeParser')
+	console.log('makeGcodeParser')
 	let last = { g: undefined, m: undefined, params: {} };
 	let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
 
@@ -33,7 +33,7 @@ function makeGcodeParser() {
 
 		const nMatch = raw.match(/(\d+)N/i);
 		if (nMatch) {
-		  out.n = parseInt(nMatch[1], 10); // используем первую группу
+			out.n = parseInt(nMatch[1], 10); // используем первую группу
 		}
 
 		// G/M
@@ -84,8 +84,8 @@ const GCodeToSvg1 = () => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
-	const [width, setwidth] = useState(3000);
-	const [height, setHeigth] = useState(1500);
+	const [width, setwidth] = useState(700);
+	const [height, setHeigth] = useState(700);
 	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState("");
 
@@ -97,13 +97,13 @@ const GCodeToSvg1 = () => {
 			//setListing(sampleListing);
 		}, 2000);
 
-		fetch("http://192.168.11.253/gcore/0/listing", {
+		fetch("http://192.168.11.254/gcore/0/listing", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
 			.then((data) => {
 				clearTimeout(timeoutId);
-				setListing(  extractGcodeLines(data) /* || sampleListing */ );
+				setListing(extractGcodeLines(data) /* || sampleListing */);
 			})
 			.catch(() => {
 				clearTimeout(timeoutId);
@@ -120,7 +120,7 @@ const GCodeToSvg1 = () => {
 		if (!containerRef.current || !listing) return;
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
-		setPaths( getPath() )
+		setPaths(getPath())
 
 		// Удаляем старый инстанс
 		if (panZoomRef.current) {
@@ -175,22 +175,22 @@ const GCodeToSvg1 = () => {
 		dir === "+" ? panZoomRef.current.zoomIn() : panZoomRef.current.zoomOut();
 	};
 
-	const extractGcodeLines = (serverData: string): string =>{
+	const extractGcodeLines = (serverData: string): string => {
 		// Регулярка достаёт номер и содержимое
-	   const regex = /<em>(\d+)<\/em>\s*<span>(.*?)<\/span>/g;
-	   let result = "";
-	   let match;
-	 
-	   while ((match = regex.exec(serverData)) !== null) {
-		 const lineNum = match[1];       // номер строки
-		 const content = match[2].trim();// содержимое
-		 result += `${lineNum}${content}\n`; // собираем строку с \n
-	   }	 
-	   return result;
+		const regex = /<em>(\d+)<\/em>\s*<span>(.*?)<\/span>/g;
+		let result = "";
+		let match;
+
+		while ((match = regex.exec(serverData)) !== null) {
+			const lineNum = match[1];       // номер строки
+			const content = match[2].trim();// содержимое
+			result += `${lineNum}${content}\n`; // собираем строку с \n
+		}
+		return result;
 	}
 
- 	const getPath = () => {
-		console.log (' getPath ')
+	const getPath = () => {
+		console.log(' getPath ')
 		const parseGcodeLine = makeGcodeParser();
 		const lines = listing.trim().split(/\n+/);
 		const cmds = lines.map(parseGcodeLine);
@@ -200,7 +200,7 @@ const GCodeToSvg1 = () => {
 		let pendingBreakCircle = null;
 		let partStarted = 'notStarted';// started, finished, notStarted
 		let res = []; // массив путей
- 
+
 		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
 		const rotatePoint = (
 			x: number,
@@ -259,12 +259,15 @@ const GCodeToSvg1 = () => {
 			if (c?.comment?.includes('Part code')) {
 				// console.log('Part code')
 				partStarted = 'started';
+				res[res.length - 1].className += " groupStart "
 				continue;
 
 			} else if (c?.comment?.includes('Part End')) {
 				// console.log('Part End')
 				partStarted = 'finished';
 				// тут уходим от относительных координат к абс...
+				res[res.length - 1].className += " groupEnd "
+
 				cx = cx + c.base.X
 				cy = cy + c.base.Y
 				continue;
@@ -330,7 +333,6 @@ const GCodeToSvg1 = () => {
 				} else if (g === 2 || g === 3) {
 
 					// console.log(`g === 2 || g === 3`)
-
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
 					const ci = (c.params.I !== undefined) ? (c.params.I) : 0;
@@ -372,10 +374,10 @@ const GCodeToSvg1 = () => {
 					// console.log('g === 52')
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
 
- 
+
 					//yobanyi kostyl!!!!
 					if (res.length > 1) {
-						let [x1, y1] = getLastTwoNumbers( res[res.length - 2].path )
+						let [x1, y1] = getLastTwoNumbers(res[res.length - 2].path)
 						res[res.length - 1].path = `M${x1} ${y1}`;
 					} else {
 						res[res.length - 1].path = `M${cx} ${height - cy}`;
@@ -449,7 +451,7 @@ const GCodeToSvg1 = () => {
 						type="range"
 						className="w-full cursor-pointer accent-orange-500"
 						min={0}
-						max={ listing.trim().split(/\n+/).length }
+						max={listing.trim().split(/\n+/).length}
 						step={1}
 						value={cutSeg}
 						onChange={(e) => setCutSeg(Number(e.target.value))}
@@ -461,8 +463,8 @@ const GCodeToSvg1 = () => {
 						className="w-full p-2 border rounded-md"
 						min={0}
 						step={1}
-						value={ cutSeg}
-						onChange={(e)=> setCutSeg(Number(e.target.value))}
+						value={cutSeg}
+						onChange={(e) => setCutSeg(Number(e.target.value))}
 					/>
 				</div>
 			</div>
@@ -500,26 +502,66 @@ const GCodeToSvg1 = () => {
 							<g
 								className="sgn_main_els"
 								style={{ fill: "none", strokeWidth: 0.5, stroke: "black" }}
-							>{  paths && paths.map((a, i) => {
-									const { path, className, n } = a;
-									return (
-										<path
-											d={path}
-											key={i}
-											className={
-												className +
-												(
-													n[0] <= cutSeg && cutSeg <= n[1]
-														? " currentCut "
-														: n[0] < cutSeg
-															? " cutted "
-															: " uncutted "
-												)
+							>
+								{paths && (() => {
+									const groupedResult: JSX.Element[] = [];
+									const outsidePaths: JSX.Element[] = [];
+									let currentGroup: JSX.Element[] | null = null;
+
+									paths.forEach((a, i) => {
+										const { path, className, n } = a;
+
+										const pathElement = (
+											<path
+												d={path}
+												key={i}
+												className={
+													className +
+													(
+														n[0] <= cutSeg && cutSeg <= n[1]
+															? " currentCut "
+															: n[0] < cutSeg
+																? " cutted "
+																: " uncutted "
+													)
+												}
+											/>
+										);
+
+										if (className.includes('groupStart')) {
+											currentGroup = [];
+											outsidePaths.push(pathElement); // собираем вне групп отдельно
+											return;
+										}
+
+										if (className.includes('groupEnd')) {
+											if (currentGroup) {
+												currentGroup.reverse();
+												groupedResult.push(<g key={`g-${i}`}>{currentGroup}</g>);
+												currentGroup = null;
+												outsidePaths.push(pathElement); // собираем вне групп отдельно
 											}
-										/>
-									);
-								})
-								}
+											return;
+										}
+
+	
+
+										if (currentGroup) {
+											currentGroup.push(pathElement);
+										} else {
+											//outsidePaths.push(pathElement); // собираем вне групп отдельно
+										}
+									});
+
+									// На случай незакрытой группы
+									if (currentGroup) {
+										currentGroup.reverse();
+										groupedResult.push(<g key="g-last">{currentGroup}</g>);
+									}
+
+									// Сначала все группы, потом пути вне групп
+									return [...groupedResult, ...outsidePaths];
+								})()}
 							</g>
 						</g>
 					</g>
