@@ -8,7 +8,7 @@ import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
-import LoadSvg4 from './loadSvg4'
+import GCodeToSvg1 from "./gcodeToSvg1";
 //import LoadSvg2 from './loadSvg2'
 //import sampleSvg from "../store/sampleSvg";
 //import { useTranslation } from 'react-i18next';
@@ -135,7 +135,7 @@ const MidBar = observer(() => {
 							{/* <LoadSvg3 svgUrl={'http://192.168.11.249/gcore/0/preview.svg'} /> */}
 							{/* <LoadSvg2 /> */}
 
-							 <LoadSvg4 /> 
+							 <GCodeToSvg1 /> 
 							</div>
 					</div>
 				)}
@@ -170,8 +170,8 @@ const MidBar = observer(() => {
 
 
 						style={{
-							height: '800px',
-							width: '1600px',
+							height: isVertical ? '1600px':'800px',
+							width: isVertical ? '800px': '1600px',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',

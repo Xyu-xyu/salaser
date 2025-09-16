@@ -144,6 +144,7 @@ const GCodeToSvg1 = () => {
 			center: true,
 			minZoom: 0.1,
 			maxZoom: 20,
+			zoomScaleSensitivity: 0.4
 		});
 
 		panZoomRef.current = panZoomInstance;
@@ -539,15 +540,7 @@ const GCodeToSvg1 = () => {
 			</div>
 			<div
 				id="workarea"
-				ref={containerRef}
-				style={{
-					border: "none",
-					width: "1300px",
-					height: "650px",
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
+				ref={containerRef}				
 			>
 				{/* SVG */}
 				<svg

@@ -148,6 +148,7 @@ const RightBar = observer(() => {
 								<ListGroup.Item key={option.lang} >
 									<Form.Check
 										type="radio"
+										style={{margin:0}}
 										id={`radio-${option.lang}`}
 										label={option.name}
 										name={`${option.lang}-Options-${'lang'}`}

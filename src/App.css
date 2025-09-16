@@ -1255,4 +1255,8 @@ height: fit-content;}
   stroke-dasharray: 4 2; 
   marker-end: url(#arrow); 
 }
-  
+
+#RightBar  .form-check {
+  padding-left: 0;
+  margin: 0;
+} 
