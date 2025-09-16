@@ -1248,3 +1248,11 @@ height: fit-content;}
   fill: green !important;
   opacity: 0.5; 
 }
+
+
+.sgn_main_els g .laserOff{
+  stroke-width: 0.5px;
+  stroke-dasharray: 4 2; 
+  marker-end: url(#arrow); 
+}
+  

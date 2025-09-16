@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import svgPanZoom from "svg-pan-zoom";
 import { Icon } from "@iconify/react";
 import sampleListing from '../store/listing'
+import ToggleViewSheet from "./toggles/toggleViewSheet";
 
 function getLastTwoNumbers(str: string): number[] {
 	// Находим все числа с точкой или без
@@ -98,7 +99,7 @@ const GCodeToSvg1 = () => {
 		}, 2000);
 
  */
-		setListing(sampleListing );
+		setListing(sampleListing);
 
 
 		/* fetch("http://192.168.11.254/gcore/0/listing", {
@@ -203,7 +204,7 @@ const GCodeToSvg1 = () => {
 		let cx = 0, cy = 0;
 		let laserOn = false;
 		let pendingBreakCircle = null;
- 		let res = []; // массив путей
+		let res = []; // массив путей
 
 		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
 		const rotatePoint = (
@@ -224,7 +225,7 @@ const GCodeToSvg1 = () => {
 		};
 
 		// Линия с учётом поворота и инверсии Y
-		const line = ( x2: number, y2: number, c: any, height: number) => {
+		const line = (x2: number, y2: number, c: any, height: number) => {
 			const [rx2, ry2] = rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
 			return `L${rx2} ${height - ry2}`;
 		};
@@ -260,12 +261,12 @@ const GCodeToSvg1 = () => {
 		for (const c of cmds) {
 			if (c?.comment?.includes('Part code')) {
 				// console.log('Part code')
- 				res[res.length - 1].className += " groupStart "
+				res[res.length - 1].className += " groupStart "
 				continue;
 
 			} else if (c?.comment?.includes('Part End')) {
 				// console.log('Part End')
- 				// тут уходим от относительных координат к абс...
+				// тут уходим от относительных координат к абс...
 				res[res.length - 1].className += " groupEnd "
 
 				cx = cx + c.base.X
@@ -317,7 +318,7 @@ const GCodeToSvg1 = () => {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-					res[res.length - 1].path += line( tx + c.base.X, ty + c.base.Y, c, height);
+					res[res.length - 1].path += line(tx + c.base.X, ty + c.base.Y, c, height);
 					if (n) {
 						let n0 = res[res.length - 1].n[0]
 						let n1 = res[res.length - 1].n[1]
@@ -384,7 +385,7 @@ const GCodeToSvg1 = () => {
 
 				}
 
- 			}
+			}
 		}
 
 		// console.log(res)
@@ -394,50 +395,68 @@ const GCodeToSvg1 = () => {
 	const [labels, setLabels] = useState<JSX.Element[]>([]); // Храним готовые метки
 	const groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
 
-
-
 	useEffect(() => {
-		if (!paths) return; 
+		if (!paths) return;
 		generateLabels();
-	  }, [paths]);
+	}, [paths]);
 
-	  const generateLabels = () => {
+	const generateLabels = () => {
 		const newLabels: JSX.Element[] = [];
 		let labelNum = 0
 		groupRefs.current.forEach((g, idx) => {
-		  if (!g) return;
-		  labelNum+=1
-		  try {
-			const bbox = g.getBBox();
-			const cx = bbox.x + bbox.width / 2;
-			const cy = bbox.y + bbox.height / 2;
-	
-			newLabels.push(
-			  <g key={`label-${idx}`} pointerEvents="none">
-				<circle cx={cx} cy={cy} r={10} fill="var(--violet)" stroke="var(--violet)"/>
-				<text
-				  x={cx}
-				  y={cy}
-				  fontSize={12}
-				  fontWeight={700}
-				  textAnchor="middle"
-				  dominantBaseline="middle"
-				  fill="#fff"
-				  stroke="none"
-				>
-				  { labelNum }
-				</text>
-			  </g>
-			);
-		  } catch (e) {
-			// Если getBBox не сработает, метку не рисуем
-		  }
+			if (!g) return;
+			labelNum += 1
+			try {
+				const bbox = g.getBBox();
+				const cx = bbox.x + bbox.width / 2;
+				const cy = bbox.y + bbox.height / 2;
+
+				newLabels.push(
+					<g key={`label-${idx}`} pointerEvents="none">
+						<circle cx={cx} cy={cy} r={10} fill="var(--violet)" stroke="var(--violet)" />
+						<text
+							x={cx}
+							y={cy}
+							fontSize={12}
+							fontWeight={700}
+							textAnchor="middle"
+							dominantBaseline="middle"
+							fill="#fff"
+							stroke="none"
+						>
+							{labelNum}
+						</text>
+					</g>
+				);
+			} catch (e) {
+				// Если getBBox не сработает, метку не рисуем
+			}
 		});
 		setLabels(newLabels);
+	};
+
+	const [showInner, setShowInner] = useState(true);
+
+	const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const checked = e.target.checked;
+		setShowInner(checked);
+		toggleLaserOff(checked);
 	  };
 
 
+	const toggleLaserOff = (visible: boolean) => {
+		const paths = document.querySelectorAll<SVGPathElement>(
+			".sgn_main_els g .laserOff"
+		);
 
+		paths.forEach((p) => {
+			if (visible) {
+				p.style.visibility = "visible"; // показать
+			} else {
+				p.style.visibility = "hidden"; // скрыть
+			}
+		});
+	}
 
 
 	return (
@@ -492,6 +511,9 @@ const GCodeToSvg1 = () => {
 						</div>
 					</button>
 				</div>
+				<div className="mx-2 mt-1">
+					<ToggleViewSheet />
+				</div>				
 				<div className="d-flex flex-column">
 					<input
 						type="range"
@@ -513,6 +535,7 @@ const GCodeToSvg1 = () => {
 						onChange={(e) => setCutSeg(Number(e.target.value))}
 					/>
 				</div>
+				
 			</div>
 			<div
 				id="workarea"
@@ -553,7 +576,7 @@ const GCodeToSvg1 = () => {
 									const groupedResult: JSX.Element[] = [];
 									const outsidePaths: JSX.Element[] = [];
 									let currentGroup: JSX.Element[] | null = null;
-									let groupIndex:number =1
+									let groupIndex: number = 1
 
 									paths.forEach((a, i) => {
 										const { path, className, n } = a;
@@ -582,16 +605,16 @@ const GCodeToSvg1 = () => {
 										}
 
 										if (className.includes('groupEnd')) {
-											groupIndex+=1
+											groupIndex += 1
 											if (currentGroup) {
 												currentGroup.reverse();
 												groupedResult.push(
 													<g
 														key={`g-${i}`}
 														ref={(el) => {
-														if (el) {
-															groupRefs.current[i] = el; // сохраняем ссылку на <g>
-														}
+															if (el) {
+																groupRefs.current[i] = el; // сохраняем ссылку на <g>
+															}
 														}}
 													>
 														{currentGroup}
@@ -603,7 +626,7 @@ const GCodeToSvg1 = () => {
 											return;
 										}
 
-	
+
 
 										if (currentGroup) {
 											currentGroup.push(pathElement);
@@ -621,7 +644,7 @@ const GCodeToSvg1 = () => {
 									// Сначала все группы, потом пути вне групп
 									return [...groupedResult, ...outsidePaths];
 								})()}
-								{ labels }
+								{labels}
 							</g>
 						</g>
 					</g>
