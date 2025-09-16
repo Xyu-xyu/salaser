@@ -130,7 +130,12 @@ const ru: Record<string, string> = {
 	"Введите значение": "Введите значение",
 	"Макрос": "Макрос",
 	"Do you want to start laser reload?":"Начать перезагрузку лазера?",
-	"Do you want to power off?":"Выключить питание?"
+	"Do you want to power off?":"Выключить питание?",
+	"Select":"Выбрать",
+	"Wizard":"Помощник",
+	"Restart":"Рестарт",
+	"Display":"Вид",
+	"Key":"Ключ",
 
 
 };

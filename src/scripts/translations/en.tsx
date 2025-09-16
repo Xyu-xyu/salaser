@@ -132,10 +132,11 @@ const en: Record<string, string> = {
 	"Макрос": "Macro",
 	"Do you want to start laser reload?":"Do you want to start laser reload?",
 	"Do you want to power off?":"Do you want to power off?",
-	
-
-
-
+	"Select":"Select",
+	"Wizard":"Wizard",
+	"Restart":"Restart",
+	"Display":"Display",
+	"Key":"Key",
 };
 
 export default en;

@@ -91,19 +91,23 @@ const GCodeToSvg1 = () => {
 
 
 	useEffect(() => {
-		const controller = new AbortController();
+		/* const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
 			controller.abort();
 			//setListing(sampleListing);
 		}, 2000);
 
-		fetch("http://192.168.11.254/gcore/0/listing", {
+ */
+		setListing(sampleListing );
+
+
+		/* fetch("http://192.168.11.254/gcore/0/listing", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
 			.then((data) => {
 				clearTimeout(timeoutId);
-				setListing(extractGcodeLines(data) /* || sampleListing */);
+				setListing(extractGcodeLines(data)  || sampleListing );
 			})
 			.catch(() => {
 				clearTimeout(timeoutId);
@@ -113,7 +117,7 @@ const GCodeToSvg1 = () => {
 		return () => {
 			clearTimeout(timeoutId);
 			controller.abort();
-		};
+		}; */
 	}, [])
 
 	useEffect(() => {
@@ -387,6 +391,55 @@ const GCodeToSvg1 = () => {
 		return res;
 	};
 
+	const [labels, setLabels] = useState<JSX.Element[]>([]); // Храним готовые метки
+	const groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
+
+
+
+	useEffect(() => {
+		if (!paths) return; 
+		generateLabels();
+	  }, [paths]);
+
+	  const generateLabels = () => {
+		const newLabels: JSX.Element[] = [];
+		let labelNum = 0
+		groupRefs.current.forEach((g, idx) => {
+		  if (!g) return;
+		  labelNum+=1
+		  try {
+			const bbox = g.getBBox();
+			const cx = bbox.x + bbox.width / 2;
+			const cy = bbox.y + bbox.height / 2;
+	
+			newLabels.push(
+			  <g key={`label-${idx}`} pointerEvents="none">
+				<circle cx={cx} cy={cy} r={10} fill="var(--violet)" stroke="var(--violet)"/>
+				<text
+				  x={cx}
+				  y={cy}
+				  fontSize={12}
+				  fontWeight={700}
+				  textAnchor="middle"
+				  dominantBaseline="middle"
+				  fill="#fff"
+				  stroke="none"
+				>
+				  { labelNum }
+				</text>
+			  </g>
+			);
+		  } catch (e) {
+			// Если getBBox не сработает, метку не рисуем
+		  }
+		});
+		setLabels(newLabels);
+	  };
+
+
+
+
+
 	return (
 		<div
 			style={{
@@ -500,6 +553,7 @@ const GCodeToSvg1 = () => {
 									const groupedResult: JSX.Element[] = [];
 									const outsidePaths: JSX.Element[] = [];
 									let currentGroup: JSX.Element[] | null = null;
+									let groupIndex:number =1
 
 									paths.forEach((a, i) => {
 										const { path, className, n } = a;
@@ -528,9 +582,21 @@ const GCodeToSvg1 = () => {
 										}
 
 										if (className.includes('groupEnd')) {
+											groupIndex+=1
 											if (currentGroup) {
 												currentGroup.reverse();
-												groupedResult.push(<g key={`g-${i}`}>{currentGroup}</g>);
+												groupedResult.push(
+													<g
+														key={`g-${i}`}
+														ref={(el) => {
+														if (el) {
+															groupRefs.current[i] = el; // сохраняем ссылку на <g>
+														}
+														}}
+													>
+														{currentGroup}
+													</g>
+												);
 												currentGroup = null;
 												outsidePaths.push(pathElement); // собираем вне групп отдельно
 											}
@@ -555,6 +621,7 @@ const GCodeToSvg1 = () => {
 									// Сначала все группы, потом пути вне групп
 									return [...groupedResult, ...outsidePaths];
 								})()}
+								{ labels }
 							</g>
 						</g>
 					</g>
