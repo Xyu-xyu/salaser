@@ -17,7 +17,7 @@ const ZoomableSVG: React.FC = () => {
 			setSvg(SampleSvg);
 		}, 2000);
 
-		fetch("http://192.168.11.250/gcore/0/preview.svg", {
+		fetch("http://192.168.11.254/gcore/0/preview.svg", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())

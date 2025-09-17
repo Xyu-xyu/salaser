@@ -8,6 +8,7 @@ import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
+import LoadSvg4 from './loadSvg4'
 import GCodeToSvg1 from "./gcodeToSvg1";
 //import LoadSvg2 from './loadSvg2'
 //import sampleSvg from "../store/sampleSvg";
@@ -134,8 +135,13 @@ const MidBar = observer(() => {
 							{/*<GCodeToSvg gcode={listing} /> */}									
 							{/* <LoadSvg3 svgUrl={'http://192.168.11.249/gcore/0/preview.svg'} /> */}
 							{/* <LoadSvg2 /> */}
+<<<<<<< Updated upstream
 
 							 <GCodeToSvg1 /> 
+=======
+  							 {/* <LoadSvg4 />  */}
+							{ <GCodeToSvg1 /> }
+>>>>>>> Stashed changes
 							</div>
 					</div>
 				)}
