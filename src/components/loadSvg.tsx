@@ -5,6 +5,7 @@ import util from "../scripts/util";
 import { observer } from "mobx-react-lite";
 import parse from "html-react-parser";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import constants from "../store/constants";
 
 
 const LoadSvg: React.FC = observer(() => {
@@ -32,7 +33,7 @@ const LoadSvg: React.FC = observer(() => {
 			setWH(SampleSvg)
 		}, 2000);
 
-		fetch("http://192.168.11.249/gcore/0/preview.svg", {
+		fetch("http://"+ constants.api +"/gcore/0/preview.svg", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())

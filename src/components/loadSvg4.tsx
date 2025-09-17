@@ -3,6 +3,7 @@ import svgPanZoom from "svg-pan-zoom";
 import SampleSvg from "../store/sampleSvg";
 import { Icon } from "@iconify/react";
 import parse from "html-react-parser";
+import constants from "../store/constants";
 
 const ZoomableSVG: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -17,7 +18,7 @@ const ZoomableSVG: React.FC = () => {
 			setSvg(SampleSvg);
 		}, 2000);
 
-		fetch("http://192.168.11.254/gcore/0/preview.svg", {
+		fetch("http://"+ constants.api+"/gcore/0/preview.svg", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())

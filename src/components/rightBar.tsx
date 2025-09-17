@@ -2,7 +2,8 @@ import { observer } from "mobx-react-lite";
 import { Icon } from '@iconify/react';
 import { ListGroup, Form } from "react-bootstrap";
 import { useTranslation } from 'react-i18next';
- import laserStore from "../store/laserStore";
+import laserStore from "../store/laserStore";
+import { UploadButton } from "./uploadButton";
 
 
 
@@ -165,6 +166,9 @@ const RightBar = observer(() => {
 			{ !carouselInPlan && <div>
 				 <div className="mt-2">
 					<h5>{t('Parameters')}</h5>
+				</div>
+				<div>
+					<UploadButton />
 				</div>
 				<div>
 					<button className="w-100">

@@ -322,8 +322,8 @@ body {
   margin-top: 8px;
 }
 
-#RightBar div {
-  margin:5px;
+#RightBar div:not(.list-group-item) {
+  margin: 5px;
 }
 
 #RightBar button {

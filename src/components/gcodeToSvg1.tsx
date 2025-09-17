@@ -3,6 +3,9 @@ import svgPanZoom from "svg-pan-zoom";
 import { Icon } from "@iconify/react";
 import sampleListing from '../store/listing'
 import ToggleViewSheet from "./toggles/toggleViewSheet";
+import constants from "../store/constants";
+import { observer } from "mobx-react-lite";
+import laserStore from "../store/laserStore";
 
 function getLastTwoNumbers(str: string): number[] {
 	// Находим все числа с точкой или без
@@ -80,29 +83,30 @@ function makeGcodeParser() {
 }
 
 
-const GCodeToSvg1 = () => {
+const GCodeToSvg1 = observer(() => {
 
+	const {wh, reload } = laserStore
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
-	const [width, setwidth] = useState(700);
-	const [height, setHeigth] = useState(700);
+	const width = wh[0];
+	const height = wh[1];
 	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState("");
 
 
 	useEffect(() => {
-		/* const controller = new AbortController();
+		const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
 			controller.abort();
 			//setListing(sampleListing);
 		}, 2000);
 
- */
-		setListing(sampleListing);
+ 
+//		setListing(sampleListing);
 
 
-		/* fetch("http://192.168.11.254/gcore/0/listing", {
+		fetch("http://"+constants.api +"/gcore/0/listing", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
@@ -118,8 +122,8 @@ const GCodeToSvg1 = () => {
 		return () => {
 			clearTimeout(timeoutId);
 			controller.abort();
-		}; */
-	}, [])
+		};
+	}, [wh])
 
 	useEffect(() => {
 		if (!containerRef.current || !listing) return;
@@ -162,7 +166,7 @@ const GCodeToSvg1 = () => {
 				// console.warn("Ошибка destroy:", e);
 			}
 		};
-	}, [listing]);
+	}, [listing, wh]);
 
 	const normalizeAngle = (a: number) => {
 		while (a > Math.PI) a -= 2 * Math.PI;
@@ -409,8 +413,8 @@ const GCodeToSvg1 = () => {
 			labelNum += 1
 			try {
 				const bbox = g.getBBox();
-				const cx = bbox.x + bbox.width / 2;
-				const cy = bbox.y + bbox.height / 2;
+				const cx = bbox.x + bbox.wh[0] / 2;
+				const cy = bbox.y + bbox.wh[1] / 2;
 
 				newLabels.push(
 					<g key={`label-${idx}`} pointerEvents="none">
@@ -418,7 +422,7 @@ const GCodeToSvg1 = () => {
 						<text
 							x={cx}
 							y={cy}
-							fontSize={12}
+							fontSize={16  - 2* Math.floor(Math.log10(Math.abs(labelNum))) - 2 }
 							fontWeight={700}
 							textAnchor="middle"
 							dominantBaseline="middle"
@@ -646,6 +650,6 @@ const GCodeToSvg1 = () => {
 		</div>
 
 	);
-};
+});
 
 export default GCodeToSvg1;

@@ -133,15 +133,10 @@ const MidBar = observer(() => {
 					<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
 						<div className="planMain" style={{ border: "2px solid grey", borderRadius: '10px'}}>
 							{/*<GCodeToSvg gcode={listing} /> */}									
-							{/* <LoadSvg3 svgUrl={'http://192.168.11.249/gcore/0/preview.svg'} /> */}
+							{/* <LoadSvg3 svgUrl={'http://'+ constants.api+'/gcore/0/preview.svg'} /> */}
 							{/* <LoadSvg2 /> */}
-<<<<<<< Updated upstream
-
-							 <GCodeToSvg1 /> 
-=======
   							 {/* <LoadSvg4 />  */}
 							{ <GCodeToSvg1 /> }
->>>>>>> Stashed changes
 							</div>
 					</div>
 				)}
