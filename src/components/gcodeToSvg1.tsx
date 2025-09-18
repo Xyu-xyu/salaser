@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import svgPanZoom from "svg-pan-zoom";
 import { Icon } from "@iconify/react";
-import sampleListing from '../store/listing'
+//import sampleListing from '../store/listing'
 import ToggleViewSheet from "./toggles/toggleViewSheet";
 import constants from "../store/constants";
 import { observer } from "mobx-react-lite";
@@ -85,7 +85,7 @@ function makeGcodeParser() {
 
 const GCodeToSvg1 = observer(() => {
 
-	const {wh, reload } = laserStore
+	const { wh } = laserStore
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
@@ -93,8 +93,16 @@ const GCodeToSvg1 = observer(() => {
 	const height = wh[1];
 	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState("");
+	const [labels, setLabels] = useState<JSX.Element[]>([]); // Храним готовые метки
+	const groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
 
+	useEffect(() => {
+		if (!paths) return;
+		setLabels([])
+		setLabels ( generateLabels())
+	}, [paths]);   
 
+	
 	useEffect(() => {
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
@@ -102,35 +110,33 @@ const GCodeToSvg1 = observer(() => {
 			//setListing(sampleListing);
 		}, 2000);
 
- 
-//		setListing(sampleListing);
-
-
+		//setListing(sampleListing);
+	
 		fetch("http://"+constants.api +"/gcore/0/listing", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
 			.then((data) => {
 				clearTimeout(timeoutId);
-				setListing(extractGcodeLines(data)  || sampleListing );
+				setListing(extractGcodeLines(data)  /*|| sampleListing*/ );
 			})
 			.catch(() => {
 				clearTimeout(timeoutId);
-				setListing(sampleListing);
+				//setListing(sampleListing);
 			});
 
 		return () => {
 			clearTimeout(timeoutId);
 			controller.abort();
 		};
-	}, [wh])
+	}, [wh[0], wh[1]])
 
 	useEffect(() => {
 		if (!containerRef.current || !listing) return;
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
-		setPaths(getPath())
-
+		setPaths( getPath() )
+		//setLabels ( generateLabels())
 		// Удаляем старый инстанс
 		if (panZoomRef.current) {
 			try {
@@ -166,7 +172,7 @@ const GCodeToSvg1 = observer(() => {
 				// console.warn("Ошибка destroy:", e);
 			}
 		};
-	}, [listing, wh]);
+	}, [listing, wh[0], wh[1]]);
 
 	const normalizeAngle = (a: number) => {
 		while (a > Math.PI) a -= 2 * Math.PI;
@@ -397,72 +403,47 @@ const GCodeToSvg1 = observer(() => {
 		return res;
 	};
 
-	const [labels, setLabels] = useState<JSX.Element[]>([]); // Храним готовые метки
-	const groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
-
-	useEffect(() => {
-		if (!paths) return;
-		generateLabels();
-	}, [paths]);
-
 	const generateLabels = () => {
 		const newLabels: JSX.Element[] = [];
 		let labelNum = 0
 		groupRefs.current.forEach((g, idx) => {
 			if (!g) return;
-			labelNum += 1
+			
 			try {
 				const bbox = g.getBBox();
-				const cx = bbox.x + bbox.wh[0] / 2;
-				const cy = bbox.y + bbox.wh[1] / 2;
-
+				const cx = bbox.x + bbox.width / 2;
+				const cy = bbox.y + bbox.height / 2;
+				labelNum += 1
 				newLabels.push(
-					<g key={`label-${idx}`} pointerEvents="none">
-						<circle cx={cx} cy={cy} r={10} fill="var(--violet)" stroke="var(--violet)" />
-						<text
-							x={cx}
-							y={cy}
-							fontSize={16  - 2* Math.floor(Math.log10(Math.abs(labelNum))) - 2 }
-							fontWeight={700}
-							textAnchor="middle"
-							dominantBaseline="middle"
-							fill="#fff"
-							stroke="none"
-						>
-							{labelNum}
-						</text>
-					</g>
+				<g key={`label-${idx}`} pointerEvents="none">
+					<circle
+					cx={cx}
+					cy={cy}
+					r={10}
+					fill="var(--violet)"
+					stroke="var(--violet)" 
+					/>
+					<text
+					x={cx}
+					y={cy}
+					fontSize={16 - 2 * Math.floor(Math.log10(Math.abs(labelNum))) - 2}
+					fontWeight={700}
+					textAnchor="middle"
+					fill="#fff"
+					stroke="none"
+					dy=".35em"   // сдвиг по вертикали для центрирования
+					>
+					{labelNum}
+					</text>
+				</g>
 				);
+
 			} catch (e) {
 				// Если getBBox не сработает, метку не рисуем
 			}
 		});
-		setLabels(newLabels);
+		return newLabels;
 	};
-
-	const [showInner, setShowInner] = useState(true);
-
-	const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const checked = e.target.checked;
-		setShowInner(checked);
-		toggleLaserOff(checked);
-	  };
-
-
-	const toggleLaserOff = (visible: boolean) => {
-		const paths = document.querySelectorAll<SVGPathElement>(
-			".sgn_main_els g .laserOff"
-		);
-
-		paths.forEach((p) => {
-			if (visible) {
-				p.style.visibility = "visible"; // показать
-			} else {
-				p.style.visibility = "hidden"; // скрыть
-			}
-		});
-	}
-
 
 	return (
 		<div
@@ -471,7 +452,7 @@ const GCodeToSvg1 = observer(() => {
 				borderRadius: "10px",
 				width: "1300px",
 				height: "650px",
-				touchAction: "none", // 🔥 обязательно для pinch
+				touchAction: "none", 
 				position: "relative",
 			}}
 		>

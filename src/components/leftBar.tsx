@@ -1,12 +1,10 @@
 import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
-import { useTranslation } from 'react-i18next';
 import { Icon } from "@iconify/react/dist/iconify.js";
 import LaserIcon from "./../../public/images/laserIcon"
 
 
 const LeftBar = observer(() => {
-	const { t } = useTranslation()
 	const { carouselInPlan } = laserStore
 
 	return (
