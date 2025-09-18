@@ -6,81 +6,7 @@ import ToggleViewSheet from "./toggles/toggleViewSheet";
 import constants from "../store/constants";
 import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
-
-function getLastTwoNumbers(str: string): number[] {
-	// Находим все числа с точкой или без
-	const numbers = str.match(/-?\d+(\.\d+)?/g);
-	if (!numbers) return [];
-	
-	// Берём последние два
-	const lastTwo = numbers.slice(-2).map(Number);
-	return lastTwo;
-  }
-  
-
-function makeGcodeParser() {
-	console.log('makeGcodeParser')
-	let last = { g: undefined, m: undefined, params: {} };
-	let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
-
-	return function parseGcodeLine(raw) {
-		let s = String(raw).trim();
-		s = s.replace(/^\d+\s*/, '');
-
-		const out = { n: undefined, g: undefined, m: undefined, params: {} };
-
-		const commentMatch = s.match(/\(([^)]*)\)/);
-		if (commentMatch) {
-			out.comment = commentMatch[1];
-			s = s.replace(/\([^)]*\)/g, ' ');
-		}
-
-		const nMatch = raw.match(/(\d+)N/i);
-		if (nMatch) {
-			out.n = parseInt(nMatch[1], 10); // используем первую группу
-		}
-
-		// G/M
-		const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
-		out.g = gMatch ? Number(gMatch[1]) : last.g;
-		const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
-		out.m = mMatch ? Number(mMatch[1]) : false;
-
-		// Параметры
-		const keys = ['X', 'Y', 'I', 'J', 'S', 'P', 'H', 'A', 'L', 'C'];
-		for (const k of keys) {
-			const r = new RegExp(`${k}(-?\\d+(?:\\.\\d+)?)`, 'i');
-			const m = s.match(r);
-			if (m) {
-				out.params[k] = Number(m[1]);
-			} else if (last.params[k] !== undefined) {
-				out.params[k] = last.params[k];
-			}
-		}
-
-		if (/(Part End)/i.test(s)) {
-			out.base = { X: 0, Y: 0, C: 0 };
-		}
-
-		// Если это строка с G52 — сохраняем её как базовую
-		if (/G52/i.test(s)) {
-			base.X = out.params.X;
-			base.Y = out.params.Y;
-			base.C = out.params.C;
-			let nb = { X: out.params.X, Y: out.params.Y, C: out.params.C }
-			out.base = { ...nb }
-		} else {
-			out.base = { ...base }
-		}
-
-		// Обновляем last
-		last.g = out.g;
-		last.m = out.m;
-		last.params = { ...last.params, ...out.params };
-		//// console.log(out)
-		return out;
-	};
-}
+import utils from "../scripts/util";
 
 
 const GCodeToSvg1 = observer(() => {
@@ -96,46 +22,22 @@ const GCodeToSvg1 = observer(() => {
 	const [labels, setLabels] = useState<JSX.Element[]>([]); // Храним готовые метки
 	const groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
 
+
+	useEffect(() => {
+		update ()
+	}, [])
+
 	useEffect(() => {
 		if (!paths) return;
 		setLabels([])
-		setLabels ( generateLabels())
-	}, [paths]);   
-
-	
-	useEffect(() => {
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => {
-			controller.abort();
-			//setListing(sampleListing);
-		}, 2000);
-
-		//setListing(sampleListing);
-	
-		fetch("http://"+constants.api +"/gcore/0/listing", {
-			signal: controller.signal,
-		})
-			.then((r) => r.text())
-			.then((data) => {
-				clearTimeout(timeoutId);
-				setListing(extractGcodeLines(data)  /*|| sampleListing*/ );
-			})
-			.catch(() => {
-				clearTimeout(timeoutId);
-				//setListing(sampleListing);
-			});
-
-		return () => {
-			clearTimeout(timeoutId);
-			controller.abort();
-		};
-	}, [wh[0], wh[1]])
+		setLabels(generateLabels())
+	}, [paths]);
 
 	useEffect(() => {
 		if (!containerRef.current || !listing) return;
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
-		setPaths( getPath() )
+		setPaths(getPath())
 		//setLabels ( generateLabels())
 		// Удаляем старый инстанс
 		if (panZoomRef.current) {
@@ -169,15 +71,48 @@ const GCodeToSvg1 = observer(() => {
 			try {
 				panZoomInstance.destroy();
 			} catch (e) {
-				// console.warn("Ошибка destroy:", e);
+				console.warn("Ошибка destroy:", e);
 			}
 		};
 	}, [listing, wh[0], wh[1]]);
 
-	const normalizeAngle = (a: number) => {
-		while (a > Math.PI) a -= 2 * Math.PI;
-		while (a < -Math.PI) a += 2 * Math.PI;
-		return a;
+	const update = () =>{
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => {
+			controller.abort();
+			//setListing(sampleListing);
+		}, 2000);
+				
+		fetch( "http://"+constants.api+"/py/gcores[0].loadresult", {
+			signal: controller.signal,
+		})
+			.then((r) => r.text())
+			.then((d) => {
+		
+				let data = JSON.parse(d)
+				const dimX = Number(data.result.jobinfo.attr.dimx);
+				const dimY = Number(data.result.jobinfo.attr.dimy);
+				laserStore.setWh([dimX, dimY]);
+		})
+	
+		
+		fetch("http://" + constants.api + "/gcore/0/listing", {
+			signal: controller.signal,
+		})
+			.then((r) => r.text())
+			.then((data) => {
+				clearTimeout(timeoutId);
+				setListing( utils.extractGcodeLines(data)  /*|| sampleListing*/);
+			})
+			.catch(() => {
+				clearTimeout(timeoutId);
+				//setListing(sampleListing);
+			});
+
+		return () => {
+			clearTimeout(timeoutId);
+			controller.abort();
+		};
 	}
 
 	const fit = () => {
@@ -191,23 +126,9 @@ const GCodeToSvg1 = observer(() => {
 		dir === "+" ? panZoomRef.current.zoomIn() : panZoomRef.current.zoomOut();
 	};
 
-	const extractGcodeLines = (serverData: string): string => {
-		// Регулярка достаёт номер и содержимое
-		const regex = /<em>(\d+)<\/em>\s*<span>(.*?)<\/span>/g;
-		let result = "";
-		let match;
-
-		while ((match = regex.exec(serverData)) !== null) {
-			const lineNum = match[1];       // номер строки
-			const content = match[2].trim();// содержимое
-			result += `${lineNum}${content}\n`; // собираем строку с \n
-		}
-		return result;
-	}
-
 	const getPath = () => {
 		console.log(' getPath ')
-		const parseGcodeLine = makeGcodeParser();
+		const parseGcodeLine = utils.makeGcodeParser();
 		const lines = listing.trim().split(/\n+/);
 		const cmds = lines.map(parseGcodeLine);
 		//console.log (cmds)
@@ -352,7 +273,7 @@ const GCodeToSvg1 = observer(() => {
 					let r = Math.round((Math.hypot(tx - ci, ty - cj)) * 1000) / 1000;
 					const a1 = Math.atan2(dys, dxs);
 					const a2 = Math.atan2(dye, dxe);
-					let d = normalizeAngle(a2 - a1);
+					let d = utils.normalizeAngle(a2 - a1);
 					const ccw = (g === 3);
 					if (ccw && d < 0) d += 2 * Math.PI;
 					if (!ccw && d > 0) d -= 2 * Math.PI;
@@ -388,7 +309,7 @@ const GCodeToSvg1 = observer(() => {
 
 					//yobanyi kostyl!!!!
 					if (res.length > 1) {
-						let [x1, y1] = getLastTwoNumbers(res[res.length - 2].path)
+						let [x1, y1] = utils.getLastTwoNumbers(res[res.length - 2].path)
 						res[res.length - 1].path = `M${x1} ${y1}`;
 					} else {
 						res[res.length - 1].path = `M${cx} ${height - cy}`;
@@ -408,34 +329,34 @@ const GCodeToSvg1 = observer(() => {
 		let labelNum = 0
 		groupRefs.current.forEach((g, idx) => {
 			if (!g) return;
-			
+
 			try {
 				const bbox = g.getBBox();
 				const cx = bbox.x + bbox.width / 2;
 				const cy = bbox.y + bbox.height / 2;
 				labelNum += 1
 				newLabels.push(
-				<g key={`label-${idx}`} pointerEvents="none">
-					<circle
-					cx={cx}
-					cy={cy}
-					r={10}
-					fill="var(--violet)"
-					stroke="var(--violet)" 
-					/>
-					<text
-					x={cx}
-					y={cy}
-					fontSize={16 - 2 * Math.floor(Math.log10(Math.abs(labelNum))) - 2}
-					fontWeight={700}
-					textAnchor="middle"
-					fill="#fff"
-					stroke="none"
-					dy=".35em"   // сдвиг по вертикали для центрирования
-					>
-					{labelNum}
-					</text>
-				</g>
+					<g key={`label-${idx}`} pointerEvents="none">
+						<circle
+							cx={cx}
+							cy={cy}
+							r={10}
+							fill="var(--violet)"
+							stroke="var(--violet)"
+						/>
+						<text
+							x={cx}
+							y={cy}
+							fontSize={16 - 2 * Math.floor(Math.log10(Math.abs(labelNum))) - 2}
+							fontWeight={700}
+							textAnchor="middle"
+							fill="#fff"
+							stroke="none"
+							dy=".35em"   // сдвиг по вертикали для центрирования
+						>
+							{labelNum}
+						</text>
+					</g>
 				);
 
 			} catch (e) {
@@ -452,7 +373,7 @@ const GCodeToSvg1 = observer(() => {
 				borderRadius: "10px",
 				width: "1300px",
 				height: "650px",
-				touchAction: "none", 
+				touchAction: "none",
 				position: "relative",
 			}}
 		>
@@ -499,7 +420,7 @@ const GCodeToSvg1 = observer(() => {
 				</div>
 				<div className="mx-2 mt-1">
 					<ToggleViewSheet />
-				</div>				
+				</div>
 				<div className="d-flex flex-column">
 					<input
 						type="range"
@@ -521,11 +442,11 @@ const GCodeToSvg1 = observer(() => {
 						onChange={(e) => setCutSeg(Number(e.target.value))}
 					/>
 				</div>
-				
+
 			</div>
 			<div
 				id="workarea"
-				ref={containerRef}				
+				ref={containerRef}
 			>
 				{/* SVG */}
 				<svg

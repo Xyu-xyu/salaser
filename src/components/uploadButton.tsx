@@ -36,12 +36,12 @@ export const UploadButton = () => {
 			try {
 				let resp = await fetch(`http://${api_host}/gcore/${core}/upload`, {
 					method: "POST",
-					headers:{},
+					headers: {},
 					body: content/* as string*/,
 				});
 
 				if (resp.ok) {
- 					console.log("✅ Uploaded");
+					console.log("✅ Uploaded");
 				} else {
 					console.error("❌ Upload failed:", resp.statusText);
 				}
@@ -53,27 +53,26 @@ export const UploadButton = () => {
 			try {
 				let resp = await fetch(`http://${api_host}/py/gcores[${core}].loadresult`);
 				resp.json().then((data) => {
-				  console.log("📥 Load result:", data);
-			  
-				  if (data.result.status === "ERROR") {
-					for (let msg_obj of data.result.jobinfo.messages) {
-					  console.error("❌ Loading failed:", msg_obj.Message);
+
+					if (data.result.status === "ERROR") {
+						for (let msg_obj of data.result.jobinfo.messages) {
+							console.error("❌ Loading failed:", msg_obj.Message);
+						}
+						return;
 					}
-					return;
-				  }
-			  
-				  if (upload_is_ok) {
-					console.log("✅ Success");
-					const dimX = Number(data.result.jobinfo.attr.dimx);
-					const dimY = Number(data.result.jobinfo.attr.dimy);
-			  		console.log(`📏 Dimensions: X=${dimX}, Y=${dimY}`);
-					laserStore.setWh([dimX, dimY])
-				  }
+
+					if (upload_is_ok) {
+						console.log("✅ Success");
+						const dimX = Number(data.result.jobinfo.attr.dimx);
+						const dimY = Number(data.result.jobinfo.attr.dimy);
+						console.log(`📏 Dimensions: X=${dimX}, Y=${dimY}`);
+						laserStore.setWh([dimX, dimY])
+					}
 				});
-			  } catch (error) {
+			} catch (error) {
 				console.error("❌ loadresult error:", error);
-			  }
-			  
+			}
+
 		};
 	};
 
