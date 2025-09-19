@@ -483,6 +483,7 @@ const GCodeToSvg1 = observer(() => {
 
 									paths.forEach((a, i) => {
 										const { path, className, n } = a;
+										console.log ( path, className, n)
 
 										const pathElement = (
 											<path
@@ -501,7 +502,7 @@ const GCodeToSvg1 = observer(() => {
 											/>
 										);
 
-										if (className.includes("groupStart")) {
+										if (className.includes("groupStart") || className.includes("g4")) {
 											currentGroup = [];
 											outsidePaths.push(pathElement);
 											return;
