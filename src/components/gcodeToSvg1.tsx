@@ -11,12 +11,13 @@ import utils from "../scripts/util";
 
 const GCodeToSvg1 = observer(() => {
 
-	const { wh } = laserStore
+	const { loadResult } = laserStore
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
-	const width = wh[0];
-	const height = wh[1];
+	const data =  JSON.parse(loadResult)
+	const width =  Number(data.result.jobinfo.attr?.dimx)||3000;
+	const height = Number(data.result.jobinfo.attr?.dimy)||1500;
 	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState("");
 	const [labels, setLabels] = useState<JSX.Element[]>([]); // Храним готовые метки
@@ -26,6 +27,10 @@ const GCodeToSvg1 = observer(() => {
 	useEffect(() => {
 		update ()
 	}, [])
+
+	useEffect(() => {
+		update ()
+	}, [loadResult])
 
 	useEffect(() => {
 		if (!paths) return;
@@ -38,13 +43,11 @@ const GCodeToSvg1 = observer(() => {
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
 		setPaths(getPath())
-		//setLabels ( generateLabels())
-		// Удаляем старый инстанс
-		if (panZoomRef.current) {
+ 		if (panZoomRef.current) {
 			try {
 				panZoomRef.current.destroy();
 			} catch (e) {
-				// console.warn("Ошибка destroy:", e);
+				console.warn("Ошибка destroy:", e);
 			}
 			panZoomRef.current = null;
 		}
@@ -74,7 +77,7 @@ const GCodeToSvg1 = observer(() => {
 				console.warn("Ошибка destroy:", e);
 			}
 		};
-	}, [listing, wh[0], wh[1]]);
+	}, [listing]);
 
 	const update = () =>{
 		const controller = new AbortController();
@@ -89,10 +92,9 @@ const GCodeToSvg1 = observer(() => {
 			.then((r) => r.text())
 			.then((d) => {
 		
-				let data = JSON.parse(d)
-				const dimX = Number(data.result.jobinfo.attr.dimx);
-				const dimY = Number(data.result.jobinfo.attr.dimy);
-				laserStore.setWh([dimX, dimY]);
+			if ( d !== JSON.stringify(loadResult)){
+				laserStore.setVal('loadResult', d)
+			}
 		})
 	
 		

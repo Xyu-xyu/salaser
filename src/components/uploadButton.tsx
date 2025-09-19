@@ -3,13 +3,15 @@ import { Icon } from "@iconify/react";
 import constants from "../store/constants";
 import { useTranslation } from "react-i18next";
 import laserStore from "../store/laserStore";
+import { observer } from "mobx-react-lite";
 
 
-export const UploadButton = () => {
+export const UploadButton = observer(() => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const api_host = constants.api
 	const core = 0
 	const { t } = useTranslation()
+	const { loadResult } = laserStore
 
 
 	const handleClick = () => {
@@ -62,11 +64,10 @@ export const UploadButton = () => {
 					}
 
 					if (upload_is_ok) {
-						console.log("✅ Success");
-						const dimX = Number(data.result.jobinfo.attr.dimx);
-						const dimY = Number(data.result.jobinfo.attr.dimy);
-						console.log(`📏 Dimensions: X=${dimX}, Y=${dimY}`);
-						laserStore.setWh([dimX, dimY])
+					 	console.log("✅ Success");
+						if ( data !== JSON.stringify(loadResult)){
+							laserStore.setVal('loadResult', JSON.stringify(data))
+						}
 					}
 				});
 			} catch (error) {
@@ -102,4 +103,4 @@ export const UploadButton = () => {
 			/>
 		</>
 	);
-};
+});

@@ -10,17 +10,13 @@ class LaserStore {
 	loading: boolean = false;
 	error: string | null = null;
 	private intervalId: ReturnType<typeof setInterval> | null = null;
-	wh:any[]=[3000,1500]
-	reload:boolean=false
+	loadResult:string= `{"success": true, "result": {"jobinfo": {}, "status": "IDLE", "mode": "NCP", "workarea": [3100, 2600]}}`
 
 
 	constructor() {
 		makeAutoObservable(this);
 	}
 
-	setWh (val:any[]){
-		this.wh = val
-	}
 
 	setVal<T extends keyof this>(key: T, value: this[T]) {
 		if (key in this) {

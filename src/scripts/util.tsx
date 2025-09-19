@@ -452,6 +452,100 @@ class Utils {
             y: (evt.clientY + CTM.e)/ CTM.d
         }; 
     }
+
+	getLastTwoNumbers(str: string): number[] {
+		// Находим все числа с точкой или без
+		const numbers = str.match(/-?\d+(\.\d+)?/g);
+		if (!numbers) return [];
+	
+		// Берём последние два
+		const lastTwo = numbers.slice(-2).map(Number);
+		return lastTwo;
+	}
+	
+	makeGcodeParser() {
+		console.log('makeGcodeParser')
+		let last = { g: undefined, m: undefined, params: {} };
+		let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
+	
+		return function parseGcodeLine(raw) {
+			let s = String(raw).trim();
+			s = s.replace(/^\d+\s*/, '');
+	
+			const out = { n: undefined, g: undefined, m: undefined, params: {} };
+	
+			const commentMatch = s.match(/\(([^)]*)\)/);
+			if (commentMatch) {
+				out.comment = commentMatch[1];
+				s = s.replace(/\([^)]*\)/g, ' ');
+			}
+	
+			const nMatch = raw.match(/(\d+)N/i);
+			if (nMatch) {
+				out.n = parseInt(nMatch[1], 10); // используем первую группу
+			}
+	
+			// G/M
+			const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
+			out.g = gMatch ? Number(gMatch[1]) : last.g;
+			const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
+			out.m = mMatch ? Number(mMatch[1]) : false;
+	
+			// Параметры
+			const keys = ['X', 'Y', 'I', 'J', 'S', 'P', 'H', 'A', 'L', 'C'];
+			for (const k of keys) {
+				const r = new RegExp(`${k}(-?\\d+(?:\\.\\d+)?)`, 'i');
+				const m = s.match(r);
+				if (m) {
+					out.params[k] = Number(m[1]);
+				} else if (last.params[k] !== undefined) {
+					out.params[k] = last.params[k];
+				}
+			}
+	
+			if (/(Part End)/i.test(s)) {
+				out.base = { X: 0, Y: 0, C: 0 };
+			}
+	
+			// Если это строка с G52 — сохраняем её как базовую
+			if (/G52/i.test(s)) {
+				base.X = out.params.X;
+				base.Y = out.params.Y;
+				base.C = out.params.C;
+				let nb = { X: out.params.X, Y: out.params.Y, C: out.params.C }
+				out.base = { ...nb }
+			} else {
+				out.base = { ...base }
+			}
+	
+			// Обновляем last
+			last.g = out.g;
+			last.m = out.m;
+			last.params = { ...last.params, ...out.params };
+			//// console.log(out)
+			return out;
+		};
+	}
+
+	extractGcodeLines = (serverData: string): string => {
+		// Регулярка достаёт номер и содержимое
+		const regex = /<em>(\d+)<\/em>\s*<span>(.*?)<\/span>/g;
+		let result = "";
+		let match;
+
+		while ((match = regex.exec(serverData)) !== null) {
+			const lineNum = match[1];       // номер строки
+			const content = match[2].trim();// содержимое
+			result += `${lineNum}${content}\n`; // собираем строку с \n
+		}
+		return result;
+	}
+
+	normalizeAngle = (a: number) => {
+		while (a > Math.PI) a -= 2 * Math.PI;
+		while (a < -Math.PI) a += 2 * Math.PI;
+		return a;
+	}
 }
 
 const utils = new Utils();
