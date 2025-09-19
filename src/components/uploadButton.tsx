@@ -4,6 +4,7 @@ import constants from "../store/constants";
 import { useTranslation } from "react-i18next";
 import laserStore from "../store/laserStore";
 import { observer } from "mobx-react-lite";
+import { showToast } from "../components/toast";
 
 
 export const UploadButton = observer(() => {
@@ -43,12 +44,30 @@ export const UploadButton = observer(() => {
 				});
 
 				if (resp.ok) {
-					console.log("✅ Uploaded");
+					//console.log("✅ Uploaded");
+					showToast({
+						type: 'success',
+						message: "Upload success!",
+						position: 'bottom-right',
+						autoClose: 5000
+					});
 				} else {
-					console.error("❌ Upload failed:", resp.statusText);
+					
+					showToast({
+						type: 'error',
+						message: "Upload failed:"+ resp.statusText,
+						position: 'bottom-right',
+						autoClose: 5000
+					});
 				}
 			} catch (error) {
-				console.error("❌ Upload error:", error);
+				
+				showToast({
+					type: 'error',
+					message: "Upload error:"+ error,
+					position: 'bottom-right',
+					autoClose: 5000
+				});
 				upload_is_ok = false;
 			}
 
@@ -58,7 +77,12 @@ export const UploadButton = observer(() => {
 
 					if (data.result.status === "ERROR") {
 						for (let msg_obj of data.result.jobinfo.messages) {
-							console.error("❌ Loading failed:", msg_obj.Message);
+ 							showToast({
+								type: 'error',
+								message: "Loading failed:"+ msg_obj.Message,
+								position: 'bottom-right',
+								autoClose: 5000
+							});
 						}
 						return;
 					}
@@ -71,7 +95,12 @@ export const UploadButton = observer(() => {
 					}
 				});
 			} catch (error) {
-				console.error("❌ loadresult error:", error);
+ 				showToast({
+					type: 'error',
+					message: "loadresult error:"+ error,
+					position: 'bottom-right',
+					autoClose: 5000
+				});
 			}
 
 		};

@@ -15,26 +15,27 @@ const GCodeToSvg1 = observer(() => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
-	const data =  JSON.parse(loadResult)
-	const width =  Number(data.result.jobinfo.attr?.dimx)||3000;
-	const height = Number(data.result.jobinfo.attr?.dimy)||1500;
+	const data = JSON.parse(loadResult)
+	const width = Number(data.result.jobinfo.attr?.dimx) || 3000;
+	const height = Number(data.result.jobinfo.attr?.dimy) || 1500;
 	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState("");
 	const [labels, setLabels] = useState<JSX.Element[]>([]); // Храним готовые метки
-	const groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
+	let groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
 
 
 	useEffect(() => {
-		update ()
+		update()
 	}, [])
 
 	useEffect(() => {
-		update ()
+		setCutSeg(0)
+		setLabels([])
+		update()
 	}, [loadResult])
 
 	useEffect(() => {
 		if (!paths) return;
-		setLabels([])
 		setLabels(generateLabels())
 	}, [paths]);
 
@@ -43,7 +44,7 @@ const GCodeToSvg1 = observer(() => {
 		const svgElement = containerRef.current.querySelector("svg");
 		if (!svgElement) return;
 		setPaths(getPath())
- 		if (panZoomRef.current) {
+		if (panZoomRef.current) {
 			try {
 				panZoomRef.current.destroy();
 			} catch (e) {
@@ -79,32 +80,32 @@ const GCodeToSvg1 = observer(() => {
 		};
 	}, [listing]);
 
-	const update = () =>{
+	const update = () => {
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
 			controller.abort();
 			//setListing(sampleListing);
 		}, 2000);
-				
-		fetch( "http://"+constants.api+"/py/gcores[0].loadresult", {
+
+		fetch("http://" + constants.api + "/py/gcores[0].loadresult", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
 			.then((d) => {
-		
-			if ( d !== JSON.stringify(loadResult)){
-				laserStore.setVal('loadResult', d)
-			}
-		})
-	
-		
+
+				if (d !== JSON.stringify(loadResult)) {
+					laserStore.setVal('loadResult', d)
+				}
+			})
+
+
 		fetch("http://" + constants.api + "/gcore/0/listing", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
 			.then((data) => {
 				clearTimeout(timeoutId);
-				setListing( utils.extractGcodeLines(data)  /*|| sampleListing*/);
+				setListing(utils.extractGcodeLines(data)  /*|| sampleListing*/);
 			})
 			.catch(() => {
 				clearTimeout(timeoutId);
@@ -477,7 +478,8 @@ const GCodeToSvg1 = observer(() => {
 									const groupedResult: JSX.Element[] = [];
 									const outsidePaths: JSX.Element[] = [];
 									let currentGroup: JSX.Element[] | null = null;
-									let groupIndex: number = 1
+									let groupIndex: number = 1;
+									groupRefs.current = [];
 
 									paths.forEach((a, i) => {
 										const { path, className, n } = a;
@@ -499,14 +501,14 @@ const GCodeToSvg1 = observer(() => {
 											/>
 										);
 
-										if (className.includes('groupStart')) {
+										if (className.includes("groupStart")) {
 											currentGroup = [];
-											outsidePaths.push(pathElement); // собираем вне групп отдельно
+											outsidePaths.push(pathElement);
 											return;
 										}
 
-										if (className.includes('groupEnd')) {
-											groupIndex += 1
+										if (className.includes("groupEnd")) {
+											groupIndex += 1;
 											if (currentGroup) {
 												currentGroup.reverse();
 												groupedResult.push(
@@ -514,7 +516,7 @@ const GCodeToSvg1 = observer(() => {
 														key={`g-${i}`}
 														ref={(el) => {
 															if (el) {
-																groupRefs.current[i] = el; // сохраняем ссылку на <g>
+																groupRefs.current.push(el); // 👉 вместо i — пушим по порядку
 															}
 														}}
 													>
@@ -522,27 +524,21 @@ const GCodeToSvg1 = observer(() => {
 													</g>
 												);
 												currentGroup = null;
-												outsidePaths.push(pathElement); // собираем вне групп отдельно
+												outsidePaths.push(pathElement);
 											}
 											return;
 										}
 
-
-
 										if (currentGroup) {
 											currentGroup.push(pathElement);
-										} else {
-											//outsidePaths.push(pathElement); // собираем вне групп отдельно
 										}
 									});
 
-									// На случай незакрытой группы
 									if (currentGroup) {
 										currentGroup.reverse();
 										groupedResult.push(<g key="g-last">{currentGroup}</g>);
 									}
 
-									// Сначала все группы, потом пути вне групп
 									return [...groupedResult, ...outsidePaths];
 								})()}
 								{labels}
