@@ -1260,3 +1260,18 @@ height: fit-content;}
   padding-left: 0;
   margin: 0;
 } 
+
+
+.sgn_main_els.hideLabels  .partLabel {
+  visibility: hidden !important;
+}
+
+.sgn_main_els.hideInners  .laserOff {
+  visibility: hidden !important;
+}
+
+
+.form-check-input:checked {
+  background-color: var(--violet);
+  border-color: var(--violet);
+}

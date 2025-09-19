@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import svgPanZoom from "svg-pan-zoom";
 import { Icon } from "@iconify/react";
 //import sampleListing from '../store/listing'
-import ToggleViewSheet from "./toggles/toggleViewSheet";
 import constants from "../store/constants";
 import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
 import utils from "../scripts/util";
+import { Form } from "react-bootstrap";
 
 
 const GCodeToSvg1 = observer(() => {
@@ -339,7 +339,7 @@ const GCodeToSvg1 = observer(() => {
 				const cy = bbox.y + bbox.height / 2;
 				labelNum += 1
 				newLabels.push(
-					<g key={`label-${idx}`} pointerEvents="none">
+					<g key={`label-${idx}`} pointerEvents="none" className="partLabel">
 						<circle
 							cx={cx}
 							cy={cy}
@@ -368,6 +368,11 @@ const GCodeToSvg1 = observer(() => {
 		});
 		return newLabels;
 	};
+
+	const [showLabels, setShowLabel] = useState(true);
+	const [showInners, setShowInners] = useState(true);
+
+
 
 	return (
 		<div
@@ -421,9 +426,6 @@ const GCodeToSvg1 = observer(() => {
 						</div>
 					</button>
 				</div>
-				<div className="mx-2 mt-1">
-					<ToggleViewSheet />
-				</div>
 				<div className="d-flex flex-column">
 					<input
 						type="range"
@@ -446,6 +448,33 @@ const GCodeToSvg1 = observer(() => {
 					/>
 				</div>
 
+			</div>
+			<div className="d-flex flex-column position-absolute mx-2 mt-2 p-2"
+				style={{ right: '0px', border: "1px solid grey", borderRadius: "5px", backgroundColor: "#fff" }}
+			>
+				<div>
+					<Form>
+						<Form.Check
+							type="checkbox"
+							id="custom-checkbox"
+							label="show labels"
+							checked={showLabels}
+							onChange={ ()=>{ setShowLabel( !showLabels)}}
+						/>
+					</Form>
+
+				</div>
+				<div className="mt-2">
+					<Form>
+						<Form.Check
+							type="checkbox"
+							id="custom-checkbox"
+							label="show laserOff"
+							checked={showInners}
+							onChange={ ()=>{ setShowInners( !showInners)}}
+						/>
+					</Form>
+				</div>
 			</div>
 			<div
 				id="workarea"
@@ -471,7 +500,7 @@ const GCodeToSvg1 = observer(() => {
 								fill="url(#grid_pattern)"
 							/>
 							<g
-								className="sgn_main_els"
+								className={`sgn_main_els ${showInners ? "showInners" : "hideInners"}  ${showLabels ? "showLeabels" : "hideLabels"}`}
 								style={{ fill: "none", strokeWidth: 0.5, stroke: "black" }}
 							>
 								{paths && (() => {
