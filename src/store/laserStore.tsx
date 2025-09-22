@@ -1,5 +1,4 @@
 import { makeAutoObservable } from "mobx";
-import axios from "axios";
 
 class LaserStore {
 	carouselInPlan: boolean = false;
@@ -51,31 +50,38 @@ class LaserStore {
 	async fetchTasks() {
 		this.setLoading(true);
 		try {
-			const response = await axios.get("http://127.0.0.1/tasks-info");
-			if (JSON.stringify(response.data) !== JSON.stringify(laserStore.tasks)){
-				this.setTasks(response.data);	
-			}		  
+			const response = await fetch("http://127.0.0.1/tasks-info");
+			if (!response.ok) {
+				throw new Error(`Ошибка сети: ${response.status} ${response.statusText}`);
+			}
+			const data = await response.json();
+
+			// сравниваем с текущими задачами
+			if (JSON.stringify(data) !== JSON.stringify(laserStore.tasks)) {
+				this.setTasks(data);
+			}
 		} catch (error: any) {
-		  this.setError(error.message);
+			this.setError(error.message || "Неизвестная ошибка");
 		} finally {
-		  this.setLoading(false);
+			this.setLoading(false);
 		}
-	  }
-	
-	  // запуск интервала (polling)
-	  startPolling(intervalMs: number = 10000) {
+	}
+
+	// запуск интервала (polling)
+	startPolling(intervalMs: number = 10000) {
 		this.fetchTasks(); // первый вызов сразу
 		if (this.intervalId) clearInterval(this.intervalId);
 		this.intervalId = setInterval(() => this.fetchTasks(), intervalMs);
-	  }
-	
-	  // остановка интервала
-	  stopPolling() {
+	}
+
+	// остановка интервала
+	stopPolling() {
 		if (this.intervalId) {
-		  clearInterval(this.intervalId);
-		  this.intervalId = null;
+			clearInterval(this.intervalId);
+			this.intervalId = null;
 		}
 	}
+	  
 
 }
 

@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/scrollbar';
 import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
