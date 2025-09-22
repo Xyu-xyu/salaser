@@ -29,7 +29,7 @@ const data0: Record<Param0, string> = {
 };
 
 
-const piercingEditStagesPanel = observer(() => {
+const PiercingEditStagesPanel = observer(() => {
 	const { isVertical, selectedPiercingStage } = viewStore;
 
 	return (
@@ -136,4 +136,4 @@ const piercingEditStagesPanel = observer(() => {
 });
 
 
-export default piercingEditStagesPanel;
+export default PiercingEditStagesPanel;

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import utils from '../scripts/util';
 import MacrosEditModalButton from './macrosEditModalButton'
 import { useTranslation } from 'react-i18next';
@@ -132,10 +132,6 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 	}, []);
 
 	const [rotation, setRotation] = useState(0);
-    const activeSegment = useMemo(() => {
-         return ((Math.round((rotation) / 120) % 3) + 3) % 3;
-    }, [rotation]);
-
 	
 
 	return (

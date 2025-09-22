@@ -20,7 +20,7 @@ const PiercingEditModalPanel = observer(() => {
 
 	const { t } = useTranslation()
 
-	const { isVertical, selectedPiercingStage, carouselModeInPiercing, selectedPiercingMacro } = viewStore;
+	const { isVertical, carouselModeInPiercing, selectedPiercingMacro } = viewStore;
 
 	return (
 		<>

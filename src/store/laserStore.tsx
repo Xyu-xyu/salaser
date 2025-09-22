@@ -6,7 +6,13 @@ class LaserStore {
 	mainMode: string = "planMode";
 	rightMode: Boolean = true
 	knobMode: Boolean = false
-	tasks: any[] = []; // тут будут задачи с бэка
+	tasks: {
+		categories?: {
+		  active?: {
+			items?: any[];
+		  };
+		};
+	  } = {};
 	loading: boolean = false;
 	error: string | null = null;
 	private intervalId: ReturnType<typeof setInterval> | null = null;
@@ -24,7 +30,13 @@ class LaserStore {
 		}
 	}
 
-	setTasks(tasks: any[]) {
+	setTasks(tasks: {
+		categories?: {
+		  active?: {
+			items?: any[];
+		  };
+		};
+	  }) {
 		this.tasks = tasks;
 	}
 

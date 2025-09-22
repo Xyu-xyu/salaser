@@ -20,6 +20,6 @@ i18n
     debug: false, // Можно включить при необходимости
     saveMissing: true, // Включает событие "missingKey"
     missingKeyHandler: function (lng, ns, key, fallbackValue) {
-      console.warn(`[i18n] Missing translation for key: "${key}" in language: "${lng}"`);
+      console.warn(`[i18n] Missing translation for key: "${key}" ${ns} in language: "${lng}"${fallbackValue}`);
     },
   });

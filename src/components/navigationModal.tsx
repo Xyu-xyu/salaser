@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 const NavigationModal = observer(() => {
 
-	const { carouselMode, selectedSlide } = viewStore
+	const { carouselMode } = viewStore
 	const { t } = useTranslation()
 
 	const cloneThis = () => {

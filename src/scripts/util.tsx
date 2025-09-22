@@ -1,6 +1,25 @@
 import cutting_settings_schema from '../store/cut_settings_schema';
 import viewStore from '../store/viewStore';
 
+interface GCodeParams {
+	[key: string]: number | undefined;
+}
+
+interface GCodeBase {
+	X: number;
+	Y: number;
+	C: number;
+}
+
+interface GCodeLine {
+	n?: number;
+	g?: number;
+	m?: number | false;
+	params: GCodeParams;
+	comment?: string;
+	base?: GCodeBase;
+}
+
 interface NestedObject {
 	[key: string]: any;
 }
@@ -417,7 +436,7 @@ class Utils {
 		return (eang * 180) / Math.PI - (sang * 180) / Math.PI <= 180 ? 0 : 1;
 	}
 
-	multiplyMatrices = (m1, m2) => {
+/* 	multiplyMatrices = (m1, m2) => {
         return {
             a: m1.a * m2.a + m1.c * m2.b,
             b: m1.b * m2.a + m1.d * m2.b,
@@ -426,9 +445,9 @@ class Utils {
             e: m1.a * m2.e + m1.c * m2.f + m1.e,
             f: m1.b * m2.e + m1.d * m2.f + m1.f,
         };
-    };
+    }; */
 
-	convertScreenCoordsToSvgCoords(x:number, y:number) {
+/* 	convertScreenCoordsToSvgCoords(x:number, y:number) {
 		var svg = document.getElementById("svg")
 		var group = document.getElementById("group");
 		var pt = svg.createSVGPoint();  // An SVGPoint SVG DOM object
@@ -441,9 +460,9 @@ class Utils {
 		} catch (e) {
 			return { 'x':0,'y': 0 }
 		}
-	}
+	} */
 
-	getMousePosition = (evt) => {
+/* 	getMousePosition = (evt) => {
 		var svg = document.getElementById("svg")
     	let CTM = svg.getScreenCTM();
         
@@ -451,7 +470,7 @@ class Utils {
             x: (evt.clientX + CTM.f)/ CTM.a,
             y: (evt.clientY + CTM.e)/ CTM.d
         }; 
-    }
+    } */
 
 	getLastTwoNumbers(str: string): number[] {
 		// Находим все числа с точкой или без
@@ -464,37 +483,41 @@ class Utils {
 	}
 	
 	makeGcodeParser() {
-		console.log('makeGcodeParser')
-		let last = { g: undefined, m: undefined, params: {} };
-		let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
-	
-		return function parseGcodeLine(raw) {
+		console.log("makeGcodeParser");
+
+		let last: GCodeLine = { g: undefined, m: undefined, params: {} };
+		let base: GCodeBase = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
+
+		return function parseGcodeLine(raw: string): GCodeLine {
 			let s = String(raw).trim();
-			s = s.replace(/^\d+\s*/, '');
-	
-			const out = { n: undefined, g: undefined, m: undefined, params: {} };
-	
+			s = s.replace(/^\d+\s*/, "");
+
+			const out: GCodeLine = { n: undefined, g: undefined, m: undefined, params: {} };
+
+			// Комментарий
 			const commentMatch = s.match(/\(([^)]*)\)/);
 			if (commentMatch) {
 				out.comment = commentMatch[1];
-				s = s.replace(/\([^)]*\)/g, ' ');
+				s = s.replace(/\([^)]*\)/g, " ");
 			}
-	
+
+			// N-номер
 			const nMatch = raw.match(/(\d+)N/i);
 			if (nMatch) {
 				out.n = parseInt(nMatch[1], 10); // используем первую группу
 			}
-	
-			// G/M
+
+			// G/M команды
 			const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
 			out.g = gMatch ? Number(gMatch[1]) : last.g;
+
 			const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
 			out.m = mMatch ? Number(mMatch[1]) : false;
-	
+
 			// Параметры
-			const keys = ['X', 'Y', 'I', 'J', 'S', 'P', 'H', 'A', 'L', 'C'];
+			const keys = ["X", "Y", "I", "J", "S", "P", "H", "A", "L", "C"];
 			for (const k of keys) {
-				const r = new RegExp(`${k}(-?\\d+(?:\\.\\d+)?)`, 'i');
+				const r = new RegExp(`${k}(-?\\d+(?:\\.\\d+)?)`, "i");
 				const m = s.match(r);
 				if (m) {
 					out.params[k] = Number(m[1]);
@@ -502,27 +525,29 @@ class Utils {
 					out.params[k] = last.params[k];
 				}
 			}
-	
+
+			// Обработка "Part End"
 			if (/(Part End)/i.test(s)) {
 				out.base = { X: 0, Y: 0, C: 0 };
 			}
-	
-			// Если это строка с G52 — сохраняем её как базовую
+
+			// Если это строка с G52 — сохраняем как базовую
 			if (/G52/i.test(s)) {
-				base.X = out.params.X;
-				base.Y = out.params.Y;
-				base.C = out.params.C;
-				let nb = { X: out.params.X, Y: out.params.Y, C: out.params.C }
-				out.base = { ...nb }
+				base = {
+					X: out.params.X ?? 0,
+					Y: out.params.Y ?? 0,
+					C: out.params.C ?? 0,
+				};
+				out.base = { ...base };
 			} else {
-				out.base = { ...base }
+				out.base = { ...base };
 			}
-	
+
 			// Обновляем last
 			last.g = out.g;
 			last.m = out.m;
 			last.params = { ...last.params, ...out.params };
-			//// console.log(out)
+
 			return out;
 		};
 	}

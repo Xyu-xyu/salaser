@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
-import { useRef, useState, useEffect, useMemo, useId } from 'react';
+import { useRef, useState, useEffect, useId } from 'react';
 import utils from '../scripts/util';
 import MacrosEditModalButton from './macrosEditModalButton'
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,6 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 		x1, x2, x4,
 		y1, y2, y3,
 		r1, r2,
-		startAngle, sweepAngle
 	} = utils.getKnobLayout(isVertical);
 
 	let val = 0;
@@ -115,11 +114,6 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 	}, []);
 
 	const [rotation, setRotation] = useState(0);
-	// Активный сегмент вычисляется автоматически
-	const activeSegment = useMemo(() => {
-		// нормализация и округление
-		return ((Math.round(rotation / 120) % 3) + 3) % 3;
-	}, [rotation]);
 
 	const onHover = () => {
 		console.log(param)

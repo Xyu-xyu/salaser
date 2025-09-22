@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 import svgPanZoom from "svg-pan-zoom";
 import { Icon } from "@iconify/react";
 //import sampleListing from '../store/listing'
@@ -8,19 +8,25 @@ import laserStore from "../store/laserStore";
 import utils from "../scripts/util";
 import { Form } from "react-bootstrap";
 
+interface PathItem {
+	path: string;
+	className: string;
+	n: number[];
+}
+
 
 const GCodeToSvg1 = observer(() => {
 
 	const { loadResult } = laserStore
 	const containerRef = useRef<HTMLDivElement | null>(null);
-	const panZoomRef = useRef(null);
+ 	const panZoomRef = useRef<any>(null);
 	const [listing, setListing] = useState("");
 	const data = JSON.parse(loadResult)
 	const width = Number(data.result.jobinfo.attr?.dimx) || 3000;
 	const height = Number(data.result.jobinfo.attr?.dimy) || 1500;
 	const [cutSeg, setCutSeg] = useState(0);
-	const [paths, setPaths] = useState("");
-	const [labels, setLabels] = useState<JSX.Element[]>([]); // Храним готовые метки
+	const [paths, setPaths] = useState<PathItem[]>([]);//useState([]);
+	const [labels, setLabels] = useState<ReactNode[]>([]); // Храним готовые метки
 	let groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
 
 
@@ -130,7 +136,7 @@ const GCodeToSvg1 = observer(() => {
 	};
 
 	const getPath = () => {
-		console.log(' getPath ')
+		//console.log(' getPath ')
 		const parseGcodeLine = utils.makeGcodeParser();
 		const lines = listing.trim().split(/\n+/);
 		const cmds = lines.map(parseGcodeLine);
@@ -138,7 +144,8 @@ const GCodeToSvg1 = observer(() => {
 
 		let cx = 0, cy = 0;
 		let laserOn = false;
-		let pendingBreakCircle = null;
+		console.log (laserOn)
+		//let pendingBreakCircle = null;
 		let res = []; // массив путей
 
 		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
@@ -204,24 +211,24 @@ const GCodeToSvg1 = observer(() => {
 				// тут уходим от относительных координат к абс...
 				res[res.length - 1].className += " groupEnd "
 
-				cx = cx + c.base.X
-				cy = cy + c.base.Y
+				cx = cx + (c.base && c.base.X ||0)
+				cy = cy + (c.base && c.base.Y ||0) 
 				continue;
 			}
 
 			if (typeof c.m === 'number') {
 
-				if (!pendingBreakCircle) {
+				/* if (!pendingBreakCircle) {
 					if (c.m === 4) pendingBreakCircle = { type: 'in', n: c.n };
 					if (c.m === 5) pendingBreakCircle = { type: 'out', n: c.n };
-				}
+				} */
 
 				if (c.m === 4) {
 					// console.log('laser on')
 					laserOn = true;
 					res[res.length - 1].className += " laserOff "
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
-					res[res.length - 1].path = start(cx + c.base.X, cy + c.base.Y, c, height);
+					res[res.length - 1].path = start(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), c, height);
 				}
 
 				if (c.m === 5) {
@@ -229,7 +236,7 @@ const GCodeToSvg1 = observer(() => {
 					laserOn = false;
 					res[res.length - 1].className += " laserOn "
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
-					res[res.length - 1].path = start(cx + c.base.X, cy + c.base.Y, c, height);
+					res[res.length - 1].path = start(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), c, height);
 
 				}
 			}
@@ -240,7 +247,7 @@ const GCodeToSvg1 = observer(() => {
 				if (g === 4) {
 
 					let crossPath = {
-						path: cross(cx + c.base.X, cy + c.base.Y, 2.5, c, height),
+						path: cross(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), 2.5, c, height),
 						n: [n ?? 0, n ?? 0],
 						className: 'g4'
 					};
@@ -253,7 +260,7 @@ const GCodeToSvg1 = observer(() => {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-					res[res.length - 1].path += line(tx + c.base.X, ty + c.base.Y, c, height);
+					res[res.length - 1].path += line(tx + (c.base && c.base.X ||0), ty + (c.base && c.base.Y ||0), c, height);
 					if (n) {
 						let n0 = res[res.length - 1].n[0]
 						let n1 = res[res.length - 1].n[1]
@@ -282,7 +289,7 @@ const GCodeToSvg1 = observer(() => {
 					if (!ccw && d > 0) d -= 2 * Math.PI;
 					const large = 0;
 					const sweep = ccw ? 1 : 0;
-					res[res.length - 1].path += arcPath(tx + c.base.X, ty + c.base.Y, r, large, sweep, c, height);
+					res[res.length - 1].path += arcPath(tx + (c.base && c.base.X ||0), ty + (c.base && c.base.Y ||0), r, large, sweep, c, height);
 					if (n) {
 						let n0 = res[res.length - 1].n[0]
 						let n1 = res[res.length - 1].n[1]
@@ -328,7 +335,7 @@ const GCodeToSvg1 = observer(() => {
 	};
 
 	const generateLabels = () => {
-		const newLabels: JSX.Element[] = [];
+		const newLabels: ReactNode[] = [];
 		let labelNum = 0
 		groupRefs.current.forEach((g, idx) => {
 			if (!g) return;
@@ -450,7 +457,7 @@ const GCodeToSvg1 = observer(() => {
 
 			</div>
 			<div className="d-flex flex-column position-absolute mx-2 mt-2 p-2"
-				style={{ right: '0px', border: "1px solid grey", borderRadius: "5px", backgroundColor: "#fff" }}
+				style={{ right: '0px', border: "1px solid var(--grey-nav)", borderRadius: "5px", backgroundColor: "#fff" }}
 			>
 				<div>
 					<Form>
@@ -504,17 +511,15 @@ const GCodeToSvg1 = observer(() => {
 								style={{ fill: "none", strokeWidth: 0.5, stroke: "black" }}
 							>
 								{paths && (() => {
-									const groupedResult: JSX.Element[] = [];
-									const outsidePaths: JSX.Element[] = [];
-									let currentGroup: JSX.Element[] | null = null;
+									const groupedResult: ReactNode[] = [];
+									const outsidePaths: ReactNode[] = [];
+									let currentGroup: ReactNode[]|null = [];
 									let groupIndex: number = 1;
 									groupRefs.current = [];
 
-									paths.forEach((a, i) => {
+									paths.forEach((a:PathItem, i:number) => {
 										const { path, className, n } = a;
-										console.log ( path, className, n)
-
-										const pathElement = (
+ 										const pathElement = (
 											<path
 												d={path}
 												key={i}

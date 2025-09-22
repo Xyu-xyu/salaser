@@ -128,6 +128,3 @@ const NavBar = observer(() => {
 });
 
 export default NavBar;
-
-
-//fluent:question-circle-12-regular

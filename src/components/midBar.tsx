@@ -1,20 +1,12 @@
 import laserStore from "../store/laserStore";
 import { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-import 'swiper/css/scrollbar';
 import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
-import LoadSvg4 from './loadSvg4'
-import GCodeToSvg1 from "./gcodeToSvg1";
-//import LoadSvg2 from './loadSvg2'
-//import sampleSvg from "../store/sampleSvg";
-//import { useTranslation } from 'react-i18next';
-//import GCodeToSvg from "./gcodeToSvg";
-//import listing from "../store/listing";
+import GCodeToSvg from "./gcodeToSvg1";
+ 
 
 
 const MidBar = observer(() => {
@@ -132,16 +124,10 @@ const MidBar = observer(() => {
 				{!carouselInPlan && tasks?.categories?.active?.items && (
 					<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
 						<div className="planMain" style={{ border: "2px solid grey", borderRadius: '10px'}}>
-							{/*<GCodeToSvg gcode={listing} /> */}									
-							{/* <LoadSvg3 svgUrl={'http://'+ constants.api+'/gcore/0/preview.svg'} /> */}
-							{/* <LoadSvg2 /> */}
-  							 {/* <LoadSvg4 />  */}
-							{ <GCodeToSvg1 /> }
-							</div>
+							{ <GCodeToSvg /> }
+						</div>
 					</div>
 				)}
-
-
 
 			</div>}
 			{carouselInPlan &&
@@ -183,7 +169,7 @@ const MidBar = observer(() => {
 						}}
 					>
 						{
-							Object.keys(tasks.categories.active.items).map((key) =>
+							Object.keys(tasks?.categories?.active?.items||[]).map((key:any) =>
 								<SwiperSlide>
 									<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
 
@@ -202,13 +188,13 @@ const MidBar = observer(() => {
 											<div className="ccard-info-block">
 												<div className="ccard-title">{key} </div>
 												<div className="ccard-details">
-													• {(tasks.categories.active.items[key].attributes.doc_attr.materialcode) || ''}
-													• {(tasks.categories.active.items[key].attributes.doc_attr.label) || ''}
-													• {(tasks.categories.active.items[key].attributes.doc_attr.thickness) || 0} mm
+													• materialcode
+													• label
+													• thickness mm
 												</div>
 												<div className="ccard-details">
-													• {(tasks.categories.active.items[key].attributes.doc_attr.dimx) || 0}  ×
-													{(tasks.categories.active.items[key].attributes.doc_attr.dimy) || 0} mm
+													• dimx mm
+													• dimy mm
 												</div>
 											</div>
 

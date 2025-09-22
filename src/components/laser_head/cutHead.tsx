@@ -37,33 +37,10 @@ interface ComponentInt {
 
 export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 
-    const { technology, selectedPiercingStage, selectedPiercingMacro, animProgress, isVertical, isAnimating,  isPaused , atEnd } = viewStore;
+    const { technology, selectedPiercingStage, selectedPiercingMacro, animProgress, isAnimating,  isPaused , atEnd } = viewStore;
     const bs: number = 175.0;
  	const macro: PiercingStage[] = technology.piercingMacros[selectedPiercingMacro]['stages'];
   
-/*     const toggleAnimation = () => {
-		if (!atEnd) {
-			if (!isAnimating && !isPaused) {
-				viewStore.setIsAnimating( true );
-		   } else if ( !isAnimating && isPaused) {
-			   viewStore.setPaused(false)
-			   viewStore.setIsAnimating( true );
-		   } else if ( isAnimating && !isPaused) {
-			   viewStore.setPaused( true )
-			   viewStore.setIsAnimating( false );
-		   }			
-		} else {
-			viewStore.setAtEnd(!atEnd)
-			rewind()
-			viewStore.setIsAnimating( true );
-		}        
-    };
-	
-	const rewind = () => {
-		viewStore.setIsAnimating( false );
-		viewStore.setPaused(false)
- 		viewStore.setAnimProgress(0, 0)
-	} */
 
 
  	const getValue = (param: string, stage = animProgress.stage, progress = animProgress.progress) => {

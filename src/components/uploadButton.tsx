@@ -45,12 +45,6 @@ export const UploadButton = observer(() => {
 
 				if (resp.ok) {
 					//console.log("✅ Uploaded");
-					showToast({
-						type: 'success',
-						message: "Upload success!",
-						position: 'bottom-right',
-						autoClose: 5000
-					});
 				} else {
 					
 					showToast({
@@ -91,6 +85,12 @@ export const UploadButton = observer(() => {
 					 	console.log("✅ Success");
 						if ( data !== JSON.stringify(loadResult)){
 							laserStore.setVal('loadResult', JSON.stringify(data))
+							showToast({
+								type: 'success',
+								message: "Upload success!",
+								position: 'bottom-right',
+								autoClose: 5000
+							});
 						}
 					}
 				});

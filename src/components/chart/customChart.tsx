@@ -9,14 +9,15 @@ interface ComponentInt {
 
 type ResultItem = {
 	name: string;
-	'focus, mm'?: number,
-	'height, mm'?: number,
-	'pressure, bar'?: number,
-	'power, kWt'?: number,
-	'enabled': boolean;
-	'power': number,
-	'power_W_s': number,
-	'delay_s':number	
+	'focus, mm'?: number;
+	'height, mm'?: number;
+	'pressure, bar'?: number;
+	'power, kWt'?: number;
+	enabled: boolean;
+	power: number;
+	power_W_s: number;
+	delay_s: number;
+	[key: string]: string | number | boolean | undefined; // ✅ добавлено
 };
 
 

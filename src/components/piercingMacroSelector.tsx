@@ -62,6 +62,7 @@ const piercingMacroSelector = observer(() => {
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
 			const newValue = selectedPiercingMacro + (e.deltaY < 0 ? step : -step)
+			console.log (newValue)
 			//viewStore.setSelectedPiercingMacro( newValue );			
 		};
 
@@ -73,11 +74,13 @@ const piercingMacroSelector = observer(() => {
 
 	const increase = () => {
 		let newval = selectedPiercingMacro + stepBig
+		console.log (newval)
 		//viewStore.setSelectedPiercingMacro( newval );
 	}
 
 	const decrease = () => {
 		let newval = selectedPiercingMacro - stepBig
+		console.log (newval)
 		//viewStore.setSelectedPiercingMacro( newval );
 	}
 
