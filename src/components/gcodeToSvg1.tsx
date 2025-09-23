@@ -144,6 +144,7 @@ const GCodeToSvg1 = observer(() => {
 
 		let cx = 0, cy = 0;
 		let laserOn = false;
+		let partOpen = false
 		console.log (laserOn)
 		//let pendingBreakCircle = null;
 		let res = []; // массив путей
@@ -203,12 +204,14 @@ const GCodeToSvg1 = observer(() => {
 		for (const c of cmds) {
 			if (c?.comment?.includes('Part code')) {
 				// console.log('Part code')
+				partOpen = true
 				res[res.length - 1].className += " groupStart "
 				continue;
 
 			} else if (c?.comment?.includes('Part End')) {
 				// console.log('Part End')
 				// тут уходим от относительных координат к абс...
+				partOpen = false
 				res[res.length - 1].className += " groupEnd "
 
 				cx = cx + (c.base && c.base.X ||0)
@@ -247,7 +250,7 @@ const GCodeToSvg1 = observer(() => {
 				if (g === 4) {
 
 					let crossPath = {
-						path: cross(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), 2.5, c, height),
+						path:partOpen ? cross(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), 2.5, c, height) : cross(cx , cy , 2.5, c, height) ,
 						n: [n ?? 0, n ?? 0],
 						className: 'g4'
 					};
@@ -507,7 +510,7 @@ const GCodeToSvg1 = observer(() => {
 								fill="url(#grid_pattern)"
 							/>
 							<g
-								className={`sgn_main_els ${showInners ? "showInners" : "hideInners"}  ${showLabels ? "showLeabels" : "hideLabels"}`}
+								className={`sgn_main_els ${showInners ? " showInners " : " hideInners "}  ${showLabels ? " showLeabels " : " hideLabels "}`}
 								style={{ fill: "none", strokeWidth: 0.5, stroke: "black" }}
 							>
 								{paths && (() => {
