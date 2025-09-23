@@ -1,5 +1,5 @@
 import laserStore from "../store/laserStore";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -9,21 +9,24 @@ import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
 import GCodeToSvg from "./gcodeToSvg1";
+import { io, Socket } from "socket.io-client";
+import constants from "../store/constants";
  
 
 
 const MidBar = observer(() => {
+	const  SERVER_URL = constants.SERVER_URL
 	let params = [
 		{ name: 'N2', measure: 'bar', val: 4.8 },
 		{ name: 'Nd', measure: 'mm', val: 12.7 },
 		{ name: 'f', measure: 'kHz', val: 88.7 },
 	]
 
-	let paramsLimit = [
+	const [paramsLimit, setParamsLimit] = useState ( [
 		{ name: 'X', measure: 'mm', val: 1250.44 },
 		{ name: 'Y', measure: 'mm', val: 44.777 },
 		{ name: 'Z', measure: 'mm', val: 28.77 },
-	]
+	])
 
 	const { carouselInPlan, tasks } = laserStore
 	const swiperRef = useRef<SwiperClass | null>(null);
@@ -31,7 +34,31 @@ const MidBar = observer(() => {
 
 	useEffect(() => {
  		laserStore.fetchTasks()
-		return () => laserStore.stopPolling();
+		 const socket: Socket = io(SERVER_URL, {
+			path: "/socket.io", // стандартный путь Socket.IO
+			transports: ["websocket"],
+		  });
+	  
+		  // Получаем поток данных от сервера
+		  socket.on("machine_data", (data: any) => {
+			//machineStore.addData(data);
+			//console.log ( data )
+			setParamsLimit( data )
+		  });
+	  
+		  // Обработка соединения
+		  socket.on("connect", () => {
+			console.log("Connected to backend");
+		  });
+	  
+		  socket.on("disconnect", () => {
+			console.log("Disconnected from backend");
+		  });
+	  
+		  return () => {
+			socket.disconnect();
+			laserStore.stopPolling();
+		  };
 	}, []);
 
 
@@ -70,14 +97,14 @@ const MidBar = observer(() => {
 									<div className="currentPlanLimits my-2 ms-2">
 										<div className="d-flex flex-column">
 											<div className="d-flex  align-items-center mb-1">
-												<div className="led-green-medium">
+												<div className={ item.val > 500 ? "led-green-medium": "led-gray-medium"}>
 												</div>
 												<div className="limitText">
 													Limit-
 												</div>
 											</div>
 											<div className="d-flex  align-items-center">
-												<div className="led-gray-medium">
+												<div className={ item.val < 500 ? "led-green-medium": "led-gray-medium"}>
 												</div>
 												<div className="limitText">
 													Limit+
@@ -181,7 +208,7 @@ const MidBar = observer(() => {
 											<div className="ccard-image-wrapper">
 												<div className="ccard-image">
 													<img
-														src={`http://127.0.0.1/get_svg_card?folder=${encodeURIComponent(key.replace('.ncp', ''))}&filename=${encodeURIComponent(key.replace('.ncp', '.svg'))}`}
+														src={''}
 														alt="svg"
 													/>
 												</div>
