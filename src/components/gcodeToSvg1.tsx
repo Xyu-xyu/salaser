@@ -7,6 +7,7 @@ import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
 import utils from "../scripts/util";
 import { Form } from "react-bootstrap";
+import { showToast } from "./toast";
 
 interface PathItem {
 	path: string;
@@ -86,26 +87,43 @@ const GCodeToSvg1 = observer(() => {
 		};
 	}, [listing]);
 
-	const update = () => {
+	const  update = async () => {
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
 			controller.abort();
 			//setListing(sampleListing);
 		}, 2000);
 
-		fetch("http://" + constants.api + "/py/gcores[0].loadresult", {
-			signal: controller.signal,
-		})
-			.then((r) => r.text())
-			.then((d) => {
+		try {
+			const controller = new AbortController();		  
+			const response = await fetch("http://" + constants.SERVER_URL + "/api/loadresult", {
+			  signal: controller.signal,
+			});
+		  
+			if (!response.ok) {
+			  throw new Error(`Ошибка сети: ${response.status} ${response.statusText}`);
+			}
+		  
+			const textData = await response.text();
+		  
+			// Сравниваем с текущим состоянием
+			if (textData !== JSON.stringify(loadResult)) {
+			  laserStore.setVal('loadResult', textData);
+			}
+		  } catch (error: any) {
+			if (error.name === 'AbortError') {
+			  console.warn("Запрос был отменён");
+			} else {
+			  showToast({
+				type: 'error',
+				message: "loadresult error:"+ error.message || error,
+				position: 'bottom-right',
+				autoClose: 5000
+			});		  
+			}
+		  }
 
-				if (d !== JSON.stringify(loadResult)) {
-					laserStore.setVal('loadResult', d)
-				}
-			})
-
-
-		fetch("http://" + constants.api + "/gcore/0/listing", {
+		fetch("http://" + constants.SERVER_URL + "/api/listing", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())
