@@ -1,5 +1,7 @@
+import { showToast } from '../components/toast';
 import cutting_settings_schema from '../store/cut_settings_schema';
 import viewStore from '../store/viewStore';
+import validator from "@rjsf/validator-ajv8";
 
 interface GCodeParams {
 	[key: string]: number | undefined;
@@ -571,6 +573,33 @@ class Utils {
 		while (a < -Math.PI) a += 2 * Math.PI;
 		return a;
 	}
+
+	validateCuttingSettings() {
+		const { schema, cut_settings, technology} = viewStore
+
+		let data = cut_settings
+		data.technology = technology
+
+		const result = validator.validateFormData( data, schema);
+		if ( result?.errors.length === 0) {
+			showToast({
+				type: 'success',
+				message: 'Cut settings is Valid!!',
+				position: 'bottom-right',
+				autoClose: 5000
+			});
+
+		} else {
+			showToast({
+				type: 'error',
+				message: 'Cut settings invalid!!',
+				position: 'bottom-right',				
+			});
+			console.error ( "ERROR in VALIDATION"+JSON.stringify (result) )
+		}		 
+		return result;
+	}
+	   
 }
 
 const utils = new Utils();

@@ -57,20 +57,20 @@ class ViewStore {
         modalBody: 'This is the body of the modal.',
         confirmText: 'Confirm',
         cancelText: 'Cancel',
-        func: () => {},
+        func: () => { },
         args: []
     };
 
-    diagActive:string=''
-    macrosModalEdit:boolean = false;
-    carouselMode:boolean = false;
-    carouselModeInPiercing:boolean = false;
-    modulationMacroModalEdit:boolean = false;
-    piercingMacroModalEdit:boolean = false;
-    selectedPiercingStage:number = 0; 
-    selectedSlide:number = 0
+    diagActive: string = ''
+    macrosModalEdit: boolean = false;
+    carouselMode: boolean = false;
+    carouselModeInPiercing: boolean = false;
+    modulationMacroModalEdit: boolean = false;
+    piercingMacroModalEdit: boolean = false;
+    selectedPiercingStage: number = 0;
+    selectedSlide: number = 0
     theme: string = 'themeLight'
-    selectedMacros:number=0
+    selectedMacros: number = 0
     knobPath: Record<string, string> = {};
     knobStep: { [key: string]: number } = {
         pressure: 0.1,
@@ -81,85 +81,85 @@ class ViewStore {
         height: 0.1,
         modulationFrequency_Hz: 1,
         piercingMacro: 1,
-        pulseFill_percent:1,
-		pulseFrequency_Hz:1,
-        initial_modulationFrequency_Hz:1,
-        initial_pressure:0.1,
-        initial_modulationMacro:1,
-        initial_power:100,
-        initial_focus:0.1,
-        initial_height:0.1,
-        delay_s:0.1,
-        power_W_s:100,
-        power:100
-        
+        pulseFill_percent: 1,
+        pulseFrequency_Hz: 1,
+        initial_modulationFrequency_Hz: 1,
+        initial_pressure: 0.1,
+        initial_modulationMacro: 1,
+        initial_power: 100,
+        initial_focus: 0.1,
+        initial_height: 0.1,
+        delay_s: 0.1,
+        power_W_s: 100,
+        power: 100
+
     };
 
     knobRound: { [key: string]: number } = {
         pressure: 1,
         power_W_mm: 0,
         focus: 1,
-        feedLimit_mm_s:0,
+        feedLimit_mm_s: 0,
         modulationMacro: 0,
         height: 1,
         modulationFrequency_Hz: 0,
-        piercingMacro:0,
-        pulseFill_percent:0,
-		pulseFrequency_Hz:0,
-        initial_modulationFrequency_Hz:0,
-        initial_pressure:1,
-        initial_modulationMacro:0,
-        initial_power:1,
-        initial_focus:1,
-        initial_height:1,
-        delay_s:1,
-        power_W_s:0,
-        power:0
+        piercingMacro: 0,
+        pulseFill_percent: 0,
+        pulseFrequency_Hz: 0,
+        initial_modulationFrequency_Hz: 0,
+        initial_pressure: 1,
+        initial_modulationMacro: 0,
+        initial_power: 1,
+        initial_focus: 1,
+        initial_height: 1,
+        delay_s: 1,
+        power_W_s: 0,
+        power: 0
     };
 
 
-    isAnimating: Boolean=false;
-	isPaused: Boolean = false;
-	atEnd: Boolean=false;
-    elapsed: number=0
-      
-    animProgress: {[key: string]: number } = { stage:0, progress:0}
+    isAnimating: Boolean = false;
+    isPaused: Boolean = false;
+    atEnd: Boolean = false;
+    elapsed: number = 0
+
+    animProgress: { [key: string]: number } = { stage: 0, progress: 0 }
     cut_settings: any = null;
     schema: any = null;
 
     loading = false;
     error: string | null = null;
 
-    technology = cut_settings.result.technology
-    macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
+    technology = cut_settings.technology
+    macrosProperties = cut_settings_schema.properties.technology.properties.macros.items.properties
 
     async loadCutSettings() {
         this.loading = true;
         this.error = null;
         try {
-          const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`);
-          if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
-    
-          const data = await resp.json();
-          viewStore.cut_settings = data;
-          viewStore.technology = data.result.technology          
-          showToast({
-            type: 'success',
-            message: "Upload settings form core 0 success!",
-            position: 'bottom-right',
-            autoClose: 5000
-        });
-          //console.log (data)
+            const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`);
+            if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
+
+            const data = await resp.json();
+            viewStore.cut_settings = data.result;
+            viewStore.technology = data.result.technology
+            showToast({
+                type: 'success',
+                message: "Upload settings form core 0 success!",
+                position: 'bottom-right',
+                autoClose: 5000
+            });
+            //console.log (data)
         } catch (err: any) {
-          this.error = err.message || "Неизвестная ошибка";
-          showToast({
-            type: 'error',
-            message: "Upload settings from core error"+ err.message,
-            position: 'bottom-right',
-            autoClose: 5000
-        });
+            this.error = err.message || "Неизвестная ошибка";
+            showToast({
+                type: 'error',
+                message: "Upload settings from core error" + err.message,
+                position: 'bottom-right',
+                autoClose: 5000
+            });
         } finally {
-          this.loading = false;
+            this.loading = false;
         }
     }
 
@@ -168,54 +168,93 @@ class ViewStore {
         this.loading = true;
         this.error = null;
         try {
-          const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings-schema`);
-          if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
-    
-          const data = await resp.json();
-          viewStore.schema = data
-          viewStore.macrosProperties = data.result.properties.technology.properties.macros.items.properties     
-          showToast({
-            type: 'success',
-            message: "Upload  schema from core 0 success!",
-            position: 'bottom-right',
-            autoClose: 5000
-        });
-          //console.log (data)
+            const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings-schema`);
+            if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
+
+            const data = await resp.json();
+            viewStore.schema = data.result
+            viewStore.macrosProperties = data.result.properties.technology.properties.macros.items.properties
+            showToast({
+                type: 'success',
+                message: "Upload  schema from core 0 success!",
+                position: 'bottom-right',
+                autoClose: 5000
+            });
+            //console.log (data)
         } catch (err: any) {
-          this.error = err.message || "Неизвестная ошибка";
-          showToast({
-            type: 'error',
-            message: "Upload schema from core error"+ err.message,
-            position: 'bottom-right',
-            autoClose: 5000
-        });
+            this.error = err.message || "Неизвестная ошибка";
+            showToast({
+                type: 'error',
+                message: "Upload schema from core error" + err.message,
+                position: 'bottom-right',
+                autoClose: 5000
+            });
         } finally {
-          this.loading = false;
+            this.loading = false;
         }
     }
-   
+
+    async updateCutSettings() {
+        viewStore.cut_settings.technology = viewStore.technology
+        try {
+            const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(viewStore.cut_settings),
+            });
+            if (!resp.ok) throw new Error(`Ошибка обновления: ${resp.statusText}`);
+            const data = await resp.json();
+            if (data.success) {
+                //this.cut_settings = newSettings;
+                showToast({ type: "success", message: "Настройки обновлены" });
+            } else {
+                throw new Error(data.exception || "Ошибка обновления");
+            }
+        } catch (err: any) {
+            showToast({ type: "error", message: err.message });
+        }
+    }
+
+    async resetCutSettings() {
+        try {
+            const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`, {
+                method: "DELETE",
+            });
+            if (!resp.ok) throw new Error(`Ошибка сброса: ${resp.statusText}`);
+            const data = await resp.json();
+            if (data.success) {
+                this.cut_settings = data.result;
+                showToast({ type: "success", message: "Настройки сброшены" });
+            } else {
+                throw new Error(data.exception || "Ошибка сброса");
+            }
+        } catch (err: any) {
+            showToast({ type: "error", message: err.message });
+        }
+    }
+
 
     constructor() {
         makeAutoObservable(this, {
             selectedModulationMacro: computed,
             selectedPiercingMacro: computed,
             isVertical: computed,
-            modulationMacroinUse:computed,
-            piercingMacroinUse:computed,
+            modulationMacroinUse: computed,
+            piercingMacroinUse: computed,
 
         });
     }
 
-    get modulationMacroinUse () {
+    get modulationMacroinUse() {
         let a = utils.extractValuesByKey(this.technology, 'modulationMacro')
         let b = utils.extractValuesByKey(this.technology, 'initial_modulationMacro')
         return [...a, ...b]
     }
 
-    get piercingMacroinUse () {
+    get piercingMacroinUse() {
         return utils.extractValuesByKey(this.technology, 'piercingMacro')
     }
- 
+
     get selectedModulationMacro() {
         return this.technology.macros[this.selectedMacros].cutting.modulationMacro;
     }
@@ -224,17 +263,17 @@ class ViewStore {
         return this.technology.macros[this.selectedMacros].piercingMacro;
     }
 
-    get isVertical () {
+    get isVertical() {
         return Boolean(window.innerHeight > window.innerWidth)
     }
 
-    setModalProps (val:ModalProps) {
-       // console.log (JSON.stringify(val))
-        this.modalProps  =  val;
+    setModalProps(val: ModalProps) {
+        // console.log (JSON.stringify(val))
+        this.modalProps = val;
     }
-          
-    setTheme(theme:string ) {
-       this.theme =theme
+
+    setTheme(theme: string) {
+        this.theme = theme
     }
 
     setKnobPath(param: string, path: string) {
@@ -244,66 +283,66 @@ class ViewStore {
     getKnobPath(param: string): string {
         return this.knobPath[param] ?? "M0 0";
     }
- 
-    setModal (val:boolean, modal:string ) {
-        console.log ('setModalEdit  '+ modal)
-        this.setCarouselMode( false )
-        this.setCarouselModeInPiercing ( false )
+
+    setModal(val: boolean, modal: string) {
+        console.log('setModalEdit  ' + modal)
+        this.setCarouselMode(false)
+        this.setCarouselModeInPiercing(false)
         if (modal === 'macros') {
 
             this.macrosModalEdit = val
-           /*  setTimeout (()=>{
-                this.piercingMacroModalEdit = false
-                this.modulationMacroModalEdit = false
-            },200) */
+            /*  setTimeout (()=>{
+                 this.piercingMacroModalEdit = false
+                 this.modulationMacroModalEdit = false
+             },200) */
 
-        } else if (modal === 'modulationMacro'  
+        } else if (modal === 'modulationMacro'
             || modal === 'initial_modulationMacro') {
 
             this.modulationMacroModalEdit = val
-/*             setTimeout (()=>{
-                this.macrosModalEdit = false
-                this.piercingMacroModalEdit = false
-            },200) */
-          
-            
+            /*             setTimeout (()=>{
+                            this.macrosModalEdit = false
+                            this.piercingMacroModalEdit = false
+                        },200) */
+
+
         } else if (modal === 'piercingMacro') {
 
             this.piercingMacroModalEdit = val
-/*             setTimeout (()=>{
-                this.modulationMacroModalEdit = false
-                this.macrosModalEdit = false
-            },200) */
+            /*             setTimeout (()=>{
+                            this.modulationMacroModalEdit = false
+                            this.macrosModalEdit = false
+                        },200) */
 
         }
     }
 
-    setVal(param: string, newVal: number, minimum:number, maximum:number) {
+    setVal(param: string, newVal: number, minimum: number, maximum: number) {
         if (param === 'selector') {
             // устанавливаем текущий макрос
             this.setSelectedMacros(newVal);
         } else {
-            console.log ( arguments )
+            console.log(arguments)
             if (newVal < minimum) newVal = minimum
             if (newVal > maximum) newVal = maximum
-            const macro = this.technology.macros[this.selectedMacros];    
+            const macro = this.technology.macros[this.selectedMacros];
 
             if (param in macro.cutting) {
-                (macro.cutting as any)[param] = Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                (macro.cutting as any)[param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             } else if (param in macro) {
-                (macro as any)[param] = Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                (macro as any)[param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             }
         }
     }
 
-    setValBoolean (param: string, newVal: boolean,) {
-        const macro = this.technology.macros[this.selectedMacros];  
+    setValBoolean(param: string, newVal: boolean,) {
+        const macro = this.technology.macros[this.selectedMacros];
         if (param in macro.cutting) {
             (macro.cutting as any)[param] = newVal
-        }  
+        }
     }
 
-    setValString(param: string, newVal: string, keyParam: string, ind:number|boolean=false) {
+    setValString(param: string, newVal: string, keyParam: string, ind: number | boolean = false) {
         if (keyParam === 'macros') {
             const macro = this.technology.macros[this.selectedMacros];
             if (param in macro.cutting) {
@@ -311,9 +350,9 @@ class ViewStore {
             }
         } else if (keyParam === 'piercingMacros') {
             if (typeof ind !== 'number') {
-                this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal    
+                this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
             } else {
-                this.technology.piercingMacros[ind][param] = newVal    
+                this.technology.piercingMacros[ind][param] = newVal
             }
             this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
         } else if (keyParam === 'modulationMacros') {
@@ -324,35 +363,35 @@ class ViewStore {
             }
         }
     }
-    
-    setSelectedMacros ( newVal: number) {
+
+    setSelectedMacros(newVal: number) {
         if (newVal < 0) newVal = 0
-        if (newVal > this.technology.macros.length-1) newVal = this.technology.macros.length-1
+        if (newVal > this.technology.macros.length - 1) newVal = this.technology.macros.length - 1
         this.selectedMacros = newVal;
     }
 
-    setselectedPiercingStage (val:number) {
-        console.log ('setselectedPiercingStage ' + val)
+    setselectedPiercingStage(val: number) {
+        console.log('setselectedPiercingStage ' + val)
         this.selectedPiercingStage = val
     }
 
-    getTecnologyValue (param:string, keyParam:string, keyInd:number|boolean=false) {
+    getTecnologyValue(param: string, keyParam: string, keyInd: number | boolean = false) {
         //console.log ('getTecnologyValue')
         //console.log ( arguments )
         if (typeof keyInd === 'number') {
             if (keyParam === 'macros') {
-            
+
                 if (param === 'piercingMacro') {
-                    return this.technology.macros[keyInd][param]	    
+                    return this.technology.macros[keyInd][param]
                 }
-                return this.technology.macros[keyInd].cutting[param]	
-                
+                return this.technology.macros[keyInd].cutting[param]
+
             } else if (keyParam === 'modulationMacros') {
-                 return this.technology.modulationMacros[keyInd][param]
+                return this.technology.modulationMacros[keyInd][param]
             } else if (keyParam === 'piercingMacros') {
                 return this.technology.piercingMacros[keyInd][param]
             } else if (keyParam === 'stages') {
-                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                let index: number = this.selectedPiercingStage - 1 < 0 ? 0 : this.selectedPiercingStage - 1
                 return this.technology.piercingMacros[keyInd].stages[index][param]
             }
 
@@ -360,86 +399,86 @@ class ViewStore {
             if (keyParam === 'macros') {
 
                 if (param === 'piercingMacro') {
-                    return this.technology.macros[this.selectedMacros][param]	    
+                    return this.technology.macros[this.selectedMacros][param]
                 }
-                return this.technology.macros[this.selectedMacros].cutting[param]	
-                
+                return this.technology.macros[this.selectedMacros].cutting[param]
+
             } else if (keyParam === 'modulationMacros') {
-                 return this.technology.modulationMacros[this.selectedModulationMacro][param]
+                return this.technology.modulationMacros[this.selectedModulationMacro][param]
             } else if (keyParam === 'piercingMacros') {
                 return this.technology.piercingMacros[this.selectedPiercingMacro][param]
             } else if (keyParam === 'stages') {
-                
-                if (this.selectedPiercingStage === 0 ) {
+
+                if (this.selectedPiercingStage === 0) {
                     return this.technology.piercingMacros[this.selectedPiercingMacro][param]
                 } else {
-                    return this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage-1][param]    
+                    return this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage - 1][param]
                 }
-                
+
             }
         }
-        
+
     }
 
-    setTecnologyValue (newVal: number, param: string, keyParam:string, minimum:number, maximum:number,  keyInd:number|boolean=false) {
-       //console.log ('setTecnologyValue')
-       //console.log ( arguments )
-        
+    setTecnologyValue(newVal: number, param: string, keyParam: string, minimum: number, maximum: number, keyInd: number | boolean = false) {
+        //console.log ('setTecnologyValue')
+        //console.log ( arguments )
+
         if (newVal < minimum) newVal = minimum
         if (newVal > maximum) newVal = maximum
         if (typeof keyInd === 'boolean') {
             if (keyParam === 'macros') {
 
                 if (param === 'piercingMacro') {
-                    this.technology.macros[this.selectedMacros][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);    return this.technology.macros[this.selectedMacros][param]	    
+                    this.technology.macros[this.selectedMacros][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]); return this.technology.macros[this.selectedMacros][param]
                 } else {
-                    this.technology.macros[this.selectedMacros].cutting[param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                    this.technology.macros[this.selectedMacros].cutting[param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
                 }
-               
+
             } else if (keyParam === 'modulationMacros') {
-                this.technology.modulationMacros[this.selectedModulationMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                this.technology.modulationMacros[this.selectedModulationMacro][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             } else if (keyParam === 'piercingMacros') {
-                this.technology.piercingMacros[this.selectedPiercingMacro][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                this.technology.piercingMacros[this.selectedPiercingMacro][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             } else if (keyParam === 'stages') {
-                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
-                this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] =  
-                Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                let index: number = this.selectedPiercingStage - 1 < 0 ? 0 : this.selectedPiercingStage - 1
+                this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] =
+                    Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             }
 
         } else {
             if (keyParam === 'macros') {
                 if (param === 'piercingMacro') {
-                    this.technology.macros[keyInd][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);    
+                    this.technology.macros[keyInd][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
                 } else {
-                    this.technology.macros[keyInd].cutting[param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
-                }               
+                    this.technology.macros[keyInd].cutting[param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
+                }
             } else if (keyParam === 'modulationMacros') {
-                this.technology.modulationMacros[keyInd][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                this.technology.modulationMacros[keyInd][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             } else if (keyParam === 'piercingMacros') {
-                this.technology.piercingMacros[keyInd][param] =  Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                this.technology.piercingMacros[keyInd][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             } else if (keyParam === 'stages') {
-                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
-                this.technology.piercingMacros[keyInd].stages[index][param] =  
-                Math.round(newVal * (10**this.knobRound[param])) / (10**this.knobRound[param]);
+                let index: number = this.selectedPiercingStage - 1 < 0 ? 0 : this.selectedPiercingStage - 1
+                this.technology.piercingMacros[keyInd].stages[index][param] =
+                    Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             }
         }
     }
 
-    setTecnologyValueBoolean (newVal: boolean, param: string, keyParam:string,keyInd:number|boolean=false ) {
+    setTecnologyValueBoolean(newVal: boolean, param: string, keyParam: string, keyInd: number | boolean = false) {
 
         if (typeof keyInd === 'boolean') {
 
             if (keyParam === 'stages') {
-                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                let index: number = this.selectedPiercingStage - 1 < 0 ? 0 : this.selectedPiercingStage - 1
                 this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] = newVal
             } else if (keyParam === 'piercingMacros') {
                 this.technology.piercingMacros[this.selectedPiercingMacro][param] = newVal
             }
-         
+
         } else {
 
             if (keyParam === 'stages') {
-                let index:number = this.selectedPiercingStage-1 < 0 ? 0 : this.selectedPiercingStage-1
+                let index: number = this.selectedPiercingStage - 1 < 0 ? 0 : this.selectedPiercingStage - 1
                 this.technology.piercingMacros[keyInd].stages[index][param] = newVal
             } else if (keyParam === 'piercingMacros') {
                 this.technology.piercingMacros[keyInd][param] = newVal
@@ -448,30 +487,30 @@ class ViewStore {
         }
     }
 
-    setCarouselMode (val:boolean) {
-        console.log ('setCarouselMode  to ' + val)
+    setCarouselMode(val: boolean) {
+        console.log('setCarouselMode  to ' + val)
         this.carouselMode = val
     }
 
-    setCarouselModeInPiercing (val:boolean) {
-        console.log ('setCarouselMode  to ' + val)
+    setCarouselModeInPiercing(val: boolean) {
+        console.log('setCarouselMode  to ' + val)
         this.carouselModeInPiercing = val
     }
 
-    setSelectedSlide (num:number) {
+    setSelectedSlide(num: number) {
         this.selectedSlide = num;
     }
 
-    deleteAndUpdate ( deleteKey: string, deleteIndex: number, adjustKey: string) {
+    deleteAndUpdate(deleteKey: string, deleteIndex: number, adjustKey: string) {
         //console.log ( arguments )
         //console.log (JSON.stringify(viewStore.technology))
-        
-        if (viewStore.technology[deleteKey] 
-            && Array.isArray(viewStore.technology[deleteKey]) 
+
+        if (viewStore.technology[deleteKey]
+            && Array.isArray(viewStore.technology[deleteKey])
             && viewStore.technology[deleteKey].length > 1) {
-			viewStore.technology[deleteKey].splice(deleteIndex, 1);
-            viewStore.setselectedPiercingStage (0)
-		} else {
+            viewStore.technology[deleteKey].splice(deleteIndex, 1);
+            viewStore.setselectedPiercingStage(0)
+        } else {
             showToast({
                 type: 'warning',
                 message: "Minimum value reached!",
@@ -480,46 +519,46 @@ class ViewStore {
             });
             return;
         }
-	
-		const adjustValues = (currentObj: NestedObject) => {
-			for (const key in currentObj) {
-                
+
+        const adjustValues = (currentObj: NestedObject) => {
+            for (const key in currentObj) {
+
                 let altKey = key.replace('initial_', "")
 
-				if (currentObj.hasOwnProperty(key) /* || currentObj.hasOwnProperty(altKey) */ ) {
-		            if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
- 						adjustValues(currentObj[key]);
-					} else if (key === adjustKey 
-                            && typeof currentObj[key] === 'number'
-                            && currentObj[key] >= deleteIndex
-                            && currentObj[key] > 0) {
+                if (currentObj.hasOwnProperty(key) /* || currentObj.hasOwnProperty(altKey) */) {
+                    if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
+                        adjustValues(currentObj[key]);
+                    } else if (key === adjustKey
+                        && typeof currentObj[key] === 'number'
+                        && currentObj[key] >= deleteIndex
+                        && currentObj[key] > 0) {
 
-                      	currentObj[key] -=1;                     
+                        currentObj[key] -= 1;
 
-					} else if (altKey === adjustKey 
+                    } else if (altKey === adjustKey
 
                         && typeof currentObj[key] === 'number'
                         && currentObj[key] >= deleteIndex
                         && currentObj[key] > 0) {
 
-                        currentObj[key] -=1;   
+                        currentObj[key] -= 1;
 
-				    }
-			    } 
-		    }; 
-        }    
-        
- 		adjustValues(viewStore.technology);
+                    }
+                }
+            };
+        }
+
+        adjustValues(viewStore.technology);
         //console.log (JSON.stringify(viewStore.technology))
-	};
+    };
 
     AddAndUpdate(key: string, selectedSlide: number, adjustKey: string) {
         //console.log ( arguments )
         const max = utils.deepFind(false, [adjustKey, 'maximum']);
-        if (viewStore.technology[key] 
-            && Array.isArray(viewStore.technology[key]) 
-            && viewStore.technology[key].length < max+1) {
-            
+        if (viewStore.technology[key]
+            && Array.isArray(viewStore.technology[key])
+            && viewStore.technology[key].length < max + 1) {
+
             const itemCopy = { ...viewStore.technology[key][selectedSlide] };
             viewStore.technology[key].splice(selectedSlide + 1, 0, itemCopy);
             const adjustValues = (currentObj: any) => {
@@ -527,50 +566,50 @@ class ViewStore {
                     if (currentObj.hasOwnProperty(key)) {
                         if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
                             adjustValues(currentObj[key]);
-                        } else if (key === adjustKey 
-                                  && typeof currentObj[key] === 'number'
-                                  && currentObj[key] > selectedSlide) {
+                        } else if (key === adjustKey
+                            && typeof currentObj[key] === 'number'
+                            && currentObj[key] > selectedSlide) {
                             currentObj[key] += 1;
                         }
                     }
                 }
             };
             adjustValues(viewStore.technology);
-            viewStore.setselectedPiercingStage (0)
+            viewStore.setselectedPiercingStage(0)
         } else {
             showToast({
                 type: 'warning',
                 message: "Maximum value reached!",
                 position: 'bottom-right',
                 autoClose: 5000
-              });
+            });
         }
     }
 
-    deleteStage(arg:string) {
+    deleteStage(arg: string) {
 
-        if (arg==='all') {
+        if (arg === 'all') {
             viewStore.setselectedPiercingStage(0)
-            viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages=[]
+            viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages = []
             return
         }
-       
+
         if (viewStore.selectedPiercingStage === 0) {
             showToast({
                 type: 'warning',
                 message: "Cannot delete this splice step!",
                 position: 'bottom-right',
                 autoClose: 5000
-              });
+            });
 
         } else {
-            if ( viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length > 1 &&
-                 typeof viewStore.selectedPiercingStage === 'number'
+            if (viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length > 1 &&
+                typeof viewStore.selectedPiercingStage === 'number'
             ) {
 
-                viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.splice(viewStore.selectedPiercingStage-1, 1);
-                if ( viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length < viewStore.selectedPiercingStage) {
-                    viewStore.setselectedPiercingStage(viewStore.selectedPiercingStage-1)
+                viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.splice(viewStore.selectedPiercingStage - 1, 1);
+                if (viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length < viewStore.selectedPiercingStage) {
+                    viewStore.setselectedPiercingStage(viewStore.selectedPiercingStage - 1)
                 }
 
                 showToast({
@@ -578,15 +617,15 @@ class ViewStore {
                     message: "Step removed!",
                     position: 'bottom-right',
                     autoClose: 5000
-                  });
-        
+                });
+
             }
-        }      
+        }
     }
 
-    addStage () {
+    addStage() {
         const max = 16
-        if ( viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length >= max ) {
+        if (viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length >= max) {
             showToast({
                 type: 'warning',
                 message: "Maximum value reached!",
@@ -595,18 +634,18 @@ class ViewStore {
             });
             return;
         }
-        
-        console.log ()
+
+        console.log()
 
         let stages = viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages;
 
-        if (viewStore.selectedPiercingStage !==0) {
+        if (viewStore.selectedPiercingStage !== 0) {
             const index = viewStore.selectedPiercingStage - 1;
             const stepPaste = stages[index];
             stages.splice(index + 1, 0, { ...stepPaste });
 
         } else {
-            let donor  = viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro]
+            let donor = viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro]
             const stepPaste = {
                 "pressure": donor.initial_pressure,
                 "power": donor.initial_power,
@@ -618,42 +657,42 @@ class ViewStore {
                 "modulationFrequency_Hz": donor.initial_modulationFrequency_Hz,
                 "cross_blow": false,
                 "modulationMacro": donor.initial_modulationMacro
-             
+
             }
-            stages.splice( 0, 0, stepPaste);
-        } 
-        
+            stages.splice(0, 0, stepPaste);
+        }
+
         showToast({
             type: 'success',
             message: "Step added!",
             position: 'bottom-right',
             autoClose: 5000
-          });
+        });
     }
 
-    setAnimProgress (stage:number, progress:number) {
+    setAnimProgress(stage: number, progress: number) {
         this.animProgress.stage = stage
-        this.animProgress.progress= progress
+        this.animProgress.progress = progress
     }
 
-    setDiagActive (val:string) {
+    setDiagActive(val: string) {
         this.diagActive = val;
 
     }
 
-    setIsAnimating (val:boolean) {
+    setIsAnimating(val: boolean) {
         this.isAnimating = val;
     }
 
-    setPaused (val:boolean) {
+    setPaused(val: boolean) {
         this.isPaused = val;
     }
 
-    setAtEnd (val:boolean) {
+    setAtEnd(val: boolean) {
         this.atEnd = val;
     }
 
-    setElapsed (val:number) {
+    setElapsed(val: number) {
         this.elapsed = val;
     }
 }

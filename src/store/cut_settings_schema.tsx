@@ -1,7 +1,6 @@
 
-const cutting_settings = JSON.parse(`{
-    "success": true,
-    "result": {
+const cutting_settings = JSON.parse(`
+    {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "title": "SGNmotion settings",
@@ -257,7 +256,7 @@ const cutting_settings = JSON.parse(`{
                                 "initial_height": {
                                     "type": "number",
                                     "minimum": 0.1,
-                                    "maximum": 20.0,
+                                    "maximum": 15.0,
                                     "default": 1.0,
                                     "title": "Начальная высота, мм"
                                 },
@@ -314,7 +313,7 @@ const cutting_settings = JSON.parse(`{
                                             "height": {
                                                 "type": "number",
                                                 "minimum": 0.1,
-                                                "maximum": 20.0,
+                                                "maximum": 15.0,
                                                 "default": 1.0,
                                                 "title": "Высота, мм"
                                             },
@@ -464,6 +463,6 @@ const cutting_settings = JSON.parse(`{
         "$id": "sgnMachineSettings",
         "type": "object"
     }
-}`)
+`)
 
 export default cutting_settings

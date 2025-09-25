@@ -1,6 +1,4 @@
 const cut_settings= JSON.parse(`{
-  "success":true,
-  "result":{
      "machine":{
         "name":"SGNlaser",
         "sourcePower_w":12000
@@ -1870,6 +1868,6 @@ const cut_settings= JSON.parse(`{
         }
      }
   }
-}`)
+`)
 
   export default cut_settings;
