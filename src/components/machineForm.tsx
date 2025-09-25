@@ -1,29 +1,27 @@
-import React from "react";
-import { IChangeEvent, withTheme } from "@rjsf/core";
+import Form from "@rjsf/mui";
 import validator from "@rjsf/validator-ajv8";
-import { Theme } from '@rjsf/mui';
-import cut_settings from "./../store/cut_settings";
-import cutting_settings_schema from "../store/cut_settings_schema";
+import { observer } from "mobx-react-lite";
+import viewStore from "../store/viewStore";
 
-
-const MachineSettingsForm: React.FC = () => {
-	const handleSubmit = (e: IChangeEvent) => {
-		console.log("Данные формы:", e.formData);
-	};
-
-	const Form = withTheme(Theme);
-
+const CuttingSettingsForm = observer(() => {
 
 	return (
-		<div style={{ padding: "1rem" }}>
-			<Form
-				schema={cutting_settings_schema.result}
-				validator={validator}
-				formData={cut_settings}
-				onSubmit={handleSubmit}
-			/>
-		</div>
+		<Form
+			schema={viewStore.schema}                // схема JSON Schema
+			formData={viewStore.cut_settings}    // данные для формы
+			validator={validator}                    // ajv8 валидатор
+			onChange={(e) => {
+				// обновляем MobX store при изменении
+				viewStore.cut_settings= e.formData;
+			}}
+			onSubmit={(e) => {
+				console.log("✅ данные валидны:", e.formData);
+			}}
+			onError={(errors) => {
+				console.error("⚠️ ошибки валидации:", errors);
+			}}
+		/>
 	);
-};
+});
 
-export default MachineSettingsForm;
+export default CuttingSettingsForm;

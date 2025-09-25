@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import PowerButton from "./navbar/powerButton";
 import LaserIcon from "./../../public/images/laserIcon"
 import laserStore from "../store/laserStore";
+import utils from "../scripts/util";
 
 const NavBar = observer(() => {
 
@@ -36,7 +37,7 @@ const NavBar = observer(() => {
 					</button>
 				</div>
 				<div className="ms-2">
-					<button className="white_button navbar_button">
+					<button className="white_button navbar_button" onClick={()=>{utils.validateCuttingSettings()}}>
 						<div className="d-flex align-items-center justify-content-center">
 							<Icon icon="material-symbols:cancel-outline"
 								width="36"
