@@ -151,7 +151,7 @@ const MidBar = observer(() => {
 					}
 				</div>
 
-				{!carouselInPlan && tasks?.categories?.active?.items && (
+				{!carouselInPlan && tasks && (
 					<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
 						<div className="planMain" style={{ border: "2px solid grey", borderRadius: '10px'}}>
 							{ <GCodeToSvg /> }
@@ -199,7 +199,7 @@ const MidBar = observer(() => {
 						}}
 					>
 						{
-							Object.keys(tasks?.categories?.active?.items||[]).map((key:any) =>
+							tasks.map((key:any) =>
 								<SwiperSlide>
 									<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
 
@@ -208,7 +208,7 @@ const MidBar = observer(() => {
 											<div className="ccard-image-wrapper">
 												<div className="ccard-image">
 													<img
-														src={''}
+														src={'/'}
 														alt="svg"
 													/>
 												</div>

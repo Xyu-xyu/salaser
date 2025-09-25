@@ -13,17 +13,17 @@ export default defineConfig({
     // https: false,  // Можно включить HTTPS (нужен сертификат)
     
     // Настройки для Proxy, если API бекенда на другом порту (опционально)
-    proxy: {
+   /*  proxy: {
       '/api': {
-        target: 'http://localhost:3000', // Адрес бекенд-сервера
+        target: 'http://localhost:5005', // Адрес бекенд-сервера
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       }
-    }
+    } */
   },
   // Оптимизации для продакшена (опционально)
   build: {
-    outDir: 'dist',  // Папка сборки
+    outDir: '/home/woodver/salaserv/templates/laserMain',  // Папка сборки
     emptyOutDir: true, // Очищать папку перед сборкой
     sourcemap: true, // Генерировать sourcemaps (опционально)
   }

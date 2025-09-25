@@ -9,7 +9,6 @@ import { showToast } from "../components/toast";
 
 export const UploadButton = observer(() => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const api_host = constants.api
 	const core = 0
 	const { t } = useTranslation()
 	const { loadResult } = laserStore

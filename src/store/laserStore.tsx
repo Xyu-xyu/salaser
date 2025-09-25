@@ -5,13 +5,7 @@ class LaserStore {
 	mainMode: string = "planMode";
 	rightMode: Boolean = true
 	knobMode: Boolean = false
-	tasks: {
-		categories?: {
-		  active?: {
-			items?: any[];
-		  };
-		};
-	  } = {};
+	tasks:string[]  = [];
 	loading: boolean = false;
 	error: string | null = null;
 	private intervalId: ReturnType<typeof setInterval> | null = null;
@@ -29,13 +23,7 @@ class LaserStore {
 		}
 	}
 
-	setTasks(tasks: {
-		categories?: {
-		  active?: {
-			items?: any[];
-		  };
-		};
-	  }) {
+	setTasks(tasks:string[]) {
 		this.tasks = tasks;
 	}
 
@@ -49,22 +37,23 @@ class LaserStore {
 
 	async fetchTasks() {
 		this.setLoading(true);
-		try {
-			const response = await fetch("http://127.0.0.1/tasks-info");
+/* 		try {
+			const response = await fetch("/api/tasks-info"); // Vite proxy или Flask build
 			if (!response.ok) {
 				throw new Error(`Ошибка сети: ${response.status} ${response.statusText}`);
 			}
-			const data = await response.json();
+			const data = JSON.parse(response)
 
-			// сравниваем с текущими задачами
-			if (JSON.stringify(data) !== JSON.stringify(laserStore.tasks)) {
+ 			if (JSON.stringify(data) !== JSON.stringify(laserStore.tasks)) {
 				this.setTasks(data);
-			}
+			} 
 		} catch (error: any) {
 			this.setError(error.message || "Неизвестная ошибка");
 		} finally {
 			this.setLoading(false);
-		}
+		} */
+		this.setTasks(['чacascaуй', 'gbpascaslf', 'scsacascas cacasca']);
+		this.setLoading(false);
 	}
 
 	// запуск интервала (polling)
