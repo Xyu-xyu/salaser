@@ -10,12 +10,18 @@ import UniversalNamedKnob from "./universalNamedKnob";
 import CentralBar from "./centralBar";
 import { useTranslation } from 'react-i18next';
 import viewStore from "../store/viewStore";
+import { useEffect } from "react";
 
 
 const Main = observer(() => {
 	const { knobMode } = laserStore;
 	const { t } = useTranslation()
-	viewStore.loadCutSettings()
+
+	useEffect (()=>{
+		if (!viewStore.schema) viewStore.loadCutSettingsSchema()
+		if (!viewStore.cut_settings)viewStore.loadCutSettings()
+	},[]) 
+	
 
 	return (
 		<main

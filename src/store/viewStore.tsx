@@ -125,6 +125,8 @@ class ViewStore {
       
     animProgress: {[key: string]: number } = { stage:0, progress:0}
     cut_settings: any = null;
+    schema: any = null;
+
     loading = false;
     error: string | null = null;
 
@@ -143,7 +145,7 @@ class ViewStore {
           viewStore.technology = data.result.technology          
           showToast({
             type: 'success',
-            message: "Upload settings form core success!",
+            message: "Upload settings form core 0 success!",
             position: 'bottom-right',
             autoClose: 5000
         });
@@ -152,7 +154,38 @@ class ViewStore {
           this.error = err.message || "Неизвестная ошибка";
           showToast({
             type: 'error',
-            message: "Upload settings form core error"+ err.message,
+            message: "Upload settings from core error"+ err.message,
+            position: 'bottom-right',
+            autoClose: 5000
+        });
+        } finally {
+          this.loading = false;
+        }
+    }
+
+
+    async loadCutSettingsSchema() {
+        this.loading = true;
+        this.error = null;
+        try {
+          const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings-schema`);
+          if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
+    
+          const data = await resp.json();
+          viewStore.schema = data
+          viewStore.macrosProperties = data.result.properties.technology.properties.macros.items.properties     
+          showToast({
+            type: 'success',
+            message: "Upload  schema from core 0 success!",
+            position: 'bottom-right',
+            autoClose: 5000
+        });
+          //console.log (data)
+        } catch (err: any) {
+          this.error = err.message || "Неизвестная ошибка";
+          showToast({
+            type: 'error',
+            message: "Upload schema from core error"+ err.message,
             position: 'bottom-right',
             autoClose: 5000
         });
