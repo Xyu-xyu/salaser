@@ -9,11 +9,13 @@ import NavBar from "./navbar";
 import UniversalNamedKnob from "./universalNamedKnob";
 import CentralBar from "./centralBar";
 import { useTranslation } from 'react-i18next';
+import viewStore from "../store/viewStore";
 
 
 const Main = observer(() => {
 	const { knobMode } = laserStore;
 	const { t } = useTranslation()
+	viewStore.loadCutSettings()
 
 	return (
 		<main

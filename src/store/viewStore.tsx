@@ -3,6 +3,7 @@ import cut_settings_schema from './cut_settings_schema'
 import cut_settings from "./cut_settings";
 import utils from "../scripts/util";
 import { showToast } from "../components/toast";
+import constants from "./constants";
 
 export interface NestedObject {
     [key: string]: any; 
@@ -123,8 +124,43 @@ class ViewStore {
     elapsed: number=0
       
     animProgress: {[key: string]: number } = { stage:0, progress:0}
+    cut_settings: any = null;
+    loading = false;
+    error: string | null = null;
+
     technology = cut_settings.result.technology
     macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
+
+    async loadCutSettings() {
+        this.loading = true;
+        this.error = null;
+        try {
+          const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`);
+          if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
+    
+          const data = await resp.json();
+          viewStore.cut_settings = data;
+          viewStore.technology = data.result.technology          
+          showToast({
+            type: 'success',
+            message: "Upload settings form core success!",
+            position: 'bottom-right',
+            autoClose: 5000
+        });
+          //console.log (data)
+        } catch (err: any) {
+          this.error = err.message || "Неизвестная ошибка";
+          showToast({
+            type: 'error',
+            message: "Upload settings form core error"+ err.message,
+            position: 'bottom-right',
+            autoClose: 5000
+        });
+        } finally {
+          this.loading = false;
+        }
+    }
+   
 
     constructor() {
         makeAutoObservable(this, {
