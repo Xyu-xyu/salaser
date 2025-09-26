@@ -4,6 +4,7 @@ import PowerButton from "./navbar/powerButton";
 import LaserIcon from "./../../public/images/laserIcon"
 import laserStore from "../store/laserStore";
 import utils from "../scripts/util";
+import SettingsButton from "./navbar/settingsButton";
 
 const NavBar = observer(() => {
 
@@ -122,6 +123,7 @@ const NavBar = observer(() => {
 						</div>
 					</button>
 				</div>
+				<SettingsButton />
 				<PowerButton />
 			</div>
 		</div>

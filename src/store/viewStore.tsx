@@ -194,45 +194,29 @@ class ViewStore {
         }
     }
 
-    async updateCutSettings() {
-        viewStore.cut_settings.technology = viewStore.technology
-        try {
-            const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(viewStore.cut_settings),
-            });
-            if (!resp.ok) throw new Error(`Ошибка обновления: ${resp.statusText}`);
-            const data = await resp.json();
-            if (data.success) {
-                //this.cut_settings = newSettings;
-                showToast({ type: "success", message: "Настройки обновлены" });
-            } else {
-                throw new Error(data.exception || "Ошибка обновления");
+    async sentSettingsToLaser() {
+        let result = utils.validateCuttingSettings()
+        if ( result?.errors.length === 0) {
+            viewStore.cut_settings.technology = viewStore.technology
+            try {
+                const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(viewStore.cut_settings),
+                });
+                if (!resp.ok) throw new Error(`Ошибка обновления: ${resp.statusText}`);
+                const data = await resp.json();
+                if (data.success) {
+                    //this.cut_settings = newSettings;
+                    showToast({ type: "success", message: "Настройки обновлены" });
+                } else {
+                    throw new Error(data.exception || "Ошибка обновления");
+                }
+            } catch (err: any) {
+                showToast({ type: "error", message: err.message });
             }
-        } catch (err: any) {
-            showToast({ type: "error", message: err.message });
-        }
+        }      
     }
-
-    async resetCutSettings() {
-        try {
-            const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`, {
-                method: "DELETE",
-            });
-            if (!resp.ok) throw new Error(`Ошибка сброса: ${resp.statusText}`);
-            const data = await resp.json();
-            if (data.success) {
-                this.cut_settings = data.result;
-                showToast({ type: "success", message: "Настройки сброшены" });
-            } else {
-                throw new Error(data.exception || "Ошибка сброса");
-            }
-        } catch (err: any) {
-            showToast({ type: "error", message: err.message });
-        }
-    }
-
 
     constructor() {
         makeAutoObservable(this, {

@@ -1,5 +1,5 @@
 
-const cutting_settings = JSON.parse(`
+const schema = JSON.parse(`
     {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
@@ -465,4 +465,4 @@ const cutting_settings = JSON.parse(`
     }
 `)
 
-export default cutting_settings
+export default schema
