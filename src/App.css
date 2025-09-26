@@ -766,7 +766,8 @@ height: fit-content;}
   z-index: -1;
 }
 
-.powerButton-navbar-modal .modal-dialog {
+.powerButton-navbar-modal .modal-dialog,
+.settingsButton-navbar-modal .modal-dialog {
   position: absolute;
   top: 65px;
   right: 0;
@@ -775,7 +776,13 @@ height: fit-content;}
   max-width: none;         /* отключаем ограничение bootstrap */
 }
 
-.powerButton-navbar-modal .modal-content {
+
+.settingsButton-navbar-modal .modal-dialog {
+  right: 63px;
+}
+
+.powerButton-navbar-modal .modal-content, 
+.settingsButton-navbar-modal .modal-dialog {
   border-radius: 8px;      /* можно слегка скруглить */
   padding: 0;              /* убрать лишние отступы */
 }

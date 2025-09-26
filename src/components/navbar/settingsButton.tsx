@@ -1,12 +1,12 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import viewStore from "../../store/viewStore";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Modal } from "react-bootstrap";
 
 
 const settingsButton = observer(() => {
-
+	const fileInputRef_1 = useRef<HTMLInputElement>(null);
 	const [show, setShow] = useState(false);
 
 	// Открыть модалку
@@ -19,43 +19,69 @@ const settingsButton = observer(() => {
 
 	const sentToLaser = () => {
 		//setShow(false)
-		viewStore.setModalProps ({
-		   show:true,
+		viewStore.setModalProps({
+			show: true,
 			modalBody: 'Do you want to sent settings to laser ?',
-		   confirmText: 'OK',
-		   cancelText:'Cancel',
-		   func: viewStore.sentSettingsToLaser,
-		   args:[]
-	   })
-   }
+			confirmText: 'OK',
+			cancelText: 'Cancel',
+			func: viewStore.sentSettingsToLaser,
+			args: []
+		})
+	}
 
-	const loadPreset = () => {
-		//setShow(false)
-		viewStore.setModalProps ({
-		   show:true,
-			modalBody: 'Do you want to load preset?',
-		   confirmText: 'OK',
-		   cancelText:'Cancel',
-		   func: ()=>{ 
- 			console.log ('loadPreset'); 
+	const savePreset = () => {
+		viewStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to save settings preset?',
+			confirmText: 'OK',
+			cancelText: 'Cancel',
+			func: () => {
+				console.log('savePreset');
 			},
-		   args:[]
-	   })
-   }
+			args: []
+		})
+	}
+
+	const handleClick = () => {
+		fileInputRef_1.current?.click();
+	};
+
+	
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		
+		const input = e.target;
+		const file = input.files?.[0];
+		//alert('handleFileChange' + JSON.stringify(file))
+		console.log (e)
+		console.log (e.target)
+		console.log (e.target.files)
+		console.log (e.target.files?.[0])
 
 
-   const savePreset = () => {
- 	viewStore.setModalProps ({
-	   show:true,
-		modalBody: 'Do you want to save settings preset?',
-	   confirmText: 'OK',
-	   cancelText:'Cancel',
-	   func: ()=>{ 
-		 console.log ('savePreset'); 
-		},
-	   args:[]
-   })
-}
+		if (!file) return;
+		/* setTimeout(() => {
+			setShow(false);
+		}, 0); */
+	  
+		try {
+		  const text = await file.text();
+		  //const data = JSON.parse(text);
+	  
+		  console.log("✅ Загруженный объект:", text);
+	  
+		  // Скрываем модалку через setTimeout, чтобы событие успело завершиться
+		  setTimeout(() => {
+			setShow(false);
+		  }, 0);
+		} catch (err) {
+		  console.error("❌ Ошибка парсинга JSON:", err);
+		} finally {
+		  // Сброс input, чтобы можно было выбрать тот же файл снова
+		  input.value = "";
+		} 
+	  };
+	  
+	  
 
 
 
@@ -72,7 +98,7 @@ const settingsButton = observer(() => {
 						height="36"
 						style={{ color: show ? "white" : "black" }}
 					/>
-        		</div>
+				</div>
 			</button>
 			<Modal
 				show={show}
@@ -83,19 +109,26 @@ const settingsButton = observer(() => {
 			>
 				<div className="m-1">
 					<div className="d-flex flex-column">
-						<button className="white_button navbar_button m-1" onClick={ sentToLaser }>
+						<button className="white_button navbar_button m-1" onClick={sentToLaser}>
 							<div className="d-flex align-items-center justify-content-center">
 								<Icon icon="iconamoon:download" width="36" height="36" style={{ color: 'black' }} />
 							</div>
 						</button>
 
-						<button className="white_button navbar_button m-1" onClick={ loadPreset }  >
+						<button className="white_button navbar_button m-1" onClick={handleClick}  >
 							<div className="d-flex align-items-center justify-content-center">
 								<Icon icon="fluent-emoji-high-contrast:open-file-folder" width="36" height="36" style={{ color: 'black' }} />
 							</div>
 						</button>
+						<input
+							type="file"
+							ref={fileInputRef_1}
+							hidden
+							accept=".json"   // только файлы с расширением .ncp и .sgn
+							onChange={handleFileChange}
+						/>
 
-						<button className="white_button navbar_button m-1" onClick={ savePreset }  >
+						<button className="white_button navbar_button m-1" onClick={savePreset}  >
 							<div className="d-flex align-items-center justify-content-center">
 								<Icon icon="fluent:save-16-regular" width="36" height="36" style={{ color: 'black' }} />
 							</div>
