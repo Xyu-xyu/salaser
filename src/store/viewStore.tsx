@@ -635,7 +635,7 @@ class ViewStore {
         height: 1,
         modulationFrequency_Hz: 0,
         piercingMacro: 0,
-        pulseFill_percent: 0,
+        pulseFill_percent: 1,
         pulseFrequency_Hz: 0,
         initial_modulationFrequency_Hz: 0,
         initial_pressure: 1,
@@ -726,7 +726,7 @@ class ViewStore {
     }
 
     async sentSettingsToLaser() {
-        let result = utils.validateCuttingSettings()
+        let result = utils.validateCuttingSettings( viewStore.technology )
         if ( result?.errors.length === 0) {
             viewStore.cut_settings.technology = viewStore.technology
             try {
@@ -1212,14 +1212,17 @@ class ViewStore {
     }
 
     updateTechnology (settings:Properties,  name:string) {
-        viewStore.technology = settings.technology  
-        showToast({
-            type: 'success',
-            message: "Preset success download:"+  name,
-            position: 'bottom-right',
-            autoClose: 5000
-        });      
         
+        let result = utils.validateCuttingSettings( settings )
+        if ( result?.errors.length === 0)  {
+            viewStore.technology = settings.technology  
+            showToast({
+                type: 'success',
+                message: "Preset success download:"+  name,
+                position: 'bottom-right',
+                autoClose: 5000
+            });      
+        }
     }
 }
 

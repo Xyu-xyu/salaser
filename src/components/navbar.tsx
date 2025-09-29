@@ -37,17 +37,6 @@ const NavBar = observer(() => {
 						</div>
 					</button>
 				</div>
-				<div className="ms-2">
-					<button className="white_button navbar_button" onClick={()=>{utils.validateCuttingSettings()}}>
-						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="material-symbols:cancel-outline"
-								width="36"
-								height="36"
-								style={{ color: 'black' }}
-							/>
-						</div>
-					</button>
-				</div>
 
 				{/* LONG button start */}
 				<div className="ms-4 w-100" id='longButton'>

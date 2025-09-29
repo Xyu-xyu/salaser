@@ -1,6 +1,6 @@
 import { showToast } from '../components/toast';
 import cutting_settings_schema from '../store/cut_settings_schema';
-import viewStore from '../store/viewStore';
+import viewStore, { Properties } from '../store/viewStore';
 import validator from "@rjsf/validator-ajv8";
 
 interface GCodeParams {
@@ -574,13 +574,11 @@ class Utils {
 		return a;
 	}
 
-	validateCuttingSettings() {
-		const { schema, cut_settings, technology} = viewStore
+	validateCuttingSettings( technology:Properties ) {
+		const { schema } = viewStore
+		const result = validator.validateFormData( technology, schema);
+		console.log (result)
 
-		let data = cut_settings
-		data.technology = technology
-
-		const result = validator.validateFormData( data, schema);
 		if ( result?.errors.length === 0) {
 			showToast({
 				type: 'success',
