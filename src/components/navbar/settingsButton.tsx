@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import viewStore from "../../store/viewStore";
 import { useState, useRef } from "react";
 import { Modal } from "react-bootstrap";
+import { showToast } from "../toast";
 
 
 const settingsButton = observer(() => {
@@ -51,34 +52,39 @@ const settingsButton = observer(() => {
 		
 		const input = e.target;
 		const file = input.files?.[0];
-		//alert('handleFileChange' + JSON.stringify(file))
-		console.log (e)
-		console.log (e.target)
-		console.log (e.target.files)
-		console.log (e.target.files?.[0])
+		
+		if (!file) {
+			
+			showToast({
+				type: 'error',
+				message: "Error in preset loading",
+				position: 'bottom-right',
+				autoClose: 5000
+			});
+		} else {
 
+			try {
+				const text = await file.text();
+				const data = JSON.parse(text);
+				viewStore.updateTechnology (data, file.name)
+			
+				setTimeout(() => {
+				  setShow(false);
+				}, 0);
 
-		if (!file) return;
-		/* setTimeout(() => {
-			setShow(false);
-		}, 0); */
-	  
-		try {
-		  const text = await file.text();
-		  //const data = JSON.parse(text);
-	  
-		  console.log("✅ Загруженный объект:", text);
-	  
-		  // Скрываем модалку через setTimeout, чтобы событие успело завершиться
-		  setTimeout(() => {
-			setShow(false);
-		  }, 0);
-		} catch (err) {
-		  console.error("❌ Ошибка парсинга JSON:", err);
-		} finally {
-		  // Сброс input, чтобы можно было выбрать тот же файл снова
-		  input.value = "";
-		} 
+			  } catch (err) {
+				
+				showToast({
+					type: 'error',
+					message: "Error in preset parsing",
+					position: 'bottom-right',
+					autoClose: 5000
+				});
+
+			  } finally {
+				input.value = "";
+			  } 
+		};
 	  };
 	  
 	  

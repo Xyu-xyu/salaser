@@ -48,6 +48,537 @@ export interface ModalProps {
     args?: any[];
 }
 
+export interface Root {
+    success: boolean
+    result: Result
+}
+
+export interface Result {
+    $schema: string
+    additionalProperties: boolean
+    title: string
+    description: string
+    required: string[]
+    properties: Properties
+    $id: string
+    type: string
+}
+
+export interface Properties {
+    machine: Machine
+    material: Material
+    technology: Technology
+}
+
+export interface Machine {
+    properties: Properties2
+    description: string
+    required: string[]
+    additionalProperties: boolean
+    title: string
+    type: string
+}
+
+export interface Properties2 {
+    name: Name
+    sourcePower_w: SourcePowerW
+}
+
+export interface Name {
+    minLength: number
+    type: string
+    maxLength: number
+    default: string
+    title: string
+}
+
+export interface SourcePowerW {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Material {
+    properties: Properties3
+    required: string[]
+    type: string
+    additionalProperties: boolean
+    title: string
+}
+
+export interface Properties3 {
+    code: Code
+    name: Name2
+    thickness: Thickness
+}
+
+export interface Code {
+    minLength: number
+    type: string
+    maxLength: number
+    default: string
+    title: string
+}
+
+export interface Name2 {
+    default: string
+    type: string
+    maxLength: number
+    title: string
+}
+
+export interface Thickness {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Technology {
+    properties: Properties4
+    required: string[]
+    $wvType: string
+    additionalProperties: boolean
+    type: string
+    title: string
+}
+
+export interface Properties4 {
+    macros: Macros
+    piercingMacros: PiercingMacros
+    modulationMacros: ModulationMacros
+    feeding: Feeding
+}
+
+export interface Macros {
+    type: string
+    items: Items
+    $wvType: string
+    additionalProperties: boolean
+    maxItems: number
+    title: string
+}
+
+export interface Items {
+    required: string[]
+    type: string
+    additionalProperties: boolean
+    properties: Properties5
+}
+
+export interface Properties5 {
+    piercingMacro: PiercingMacro
+    cutting: Cutting
+}
+
+export interface PiercingMacro {
+    $wvEnumRef: string
+    title: string
+    minimum: number
+    maximum: number
+    default: number
+    type: string
+}
+
+export interface Cutting {
+    properties: Properties6
+    required: string[]
+    type: string
+    additionalProperties: boolean
+    title: string
+}
+
+export interface Properties6 {
+    pressure: Pressure
+    power_W_mm: PowerWMm
+    gas: Gas
+    focus: Focus
+    enabled: Enabled
+    feedLimit_mm_s: FeedLimitMmS
+    cross_blow: CrossBlow
+    type: Type
+    modulationMacro: ModulationMacro
+    height: Height
+    modulationFrequency_Hz: ModulationFrequencyHz
+}
+
+export interface Pressure {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface PowerWMm {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Gas {
+    default: string
+    type: string
+    enum: string[]
+    title: string
+}
+
+export interface Focus {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Enabled {
+    title: string
+    type: string
+    default: boolean
+}
+
+export interface FeedLimitMmS {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface CrossBlow {
+    title: string
+    type: string
+    default: boolean
+}
+
+export interface Type {
+    default: string
+    type: string
+    enum: string[]
+    title: string
+}
+
+export interface ModulationMacro {
+    $wvEnumRef: string
+    title: string
+    minimum: number
+    maximum: number
+    default: number
+    type: string
+}
+
+export interface Height {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface ModulationFrequencyHz {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface PiercingMacros {
+    type: string
+    items: Items2
+    $wvType: string
+    additionalProperties: boolean
+    maxItems: number
+    title: string
+}
+
+export interface Items2 {
+    required: string[]
+    properties: Properties7
+    additionalProperties: boolean
+    $wvFormat: WvFormat
+    type: string
+}
+
+export interface Properties7 {
+    initial_modulationFrequency_Hz: InitialModulationFrequencyHz
+    initial_focus: InitialFocus
+    initial_modulationMacro: InitialModulationMacro
+    initial_pressure: InitialPressure
+    gas: Gas2
+    name: Name3
+    initial_power: InitialPower
+    initial_height: InitialHeight
+    stages: Stages
+    initial_cross_blow: InitialCrossBlow
+}
+
+export interface InitialModulationFrequencyHz {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface InitialFocus {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface InitialModulationMacro {
+    $wvEnumRef: string
+    title: string
+    minimum: number
+    maximum: number
+    default: number
+    type: string
+}
+
+export interface InitialPressure {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Gas2 {
+    default: string
+    type: string
+    enum: string[]
+    title: string
+}
+
+export interface Name3 {
+    minLength: number
+    type: string
+    maxLength: number
+    default: string
+    title: string
+}
+
+export interface InitialPower {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface InitialHeight {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Stages {
+    type: string
+    items: Items3
+    maxItems: number
+    additionalProperties: boolean
+    title: string
+}
+
+export interface Items3 {
+    required: string[]
+    additionalProperties: boolean
+    type: string
+    properties: Properties8
+}
+
+export interface Properties8 {
+    pressure: Pressure2
+    power: Power
+    enabled: Enabled2
+    delay_s: DelayS
+    power_W_s: PowerWS
+    focus: Focus2
+    height: Height2
+    modulationMacro: ModulationMacro2
+    cross_blow: CrossBlow2
+    modulationFrequency_Hz: ModulationFrequencyHz2
+}
+
+export interface Pressure2 {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Power {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Enabled2 {
+    title: string
+    type: string
+    default: boolean
+}
+
+export interface DelayS {
+    title: string
+    type: string
+    default: number
+}
+
+export interface PowerWS {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Focus2 {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Height2 {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface ModulationMacro2 {
+    $wvEnumRef: string
+    title: string
+    minimum: number
+    maximum: number
+    default: number
+    type: string
+}
+
+export interface CrossBlow2 {
+    title: string
+    type: string
+    default: boolean
+}
+
+export interface ModulationFrequencyHz2 {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface InitialCrossBlow {
+    title: string
+    type: string
+    default: boolean
+}
+
+export interface WvFormat {
+    format: string
+    variables: Variable[]
+}
+
+export interface Variable {
+    type: string
+    name: string
+    default: string
+}
+
+export interface ModulationMacros {
+    title: string
+    items: Items4
+    $wvType: string
+    additionalProperties: boolean
+    maxItems: number
+    type: string
+}
+
+export interface Items4 {
+    properties: Properties9
+    additionalProperties: boolean
+    type: string
+    $wvFormat: WvFormat2
+}
+
+export interface Properties9 {
+    pulseFill_percent: PulseFillPercent
+    name: Name4
+    pulseFrequency_Hz: PulseFrequencyHz
+}
+
+export interface PulseFillPercent {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface Name4 {
+    minLength: number
+    type: string
+    maxLength: number
+    default: string
+    title: string
+}
+
+export interface PulseFrequencyHz {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
+export interface WvFormat2 {
+    format: string
+    variables: Variable2[]
+}
+
+export interface Variable2 {
+    type: string
+    name: string
+    default: string
+}
+
+export interface Feeding {
+    properties: Properties10
+    required: string[]
+    type: string
+    additionalProperties: boolean
+    title: string
+}
+
+export interface Properties10 {
+    feedLimit_mm_s: FeedLimitMmS2
+}
+
+export interface FeedLimitMmS2 {
+    type: string
+    minimum: number
+    maximum: number
+    default: number
+    title: string
+}
+
 
 
 class ViewStore {
@@ -678,6 +1209,17 @@ class ViewStore {
 
     setElapsed(val: number) {
         this.elapsed = val;
+    }
+
+    updateTechnology (settings:Properties,  name:string) {
+        viewStore.technology = settings.technology  
+        showToast({
+            type: 'success',
+            message: "Preset success download:"+  name,
+            position: 'bottom-right',
+            autoClose: 5000
+        });      
+        
     }
 }
 
