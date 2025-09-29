@@ -726,9 +726,10 @@ class ViewStore {
     }
 
     async sentSettingsToLaser() {
-        let result = utils.validateCuttingSettings( viewStore.technology )
+        viewStore.cut_settings.technology = viewStore.technology
+        let result = utils.validateCuttingSettings( viewStore.cut_settings )
         if ( result?.errors.length === 0) {
-            viewStore.cut_settings.technology = viewStore.technology
+            
             try {
                 const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`, {
                     method: "PUT",
@@ -1218,10 +1219,41 @@ class ViewStore {
             viewStore.technology = settings.technology  
             showToast({
                 type: 'success',
-                message: "Preset success download:"+  name,
+                message: "Preset success download: "+  name,
                 position: 'bottom-right',
                 autoClose: 5000
             });      
+        }
+    }
+
+    async savePreset() {
+        viewStore.cut_settings.technology = viewStore.technology
+        let result = utils.validateCuttingSettings( viewStore.cut_settings )
+        if ( result?.errors.length !== 0) return;        
+        try {
+          const resp = await fetch(`http://${constants.SERVER_URL}/api/savepreset`, {
+            method: "POST",
+            headers: {/*  "Content-Type": "application/json"  */},
+            body: JSON.stringify( viewStore.cut_settings),
+          });
+      
+          if (!resp.ok) throw new Error(`Ошибка: ${resp.statusText}`);
+          const data = await resp.json();
+      
+          showToast({
+            type: 'success',
+            message: `Preset сохранён: ${data.file}`,
+            position: 'bottom-right',
+            autoClose: 5000
+          });
+      
+        } catch (err: any) {
+          showToast({
+            type: 'error',
+            message: "Ошибка сохранения пресета: " + (err.message || "Неизвестная"),
+            position: 'bottom-right',
+            autoClose: 5000
+          });
         }
     }
 }

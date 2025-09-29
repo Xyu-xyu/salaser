@@ -36,11 +36,14 @@ const settingsButton = observer(() => {
 			modalBody: 'Do you want to save settings preset?',
 			confirmText: 'OK',
 			cancelText: 'Cancel',
-			func: () => {
-				console.log('savePreset');
-			},
+			func: viewStore.savePreset
+			,
 			args: []
 		})
+
+		setTimeout(() => {
+			setShow(false);
+		}, 0);
 	}
 
 	const handleClick = () => {
