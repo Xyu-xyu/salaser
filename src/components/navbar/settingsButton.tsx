@@ -102,7 +102,7 @@ const settingsButton = observer(() => {
 				onClick={showModal}>
 				<div className="d-flex align-items-center justify-content-center">
 					<Icon
-						icon="gravity-ui:gear"
+						icon="octicon:gear-24"
 						width="36"
 						height="36"
 						style={{ color: show ? "white" : "black" }}
@@ -120,7 +120,7 @@ const settingsButton = observer(() => {
 					<div className="d-flex flex-column">
 						<button className="white_button navbar_button m-1" onClick={sentToLaser}>
 							<div className="d-flex align-items-center justify-content-center">
-								<Icon icon="iconamoon:download" width="36" height="36" style={{ color: 'black' }} />
+								<Icon icon="solar:upload-square-linear" width="36" height="36" style={{ color: 'black' }} />
 							</div>
 						</button>
 

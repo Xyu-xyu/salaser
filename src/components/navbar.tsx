@@ -3,8 +3,10 @@ import { observer } from 'mobx-react-lite';
 import PowerButton from "./navbar/powerButton";
 import LaserIcon from "./../../public/images/laserIcon"
 import laserStore from "../store/laserStore";
-import utils from "../scripts/util";
+//import utils from "../scripts/util";
 import SettingsButton from "./navbar/settingsButton";
+import constants from "../store/constants";
+import { showToast } from "./toast";
 
 const NavBar = observer(() => {
 
@@ -16,8 +18,41 @@ const NavBar = observer(() => {
 	};
 
 	const handleClickRightMode = () => {
-		laserStore.setVal( 'rightMode',!rightMode);
+		laserStore.setVal('rightMode', !rightMode);
 	};
+
+	const execute = async () => {
+		
+		try {
+			
+			let req_resp = await fetch(`http://${constants.SERVER_URL}/api/gcore/${0}/execute`, {	
+				method: "GET",
+				headers: {},
+			});
+
+
+			if (req_resp.ok) {
+				const text = await req_resp.text();
+				console.debug(`Execute: [${text}]`);
+				showToast({
+					type: 'success',
+					message: "Execution started: " + req_resp.statusText,
+					position: 'bottom-right',
+					autoClose: 5000
+				});
+				return;
+			}
+
+		} catch (exc: any) {
+
+			showToast({
+				type: 'error',
+				message: "Execution started: " + exc.message,
+				position: 'bottom-right',
+				autoClose: 5000
+			});
+		}
+	}
 
 
 	return (
@@ -33,7 +68,7 @@ const NavBar = observer(() => {
 				<div className="ms-2">
 					<button className="white_button navbar_button">
 						<div className="d-flex align-items-center justify-content-center">
-						<Icon icon="mynaui:grid" width="48" height="48"  style={{color: 'black'}} strokeWidth={0.5}/>
+							<Icon icon="mynaui:grid" width="48" height="48" style={{ color: 'black' }} strokeWidth={0.5} />
 						</div>
 					</button>
 				</div>
@@ -62,13 +97,13 @@ const NavBar = observer(() => {
 							<Icon icon="fluent:wrench-16-regular"
 								width="36"
 								height="36"
-								style={{ color: knobMode ? 'white':'red' }}
+								style={{ color: knobMode ? 'white' : 'red' }}
 							/>
 						</div>
 					</button>
 				</div>
 				<div className="ms-2">
-					<button className="white_button navbar_button">
+					<button className="white_button navbar_button" onPointerDown={execute}>
 						<div className="d-flex align-items-center justify-content-center">
 							<Icon icon="fluent:laser-tool-20-filled"
 								width="36"
