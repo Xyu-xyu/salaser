@@ -1,14 +1,14 @@
 import { observer } from 'mobx-react-lite';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
 import StringComponent from './stringComponent';
 import NavigationModalinStages from './navigationModalinStages';
 import SwiperPiercingMacro from './swiperPiercingMacro';
 import { CustomChart } from './chart/customChart'
-import { useTranslation } from 'react-i18next';
 import CutHead from './laser_head/cutHead';
 import NavigationButtonsInChartInStages from './navigationButtonsInChartInStages'
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 
 
@@ -17,17 +17,23 @@ const PiercingEditModalPanel = observer(() => {
 	const handleClose = () => {
 		viewStore.setModal(false, 'piercingMacro');
 	};
-
-	const { t } = useTranslation()
-
 	const { isVertical, carouselModeInPiercing, selectedPiercingMacro } = viewStore;
 
 	return (
 		<>
 			<Modal show={viewStore.piercingMacroModalEdit} onHide={handleClose} fullscreen centered >
-				<Modal.Header closeButton>
-					<Modal.Title>
-					</Modal.Title>
+			<Modal.Header className="d-flex justify-content-between align-items-center">
+					<Modal.Title></Modal.Title>
+					<button
+						className={`violet_button navbar_button small_button40`} onClick={handleClose}>
+						<div className="d-flex align-items-center justify-content-center">
+							<Icon icon="material-symbols:close-rounded"
+								width="36"
+								height="36"
+								style={{ color: 'white' }}
+							/>
+						</div>
+					</button>
 				</Modal.Header>
 				<Modal.Body>
 					{!carouselModeInPiercing &&
@@ -63,19 +69,9 @@ const PiercingEditModalPanel = observer(() => {
 					}
 				</Modal.Body>
 
-				<Modal.Footer className="position-relative">
-					<div className="position-absolute top-50 start-50 translate-middle fs-4 no-wrap">
-						<NavigationModalinStages />
-					</div>
-
-					<Button
-						variant="secondary"
-						onClick={handleClose}
-						className="mt-4 py-3 px-5 fs-3 close-button ms-auto"
-					>
-						{t('Close')}
-					</Button>
-				</Modal.Footer>
+				<Modal.Footer className="position-relative d-flex justify-content-center align-items-center">
+ 						<NavigationModalinStages />
+ 				</Modal.Footer>
 			</Modal>
 		</>
 	);

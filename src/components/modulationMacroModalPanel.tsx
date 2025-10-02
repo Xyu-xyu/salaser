@@ -1,12 +1,8 @@
 import { observer } from 'mobx-react-lite';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import viewStore from '../store/viewStore';
-//import ModulationMacroSelector from './modulationMacroSelector';
-//import UniversalKnob from './universalKnob';
-//import StringComponent from './stringComponent';
-//import NavigationModal from './navigationModal';
 import SwiperModulationMacro from './swiperModulationMacro'
-import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 
 
@@ -15,28 +11,27 @@ const ModulationMacroModalPanel = observer(() => {
 	const handleClose = () => {
 		viewStore.setModal(false, 'modulationMacro');
 	};
-	const { t } = useTranslation()
- 	return (
+  	return (
 		<>
 			<Modal show={viewStore.modulationMacroModalEdit} onHide={handleClose} fullscreen centered >
-				<Modal.Header closeButton>
-					<Modal.Title>
-					</Modal.Title>
+			<Modal.Header className="d-flex justify-content-between align-items-center">
+					<Modal.Title></Modal.Title>
+					<button
+						className={`violet_button navbar_button small_button40`} onClick={handleClose}>
+						<div className="d-flex align-items-center justify-content-center">
+							<Icon icon="material-symbols:close-rounded"
+								width="36"
+								height="36"
+								style={{ color: 'white' }}
+							/>
+						</div>
+					</button>
 				</Modal.Header>
 				<Modal.Body className="position-relative">
 					{ 
 						<SwiperModulationMacro />
 					}
 				</Modal.Body>
-				<Modal.Footer className="position-relative">
- 					<Button
-						variant="secondary"
-						onClick={handleClose}
-						className="mt-4 py-3 px-5 fs-3 close-button ms-auto"
-					>
-						{t('Close')}
-					</Button>
-				</Modal.Footer>
 			</Modal>
 		</>
 	);

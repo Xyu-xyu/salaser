@@ -8,15 +8,13 @@ const NavigationModalinStages = observer(() => {
 
 	const { carouselModeInPiercing } = viewStore
 	const { t } = useTranslation()
-
 	const carousel = () => {
 		viewStore.setCarouselModeInPiercing(!carouselModeInPiercing)
 	}
 
 	return (
 		<>
-			<div className="ms-2">
-				<button className="carousel_btn violet_button mx-2">
+ 				<button className="carousel_btn violet_button mx-2">
 					<div
 						className="d-flex align-items-center justify-content-center mx-2"
 						onMouseDown={carousel}
@@ -36,13 +34,12 @@ const NavigationModalinStages = observer(() => {
 								style={{ color: 'white' }}
 							/>
 						)}
-						<div className="mx-4 d-flex align-items-center">
-							<p className="text-white mb-0">{!carouselModeInPiercing ? t('View all') : t('Edit')  }</p>
+						<div className="mx-2 d-flex align-items-center">
+							<p className="text-white mb-0 font25">{!carouselModeInPiercing ? t('View all') : t('Edit')  }</p>
 						</div>
 					</div>
 				</button>
-			</div>
-		</>
+ 		</>
 	)
 });
 

@@ -59,8 +59,8 @@ const NavigationModal = observer(() => {
 								style={{ color: 'white' }}
 							/>
 						)}
-						<div className="mx-4 d-flex align-items-center">
-							<p className="text-white mb-0">{ t('View') }</p>
+						<div className="mx-2 d-flex align-items-center">
+							<p className="text-white mb-0 font25">{ t('View') }</p>
 						</div>
 					</div>
 				</button>
@@ -77,8 +77,8 @@ const NavigationModal = observer(() => {
 								height="48"
 								style={{ color: 'white' }}
 							/>
-							<div className="mx-4 d-flex align-items-center">
-								<p className="text-white mb-0">{ t('Copy') }</p>
+							<div className="mx-2 d-flex align-items-center">
+								<p className="text-white mb-0 font25">{ t('Copy') }</p>
 							</div>
 						</div>
 					</button>
@@ -96,8 +96,8 @@ const NavigationModal = observer(() => {
 								height="48"
 								style={{ color: 'white' }}
 							/>
-							<div className="mx-4 d-flex align-items-center">
-								<p className="text-white mb-0">{ t('Delete') }</p>
+							<div className="mx-2 d-flex align-items-center">
+								<p className="text-white mb-0 font25">{ t('Delete') }</p>
 							</div>
 						</div>
 					</button>
