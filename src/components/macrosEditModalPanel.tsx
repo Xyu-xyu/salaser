@@ -8,6 +8,7 @@ import IosToggleMacrocInMacros from './toggles/iosToggleMacrosInMacros';
 import UniversalNamedKnob from './universalNamedKnob';
 import UniversalKnobList from './universalKnobList';
 import { Icon } from '@iconify/react/dist/iconify.js';
+import StringComponent from './stringComponent';
 
 
 const MacrosEditModalPanel = observer(() => {
@@ -34,6 +35,10 @@ const MacrosEditModalPanel = observer(() => {
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container-fluid w-100 h-100 d-flex flex-column justify-content-evenly">
+					<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+						<StringComponent keyParam={'preset'} param={'name'} />
+						<StringComponent keyParam={'preset'} param={'thickness'} />
+					</div>
 						<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
 							<div key={0} className="editModal_row">
 								<div className={isVertical ? "editModal_col" : "editModal_col_hor"}>

@@ -689,6 +689,9 @@ class ViewStore {
                 position: 'bottom-right',
                 autoClose: 5000
             });
+            // remove in production
+            viewStore.cut_settings = cut_settings;
+            viewStore.technology = cut_settings.technology
         } finally {
             this.loading = false;
         }
@@ -720,6 +723,7 @@ class ViewStore {
                 position: 'bottom-right',
                 autoClose: 5000
             });
+            viewStore.schema = cut_settings_schema
         } finally {
             this.loading = false;
         }
@@ -877,6 +881,8 @@ class ViewStore {
             } else {
                 this.technology.modulationMacros[ind][param] = newVal
             }
+        } else if (keyParam === 'preset') {
+            this.cut_settings.material[param] = newVal
         }
     }
 
@@ -931,6 +937,8 @@ class ViewStore {
                     return this.technology.piercingMacros[this.selectedPiercingMacro].stages[this.selectedPiercingStage - 1][param]
                 }
 
+            } else if (keyParam === 'preset') {
+                return this.cut_settings.material[param]
             }
         }
 

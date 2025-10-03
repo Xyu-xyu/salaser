@@ -27,23 +27,39 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
-        if (newValue.length < 1) {
-            setError( true);
-			return
-        } else if (newValue.length > 32) {
-            setError( true);
-			return
-        } else {
-            setError( false);
+        if (param !== 'thickness')
+            if (newValue.length < 1) {
+                setError(true);
+                return
+            } else if (newValue.length > 32) {
+                setError(true);
+                return
+            } else {
+                setError(false);
+            }
+
+        else {
+            
+            let minimum = utils.deepFind(false, ["material", param, 'minimum'])|| 0.1
+            let maximum = utils.deepFind(false, ["material", param, 'maximum'])|| 60
+            if (Number(newValue) < minimum) {
+                setError(true);
+                return
+            } else if (Number(newValue) > maximum) {
+                setError(true);
+                return
+            } else {
+                setError(false);
+            }
         }
         viewStore.setValString( param, newValue, keyParam)
     };
 
 	let value = viewStore.getTecnologyValue( param, keyParam)
 
-	useEffect (()=>{
-		value = viewStore.getTecnologyValue( param, keyParam)
-		if (value.length < 1) {
+    useEffect(() => {
+        value = viewStore.getTecnologyValue(param, keyParam)
+        if (value.length < 1) {
             setError( true);
 			return
         } else if (value.length > 32) {
@@ -51,9 +67,9 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
 			return
         } else {
             setError( false);
-        }
+        }        
 
-	},[ selectedPiercingMacro, selectedModulationMacro ])
+    }, [selectedPiercingMacro, selectedModulationMacro])
 
 
     const stageTime: number[] = [];
@@ -85,20 +101,23 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
                 { totalTime.toFixed(1) }&nbsp;seconds 
                 </p>
             </div>}
+            { keyParam === 'preset' && ""}
+
             <div className='stringComponentContainer px-2'>
                 <div className='stringComponentLabel mx-2' >
-                    {'Name'}
+                    { keyParam === 'preset' ? param : 'Name'}
                 </div>
                 <input 
-                    type="text" 
+                    type={ param === "thickness" ?  "number" : "text"}                    
                     value={value} 
                     onChange={handleChange} 
+                    {...(param === "thickness" ? { step: 0.1 } : {})}
                     className={`form-control stringComponent ${error ? 'is-invalid' : ''}`} 
                 />
             </div>
 
         </>
-            );
+    );
 });
 
 export default StringComponent;
