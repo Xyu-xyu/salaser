@@ -112,6 +112,29 @@ const SettingsButton = observer(() => {
 		})
 	}
 
+	async function deleteAllPresets() {
+
+		await fetch(api_host + `/db/delete_all_presets`, {
+			method: "DELETE"
+		}).then(() => {
+			setUpdate(true)
+		})		
+	}
+
+	const deleteAll = () => {
+		viewStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to delete ALL presets from DB?',
+			confirmText: 'OK',
+			cancelText: 'Cancel',
+			func: deleteAllPresets,
+			args: []
+		})
+	
+		setTimeout(() => {
+			setShow(false);
+		}, 0);
+	}
 
 	return (
 		<div className="ms-2">
@@ -140,6 +163,7 @@ const SettingsButton = observer(() => {
 						style={{
 							minHeight: '500px',
 							maxHeight: '900px',
+							minWidth: '900px',							
 							overflowY: 'auto',
 							overflowX: 'hidden',
 						}}
@@ -244,7 +268,7 @@ const SettingsButton = observer(() => {
 						</table>
 					</div>
 					<button
-						onClick={() =>{}}
+						onClick={() =>{ deleteAll() }}
 						className="violet_button navbar_button small_button40"
 					>
 						<div className="d-flex align-items-center justify-content-center">
