@@ -648,6 +648,7 @@ class ViewStore {
         power: 0
     };
 
+    presetMode:string = 'edit'//'select' 
 
     isAnimating: Boolean = false;
     isPaused: Boolean = false;
@@ -697,7 +698,6 @@ class ViewStore {
         }
     }
 
-
     async loadCutSettingsSchema() {
         this.loading = true;
         this.error = null;
@@ -723,7 +723,10 @@ class ViewStore {
                 position: 'bottom-right',
                 autoClose: 5000
             });
+
             viewStore.schema = cut_settings_schema
+            viewStore.macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
+            
         } finally {
             this.loading = false;
         }
@@ -1225,6 +1228,8 @@ class ViewStore {
         let result = utils.validateCuttingSettings( settings )
         if ( result?.errors.length === 0)  {
             viewStore.technology = settings.technology  
+            viewStore.cut_settings = settings
+
             showToast({
                 type: 'success',
                 message: "Preset success download: "+  name,
@@ -1233,6 +1238,11 @@ class ViewStore {
             });      
         }
     }
+
+    setPresetMode (mode:string) {
+        this.presetMode = mode
+    }
+    
 }
 
 const viewStore = new ViewStore();

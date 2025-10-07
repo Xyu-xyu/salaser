@@ -1,26 +1,235 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import viewStore from "../../store/viewStore";
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { showToast } from "../toast";
 import constants from "../../store/constants";
-import utils from "../../scripts/util";
 
-const settingsButton = observer(() => {
-	const fileInputRef_1 = useRef<HTMLInputElement>(null);
+interface Preset {
+	id: number;
+	code: string;
+	name: string;
+	thickness: number;
+	ts: string;
+}
+
+type SortKey = "code" | "name" | "thickness" | "ts";
+type SortOrder = "asc" | "desc";
+
+const SettingsButton = observer(() => {
+	const {  presetMode } = viewStore
 	const [show, setShow] = useState(false);
-	const api_host = 'http://' + constants.SERVER_URL
+	const [update, setUpdate] = useState(true);
+	const [presets, setPresets] = useState<Preset[]>([]);
+	const [sortKey, setSortKey] = useState<SortKey>("code");
+	const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
-	// Открыть модалку
-	const showModal = () => {
-		setShow(true);
-	};
+	const api_host = 'http://' + constants.SERVER_URL;
 
-	// Закрыть модалку
+	const showModal = () => setShow(true);
 	const handleClose = () => setShow(false);
 
-	const sentToLaser = () => {
+
+	useEffect  (()=>{
+		if (update){
+			listPresets()
+			setUpdate(false)
+		}
+	}, [update])
+
+	async function listPresets() {
+		let resp = await fetch(api_host + "/db/listpresets");
+		resp.json().then((data) => {
+			setPresets(data);
+		});
+	}
+
+	function sortPresets(key: SortKey) {
+		if (sortKey === key) {
+			// переключаем порядок сортировки
+			setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+		} else {
+			setSortKey(key);
+			setSortOrder("asc");
+		}
+	}
+
+	const sortedPresets = [...presets].sort((a, b) => {
+		let aVal = a[sortKey];
+		let bVal = b[sortKey];
+
+		if (sortKey === "thickness") {
+			aVal = Number(aVal);
+			bVal = Number(bVal);
+		} else {
+			aVal = String(aVal).toLowerCase();
+			bVal = String(bVal).toLowerCase();
+		}
+
+		if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+		if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
+		return 0;
+	});
+
+	async function deletePreset(id: number) {
+		await fetch(api_host + `/db/deletepreset?id=${id}`, {
+			method: "DELETE"
+		}).then(()=>{
+			setUpdate(true)
+		})
+	}
+
+	async function copyPreset(id: number) {
+		await fetch(api_host + `/db/copy_preset`, {
+			method: "POST",
+			headers: {
+				/* "Content-Type": "application/json" */
+			},
+			body: JSON.stringify({ id })
+		}).then(()=>{
+			setUpdate(true)
+		})
+	
+	}
+	
+
+	return (
+		<div className="ms-2">
+			<button
+				className={`navbar_button me-1 ${show ? "violet_button" : "white_button"}`}
+				onClick={showModal}
+			>
+				<div className="d-flex align-items-center justify-content-center">
+					<Icon
+						icon="octicon:gear-24"
+						width="36"
+						height="36"
+						style={{ color: show ? "white" : "black" }}
+					/>
+				</div>
+			</button>
+
+			<Modal
+				show={show}
+				onHide={handleClose}
+				id="settingsButtonModal"
+				className="with-inner-backdrop powerButton-navbar-modal settingsButton-navbar-modal"
+				centered={false} // убираем выравнивание по центру
+			>
+				<div>
+					<div style={{
+						minHeight: "500px",
+						maxHeight: "90%",
+						overflowX: "hidden",
+						overflowY: "auto",
+						padding: ".25rem"
+					}}>
+						<table style={{ width: "100%", borderCollapse: "collapse" }} className="table table-striped table-hover">
+							<thead>
+								<tr>
+									<th style={{ cursor: "pointer" }} onClick={() => sortPresets("code")}>
+										Code {sortKey === "code" ? (sortOrder === "asc" ? "▲" : "▼") : ""}
+									</th>
+									<th style={{ cursor: "pointer" }} onClick={() => sortPresets("name")}>
+										Name {sortKey === "name" ? (sortOrder === "asc" ? "▲" : "▼") : ""}
+									</th>
+									<th style={{ cursor: "pointer" }} onClick={() => sortPresets("thickness")}>
+										Thickness {sortKey === "thickness" ? (sortOrder === "asc" ? "▲" : "▼") : ""}
+									</th>
+									<th style={{ cursor: "pointer" }} onClick={() => sortPresets("ts")}>
+										Timestamp {sortKey === "ts" ? (sortOrder === "asc" ? "▲" : "▼") : ""}
+									</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{sortedPresets.map((preset: Preset) => (
+									<tr key={preset.id}>
+										<td>{preset.code}</td>
+										<td>{preset.name}</td>
+										<td>{preset.thickness}</td>
+										<td>{preset.ts}</td>
+										<td>
+											<div>
+												{ presetMode === 'select' ?
+
+												<div className="mx-2 mt-1">
+													<button
+														onClick={() => {}}
+														className={`violet_button navbar_button small_button40`} >
+														<div className="d-flex align-items-center justify-content-center">
+															<Icon icon="fa-regular:edit"
+																width="36"
+																height="36"
+																style={{ color: 'white' }}
+															/>
+														</div>
+													</button>
+												</div>
+												:
+												<div className="d-flex">
+													<div className="mx-2 mt-1">
+														<button
+															onClick={() => { }}
+															className={`violet_button navbar_button small_button40`} >
+															<div className="d-flex align-items-center justify-content-center">
+																<Icon icon="fa-regular:edit"
+																	width="36"
+																	height="36"
+																	style={{ color: 'white' }}
+																/>
+															</div>
+														</button>
+													</div>
+													<div className="mx-2 mt-1">
+														<button
+															onClick={() => { copyPreset (preset.id)}}
+															className={`violet_button navbar_button small_button40`} >
+															<div className="d-flex align-items-center justify-content-center">
+																<Icon icon="fluent:copy-add-20-regular"
+																	width="36"
+																	height="36"
+																	style={{ color: 'white' }}
+																/>
+															</div>
+														</button>
+													</div>
+													<div className="mx-2 mt-1">
+														<button
+															onClick={() => { deletePreset (preset.id) }}
+															className={`violet_button navbar_button small_button40`} >
+															<div className="d-flex align-items-center justify-content-center">
+																<Icon icon="ic:twotone-delete-outline"
+																	width="36"
+																	height="36"
+																	style={{ color: 'white' }}
+																/>
+															</div>
+														</button>
+													</div>
+												</div>	
+											}							
+											</div>
+											
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</Modal>
+		</div>
+	);
+});
+
+export default SettingsButton;
+
+
+
+
+/* 	const sentToLaser = () => {
 		//setShow(false)
 		viewStore.setModalProps({
 			show: true,
@@ -31,194 +240,36 @@ const settingsButton = observer(() => {
 			args: []
 		})
 	}
+ */
+/* const savePreset = () => {
+	viewStore.setModalProps({
+		show: true,
+		modalBody: 'Do you want to save settings preset?',
+		confirmText: 'OK',
+		cancelText: 'Cancel',
+		func: viewStore.savePreset
+		,
+		args: []
+	})
 
+	setTimeout(() => {
+		setShow(false);
+	}, 0);
+} */
 
-	/* const savePreset = () => {
-		viewStore.setModalProps({
-			show: true,
-			modalBody: 'Do you want to save settings preset?',
-			confirmText: 'OK',
-			cancelText: 'Cancel',
-			func: viewStore.savePreset
-			,
-			args: []
-		})
+/* 	async function deletePreset(id: number) {
+	let resp = await fetch(api_host + `/db/deletepreset?id=${id}`, {
+		method: "DELETE"
+	});
+	return await resp.json();
+}
 
-		setTimeout(() => {
-			setShow(false);
-		}, 0);
-	} */
+async function updatePreset(data: any) {
+	let resp = await fetch(api_host + "/db/updatepreset", {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(data)
+	});
+	return await resp.json();
+} */
 
-	const handleClick = () => {
-		fileInputRef_1.current?.click();
-	};
-
-
-	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-
-		const input = e.target;
-		const file = input.files?.[0];
-
-		if (!file) {
-
-			showToast({
-				type: 'error',
-				message: "Error in preset loading",
-				position: 'bottom-right',
-				autoClose: 5000
-			});
-		} else {
-
-			try {
-				const text = await file.text();
-				const data = JSON.parse(text);
-				viewStore.updateTechnology(data, file.name)
-
-				setTimeout(() => {
-					setShow(false);
-				}, 0);
-
-			} catch (err) {
-
-				showToast({
-					type: 'error',
-					message: "Error in preset parsing",
-					position: 'bottom-right',
-					autoClose: 5000
-				});
-
-			} finally {
-				input.value = "";
-			}
-		};
-	};
-
-	async function listPresets() {
-		let resp = await fetch(api_host + "/db/listpresets");
-		return await resp.json();
-	}
-
-	async function savePreset() {
-
-		viewStore.cut_settings.technology = viewStore.technology
-		let result = utils.validateCuttingSettings(viewStore.cut_settings)
-		if (result?.errors.length !== 0) {
-
-			showToast({
-				type: 'error',
-				message: `Preset invalid`,
-				position: 'bottom-right',
-				autoClose: 5000
-			});
-
-			return
-
-		};
-
-		try {
-			let resp = await fetch(api_host + "/db/savepreset", {
-				method: "POST",
-				headers: { /* "Content-Type": "application/json" */ },
-				body: JSON.stringify(viewStore.cut_settings)
-			});
-
-			if (!resp.ok) throw new Error(`Ошибка: ${resp.statusText}`);
-			//const data = await resp.json();
-
-			showToast({
-				type: 'success',
-				message: `Preset сохранён`,
-				position: 'bottom-right',
-				autoClose: 5000
-			});
-
-		} catch (err: any) {
-			showToast({
-				type: 'error',
-				message: "Ошибка сохранения пресета: " + (err.message || "Неизвестная"),
-				position: 'bottom-right',
-				//autoClose: 5000
-			});
-		}
-
-	}
-
-	async function deletePreset(id: number) {
-		let resp = await fetch(api_host + `/db/deletepreset?id=${id}`, {
-			method: "DELETE"
-		});
-		return await resp.json();
-	}
-
-	async function updatePreset(data: any) {
-		let resp = await fetch(api_host + "/db/updatepreset", {
-			method: "PUT",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(data)
-		});
-		return await resp.json();
-	}
-
-
-	return (
-
-		<div className="ms-2" >
-			<button
-				className={`navbar_button me-1 ${show ? "violet_button" : "white_button"}`}
-				onClick={showModal}>
-				<div className="d-flex align-items-center justify-content-center">
-					<Icon
-						icon="octicon:gear-24"
-						width="36"
-						height="36"
-						style={{ color: show ? "white" : "black" }}
-					/>
-				</div>
-			</button>
-			<Modal
-				show={show}
-				onHide={handleClose}
-				id="powerButtonModal"
-				className="with-inner-backdrop settingsButton-navbar-modal"
-				centered={false} // убираем выравнивание по центру
-			>
-				<div className="m-1">
-					<div className="d-flex flex-column">
-						<button className="white_button navbar_button m-1" onClick={sentToLaser}>
-							<div className="d-flex align-items-center justify-content-center">
-								<Icon icon="solar:upload-square-linear" width="36" height="36" style={{ color: 'black' }} />
-							</div>
-						</button>
-
-						<button className="white_button navbar_button m-1" onClick={handleClick}  >
-							<div className="d-flex align-items-center justify-content-center">
-								<Icon icon="fluent-emoji-high-contrast:open-file-folder" width="36" height="36" style={{ color: 'black' }} />
-							</div>
-						</button>
-						<input
-							type="file"
-							ref={fileInputRef_1}
-							hidden
-							accept=".json"   // только файлы с расширением .ncp и .sgn
-							onChange={handleFileChange}
-						/>
-
-						<button className="white_button navbar_button m-1" onClick={savePreset}  >
-							<div className="d-flex align-items-center justify-content-center">
-								<Icon icon="fluent:save-16-regular" width="36" height="36" style={{ color: 'black' }} />
-							</div>
-						</button>
-						<button className="white_button navbar_button m-1" onClick={listPresets}  >
-							<div className="d-flex align-items-center justify-content-center">
-								<Icon icon="fluent:save-16-regular" width="36" height="36" style={{ color: 'black' }} />
-							</div>
-						</button>
-					</div>
-				</div>
-			</Modal>
-		</div>
-
-	)
-});
-
-export default settingsButton;

@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import viewStore from '../store/viewStore';
 import { useEffect, useState } from 'react';
 import utils from '../scripts/util';
+//import Technology from './technology';
 
 interface StringComponentInt {
 	param:string;
@@ -23,7 +24,7 @@ type ResultItem = {
 
 const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam}) => {
     const [error, setError] = useState<boolean>(false);
-	const { selectedPiercingMacro, selectedModulationMacro } = viewStore
+	const { selectedPiercingMacro, selectedModulationMacro, cut_settings } = viewStore
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
@@ -69,7 +70,7 @@ const StringComponent: React.FC<StringComponentInt> = observer(({param, keyParam
             setError( false);
         }        
 
-    }, [selectedPiercingMacro, selectedModulationMacro])
+    }, [selectedPiercingMacro, selectedModulationMacro, cut_settings])
 
 
     const stageTime: number[] = [];

@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { /*useEffect,  useState  */} from 'react';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
 const ProgressBarContainer = () => {
-	const [progress, setProgress] = useState(0);
-	const [direction, setDirection] = useState<'up' | 'down'>('up');
-	const [target, setTarget] = useState(Math.floor(Math.random() * 100) + 1);
-
+	//const [progress, setProgress] = useState(0);
+	//const [direction, setDirection] = useState<'up' | 'down'>('up');
+	//const [target, setTarget] = useState(Math.floor(Math.random() * 100) + 1);
+/*
 	useEffect(() => {
-		const interval = setInterval(() => {
+		/* const interval = setInterval(() => {
 			setProgress((prev) => {
 				if (direction === 'up') {
 					if (prev < target) {
@@ -31,16 +31,16 @@ const ProgressBarContainer = () => {
 			});
 		}, 100); // скорость анимации
 
-		return () => clearInterval(interval);
+		return () => clearInterval(interval); 
 	}, [direction, target]);
-
+	*/
 
 	return (
 		<div id="ProgressBarContainer" className="w-100" style={{ position: 'relative' }}>
 			<ProgressBar
 				striped
 				variant="info"
-				now={progress}
+				now={100}
 				className="m-2"
 				style={{ height: '58px' }}
 			/>
@@ -54,7 +54,7 @@ const ProgressBarContainer = () => {
 				textAlign: 'center',
 				pointerEvents: 'none' // чтобы клики проходили сквозь текст
 			}}>
-				Current work 06.08 1,5мм-01 2 mm Steel {progress}%
+				Current work 06.08 1,5мм-01 2 mm Steel {100}%
 			</div>
 		</div>
 	);
