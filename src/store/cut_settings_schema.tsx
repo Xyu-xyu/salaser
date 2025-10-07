@@ -189,6 +189,7 @@ const schema = JSON.parse(`
                         "$wvType": "tabbed",
                         "additionalProperties": false,
                         "maxItems": 8,
+                        "minItems": 1,
                         "title": "Макросы"
                     },
                     "piercingMacros": {
@@ -340,6 +341,7 @@ const schema = JSON.parse(`
                                         }
                                     },
                                     "maxItems": 16,
+                                    "minItems": 1,
                                     "additionalProperties": false,
                                     "title": "Шаги врезки"
                                 },
@@ -375,6 +377,7 @@ const schema = JSON.parse(`
                         "$wvType": "tabbed",
                         "additionalProperties": false,
                         "maxItems": 8,
+                        "minItems": 8,
                         "title": "Настройки врезок"
                     },
                     "modulationMacros": {
@@ -429,6 +432,7 @@ const schema = JSON.parse(`
                         "$wvType": "compact",
                         "additionalProperties": false,
                         "maxItems": 16,
+                        "minItems": 1,
                         "type": "array"
                     },
                     "feeding": {

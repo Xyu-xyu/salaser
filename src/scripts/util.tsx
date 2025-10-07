@@ -2,6 +2,7 @@ import { showToast } from '../components/toast';
 import cutting_settings_schema from '../store/cut_settings_schema';
 import viewStore, { Properties } from '../store/viewStore';
 import validator from "@rjsf/validator-ajv8";
+import { getDefaultFormState } from "@rjsf/utils";
 
 interface GCodeParams {
 	[key: string]: number | undefined;
@@ -576,8 +577,8 @@ class Utils {
 
 	validateCuttingSettings( technology:Properties ) {
 		const { schema } = viewStore
-		const result = validator.validateFormData( technology, schema);
-		console.log (result)
+		const result = validator.validateFormData(technology, schema);
+		//console.log(result)
 
 		if ( result?.errors.length === 0) {
 			showToast({
@@ -597,7 +598,34 @@ class Utils {
 		}		 
 		return result;
 	}
-	   
+
+	ensureMinItems(schema: any): any {
+		if (!schema || typeof schema !== "object") return schema;
+
+		const copy = Array.isArray(schema) ? [...schema] : { ...schema };
+
+		// Если это объект-массив и есть maxItems — добавляем minItems: 1, если нет
+		if (copy.type === "array" && copy.maxItems !== undefined && copy.minItems === undefined) {
+			copy.minItems = 1;
+		}
+
+		// Рекурсивно обходим вложенные свойства
+		for (const key of Object.keys(copy)) {
+			if (typeof copy[key] === "object") {
+				copy[key] = this.ensureMinItems(copy[key]);
+			}
+		}
+		return copy;
+	}
+
+	getDefaultsFromSchema() {
+		const { schema } = viewStore;
+		if (!schema) return {};
+		const safeSchema = this.ensureMinItems(schema);
+		const defaults = getDefaultFormState(validator, safeSchema, undefined);
+		return defaults
+	}
+
 }
 
 const utils = new Utils();
