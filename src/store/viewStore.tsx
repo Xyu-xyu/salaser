@@ -648,7 +648,7 @@ class ViewStore {
         power: 0
     };
 
-    presetMode:string = 'edit'//'select' 
+    presetMode:string = '25_edit'
 
     isAnimating: Boolean = false;
     isPaused: Boolean = false;
@@ -673,8 +673,9 @@ class ViewStore {
             if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
 
             const data = await resp.json();
-            viewStore.cut_settings = data.result;
-            viewStore.technology = data.result.technology
+            viewStore.setCutSettings(data.result)
+            //viewStore.cut_settings = data.result;
+            //viewStore.technology = data.result.technology
             showToast({
                 type: 'success',
                 message: "Upload settings form core 0 success!",
@@ -691,8 +692,9 @@ class ViewStore {
                 autoClose: 5000
             });
             // remove in production
-            viewStore.cut_settings = cut_settings;
-            viewStore.technology = cut_settings.technology
+            //viewStore.cut_settings = cut_settings;
+            //viewStore.technology = cut_settings.technology
+            viewStore.setCutSettings(cut_settings)
         } finally {
             this.loading = false;
         }
@@ -790,6 +792,11 @@ class ViewStore {
         return Boolean(window.innerHeight > window.innerWidth)
     }
 
+    setCutSettings(data: any) {
+        this.cut_settings = data;
+        this.technology = data?.technology ?? null;
+      }
+
     setModalProps(val: ModalProps) {
         // console.log (JSON.stringify(val))
         this.modalProps = val;
@@ -814,6 +821,27 @@ class ViewStore {
         if (modal === 'macros') {
 
             this.macrosModalEdit = val
+            if ( val ) {
+                // открываем модалку макросов
+                //console.log ("OPEN MODAL")
+           
+            } else {
+                // закрываем модалку макросов
+                console.log ("CLOSE MODAL")
+                if (this.presetMode.endsWith('edit')) {
+                    let id:number  = Number ( this.presetMode.split('_')[0])
+                    console.log ("update preset "+ id  )
+                    viewStore.setModalProps({
+                        show: true,
+                        modalBody: 'Do you want to save settings preset?',
+                        confirmText: 'OK',
+                        cancelText: 'Cancel',
+                        func: viewStore.updatePreset                        ,
+                        args: [id]
+                    })
+                }
+            }
+           
             /*  setTimeout (()=>{
                  this.piercingMacroModalEdit = false
                  this.modulationMacroModalEdit = false
@@ -1227,9 +1255,7 @@ class ViewStore {
         
         let result = utils.validateCuttingSettings( settings )
         if ( result?.errors.length === 0)  {
-            viewStore.technology = settings.technology  
-            viewStore.cut_settings = settings
-
+            viewStore.setCutSettings(settings)
             showToast({
                 type: 'success',
                 message: "Preset success download: "+  name,
@@ -1241,6 +1267,28 @@ class ViewStore {
 
     setPresetMode (mode:string) {
         this.presetMode = mode
+    }
+    
+    async updatePreset (id:number) {
+        console.log ("update id " + id)
+        const api_host = 'http://' + constants.SERVER_URL;
+        viewStore.cut_settings.technology = viewStore.technology
+
+        await fetch(api_host + `/db/updatepreset`, {
+			method: "PUT",
+            headers: {
+				/* "Content-Type": "application/json" */
+			},
+             body: JSON.stringify({ id, ...viewStore.cut_settings })
+		}).then(() => {
+			
+            showToast({
+                type: 'success',
+                message: "Preset update with success!" ,
+                position: 'bottom-right',
+                autoClose: 5000
+            });     
+		})
     }
     
 }

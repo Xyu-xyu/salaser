@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import viewStore from "../../store/viewStore";
 import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
-import { showToast } from "../toast";
+//import { showToast } from "../toast";
 import constants from "../../store/constants";
 import utils from "../../scripts/util";
 
@@ -28,9 +28,12 @@ const SettingsButton = observer(() => {
 
 	const api_host = 'http://' + constants.SERVER_URL;
 
-	const showModal = () => setShow(true);
-	const handleClose = () => setShow(false);
+	const showModal = () => {
+		setShow(true)
+		if (!update) setUpdate(true)
+	};
 
+	const handleClose = () => setShow(false);
 
 	useEffect(() => {
 		if (update) {
@@ -97,10 +100,10 @@ const SettingsButton = observer(() => {
 	async function addDefault() {
 		let defaults = utils.getDefaultsFromSchema()
 		console.log(JSON.stringify(defaults))
-		savePreset(defaults)
+		addPreset(defaults)
 	}
 
-	async function savePreset(preset: object) {
+	async function addPreset(preset: object) {
 		await fetch(api_host + `/db/savepreset`, {
 			method: "POST",
 			headers: {
@@ -135,6 +138,27 @@ const SettingsButton = observer(() => {
 			setShow(false);
 		}, 0);
 	}
+
+	async function editPreset (id: number) {
+		try {
+			viewStore.setPresetMode ( String(id)+"_edit")
+			const resp = await fetch(`${api_host}/db/get_preset?id=${id}`, {
+				method: "GET",
+			});
+			if (!resp.ok) throw new Error(`Ошибка: ${resp.statusText}`);
+			
+			const data = await resp.json();
+			//console.log("📦 Получен пресет:", data);
+			viewStore.setCutSettings( data.preset);
+			handleClose()
+			viewStore.setModal(true, 'macros')
+
+		} catch (err) {
+			console.error("Ошибка при загрузке пресета:", err);
+			throw err;
+		}
+	}
+ 
 
 	return (
 		<div className="ms-2">
@@ -243,7 +267,7 @@ const SettingsButton = observer(() => {
 													<div className="d-flex">
 														<div className="mx-2 mt-1">
 															<button
-																onClick={() => { }}
+																onClick={() => { editPreset(preset.id)}}
 																className="violet_button navbar_button small_button40"
 															>
 																<div className="d-flex align-items-center justify-content-center">
@@ -344,31 +368,3 @@ export default SettingsButton;
 		})
 	}
  */
-/* const savePreset = () => {
-	viewStore.setModalProps({
-		show: true,
-		modalBody: 'Do you want to save settings preset?',
-		confirmText: 'OK',
-		cancelText: 'Cancel',
-		func: viewStore.savePreset
-		,
-		args: []
-	})
-
-	setTimeout(() => {
-		setShow(false);
-	}, 0);
-} */
-
-
-/*
-
-async function updatePreset(data: any) {
-	let resp = await fetch(api_host + "/db/updatepreset", {
-		method: "PUT",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(data)
-	});
-	return await resp.json();
-} */
-
