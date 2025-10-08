@@ -94,19 +94,19 @@ const SettingsButton = observer(() => {
 
 	}
 
-	async function addDefault () {
+	async function addDefault() {
 		let defaults = utils.getDefaultsFromSchema()
-		console.log (JSON.stringify(defaults))
-		savePreset (defaults)
+		console.log(JSON.stringify(defaults))
+		savePreset(defaults)
 	}
 
-	async function savePreset (preset:object) {
+	async function savePreset(preset: object) {
 		await fetch(api_host + `/db/savepreset`, {
 			method: "POST",
 			headers: {
 				/* "Content-Type": "application/json" */
 			},
-			body: JSON.stringify( preset )
+			body: JSON.stringify(preset)
 		}).then(() => {
 			setUpdate(true)
 		})
@@ -118,7 +118,7 @@ const SettingsButton = observer(() => {
 			method: "DELETE"
 		}).then(() => {
 			setUpdate(true)
-		})		
+		})
 	}
 
 	const deleteAll = () => {
@@ -130,7 +130,7 @@ const SettingsButton = observer(() => {
 			func: deleteAllPresets,
 			args: []
 		})
-	
+
 		setTimeout(() => {
 			setShow(false);
 		}, 0);
@@ -163,7 +163,7 @@ const SettingsButton = observer(() => {
 						style={{
 							minHeight: '500px',
 							maxHeight: '900px',
-							minWidth: '900px',							
+							minWidth: '900px',
 							overflowY: 'auto',
 							overflowX: 'hidden',
 						}}
@@ -171,29 +171,57 @@ const SettingsButton = observer(() => {
 						<table style={{ width: '100%', borderCollapse: 'collapse' }} className="table table-striped table-hover">
 							<thead style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
 								<tr>
-									<th style={{ cursor: 'pointer' }} onClick={() => sortPresets('code')}>
-										Code {sortKey === 'code' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-									</th>
-									<th style={{ cursor: 'pointer' }} onClick={() => sortPresets('name')}>
-										Name {sortKey === 'name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-									</th>
-									<th style={{ cursor: 'pointer' }} onClick={() => sortPresets('thickness')}>
-										Thickness {sortKey === 'thickness' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-									</th>
-									<th style={{ cursor: 'pointer' }} onClick={() => sortPresets('ts')}>
-										Timestamp {sortKey === 'ts' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-									</th>
+									{[
+										{ key: "code", label: "Code" },
+										{ key: "name", label: "Name" },
+										{ key: "thickness", label: "Thickness" },
+										{ key: "ts", label: "Timestamp" },
+									].map((col) => (
+										<th
+											key={col.key}
+											style={{
+												cursor: "pointer",
+												verticalAlign: "middle",
+												whiteSpace: "nowrap",
+												textAlign: "left",
+											}}
+											onClick={() => sortPresets(col.key as SortKey)}
+										>
+											<span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+												{col.label}
+												<span
+													style={{
+														display: "inline-block",
+														width: "1em", // фиксированное пространство под стрелку
+														textAlign: "center",
+													}}
+												>
+													<Icon
+														icon="tabler:triangle-inverted-filled"
+														width="14"
+														height="14"
+														style={{
+															color: "#514fff",
+															marginLeft: "4px",
+															transition: "transform 0.2s ease-in-out",
+															transform: sortKey === col.key && sortOrder === "desc" ? "rotate(180deg)" : "rotate(0deg)",
+														}}
+													/>
+												</span>
+											</span>
+										</th>
+									))}
 									<th>Actions</th>
 								</tr>
 							</thead>
 							<tbody>
 								{sortedPresets.map((preset) => (
 									<tr key={preset.id}>
-										<td>{preset.code}</td>
-										<td>{preset.name}</td>
-										<td>{preset.thickness}</td>
-										<td>{preset.ts}</td>
-										<td>
+										<td style={{ verticalAlign: "middle" }}>{preset.code}</td>
+										<td style={{ verticalAlign: "middle" }}>{preset.name}</td>
+										<td style={{ verticalAlign: "middle" }}>{preset.thickness}</td>
+										<td style={{ verticalAlign: "middle" }}>{preset.ts}</td>
+										<td style={{ verticalAlign: "middle" }}>
 											<div>
 												{presetMode === 'select' ? (
 													<div className="mx-2 mt-1">
@@ -204,8 +232,8 @@ const SettingsButton = observer(() => {
 															<div className="d-flex align-items-center justify-content-center">
 																<Icon
 																	icon="charm:square-tick"
-																	width="36"
-																	height="36"
+																	width="24"
+																	height="24"
 																	style={{ color: 'white' }}
 																/>
 															</div>
@@ -268,7 +296,7 @@ const SettingsButton = observer(() => {
 						</table>
 					</div>
 					<button
-						onClick={() =>{ deleteAll() }}
+						onClick={() => { deleteAll() }}
 						className="violet_button navbar_button small_button40"
 					>
 						<div className="d-flex align-items-center justify-content-center">
@@ -281,16 +309,16 @@ const SettingsButton = observer(() => {
 						</div>
 					</button>
 					<button
-						onClick={() => { addDefault()}}
+						onClick={() => { addDefault() }}
 						className="violet_button navbar_button small_button40 ms-1"
 					>
 						<div className="d-flex align-items-center justify-content-center">
-						<Icon
-							icon="fluent:copy-add-20-regular"
-							width="36"
-							height="36"
-							style={{ color: 'white' }}
-						/>
+							<Icon
+								icon="fluent:copy-add-20-regular"
+								width="36"
+								height="36"
+								style={{ color: 'white' }}
+							/>
 						</div>
 					</button>
 				</div>
