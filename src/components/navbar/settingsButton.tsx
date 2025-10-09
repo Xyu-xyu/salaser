@@ -99,7 +99,7 @@ const SettingsButton = observer(() => {
 
 	async function addDefault() {
 		let defaults = utils.getDefaultsFromSchema()
-		console.log(JSON.stringify(defaults))
+		//console.log(JSON.stringify(defaults))
 		addPreset(defaults)
 	}
 
@@ -158,6 +158,25 @@ const SettingsButton = observer(() => {
 			throw err;
 		}
 	}
+
+	async function getAndSenTolaser (id: number) {
+		const resp = await fetch(`${api_host}/db/get_preset?id=${id}`, {
+			method: "GET",
+		});
+		if (!resp.ok) throw new Error(`Ошибка: ${resp.statusText}`);
+		
+		const data = await resp.json();
+		viewStore.setCutSettings( data.preset );
+		handleClose()
+		viewStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to sent settings to laser ?',
+			confirmText: 'OK',
+			cancelText: 'Cancel',
+			func: viewStore.sentSettingsToLaser,
+			args: [data.preset]}
+		)
+	}
  
 
 	return (
@@ -185,9 +204,9 @@ const SettingsButton = observer(() => {
 				<div style={{ padding: '.25rem' }}>
 					<div
 						style={{
-							minHeight: '500px',
-							maxHeight: '900px',
-							minWidth: '900px',
+							minHeight: 'calc(100vh * 0.5)',
+							maxHeight: 'calc(100vh * 0.75)',
+							minWidth: 'calc(100vw * 0.5)',
 							overflowY: 'auto',
 							overflowX: 'hidden',
 						}}
@@ -297,6 +316,21 @@ const SettingsButton = observer(() => {
 														</div>
 														<div className="mx-2 mt-1">
 															<button
+																onClick={() => getAndSenTolaser(preset.id)}
+																className="violet_button navbar_button small_button40"
+															>
+																<div className="d-flex align-items-center justify-content-center">
+																	<Icon
+																		icon="bi:send-arrow-up"
+																		width="36"
+																		height="36"
+																		style={{ color: 'white' }}
+																	/>
+																</div>
+															</button>
+														</div>
+														<div className="mx-2 mt-1">
+															<button
 																onClick={() => deletePreset(preset.id)}
 																className="violet_button navbar_button small_button40"
 															>
@@ -352,19 +386,3 @@ const SettingsButton = observer(() => {
 });
 
 export default SettingsButton;
-
-
-
-
-/* 	const sentToLaser = () => {
-		//setShow(false)
-		viewStore.setModalProps({
-			show: true,
-			modalBody: 'Do you want to sent settings to laser ?',
-			confirmText: 'OK',
-			cancelText: 'Cancel',
-			func: viewStore.sentSettingsToLaser,
-			args: []
-		})
-	}
- */

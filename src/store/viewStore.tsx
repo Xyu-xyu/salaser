@@ -648,7 +648,7 @@ class ViewStore {
         power: 0
     };
 
-    presetMode:string = '25_edit'
+    presetMode:string = 'none'
 
     isAnimating: Boolean = false;
     isPaused: Boolean = false;
@@ -734,16 +734,25 @@ class ViewStore {
         }
     }
 
-    async sentSettingsToLaser() {
-        viewStore.cut_settings.technology = viewStore.technology
-        let result = utils.validateCuttingSettings( viewStore.cut_settings )
+    async sentSettingsToLaser( settings:Properties ) {
+        if(!settings ) {
+            viewStore.cut_settings.technology = viewStore.technology
+            settings = viewStore.cut_settings
+        }
+        //yobaniy kostyl remove
+        if ("id" in settings) {
+            delete (settings as any).id;
+        }
+
+        let result = utils.validateCuttingSettings( settings )
         if ( result?.errors.length === 0) {
             
             try {
+                
                 const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`, {
                     method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(viewStore.cut_settings),
+                    headers: { /* "Content-Type": "application/json "*/ },
+                    body: JSON.stringify(settings),
                 });
                 if (!resp.ok) throw new Error(`Ошибка обновления: ${resp.statusText}`);
                 const data = await resp.json();
@@ -753,10 +762,13 @@ class ViewStore {
                 } else {
                     throw new Error(data.exception || "Ошибка обновления");
                 }
+
             } catch (err: any) {
                 showToast({ type: "error", message: err.message });
             }
-        }      
+        } else {
+            showToast({ type: "error", message: 'invalid something...' });
+        }   
     }
 
     constructor() {
@@ -840,6 +852,7 @@ class ViewStore {
                         args: [id]
                     })
                 }
+                this.setPresetMode('none')
             }
            
             /*  setTimeout (()=>{
@@ -893,7 +906,7 @@ class ViewStore {
         }
     }
 
-    setValString(param: string, newVal: string, keyParam: string, ind: number | boolean = false) {
+    setValString(param: string, newVal: string|number, keyParam: string, ind: number | boolean = false) {
         if (keyParam === 'macros') {
             const macro = this.technology.macros[this.selectedMacros];
             if (param in macro.cutting) {
@@ -914,6 +927,8 @@ class ViewStore {
             }
         } else if (keyParam === 'preset') {
             this.cut_settings.material[param] = newVal
+        }  else if (keyParam === 'thickness') {
+            this.cut_settings.material[param] = Number(newVal)
         }
     }
 
@@ -1251,19 +1266,6 @@ class ViewStore {
         this.elapsed = val;
     }
 
-    updateTechnology (settings:Properties,  name:string) {
-        
-        let result = utils.validateCuttingSettings( settings )
-        if ( result?.errors.length === 0)  {
-            viewStore.setCutSettings(settings)
-            showToast({
-                type: 'success',
-                message: "Preset success download: "+  name,
-                position: 'bottom-right',
-                autoClose: 5000
-            });      
-        }
-    }
 
     setPresetMode (mode:string) {
         this.presetMode = mode

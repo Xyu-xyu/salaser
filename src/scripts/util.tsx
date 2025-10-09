@@ -606,7 +606,7 @@ class Utils {
 
 		// Если это объект-массив и есть maxItems — добавляем minItems: 1, если нет
 		if (copy.type === "array" && copy.maxItems !== undefined && copy.minItems === undefined) {
-			copy.minItems = 1;
+			copy.minItems = copy.maxItems;
 		}
 
 		// Рекурсивно обходим вложенные свойства
