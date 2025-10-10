@@ -585,7 +585,7 @@ class Utils {
 				type: 'success',
 				message: 'Cut settings is Valid!!',
 				position: 'bottom-right',
-				autoClose: 5000
+				autoClose: 2500
 			});
 
 		} else {

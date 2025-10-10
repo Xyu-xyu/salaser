@@ -48,20 +48,23 @@ export const UploadButton = observer(() => {
 					
 					showToast({
 						type: 'error',
-						message: "Upload failed:"+ resp.statusText,
+						message: "Upload failed",
 						position: 'bottom-right',
-						autoClose: 5000
+						autoClose: 2500
 					});
+					console.log ( "Upload failed:"+ resp.statusText )
+
 				}
 			} catch (error) {
 				
 				showToast({
 					type: 'error',
-					message: "Upload error:"+ error,
+					message: "Upload error:",
 					position: 'bottom-right',
-					autoClose: 5000
+					autoClose: 2500
 				});
 				upload_is_ok = false;
+				console.log ( "Upload error:"+ error )
 			}
 
 			try {
@@ -73,10 +76,11 @@ export const UploadButton = observer(() => {
 						for (let msg_obj of data.result.jobinfo.messages) {
  							showToast({
 								type: 'error',
-								message: "Loading failed:"+ msg_obj.Message,
+								message: "Loading failed",
 								position: 'bottom-right',
-								autoClose: 5000
+								autoClose: 2500
 							});
+							console.log ( "Loading failed:"+ msg_obj.Message )
 						}
 						return;
 					}
@@ -89,7 +93,7 @@ export const UploadButton = observer(() => {
 								type: 'success',
 								message: "Upload success!",
 								position: 'bottom-right',
-								autoClose: 5000
+								autoClose: 2500
 							});
 						}
 					}
@@ -97,10 +101,11 @@ export const UploadButton = observer(() => {
 			} catch (error) {
  				showToast({
 					type: 'error',
-					message: "loadresult error:"+ error,
+					message: "loadresult error",
 					position: 'bottom-right',
-					autoClose: 5000
+					autoClose: 2500
 				});
+				console.log ( "loadresult error:"+ error)
 			}
 
 		};

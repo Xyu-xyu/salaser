@@ -116,10 +116,11 @@ const GCodeToSvg1 = observer(() => {
 			} else {
 			  showToast({
 				type: 'error',
-				message: "loadresult error:"+ error.message || error,
+				message: "loadresult error",
 				position: 'bottom-right',
-				autoClose: 5000
-			});		  
+				autoClose: 2500
+			});
+			console.log ( "loadresult error:"+ error.message || error,)		  
 			}
 		  }
 

@@ -136,6 +136,30 @@ const ru: Record<string, string> = {
 	"Restart":"Рестарт",
 	"Display":"Вид",
 	"Key":"Ключ",
+	"Do you want to save settings preset?":"Вы хотите сохранить установки настроек?",
+	"Do you want to sent settings to laser ?":"Вы хотите отправить настройки на лазер?",
+	"OK":"ДА",
+	"Preset update with success!":"Предустановка успешно обновлена!",
+	"Upload":"Загрузить",
+	"Upload schema from core error":"Ошибка загрузки схемы из ядра",
+	"Upload schema from core errorОшибка загрузки: GATEWAY TIMEOUT":"Ошибка загрузки схемы из ядра: GATEWAY TIMEOUT",
+	"Upload settings from core error":"Ошибка загрузки настроек из ядра",
+	"Upload settings from core errorОшибка загрузки: GATEWAY TIMEOUT":"Ошибка загрузки настроек из ядра: GATEWAY TIMEOUT",
+	"loadresult error":"Ошибка загрузки результата",
+	"Execution error":"Ошибка выполнения",
+	"Execution started":"Выполнение запущено",
+	"Upload failed":"Загрузка не удалась",
+	"Upload error":"Ошибка загрузки",
+	"Upload success!":"Загрузка успешно завершена!",
+	"Cut settings is Valid!!":"Настройки резки корректны!!",
+	"Cut settings invalid!!":"Настройки резки некорректны!!",
+	"Upload settings form core 0 success!":"Настройки из ядра 0 успешно загружены!",
+	"Upload settings form core 1 success!":"Настройки из ядра 1 успешно загружены!",
+	"Settings updated":"Настройки обновлены",
+	"invalid something...":"Что-то неверно...",
+	"Update error":"Ошибка обновления"
+	
+ 
 
 
 };

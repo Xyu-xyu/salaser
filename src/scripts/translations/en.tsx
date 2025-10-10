@@ -137,6 +137,30 @@ const en: Record<string, string> = {
 	"Restart":"Restart",
 	"Display":"Display",
 	"Key":"Key",
+	"Do you want to save settings preset?":"Do you want to save settings preset?",
+	"Do you want to sent settings to laser ?":"Do you want to sent settings to laser ?",
+	"OK":"OK",
+	"Preset update with success!":"Preset update with success!",
+	"Upload":"Upload",
+	"Upload schema from core error":"Upload schema from core error",
+	"Upload schema from core errorОшибка загрузки: GATEWAY TIMEOUT":"Upload schema from core errorОшибка загрузки: GATEWAY TIMEOUT",
+	"Upload settings from core error":"Upload settings from core error",
+	"Upload settings from core errorОшибка загрузки: GATEWAY TIMEOUT":"Upload settings from core errorОшибка загрузки: GATEWAY TIMEOUT",
+	"loadresult error":"loadresult error",
+	"Execution error":"Execution error",
+	"Execution started":"Execution started",
+	"Upload failed":"Upload failed",
+	"Upload error":"Upload error",
+	"Upload success!":"Upload success!",
+	"Cut settings is Valid!!":"Cut settings is Valid!!",
+	"Cut settings invalid!!":"Cut settings invalid!!",
+	"Upload settings form core 0 success!":"Upload settings form core 0 success!",
+	"Upload settings form core 1 success!":"Upload settings form core 1 success!",
+	"Settings updated":"Settings updated",
+	"invalid something...":"invalid something...",
+	"Update error":"Update error",
+	
+ 
 };
 
 export default en;

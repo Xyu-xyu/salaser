@@ -680,17 +680,18 @@ class ViewStore {
                 type: 'success',
                 message: "Upload settings form core 0 success!",
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });
             //console.log (data)
         } catch (err: any) {
             this.error = err.message || "Неизвестная ошибка";
             showToast({
                 type: 'error',
-                message: "Upload settings from core error" + err.message,
+                message: "Upload settings from core error",
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });
+        console.log ( "Upload settings from core error" + err.message)
             // remove in production
             //viewStore.cut_settings = cut_settings;
             //viewStore.technology = cut_settings.technology
@@ -714,17 +715,18 @@ class ViewStore {
                 type: 'success',
                 message: "Upload  schema from core 0 success!",
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });
             //console.log (data)
         } catch (err: any) {
             this.error = err.message || "Неизвестная ошибка";
             showToast({
                 type: 'error',
-                message: "Upload schema from core error" + err.message,
+                message: "Upload schema from core error",
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });
+            console.log ("Upload schema from core error" + err.message)
 
             viewStore.schema = cut_settings_schema
             viewStore.macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
@@ -758,9 +760,9 @@ class ViewStore {
                 const data = await resp.json();
                 if (data.success) {
                     //this.cut_settings = newSettings;
-                    showToast({ type: "success", message: "Настройки обновлены" });
+                    showToast({ type: "success", message: "Settings updated" });
                 } else {
-                    throw new Error(data.exception || "Ошибка обновления");
+                    throw new Error(data.exception || "Update error");
                 }
 
             } catch (err: any) {
@@ -1085,7 +1087,7 @@ class ViewStore {
                 type: 'warning',
                 message: "Minimum value reached!",
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });
             return;
         }
@@ -1151,7 +1153,7 @@ class ViewStore {
                 type: 'warning',
                 message: "Maximum value reached!",
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });
         }
     }
@@ -1169,7 +1171,7 @@ class ViewStore {
                 type: 'warning',
                 message: "Cannot delete this splice step!",
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });
 
         } else {
@@ -1186,7 +1188,7 @@ class ViewStore {
                     type: 'success',
                     message: "Step removed!",
                     position: 'bottom-right',
-                    autoClose: 5000
+                    autoClose: 2500
                 });
 
             }
@@ -1200,7 +1202,7 @@ class ViewStore {
                 type: 'warning',
                 message: "Maximum value reached!",
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });
             return;
         }
@@ -1236,7 +1238,7 @@ class ViewStore {
             type: 'success',
             message: "Step added!",
             position: 'bottom-right',
-            autoClose: 5000
+            autoClose: 2500
         });
     }
 
@@ -1288,7 +1290,7 @@ class ViewStore {
                 type: 'success',
                 message: "Preset update with success!" ,
                 position: 'bottom-right',
-                autoClose: 5000
+                autoClose: 2500
             });     
 		})
     }

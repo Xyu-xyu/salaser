@@ -36,10 +36,11 @@ const NavBar = observer(() => {
 				console.debug(`Execute: [${text}]`);
 				showToast({
 					type: 'success',
-					message: "Execution started: " + req_resp.statusText,
+					message: "Execution started",
 					position: 'bottom-right',
-					autoClose: 5000
+					autoClose: 2500
 				});
+				console.log ( "Execution started: " + req_resp.statusText )
 				return;
 			}
 
@@ -47,10 +48,11 @@ const NavBar = observer(() => {
 
 			showToast({
 				type: 'error',
-				message: "Execution started: " + exc.message,
+				message: "Execution error",
 				position: 'bottom-right',
-				autoClose: 5000
+				autoClose: 2500
 			});
+			console.log ("Execution error:" + exc.message)
 		}
 	}
 
