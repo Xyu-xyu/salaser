@@ -31,7 +31,7 @@ export const showToast = ({
   closeOnClick = true,
   pauseOnHover = false,
   draggable = true,
-  theme = 'light',
+  theme = 'colored',
 }: ShowToastOptions): void => {
   toast(i18next.t(message), {
     type,

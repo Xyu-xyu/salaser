@@ -76,6 +76,19 @@ const SettingsButton = observer(() => {
 		return 0;
 	});
 
+
+	const deleteP = (id: number) => {
+		viewStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to delete this presets from DB?',
+			confirmText: 'OK',
+			cancelText: 'Cancel',
+			func: deletePreset,
+			args: [id]
+		})	
+	}
+
+
 	async function deletePreset(id: number) {
 		await fetch(api_host + `/db/deletepreset?id=${id}`, {
 			method: "DELETE"
@@ -83,6 +96,21 @@ const SettingsButton = observer(() => {
 			setUpdate(true)
 		})
 	}
+
+
+	const copyP = (id: number) => {
+		viewStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to copy this presets?',
+			confirmText: 'OK',
+			cancelText: 'Cancel',
+			func: copyPreset,
+			args: [id]
+		})	
+	}
+
+
+
 
 	async function copyPreset(id: number) {
 		await fetch(api_host + `/db/copy_preset`, {
@@ -301,7 +329,7 @@ const SettingsButton = observer(() => {
 														</div>
 														<div className="mx-2 mt-1">
 															<button
-																onClick={() => copyPreset(preset.id)}
+																onClick={() => copyP(preset.id)}
 																className="violet_button navbar_button small_button40"
 															>
 																<div className="d-flex align-items-center justify-content-center">
@@ -331,7 +359,7 @@ const SettingsButton = observer(() => {
 														</div>
 														<div className="mx-2 mt-1">
 															<button
-																onClick={() => deletePreset(preset.id)}
+																onClick={() => deleteP(preset.id)}
 																className="violet_button navbar_button small_button40"
 															>
 																<div className="d-flex align-items-center justify-content-center">
