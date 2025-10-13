@@ -161,5 +161,7 @@ const en: Record<string, string> = {
 	"Update error": "Update error",
 	"person listen": "person listen",
 	"Do you want to delete this presets from DB?": "Do you want to delete this presets from DB?",
+	"Upload  schema from core 0 success!": "Upload  schema from core 0 success!",
+	"Current settings dounloaded from core 0!": "Current settings dounloaded from core 0!",
 }
 export default en;

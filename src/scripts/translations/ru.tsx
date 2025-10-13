@@ -160,5 +160,7 @@ const ru: Record<string, string> = {
 	"Update error": "Ошибка обновления",
 	"person listen": "человек слушает",
 	"Do you want to delete this presets from DB?": "Вы хотите удалить эти пресеты из БД?",
+	"Upload  schema from core 0 success!": "Загрузить схему из ядра 0 удалось!",
+	"Current settings dounloaded from core 0!": "Текущие настройки выгружены из ядра 0!",
 }
 export default ru;

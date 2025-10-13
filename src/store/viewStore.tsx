@@ -1291,7 +1291,19 @@ class ViewStore {
                 message: "Preset update with success!" ,
                 position: 'bottom-right',
                 autoClose: 2500
-            });     
+            }); 
+            
+		}).then(() => {
+			
+            showToast({
+                type: 'success',
+                message: "Current settings dounloaded from core 0!" ,
+                position: 'bottom-right',
+                autoClose: 2500
+            }); 
+            viewStore.loadCutSettings()
+            viewStore.setPresetMode('none')
+            
 		})
     }
     
