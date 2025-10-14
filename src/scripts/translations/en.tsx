@@ -163,5 +163,11 @@ const en: Record<string, string> = {
 	"Do you want to delete this presets from DB?": "Do you want to delete this presets from DB?",
 	"Upload  schema from core 0 success!": "Upload  schema from core 0 success!",
 	"Current settings dounloaded from core 0!": "Current settings dounloaded from core 0!",
+	"show labels": "show labels",
+	"show laserOff": "show laserOff",
+	"Thickness": "Thickness",
+	"Timestamp": "Timestamp",
+	"Actions": "Actions",
+	"Code": "Code",
 }
 export default en;

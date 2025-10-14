@@ -13,8 +13,9 @@ const RightBar = observer(() => {
 	const { i18n } = useTranslation();
 	const { t } = useTranslation()
 	const languages = [
-		{ lang: 'ru', name: 'Русский' },
-		{ lang: 'en', name: 'English' }
+		{ lang: 'ru', name: 'Russian' },
+		{ lang: 'en', name: 'English' },
+		{ lang: 'zh', name: 'Chineese' }
 	]
 
 	return (

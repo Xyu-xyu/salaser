@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import ru from './translations/ru.tsx'
 import en from './translations/en.tsx'
+import zh from './translations/zh.tsx';
 import constants from '../store/constants.tsx';
 
 const settedLang = localStorage.getItem('lng') || 'en'
@@ -11,7 +12,8 @@ i18n
   .init({
     resources: {
       en: { translation: en },
-      ru: { translation: ru }
+      ru: { translation: ru },
+      zh: { translation: zh }
     },
     lng: settedLang,
     fallbackLng: 'en',

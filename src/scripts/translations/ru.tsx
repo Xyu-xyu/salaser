@@ -162,5 +162,11 @@ const ru: Record<string, string> = {
 	"Do you want to delete this presets from DB?": "Вы хотите удалить эти пресеты из БД?",
 	"Upload  schema from core 0 success!": "Загрузить схему из ядра 0 удалось!",
 	"Current settings dounloaded from core 0!": "Текущие настройки выгружены из ядра 0!",
+	"show laserOff": "показать лазер выкл.",
+	"show labels": "показывать ярлыки",
+	"Code": "Код",
+	"Timestamp": "Временная метка",
+	"Thickness": "Толщина",
+	"Actions": "Действия",
 }
 export default ru;
