@@ -165,9 +165,9 @@ const en: Record<string, string> = {
 	"Current settings dounloaded from core 0!": "Current settings dounloaded from core 0!",
 	"show labels": "show labels",
 	"show laserOff": "show laserOff",
+	"Code": "Code",
+	"Actions": "Actions",
 	"Thickness": "Thickness",
 	"Timestamp": "Timestamp",
-	"Actions": "Actions",
-	"Code": "Code",
 }
 export default en;

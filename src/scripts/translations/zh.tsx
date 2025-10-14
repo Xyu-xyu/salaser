@@ -165,5 +165,9 @@ const zh: Record<string, string> = {
 	"Current settings dounloaded from core 0!": "当前设置从核心0下载！",
 	"show labels": "显示标签",
 	"show laserOff": "显示激光关闭",
+	"Code": "代码",
+	"Timestamp": "时间戳",
+	"Actions": "行动",
+	"Thickness": "厚度",
 }
 export default zh;

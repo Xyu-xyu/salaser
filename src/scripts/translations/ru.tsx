@@ -164,9 +164,8 @@ const ru: Record<string, string> = {
 	"Current settings dounloaded from core 0!": "Текущие настройки выгружены из ядра 0!",
 	"show laserOff": "показать лазер выкл.",
 	"show labels": "показывать ярлыки",
-	"Code": "Код",
 	"Timestamp": "Временная метка",
-	"Thickness": "Толщина",
 	"Actions": "Действия",
+	"Thickness": "Толщина",
 }
 export default ru;

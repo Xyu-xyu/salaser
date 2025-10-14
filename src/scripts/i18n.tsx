@@ -5,7 +5,7 @@ import en from './translations/en.tsx'
 import zh from './translations/zh.tsx';
 import constants from '../store/constants.tsx';
 
-const settedLang = localStorage.getItem('lng') || 'en'
+const settedLang = /* localStorage.getItem('lng') || */ 'en'
 
 i18n
   .use(initReactI18next)
