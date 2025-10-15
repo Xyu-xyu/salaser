@@ -7,6 +7,7 @@ import laserStore from "../store/laserStore";
 import SettingsButton from "./navbar/settingsButton";
 import constants from "../store/constants";
 import { showToast } from "./toast";
+import FavoritesButton from "./navbar/favoritesButton";
 
 const NavBar = observer(() => {
 
@@ -77,7 +78,7 @@ const NavBar = observer(() => {
 
 				{/* LONG button start */}
 				<div className="ms-4 w-100" id='longButton'>
-					<h5 className="m-0">Produce</h5>
+					<h5 className="m-0"></h5>
 				</div>
 
 				{/* LONG button end */}
@@ -130,7 +131,7 @@ const NavBar = observer(() => {
 				<div className="ms-2">
 					<button className={`${rightMode ? "violet_button" : "white_button"} navbar_button`} onPointerDown={handleClickRightMode}>
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="fluent:star-16-regular"
+							<Icon icon="ph:function-bold"
 								width="36"
 								height="36"
 								style={{ color: rightMode ? 'white' : 'black' }}
@@ -138,6 +139,7 @@ const NavBar = observer(() => {
 						</div>
 					</button>
 				</div>
+				<FavoritesButton />
 				<div className="ms-2">
 					<button className="white_button navbar_button">
 						<div className="d-flex align-items-center justify-content-center">

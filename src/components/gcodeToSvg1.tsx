@@ -8,6 +8,7 @@ import laserStore from "../store/laserStore";
 import utils from "../scripts/util";
 import { Form } from "react-bootstrap";
 import { showToast } from "./toast";
+import { useTranslation } from 'react-i18next';
 
 interface PathItem {
 	path: string;
@@ -29,7 +30,7 @@ const GCodeToSvg1 = observer(() => {
 	const [paths, setPaths] = useState<PathItem[]>([]);//useState([]);
 	const [labels, setLabels] = useState<ReactNode[]>([]); // Храним готовые метки
 	let groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
-
+	const { t } = useTranslation()
 
 	useEffect(() => {
 		update()
@@ -486,7 +487,7 @@ const GCodeToSvg1 = observer(() => {
 						<Form.Check
 							type="checkbox"
 							id="custom-checkbox"
-							label="show labels"
+							label={ t("show labels")}
 							checked={showLabels}
 							onChange={ ()=>{ setShowLabel( !showLabels)}}
 						/>
@@ -498,7 +499,7 @@ const GCodeToSvg1 = observer(() => {
 						<Form.Check
 							type="checkbox"
 							id="custom-checkbox"
-							label="show laserOff"
+							label={ t("show laserOff")}
 							checked={showInners}
 							onChange={ ()=>{ setShowInners( !showInners)}}
 						/>

@@ -326,6 +326,7 @@ body {
   margin: 5px;
 }
 
+#favoritesButtonModal button,
 #RightBar button {
   background-color: var(--grey-progress);
   border: 1px solid var(--grey-progress);
@@ -766,6 +767,9 @@ height: fit-content;}
   z-index: -1;
 }
 
+
+
+.favoritesButton-navbar-modal .modal-dialog, 
 .powerButton-navbar-modal .modal-dialog,
 .settingsButton-navbar-modal .modal-dialog {
   position: absolute;
@@ -774,6 +778,8 @@ height: fit-content;}
   margin: 0;              /* убираем стандартные отступы */
   width: fit-content;      /* ширина по содержимому */
   max-width: none;         /* отключаем ограничение bootstrap */
+  border-radius: 8px;      /* можно слегка скруглить */
+  padding: 0;              /* убрать лишние отступы */
 }
 
 
@@ -781,11 +787,10 @@ height: fit-content;}
   right: 68px;
 }
 
-.powerButton-navbar-modal .modal-content, 
-.settingsButton-navbar-modal .modal-dialog {
-  border-radius: 8px;      /* можно слегка скруглить */
-  padding: 0;              /* убрать лишние отступы */
-}
+.favoritesButton-navbar-modal .modal-dialog {
+  right: 4px;
+} 
+ 
 
 #timer {
  font-size: 10px;
@@ -1286,3 +1291,99 @@ height: fit-content;}
   background-color: var(--violet);
   border-color: var(--violet);
 }
+
+
+/*  LOGIN  */
+/* Общий контейнер */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* Карточка логина */
+.login-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Верхняя полоска (cyan) */
+.login-header {
+  height: 48px;
+  background-color: #22d3ee;
+}
+
+/* Тело карточки */
+.login-body {
+  padding: 24px;
+}
+
+/* Заголовок */
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+
+/* Поля ввода */
+.login-body input {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: #f9fafb;
+  font-size: 16px;
+}
+
+.login-body input:focus {
+  outline: none;
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3);
+}
+
+/* Кнопка */
+.login-body button {
+  display: inline-block;
+  background-color: #4f46e5;
+  color: white;
+  font-weight: 600;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  float: right;
+}
+
+.login-body button:hover {
+  background-color: #4338ca;
+}
+
+.login-body button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ошибка */
+.login-error {
+  color: #dc2626;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Подсказка */
+.login-hint {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #6b7280;
+}
+/*     LOGIN       */

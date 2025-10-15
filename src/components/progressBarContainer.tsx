@@ -40,7 +40,7 @@ const ProgressBarContainer = () => {
 			<ProgressBar
 				striped
 				variant="info"
-				now={100}
+				now={0}
 				className="m-2"
 				style={{ height: '58px' }}
 			/>
@@ -54,7 +54,7 @@ const ProgressBarContainer = () => {
 				textAlign: 'center',
 				pointerEvents: 'none' // чтобы клики проходили сквозь текст
 			}}>
-				Current work 06.08 1,5мм-01 2 mm Steel {100}%
+				Current work 06.08 1,5мм-01 2 mm Steel {0}%
 			</div>
 		</div>
 	);

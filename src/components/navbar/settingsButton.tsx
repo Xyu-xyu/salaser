@@ -6,6 +6,8 @@ import { Modal } from "react-bootstrap";
 //import { showToast } from "../toast";
 import constants from "../../store/constants";
 import utils from "../../scripts/util";
+import { useTranslation } from 'react-i18next';
+
 
 interface Preset {
 	id: number;
@@ -18,6 +20,7 @@ interface Preset {
 type SortKey = "code" | "name" | "thickness" | "ts";
 type SortOrder = "asc" | "desc";
 
+
 const SettingsButton = observer(() => {
 	const { presetMode } = viewStore
 	const [show, setShow] = useState(false);
@@ -25,6 +28,7 @@ const SettingsButton = observer(() => {
 	const [presets, setPresets] = useState<Preset[]>([]);
 	const [sortKey, setSortKey] = useState<SortKey>("code");
 	const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+	const { t } = useTranslation()
 
 	const api_host = 'http://' + constants.SERVER_URL;
 
@@ -259,7 +263,7 @@ const SettingsButton = observer(() => {
 											onClick={() => sortPresets(col.key as SortKey)}
 										>
 											<span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-												{col.label}
+												{ t(col.label)}
 												<span
 													style={{
 														display: "inline-block",
@@ -282,7 +286,7 @@ const SettingsButton = observer(() => {
 											</span>
 										</th>
 									))}
-									<th>Actions</th>
+									<th>{t('Actions')}</th>
 								</tr>
 							</thead>
 							<tbody>
