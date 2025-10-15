@@ -6,6 +6,8 @@ import { ToastContainer } from 'react-toastify';
 import SvgDefs from './components/svgDef.tsx';
 import ModalGeneric from "./components/modalGeneric.js";
 import './scripts/i18n.tsx'; 
+import LoginPage from './components/login.tsx';
+//import laserStore from './store/laserStore.tsx';
 
 
 const App = observer(() => {
@@ -13,6 +15,7 @@ const App = observer(() => {
  	const handleContextMenu = (e: React.MouseEvent) => {
 		e.preventDefault(); 
 	};
+	//const { logined } = laserStore
 
 	return (
 		<>
@@ -27,7 +30,7 @@ const App = observer(() => {
 					minHeight: '150px',
 					fontSize: '20px'
 				}}/> 
-				<Main />
+				{ false ? <LoginPage /> : <Main />}
 				<ModalGeneric />
 			</div>
 

@@ -11,10 +11,11 @@ import CentralBar from "./centralBar";
 import { useTranslation } from 'react-i18next';
 import viewStore from "../store/viewStore";
 import { useEffect } from "react";
+import ServiceBar from "./serviceBar";
 
 
 const Main = observer(() => {
-	const { knobMode } = laserStore;
+	const { knobMode, centralBarMode  } = laserStore;
 	const { t } = useTranslation()
 
 	useEffect (()=>{
@@ -64,7 +65,11 @@ const Main = observer(() => {
 
 			<div className="d-flex flex-column w-100 h-100">
 				<NavBar />
-				<CentralBar />
+				{ 
+					centralBarMode === 'service' ? 
+					<ServiceBar /> :
+					<CentralBar />  
+				}
 			</div>
 
 

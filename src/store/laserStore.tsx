@@ -10,6 +10,7 @@ class LaserStore {
 	error: string | null = null;
 	private intervalId: ReturnType<typeof setInterval> | null = null;
 	loadResult:string= `{"success": true, "result": {"jobinfo": {}, "status": "IDLE", "mode": "NCP", "workarea": [3100, 2600]}}`
+	centralBarMode:string = 'plans'
 
 
 	constructor() {

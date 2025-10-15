@@ -21,7 +21,7 @@ interface MenuSectionData {
 // Главный компонент
 const FavoritesButton: React.FC = observer(() => {
   // const { t } = useTranslation();
-  const [show, setShow] = useState<boolean>(true);
+  const [show, setShow] = useState<boolean>(false);
   const handleClose = (): void => setShow(false);
   const showModal = (): void => setShow(true);
   const { t } = useTranslation()

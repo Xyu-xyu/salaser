@@ -1387,3 +1387,12 @@ height: fit-content;}
   color: #6b7280;
 }
 /*     LOGIN       */
+
+
+
+#serviceBar button {
+  border: 1px solid white;
+  border-radius:20px;
+  height:275px;
+  
+  }

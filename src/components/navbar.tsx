@@ -11,7 +11,7 @@ import FavoritesButton from "./navbar/favoritesButton";
 
 const NavBar = observer(() => {
 
-	const { rightMode, knobMode } = laserStore
+	const { rightMode, knobMode, centralBarMode } = laserStore
 
 
 	const handleClick = () => {
@@ -58,20 +58,52 @@ const NavBar = observer(() => {
 	}
 
 
+	/*
+
+	   <button
+        className={`navbar_button me-1 ${show ? "violet_button" : "white_button"}`}
+        onClick={showModal}
+      >
+        <div className="d-flex align-items-center justify-content-center">
+          <Icon
+            icon="fluent:star-16-regular"
+            width="36"
+            height="36"
+          />
+        </div>
+      </button>
+
+	*/
+
 	return (
 		<div>
 			<div id="NavBar" className="w-100 mt-1">
 				<div className="ms-2">
-					<button className="violet_button navbar_button">
+					<button 
+						className={`navbar_button me-1 ${centralBarMode === "plans" ? "violet_button" : "white_button"}` }
+						onPointerDown={()=>{laserStore.setVal('centralBarMode', "plans"	)}}>
 						<div className="d-flex align-items-center justify-content-center">
-							<LaserIcon size={45} color="white" strokeWidth={1.5} />
+							<LaserIcon 
+								size={45} 
+								color={ centralBarMode === "plans" ? "white" : "black"} 
+								strokeWidth={1.5} 
+							/>
 						</div>
 					</button>
 				</div>
 				<div className="ms-2">
-					<button className="white_button navbar_button">
+					<button className={`navbar_button me-1 ${centralBarMode === "service" ? "violet_button" : "white_button"}` }
+						onPointerDown={()=>{
+							laserStore.setVal('centralBarMode', "service"
+						)
+					}}>
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="mynaui:grid" width="48" height="48" style={{ color: 'black' }} strokeWidth={0.5} />
+							<Icon icon="mynaui:grid" 
+								width="48" 
+								height="48" 
+								style={{ color: centralBarMode === "service" ? 'white' : "black" }} 
+								strokeWidth={0.5} 								
+							/>
 						</div>
 					</button>
 				</div>
