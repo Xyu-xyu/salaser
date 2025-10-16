@@ -669,7 +669,7 @@ class ViewStore {
         this.loading = true;
         this.error = null;
         try {
-            const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`);
+            const resp = await fetch(`${constants.SERVER_URL}/api/cut-settings`);
             if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
 
             const data = await resp.json();
@@ -705,7 +705,7 @@ class ViewStore {
         this.loading = true;
         this.error = null;
         try {
-            const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings-schema`);
+            const resp = await fetch(`${constants.SERVER_URL}/api/cut-settings-schema`);
             if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
 
             const data = await resp.json();
@@ -751,7 +751,7 @@ class ViewStore {
             
             try {
                 
-                const resp = await fetch(`http://${constants.SERVER_URL}/api/cut-settings`, {
+                const resp = await fetch(`${constants.SERVER_URL}/api/cut-settings`, {
                     method: "PUT",
                     headers: { /* "Content-Type": "application/json "*/ },
                     body: JSON.stringify(settings),
@@ -1275,7 +1275,7 @@ class ViewStore {
     
     async updatePreset (id:number) {
         console.log ("update id " + id)
-        const api_host = 'http://' + constants.SERVER_URL;
+        const api_host = constants.SERVER_URL;
         viewStore.cut_settings.technology = viewStore.technology
 
         await fetch(api_host + `/db/updatepreset`, {

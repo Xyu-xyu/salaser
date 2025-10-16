@@ -97,7 +97,7 @@ const GCodeToSvg1 = observer(() => {
 
 		try {
 			const controller = new AbortController();		  
-			const response = await fetch("http://" + constants.SERVER_URL + "/api/loadresult", {
+			const response = await fetch( constants.SERVER_URL + "/api/loadresult", {
 			  signal: controller.signal,
 			});
 		  
@@ -125,7 +125,7 @@ const GCodeToSvg1 = observer(() => {
 			}
 		  }
 
-		fetch("http://" + constants.SERVER_URL + "/api/listing", {
+		fetch( constants.SERVER_URL + "/api/listing", {
 			signal: controller.signal,
 		})
 			.then((r) => r.text())

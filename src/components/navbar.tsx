@@ -27,7 +27,7 @@ const NavBar = observer(() => {
 		
 		try {
 			
-			let req_resp = await fetch(`http://${constants.SERVER_URL}/api/gcore/${0}/execute`, {	
+			let req_resp = await fetch(`${constants.SERVER_URL}/api/gcore/${0}/execute`, {	
 				method: "GET",
 				headers: {},
 			});

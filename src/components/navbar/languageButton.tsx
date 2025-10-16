@@ -68,7 +68,9 @@ const LanguageButton: React.FC = observer(() => {
 										checked={option.lang === i18n.language}
 										onChange={() => {
 											i18n.changeLanguage(option.lang)
+											localStorage.setItem('lng', option.lang)
 											setTimeout(()=>{setShow(false)}, 500)
+
 										}}
 										className="w-100 px-3 py-2"
 									/>

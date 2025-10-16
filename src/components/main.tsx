@@ -22,6 +22,11 @@ const Main = observer(() => {
 	useEffect(() => {
 		if (!viewStore.schema) viewStore.loadCutSettingsSchema()
 		if (!viewStore.cut_settings) viewStore.loadCutSettings()
+		/* if (import.meta.env.DEV) {
+			alert ('DEV MODE')
+		} else {
+			alert ('BUILD MODE')
+		} */
 	}, [])
 
 

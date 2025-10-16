@@ -36,7 +36,7 @@ export const UploadButton = observer(() => {
 			console.log("⏳ Sending...");
 
 			try {
- 				let resp = await fetch(`http://${constants.SERVER_URL}/api/gcore/${core}/upload`, {	
+ 				let resp = await fetch(`${constants.SERVER_URL}/api/gcore/${core}/upload`, {	
 					method: "POST",
 					headers: {},
 					body: content/* as string*/,
@@ -69,7 +69,7 @@ export const UploadButton = observer(() => {
 
 			try {
 
-				let resp = await fetch("http://" + constants.SERVER_URL + "/api/loadresult")
+				let resp = await fetch(constants.SERVER_URL + "/api/loadresult")
 				resp.json().then((data) => {
 
 					if (data.result.status === "ERROR") {

@@ -30,7 +30,7 @@ const SettingsButton = observer(() => {
 	const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 	const { t } = useTranslation()
 
-	const api_host = 'http://' + constants.SERVER_URL;
+	const api_host = constants.SERVER_URL;
 
 	const showModal = () => {
 		setShow(true)
