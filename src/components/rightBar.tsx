@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { Icon } from '@iconify/react';
-import { ListGroup, Form } from "react-bootstrap";
+//import { ListGroup, Form } from "react-bootstrap";
 import { useTranslation } from 'react-i18next';
 import laserStore from "../store/laserStore";
 import { UploadButton } from "./uploadButton";
@@ -10,13 +10,13 @@ import { UploadButton } from "./uploadButton";
 const RightBar = observer(() => {
 
 	const { carouselInPlan, rightMode } = laserStore
-	const { i18n } = useTranslation();
+//	const { i18n } = useTranslation();
 	const { t } = useTranslation()
-	const languages = [
+/* 	const languages = [
 		{ lang: 'ru', name: 'Russian' },
 		{ lang: 'en', name: 'English' },
 		{ lang: 'zh', name: 'Chineese' }
-	]
+	] */
 
 	return (
 
@@ -135,7 +135,7 @@ const RightBar = observer(() => {
 				<div className="mt-4">
 					<h5>{t('View')}</h5>
 				</div>
-				<div className="dropdown">
+				{/* <div className="dropdown">
 					<button
 						className="btn dropdown-toggle w-100 d-flex align-items-center"
 						type="button"
@@ -162,7 +162,7 @@ const RightBar = observer(() => {
 							))}
 						</ListGroup>
 					</ul>
-				</div>
+				</div> */}
 			</div>}
 			{ !carouselInPlan && <div>
 				 <div className="mt-2">

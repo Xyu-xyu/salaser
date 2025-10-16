@@ -8,6 +8,7 @@ import SettingsButton from "./navbar/settingsButton";
 import constants from "../store/constants";
 import { showToast } from "./toast";
 import FavoritesButton from "./navbar/favoritesButton";
+import LanguageButton from "./navbar/languageButton";
 
 const NavBar = observer(() => {
 
@@ -184,6 +185,7 @@ const NavBar = observer(() => {
 					</button>
 				</div>
 				<SettingsButton />
+				<LanguageButton />
 				<PowerButton />
 			</div>
 		</div>
