@@ -149,6 +149,7 @@ body {
     width: 1300px;          
     height: 650px;          
     overflow:hidden;
+    margin: 10px 0 0 10px;    
   }
 }
 
@@ -188,10 +189,9 @@ body {
     width: 650px;
     height: 650px;
     background-color: #fff;
-    border: 2px solid var(--grey-button-bottom);
-    border-radius: 10px;
+ 
     overflow: hidden;
-     
+    margin: 10px 0 0 10px;     
   }
 
   .swiperSlideInTasks {
@@ -1044,8 +1044,7 @@ height: fit-content;}
   --stroke-width-mul: 1px;
   --default-stroke-width: 0.5%;
   stroke-width: 1px;
-  border: 1px solid gray;
-  border-radius: 10px;
+
 }
 
 #workarea svg {

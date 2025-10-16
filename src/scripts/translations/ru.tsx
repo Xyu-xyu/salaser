@@ -184,5 +184,13 @@ const ru: Record<string, string> = {
 	"Clicked on Calibrate": "Нажал «Калибровать»",
 	"Clicked on Clean": "Нажал «Очистить».",
 	"Clicked on Manual operation": "Нажал «Ручной режим».",
+	"manage": "управлять",
+	"IPC diagnostics": "Диагностика МПК",
+	"cutting head": "режущая голова",
+	"laser module": "лазерный модуль",
+	"operation log": "журнал операций",
+	"pallet change": "смена паллет",
+	"motion control": "управление движением",
+	"machine": "станок",
 }
 export default ru;

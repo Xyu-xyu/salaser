@@ -12,17 +12,18 @@ import { useTranslation } from 'react-i18next';
 import viewStore from "../store/viewStore";
 import { useEffect } from "react";
 import ServiceBar from "./serviceBar";
+import { AnimatePresence, motion } from "framer-motion";
 
 
 const Main = observer(() => {
-	const { knobMode, centralBarMode  } = laserStore;
+	const { knobMode, centralBarMode } = laserStore;
 	const { t } = useTranslation()
 
-	useEffect (()=>{
+	useEffect(() => {
 		if (!viewStore.schema) viewStore.loadCutSettingsSchema()
-		if (!viewStore.cut_settings)viewStore.loadCutSettings()
-	},[]) 
-	
+		if (!viewStore.cut_settings) viewStore.loadCutSettings()
+	}, [])
+
 
 	return (
 		<main
@@ -65,11 +66,29 @@ const Main = observer(() => {
 
 			<div className="d-flex flex-column w-100 h-100">
 				<NavBar />
-				{ 
-					centralBarMode === 'service' ? 
-					<ServiceBar /> :
-					<CentralBar />  
-				}
+				<AnimatePresence mode="wait">
+					{centralBarMode === 'service' ? (
+						<motion.div
+							key="service" // ключ обязательно разный для разных компонентов
+							initial={{ opacity: 0, x: 50 }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: -50 }}
+							transition={{ duration: 0.2 }}
+						>
+							<ServiceBar />
+						</motion.div>
+					) : (
+						<motion.div
+							key="central"
+							initial={{ opacity: 0, x: 50 }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: -50 }}
+							transition={{ duration: 0.2 }}
+						>
+							<CentralBar />
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 
 

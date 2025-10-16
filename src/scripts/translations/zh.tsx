@@ -186,5 +186,13 @@ const zh: Record<string, string> = {
 	"Clicked on Calibrate": "单击校准",
 	"Clicked on Clean": "单击“清洁”",
 	"Clicked on Manual operation": "点击手动操作",
+	"machine": "机器",
+	"laser module": "激光模组",
+	"operation log": "操作日志",
+	"motion control": "运动控制",
+	"manage": "管理",
+	"cutting head": "切割头",
+	"pallet change": "托盘更换",
+	"IPC diagnostics": "IPC 诊断",
 }
 export default zh;

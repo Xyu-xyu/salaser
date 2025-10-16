@@ -1,10 +1,11 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { showToast } from "./toast";
+import { useTranslation } from "react-i18next";
 
 
 export default function serviceBar() {
 	// группируем кнопки по рядам
-
+	const { t } = useTranslation()
 	const items = [
 		{ name: "machine", icon: "fluent:hand-left-16-regular", onClick: () => handleClick("machine") },
 		{ name: "laser module", icon: "game-icons:laser-warning", onClick: () => handleClick("laser module") },
@@ -56,7 +57,7 @@ export default function serviceBar() {
 											/>
 										</div>
 										<div className="mt-2">
-											<h4 className="m-0 p-0">{name}</h4>
+											<h4 className="m-0 p-0">{t(name)}</h4>
 										</div>
 									</div>
 								</button>

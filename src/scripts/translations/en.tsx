@@ -186,5 +186,13 @@ const en: Record<string, string> = {
 	"Clicked on Calibrate": "Clicked on Calibrate",
 	"Clicked on Clean": "Clicked on Clean",
 	"Clicked on Manual operation": "Clicked on Manual operation",
+	"IPC diagnostics": "IPC diagnostics",
+	"machine": "machine",
+	"laser module": "laser module",
+	"operation log": "operation log",
+	"cutting head": "cutting head",
+	"manage": "manage",
+	"pallet change": "pallet change",
+	"motion control": "motion control",
 }
 export default en;
