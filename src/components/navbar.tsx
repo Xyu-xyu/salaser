@@ -58,23 +58,7 @@ const NavBar = observer(() => {
 		}
 	}
 
-
-	/*
-
-	   <button
-        className={`navbar_button me-1 ${show ? "violet_button" : "white_button"}`}
-        onClick={showModal}
-      >
-        <div className="d-flex align-items-center justify-content-center">
-          <Icon
-            icon="fluent:star-16-regular"
-            width="36"
-            height="36"
-          />
-        </div>
-      </button>
-
-	*/
+ 
 
 	return (
 		<div>
@@ -130,10 +114,10 @@ const NavBar = observer(() => {
 				<div className="ms-2">
 					<button className={`${knobMode ? "violet_button" : "white_button"} navbar_button`} onPointerDown={handleClick}>
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="fluent:wrench-16-regular"
+							<Icon icon="fluent:text-box-settings-24-regular"
 								width="36"
 								height="36"
-								style={{ color: knobMode ? 'white' : 'red' }}
+								style={{ color: knobMode ? 'white' : 'black' }}
 							/>
 						</div>
 					</button>
@@ -150,7 +134,16 @@ const NavBar = observer(() => {
 					</button>
 				</div>
 				<div className="ms-2">
-					<button className="white_button navbar_button">
+					<button className="white_button navbar_button" onPointerDown={ ()=>{
+
+							showToast({
+								type: 'error',
+								message: "Laser stop!",
+								position: 'bottom-right',
+								autoClose: false
+							})
+						}
+					}>
 						<div className="d-flex align-items-center justify-content-center">
 							<Icon icon="ic:round-cancel"
 								width="36"

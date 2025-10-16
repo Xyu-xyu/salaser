@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import { Icon } from '@iconify/react';
-//import { ListGroup, Form } from "react-bootstrap";
 import { useTranslation } from 'react-i18next';
 import laserStore from "../store/laserStore";
 import { UploadButton } from "./uploadButton";
@@ -10,13 +9,7 @@ import { UploadButton } from "./uploadButton";
 const RightBar = observer(() => {
 
 	const { carouselInPlan, rightMode } = laserStore
-//	const { i18n } = useTranslation();
 	const { t } = useTranslation()
-/* 	const languages = [
-		{ lang: 'ru', name: 'Russian' },
-		{ lang: 'en', name: 'English' },
-		{ lang: 'zh', name: 'Chineese' }
-	] */
 
 	return (
 
@@ -135,34 +128,6 @@ const RightBar = observer(() => {
 				<div className="mt-4">
 					<h5>{t('View')}</h5>
 				</div>
-				{/* <div className="dropdown">
-					<button
-						className="btn dropdown-toggle w-100 d-flex align-items-center"
-						type="button"
-						data-bs-toggle="dropdown"
-						aria-expanded="false">
-						<Icon icon="fluent-mdl2:world" width="24" height="24" style={{ 'color': 'black' }} />
-						<div className="flex-grow-1 text-center">{t('Select language')}</div>
-					</button>
-					<ul className="dropdown-menu w-100 m-0" style={{ 'border': 'none' }}>
-						<ListGroup style={{ 'border': 'none' }}>
-							{languages.map((option) => (
-								<ListGroup.Item key={option.lang} >
-									<Form.Check
-										type="radio"
-										style={{margin:0}}
-										id={`radio-${option.lang}`}
-										label={option.name}
-										name={`${option.lang}-Options-${'lang'}`}
-										value={option.name}
-										checked={option.lang === i18n.language}
-										onChange={() => i18n.changeLanguage(option.lang)}
-									/>
-								</ListGroup.Item>
-							))}
-						</ListGroup>
-					</ul>
-				</div> */}
 			</div>}
 			{ !carouselInPlan && <div>
 				 <div className="mt-2">

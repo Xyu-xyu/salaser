@@ -37,7 +37,7 @@ export default function serviceBar() {
 
 		<div className="w-100" id="serviceBar">
 			<div className="ms-2 my-4">
-				<h1>Modul</h1>
+			{/* 	<h2>Modul</h2> */}
 			</div>
 			<div className="d-flex">
 				{rows.map((row, i) => (
