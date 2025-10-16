@@ -194,5 +194,6 @@ const en: Record<string, string> = {
 	"manage": "manage",
 	"pallet change": "pallet change",
 	"motion control": "motion control",
+	"Laser stop!": "Laser stop!",
 }
 export default en;

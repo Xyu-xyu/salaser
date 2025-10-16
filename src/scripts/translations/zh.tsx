@@ -194,5 +194,6 @@ const zh: Record<string, string> = {
 	"cutting head": "切割头",
 	"pallet change": "托盘更换",
 	"IPC diagnostics": "IPC 诊断",
+	"Laser stop!": "激光停止！",
 }
 export default zh;

@@ -108,24 +108,15 @@ body {
     flex-direction: row;
   }
 
-  .fade-toggle {
-   /*  transform: translateX(-100%); 
-    opacity: 1;
-    transition: transform 0.5s ease, opacity 0.5s ease; */
-    display: none;
-    background-color: var(--white);
-    z-index: 10; 
-    width: 0px;
-
-   }
-
   .fade-toggle.visible {
     display: flex;
-    transform: translateX(0);
     opacity: 1;
     max-width: 275px;
     min-width: 275px;
     padding: 0.5em;
+    background-color: var(--white);
+    z-index: 10; 
+    width: 0px;
   }   
 
   .swiperSlide {
@@ -159,30 +150,11 @@ body {
     flex-direction: row;
   }
 
-  .fade-toggle {
-    transform: translateX(-100%); 
-    opacity: 1;
-    transition: transform 0.5s ease, opacity 0.5s ease;
-    background-color: var(--white);
-    z-index: 10; 
-    width: 0px;
-
-   }
-
-
   .fade-toggle.visible {
-    transform: translateX(0);
     opacity: 1;
     width: 160px !important; 
     padding: 0.5em 0.5em;
-  }
-
-  .fade-toggle.visible .h-125 {
-    width: 140px;   
-  }
-
-  .fade-toggle .h-125 {
-    width: 0px;
+    background-color: var(--white);
   }
 
   .swiperSlide {
@@ -504,7 +476,8 @@ body {
   height: 10% !important;
 }
 
-.h-125 {  height: 11.5% !important;
+.h-125 {  
+  height: calc(100vh*0.115 ) !important;
 }
 
 .vidget {  

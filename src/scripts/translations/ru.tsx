@@ -192,5 +192,6 @@ const ru: Record<string, string> = {
 	"pallet change": "смена паллет",
 	"motion control": "управление движением",
 	"machine": "станок",
+	"Laser stop!": "Лазер стоп!",
 }
 export default ru;

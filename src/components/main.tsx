@@ -37,36 +37,51 @@ const Main = observer(() => {
 		>
 
 			<div className="d-flex flex-column">
-				<div id="sidePanelWrapper" className={`h-100 d-flex flex-column justify-content-evenly fade-toggle ${knobMode ? "visible" : "d-none"}`}>
-					<h5 style={{
-						opacity: knobMode ? 1 : 0
-					}}>
-						{t('Макрос')}
-					</h5>
+			<AnimatePresence mode="wait">
+  {knobMode && (
+    <motion.div
+      key="knobModeON"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+      style={{ position: "relative" }}
+    >
+      <div
+        id="sidePanelWrapper"
+        className="h-100 d-flex flex-column justify-content-evenly fade-toggle visible"
+      >
+        <h5>{t("Макрос")}</h5>
 
-					<div key={0} className="h-125 col-12 vidget">
-						<MacrosSelector />
-					</div>
-					{[
-						"pressure",
-						"power_W_mm",
-						"focus",
-						"feedLimit_mm_s",
-						"modulationMacro",
-						"height",
-						"modulationFrequency_Hz",
-					].map((a: string, i: number) =>
-						a === "modulationMacro" ? (
-							<div key={i} className="h-125 col-12 vidget">
-								<UniversalNamedKnob param={a} keyParam={"macros"} />
-							</div>
-						) : (
-							<div key={i} className="h-125 col-12 vidget">
-								<UniversalKnob param={a} keyParam={"macros"} />
-							</div>
-						)
-					)}
-				</div>
+        <div key={0} className="h-125 col-12 vidget">
+          <MacrosSelector />
+        </div>
+
+        {[
+          "pressure",
+          "power_W_mm",
+          "focus",
+          "feedLimit_mm_s",
+          "modulationMacro",
+          "height",
+          "modulationFrequency_Hz",
+        ].map((a: string, i: number) =>
+          a === "modulationMacro" ? (
+            <div key={i} className="h-125 col-12 vidget">
+              <UniversalNamedKnob param={a} keyParam="macros" />
+            </div>
+          ) : (
+            <div key={i} className="h-125 col-12 vidget">
+              <UniversalKnob param={a} keyParam="macros" />
+            </div>
+          )
+        )}
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+			
+
 			</div>
 
 			<div className="d-flex flex-column w-100 h-100">

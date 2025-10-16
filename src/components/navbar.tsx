@@ -100,7 +100,7 @@ const NavBar = observer(() => {
 
 				{/* LONG button end */}
 
-				<div className="ms-2">
+{/* 				<div className="ms-2">
 					<button className="white_button navbar_button">
 						<div className="d-flex align-items-center justify-content-center">
 							<Icon icon="fluent:play-circle-28-regular"
@@ -110,7 +110,7 @@ const NavBar = observer(() => {
 							/>
 						</div>
 					</button>
-				</div>
+				</div> */}
 				<div className="ms-2">
 					<button className={`${knobMode ? "violet_button" : "white_button"} navbar_button`} onPointerDown={handleClick}>
 						<div className="d-flex align-items-center justify-content-center">
