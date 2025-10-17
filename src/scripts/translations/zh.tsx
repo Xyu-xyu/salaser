@@ -195,5 +195,12 @@ const zh: Record<string, string> = {
 	"pallet change": "托盘更换",
 	"IPC diagnostics": "IPC 诊断",
 	"Laser stop!": "激光停止！",
+	"Clicked on machine": "点击机器",
+	"Clicked on laser module": "点击激光模块",
+	"Clicked on IPC diagnostics": "单击 IPC 诊断",
+	"Password": "密码",
+	"Sign in": "登入",
+	"Login": "登录",
+	"Please fill all fields.": "请填写所有字段。",
 }
 export default zh;

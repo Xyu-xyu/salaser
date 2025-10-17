@@ -1283,7 +1283,7 @@ height: fit-content;}
 /* Верхняя полоска (cyan) */
 .login-header {
   height: 48px;
-  background-color: #22d3ee;
+  background-color: #4f46e5;
 }
 
 /* Тело карточки */
@@ -1313,7 +1313,7 @@ height: fit-content;}
 .login-body input:focus {
   outline: none;
   border-color: #22d3ee;
-  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
 }
 
 /* Кнопка */

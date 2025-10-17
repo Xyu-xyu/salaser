@@ -193,5 +193,12 @@ const ru: Record<string, string> = {
 	"motion control": "управление движением",
 	"machine": "станок",
 	"Laser stop!": "Лазер стоп!",
+	"Clicked on machine": "Нажал на машину",
+	"Clicked on laser module": "Нажал на лазерный модуль",
+	"Clicked on IPC diagnostics": "Нажал на диагностику IPC.",
+	"Password": "Пароль",
+	"Sign in": "Войти",
+	"Login": "Логин",
+	"Please fill all fields.": "Пожалуйста, заполните все поля.",
 }
 export default ru;

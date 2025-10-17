@@ -1,4 +1,7 @@
 import { useState, FormEvent } from "react";
+import { useTranslation } from 'react-i18next';
+import LanguageButton from "./navbar/languageButton";
+import laserStore from "../store/laserStore";
 
 
 const LoginPage = () => {
@@ -6,30 +9,33 @@ const LoginPage = () => {
 	const [password, setPassword] = useState<string>("");
 	const [error, setError] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
+	const { t } = useTranslation()
+
 
 
 	// Простая проверка и имитация отправки формы
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+		
+		laserStore.setVal( 'isLogined', true)
 		e.preventDefault();
 		setError("");
 
 		if (!login.trim() || !password) {
-			setError("Пожалуйста, заполните все поля.");
+			setError(t("Please fill all fields."));
 			return;
 		}
 
 		setLoading(true);
 		try {
-			// Здесь можно вызвать API для авторизации.
-			// В демо-версии просто ждем 700мс и сбрасываем состояние.
-			await new Promise((r) => setTimeout(r, 700));
-			// TODO: заменить на реальную логику авторизации
-			alert(`Успешная авторизация: ${login}`);
+ 			await new Promise((r) => setTimeout(r, 700));
+ 			console.log (t(`Auth success: `)+ login);
 		} catch (err) {
-			setError("Ошибка авторизации. Попробуйте снова.");
+			setError(t("Auth error. Try again."));
 		} finally {
 			setLoading(false);
-		}
+			laserStore.setVal( 'isLogined', true)
+
+		} 
 	};
 
 	return (
@@ -39,18 +45,18 @@ const LoginPage = () => {
 					<div className="login-header"></div>
 
 					<div className="login-body">
-						<h1 className="login-title">SGNmotion</h1>
+						<h1 className="login-title">Vematic</h1>
 
 						<form onSubmit={handleSubmit}>
 							<input
 								type="text"
-								placeholder="Login"
+								placeholder={t("Login")}
 								value={login}
 								onChange={(e) => setLogin(e.target.value)}
 							/>
 							<input
 								type="password"
-								placeholder="Password"
+								placeholder={t("Password")}
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 							/>
@@ -58,7 +64,7 @@ const LoginPage = () => {
 							{error && <div className="login-error">{error}</div>}
 
 							<button type="submit" disabled={loading} className="mt-2 mb-4">
-								{loading ? "Вход..." : "Sign in"}
+								{loading ? t("Enter...") : t("Sign in")}
 							</button>
 						</form>
 						<p className="login-hint">
@@ -77,6 +83,9 @@ const LoginPage = () => {
 				opacity: "0.2"
 			}}		
 			 >
+			</div>
+			<div className="position-absolute" style={{right:"0", top:"0"}}>
+				<LanguageButton />
 			</div>
 		</>
 	);

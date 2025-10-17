@@ -26,6 +26,7 @@ class LaserStore {
 		{ name: 'Y', measure: 'mm', val: 0 },
 		{ name: 'Z', measure: 'mm', val: 0 }
 	];
+	isLogined:boolean = false;
 
 	constructor() {
 		makeAutoObservable(this);

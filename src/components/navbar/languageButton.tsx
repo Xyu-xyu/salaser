@@ -43,8 +43,7 @@ const LanguageButton: React.FC = observer(() => {
 				<div style={{ padding: ".25rem" }}>
 					<div
 						style={{
-							minHeight: "calc(100vh * 0.75)",
-							maxHeight: "calc(100vh * 0.75)",
+							height: "fit-content",
 							minWidth: "calc(100vw * 0.2)",
 							overflowY: "auto",
 							overflowX: "hidden",

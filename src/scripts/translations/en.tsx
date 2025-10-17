@@ -195,5 +195,12 @@ const en: Record<string, string> = {
 	"pallet change": "pallet change",
 	"motion control": "motion control",
 	"Laser stop!": "Laser stop!",
+	"Clicked on machine": "Clicked on machine",
+	"Clicked on laser module": "Clicked on laser module",
+	"Clicked on IPC diagnostics": "Clicked on IPC diagnostics",
+	"Sign in": "Sign in",
+	"Login": "Login",
+	"Password": "Password",
+	"Please fill all fields.": "Please fill all fields.",
 }
 export default en;
