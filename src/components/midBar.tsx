@@ -1,5 +1,5 @@
 import laserStore from "../store/laserStore";
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -9,59 +9,34 @@ import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
 import GCodeToSvg from "./gcodeToSvg1";
-import { io, Socket } from "socket.io-client";
-import constants from "../store/constants";
 import { AnimatePresence, motion } from "framer-motion";
 
-
-
+interface ParamItem {
+	name: string;
+	val: number;
+	measure: string;
+}
 
 const MidBar = observer(() => {
-	const SERVER_URL = constants.SERVER_URL
 	let params = [
 		{ name: 'N2', measure: 'bar', val: 4.8 },
 		{ name: 'Nd', measure: 'mm', val: 12.7 },
 		{ name: 'f', measure: 'kHz', val: 88.7 },
 	]
 
-	const [paramsLimit, setParamsLimit] = useState([
-		{ name: 'X', measure: 'mm', val: 1250.44 },
-		{ name: 'Y', measure: 'mm', val: 44.777 },
-		{ name: 'Z', measure: 'mm', val: 28.77 },
-	])
+	const { paramsLimit } = laserStore;
+	useEffect(() => {
+		laserStore.fetchTasks();
+
+		return () => {
+			laserStore.stopPolling();
+		};
+	}, []);
+
 
 	const { carouselInPlan, tasks } = laserStore
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const { isVertical } = viewStore
-
-	useEffect(() => {
-		laserStore.fetchTasks()
-		const socket: Socket = io(SERVER_URL, {
-			path: "/socket.io", // стандартный путь Socket.IO
-			transports: ["websocket"],
-		});
-
-		// Получаем поток данных от сервера
-		socket.on("machine_data", (data: any) => {
-			//machineStore.addData(data);
-			//console.log ( data )
-			setParamsLimit(data)
-		});
-
-		// Обработка соединения
-		socket.on("connect", () => {
-			console.log("Connected to backend");
-		});
-
-		socket.on("disconnect", () => {
-			console.log("Disconnected from backend");
-		});
-
-		return () => {
-			socket.disconnect();
-			laserStore.stopPolling();
-		};
-	}, []);
 
 
 	if (laserStore.loading) return <div>Загрузка...</div>;
@@ -72,117 +47,96 @@ const MidBar = observer(() => {
 
 		<>
 			<AnimatePresence mode="wait">
-			{!carouselInPlan ?
-				<motion.div
-					key="!carouselInPlan" // ключ обязательно разный для разных компонентов
-					initial={{ opacity: 0, x: 20 }}
-					animate={{ opacity: 1, x: 0 }}
-					exit={{ opacity: 0, x: -20 }}
-					transition={{ duration: 0.2 }}
-				>
+				{!carouselInPlan ?
+					<motion.div
+						key="!carouselInPlan" // ключ обязательно разный для разных компонентов
+						initial={{ opacity: 0, x: 20 }}
+						animate={{ opacity: 1, x: 0 }}
+						exit={{ opacity: 0, x: -20 }}
+						transition={{ duration: 0.2 }}
+					>
 
-					<div className="d-flex flex-column w-100">
-						<div className="d-flex mx-2 flex-wrap">
-							{
-								paramsLimit.map((item, i) => {
-									return (
-										<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
-											<div className="currentPlanMeasureWpapper">
-												<div className="currentPlanMeasure">
-
-													<div className="currentPlanMeasureNameCont">
-														<div className="currentPlanMeasureName">
-															{item.name}
-														</div>
-													</div>
-
-													<div className="currentPlanMeasureValConainer d-flex align-items-center">
-														<div className="currentPlanMeasureValue">
-															{item.val.toFixed(2)}
-														</div>
-														<div className="currentPlanMeasureItem mx-1">
-															{item.measure}
-														</div>
-													</div>
+						<div className="d-flex flex-column w-100">
+							<div className="d-flex mx-2 flex-wrap">
+								{paramsLimit.map((item: ParamItem, i: number) => (
+									<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
+										<div className="currentPlanMeasureWpapper">
+											<div className="currentPlanMeasure">
+												<div className="currentPlanMeasureNameCont">
+													<div className="currentPlanMeasureName">{item.name}</div>
 												</div>
-											</div>
-											<div className="currentPlanLimits my-2 ms-2">
-												<div className="d-flex flex-column">
-													<div className="d-flex  align-items-center mb-1">
-														<div className={item.val > 500 ? "led-green-medium" : "led-gray-medium"}>
-														</div>
-														<div className="limitText">
-															Limit-
-														</div>
-													</div>
-													<div className="d-flex  align-items-center">
-														<div className={item.val < 500 ? "led-green-medium" : "led-gray-medium"}>
-														</div>
-														<div className="limitText">
-															Limit+
-														</div>
-													</div>
+												<div className="currentPlanMeasureValConainer d-flex align-items-center">
+													<div className="currentPlanMeasureValue">{item.val.toFixed(2)}</div>
+													<div className="currentPlanMeasureItem mx-1">{item.measure}</div>
 												</div>
 											</div>
 										</div>
-									)
-
-								})
-							}
-						</div>
-						<div className="d-flex mx-2 flex-wrap">
-							{
-								params.map((item, i) => {
-									return (
-										<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
-											<div className="currentPlanMeasureWpapper">
-												<div className="currentPlanMeasure">
-
-													<div className="currentPlanMeasureNameCont">
-														<div className="currentPlanMeasureName">
-															{item.name}
-														</div>
-													</div>
-
-													<div className="currentPlanMeasureValConainer d-flex align-items center">
-														<div className="currentPlanMeasureValue">
-															{item.val.toFixed(2)}
-														</div>
-														<div className="currentPlanMeasureItem mx-1">
-															{item.measure}
-														</div>
-													</div>
+										<div className="currentPlanLimits my-2 ms-2">
+											<div className="d-flex flex-column">
+												<div className="d-flex align-items-center mb-1">
+													<div className={item.val > 500 ? "led-green-medium" : "led-gray-medium"}></div>
+													<div className="limitText">Limit-</div>
+												</div>
+												<div className="d-flex align-items-center">
+													<div className={item.val < 500 ? "led-green-medium" : "led-gray-medium"}></div>
+													<div className="limitText">Limit+</div>
 												</div>
 											</div>
-											<div className="currentPlanLimits">
-											</div>
 										</div>
-									)
+									</div>
+								))}
 
-								})
-							}
-						</div>
-
-						{!carouselInPlan && tasks && (
-							<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
-								<div className="planMain" style={{ border: "2px solid grey", borderRadius: '10px' }}>
-									{<GCodeToSvg />}
-								</div>
 							</div>
-						)}
+							<div className="d-flex mx-2 flex-wrap">
+								{
+									params.map((item, i) => {
+										return (
+											<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
+												<div className="currentPlanMeasureWpapper">
+													<div className="currentPlanMeasure">
+														<div className="currentPlanMeasureNameCont">
+															<div className="currentPlanMeasureName">
+																{item.name}
+															</div>
+														</div>
+														<div className="currentPlanMeasureValConainer d-flex align-items center">
+															<div className="currentPlanMeasureValue">
+																{item.val.toFixed(2)}
+															</div>
+															<div className="currentPlanMeasureItem mx-1">
+																{item.measure}
+															</div>
+														</div>
+													</div>
+												</div>
+												<div className="currentPlanLimits">
+												</div>
+											</div>
+										)
+									})
+								}
+							</div>
 
-					</div>
-				</motion.div>
-							:
-				<motion.div
-					key="carouselInPlan" // ключ обязательно разный для разных компонентов
-					initial={{ opacity: 0, x: 20 }}
-					animate={{ opacity: 1, x: 0 }}
-					exit={{ opacity: 0, x: -20 }}
-					transition={{ duration: 0.2 }}
-				>
+							{!carouselInPlan && tasks && (
+								<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
+									<div className="planMain" style={{ border: "2px solid grey", borderRadius: '10px' }}>
+										{<GCodeToSvg />}
+									</div>
+								</div>
+							)}
 
-					
+						</div>
+					</motion.div>
+					:
+					<motion.div
+						key="carouselInPlan" // ключ обязательно разный для разных компонентов
+						initial={{ opacity: 0, x: 20 }}
+						animate={{ opacity: 1, x: 0 }}
+						exit={{ opacity: 0, x: -20 }}
+						transition={{ duration: 0.2 }}
+					>
+
+
 						<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
 							<div className="planMain">
 								<Swiper
@@ -236,7 +190,6 @@ const MidBar = observer(() => {
 															</div>
 														</div>
 
-
 														<div className="ccard-info-block">
 															<div className="ccard-title">{key} </div>
 															<div className="ccard-details">
@@ -259,9 +212,8 @@ const MidBar = observer(() => {
 								</Swiper>
 							</div>
 						</div>
-					
-				</motion.div>
-			}
+					</motion.div>
+				}
 			</AnimatePresence>
 		</>
 
