@@ -200,5 +200,6 @@ const ru: Record<string, string> = {
 	"Sign in": "Войти",
 	"Login": "Логин",
 	"Please fill all fields.": "Пожалуйста, заполните все поля.",
+	"Upload error:": "Ошибка загрузки:",
 }
 export default ru;

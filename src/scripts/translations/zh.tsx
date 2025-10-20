@@ -202,5 +202,6 @@ const zh: Record<string, string> = {
 	"Sign in": "登入",
 	"Login": "登录",
 	"Please fill all fields.": "请填写所有字段。",
+	"Upload error:": "上传错误：",
 }
 export default zh;

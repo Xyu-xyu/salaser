@@ -37,78 +37,98 @@ const Main = observer(() => {
 		>
 
 			<div className="d-flex flex-column">
-			<AnimatePresence mode="wait">
-  {knobMode && (
-    <motion.div
-      key="knobModeON"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.5, ease: "easeInOut" }}
-      style={{ position: "relative" }}
-    >
-      <div
-        id="sidePanelWrapper"
-        className="h-100 d-flex flex-column justify-content-evenly fade-toggle visible"
-      >
-        <h5>{t("Макрос")}</h5>
+				<AnimatePresence mode="wait">
+					{knobMode && (
+						<motion.div
+							key="knobModeON"
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: 20 }}
+							transition={{ duration: 0.5, ease: "easeInOut" }}
+							style={{ position: "relative" }}
+						>
+							<div
+								id="sidePanelWrapper"
+								className="h-100 d-flex flex-column justify-content-evenly fade-toggle visible"
+							>
+								<h5>{t("Макрос")}</h5>
 
-        <div key={0} className="h-125 col-12 vidget">
-          <MacrosSelector />
-        </div>
+								<div key={0} className="h-125 col-12 vidget">
+									<MacrosSelector />
+								</div>
 
-        {[
-          "pressure",
-          "power_W_mm",
-          "focus",
-          "feedLimit_mm_s",
-          "modulationMacro",
-          "height",
-          "modulationFrequency_Hz",
-        ].map((a: string, i: number) =>
-          a === "modulationMacro" ? (
-            <div key={i} className="h-125 col-12 vidget">
-              <UniversalNamedKnob param={a} keyParam="macros" />
-            </div>
-          ) : (
-            <div key={i} className="h-125 col-12 vidget">
-              <UniversalKnob param={a} keyParam="macros" />
-            </div>
-          )
-        )}
-      </div>
-    </motion.div>
-  )}
-</AnimatePresence>
-			
+								{[
+									"pressure",
+									"power_W_mm",
+									"focus",
+									"feedLimit_mm_s",
+									"modulationMacro",
+									"height",
+									"modulationFrequency_Hz",
+								].map((a: string, i: number) =>
+									a === "modulationMacro" ? (
+										<div key={i} className="h-125 col-12 vidget">
+											<UniversalNamedKnob param={a} keyParam="macros" />
+										</div>
+									) : (
+										<div key={i} className="h-125 col-12 vidget">
+											<UniversalKnob param={a} keyParam="macros" />
+										</div>
+									)
+								)}
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
+
 
 			</div>
 
 			<div className="d-flex flex-column w-100 h-100">
 				<NavBar />
-				<AnimatePresence mode="wait">
-					{centralBarMode === 'service' ? (
-						<motion.div
-							key="service" // ключ обязательно разный для разных компонентов
-							initial={{ opacity: 0, x: 50 }}
-							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: -50 }}
-							transition={{ duration: 0.2 }}
-						>
-							<ServiceBar />
-						</motion.div>
-					) : (
-						<motion.div
-							key="central"
-							initial={{ opacity: 0, x: 50 }}
-							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: -50 }}
-							transition={{ duration: 0.2 }}
-						>
-							<CentralBar />
-						</motion.div>
-					)}
-				</AnimatePresence>
+				<div style={{ position: "relative", width: "100%", height: "100%" }}>
+					{/* CentralBar */}
+					<motion.div
+						key="central"
+						initial={false}
+						animate={{
+							opacity: centralBarMode === "service" ? 0 : 1,
+							x: centralBarMode === "service" ? -30 : 0,
+							pointerEvents: centralBarMode === "service" ? "none" : "auto",
+						}}
+						transition={{ duration: 0.25, ease: "easeInOut" }}
+						style={{
+							position: "absolute",
+							inset: 0,
+							width: "100%",
+							height: "100%",
+						}}
+						className="h-100"
+					>
+						<CentralBar />
+					</motion.div>
+
+					{/* ServiceBar */}
+					<motion.div
+						key="service"
+						initial={false}
+						animate={{
+							opacity: centralBarMode === "service" ? 1 : 0,
+							x: centralBarMode === "service" ? 0 : 30,
+							pointerEvents: centralBarMode === "service" ? "auto" : "none",
+						}}
+						transition={{ duration: 0.25, ease: "easeInOut" }}
+						style={{
+							position: "absolute",
+							inset: 0,
+							width: "100%",
+							height: "100%",
+						}}
+					>
+						<ServiceBar />
+					</motion.div>
+				</div>
+
 			</div>
 
 

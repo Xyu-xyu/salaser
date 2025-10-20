@@ -46,175 +46,178 @@ const MidBar = observer(() => {
 	return (
 
 		<>
-			<AnimatePresence mode="wait">
-				{!carouselInPlan ?
-					<motion.div
-						key="!carouselInPlan" // ключ обязательно разный для разных компонентов
-						initial={{ opacity: 0, x: 20 }}
-						animate={{ opacity: 1, x: 0 }}
-						exit={{ opacity: 0, x: -20 }}
-						transition={{ duration: 0.2 }}
-					>
-
-						<div className="d-flex flex-column w-100">
-							<div className="d-flex mx-2 flex-wrap">
-								{paramsLimit.map((item: ParamItem, i: number) => (
-									<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
-										<div className="currentPlanMeasureWpapper">
-											<div className="currentPlanMeasure">
-												<div className="currentPlanMeasureNameCont">
-													<div className="currentPlanMeasureName">{item.name}</div>
-												</div>
-												<div className="currentPlanMeasureValConainer d-flex align-items-center">
-													<div className="currentPlanMeasureValue">{item.val.toFixed(2)}</div>
-													<div className="currentPlanMeasureItem mx-1">{item.measure}</div>
-												</div>
+			<div style={{ position: "relative", width: "100%", height: "100%" }}>
+				{/* Первый блок */}
+				<motion.div
+					key="blockA"
+					initial={false}
+					animate={{
+						opacity: !carouselInPlan ? 1 : 0,
+						x: !carouselInPlan ? 0 : -20,
+						pointerEvents: !carouselInPlan ? "auto" : "none",
+					}}
+					transition={{ duration: 0.25, ease: "easeInOut" }}
+					style={{
+						position: "absolute",
+						inset: 0,
+						width: "100%",
+						height: "100%",
+					}}
+				>
+					<div className="d-flex flex-column w-100">
+						<div className="d-flex mx-2 flex-wrap">
+							{paramsLimit.map((item: ParamItem, i: number) => (
+								<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
+									<div className="currentPlanMeasureWpapper">
+										<div className="currentPlanMeasure">
+											<div className="currentPlanMeasureNameCont">
+												<div className="currentPlanMeasureName">{item.name}</div>
 											</div>
-										</div>
-										<div className="currentPlanLimits my-2 ms-2">
-											<div className="d-flex flex-column">
-												<div className="d-flex align-items-center mb-1">
-													<div className={item.val > 500 ? "led-green-medium" : "led-gray-medium"}></div>
-													<div className="limitText">Limit-</div>
-												</div>
-												<div className="d-flex align-items-center">
-													<div className={item.val < 500 ? "led-green-medium" : "led-gray-medium"}></div>
-													<div className="limitText">Limit+</div>
-												</div>
+											<div className="currentPlanMeasureValConainer d-flex align-items-center">
+												<div className="currentPlanMeasureValue">{item.val.toFixed(2)}</div>
+												<div className="currentPlanMeasureItem mx-1">{item.measure}</div>
 											</div>
 										</div>
 									</div>
-								))}
-
-							</div>
-							<div className="d-flex mx-2 flex-wrap">
-								{
-									params.map((item, i) => {
-										return (
-											<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
-												<div className="currentPlanMeasureWpapper">
-													<div className="currentPlanMeasure">
-														<div className="currentPlanMeasureNameCont">
-															<div className="currentPlanMeasureName">
-																{item.name}
-															</div>
-														</div>
-														<div className="currentPlanMeasureValConainer d-flex align-items center">
-															<div className="currentPlanMeasureValue">
-																{item.val.toFixed(2)}
-															</div>
-															<div className="currentPlanMeasureItem mx-1">
-																{item.measure}
-															</div>
-														</div>
-													</div>
-												</div>
-												<div className="currentPlanLimits">
-												</div>
+									<div className="currentPlanLimits my-2 ms-2">
+										<div className="d-flex flex-column">
+											<div className="d-flex align-items-center mb-1">
+												<div className={item.val > 500 ? "led-green-medium" : "led-gray-medium"}></div>
+												<div className="limitText">Limit-</div>
 											</div>
-										)
-									})
-								}
-							</div>
-
-							{!carouselInPlan && tasks && (
-								<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
-									<div className="planMain" style={{ border: "2px solid grey", borderRadius: '10px' }}>
-										{<GCodeToSvg />}
+											<div className="d-flex align-items-center">
+												<div className={item.val < 500 ? "led-green-medium" : "led-gray-medium"}></div>
+												<div className="limitText">Limit+</div>
+											</div>
+										</div>
 									</div>
 								</div>
-							)}
-
+							))}
 						</div>
-					</motion.div>
-					:
-					<motion.div
-						key="carouselInPlan" // ключ обязательно разный для разных компонентов
-						initial={{ opacity: 0, x: 20 }}
-						animate={{ opacity: 1, x: 0 }}
-						exit={{ opacity: 0, x: -20 }}
-						transition={{ duration: 0.2 }}
-					>
+
+						<div className="d-flex mx-2 flex-wrap">
+							{params.map((item, i) => (
+								<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
+									<div className="currentPlanMeasureWpapper">
+										<div className="currentPlanMeasure">
+											<div className="currentPlanMeasureNameCont">
+												<div className="currentPlanMeasureName">{item.name}</div>
+											</div>
+											<div className="currentPlanMeasureValConainer d-flex align-items-center">
+												<div className="currentPlanMeasureValue">{item.val.toFixed(2)}</div>
+												<div className="currentPlanMeasureItem mx-1">{item.measure}</div>
+											</div>
+										</div>
+									</div>
+									<div className="currentPlanLimits"></div>
+								</div>
+							))}
+						</div>
+
+						<div className="d-flex w-100 h-100 flex-center align-items-center">
+							<div className="planMain" style={{ border: "2px solid grey", borderRadius: "10px" }}>
+								<GCodeToSvg />
+							</div>
+						</div>
+					</div>
+				</motion.div>
+
+				{/* Второй блок */}
+				<motion.div
+					key="blockB"
+					initial={false}
+					animate={{
+						opacity: carouselInPlan ? 1 : 0,
+						x: carouselInPlan ? 0 : 20,
+						pointerEvents: carouselInPlan ? "auto" : "none",
+					}}
+					transition={{ duration: 0.25, ease: "easeInOut" }}
+					style={{
+						position: "absolute",
+						inset: 0,
+						width: "100%",
+						height: "100%",
+					}}
+				>
+					<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
+						<div className="planMain">
+							{/* Ваш контент для режима carousel */}
+							<Swiper
+								onSwiper={(swiper) => {
+									swiperRef.current = swiper;
+								}}
+								modules={[EffectCoverflow, /* Mousewheel */]}
+								direction={'horizontal'}
+								effect="coverflow"
+								loop={false}
+								slideToClickedSlide={true}
+								grabCursor={true}
+								centeredSlides={true}
+								slidesPerView={5}
+								initialSlide={viewStore.selectedModulationMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
+								freeMode={false}
+								coverflowEffect={{
+									rotate: 0,
+									stretch: 0,
+									depth: 450,
+									modifier: isVertical ? 1 : 0.8,
+									slideShadows: false,
+								}}
 
 
-						<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
-							<div className="planMain">
-								<Swiper
-									onSwiper={(swiper) => {
-										swiperRef.current = swiper;
-									}}
-									modules={[EffectCoverflow, /* Mousewheel */]}
-									direction={'horizontal'}
-									effect="coverflow"
-									loop={false}
-									slideToClickedSlide={true}
-									grabCursor={true}
-									centeredSlides={true}
-									slidesPerView={5}
-									initialSlide={viewStore.selectedModulationMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
-									freeMode={false}
-									coverflowEffect={{
-										rotate: 0,
-										stretch: 0,
-										depth: 450,
-										modifier: isVertical ? 1 : 0.8,
-										slideShadows: false,
-									}}
+								style={{
+									height: isVertical ? '1600px' : '800px',
+									width: isVertical ? '800px' : '1600px',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+								}}
+								onSlideChange={(swiper) => {
+									const currentSlide = swiper.activeIndex;
+									viewStore.setSelectedSlide(currentSlide);
+								}}
+							>
+								{
+									tasks.map((key: any) =>
+										<SwiperSlide>
+											<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
 
-
-									style={{
-										height: isVertical ? '1600px' : '800px',
-										width: isVertical ? '800px' : '1600px',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
-									}}
-									onSlideChange={(swiper) => {
-										const currentSlide = swiper.activeIndex;
-										viewStore.setSelectedSlide(currentSlide);
-									}}
-								>
-									{
-										tasks.map((key: any) =>
-											<SwiperSlide>
-												<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
-
-													<div className="ccard">
-														<div className="ccard-header">{key} 00:08:10</div>
-														<div className="ccard-image-wrapper">
-															<div className="ccard-image">
-																<img
-																	src={'/'}
-																	alt="svg"
-																/>
-															</div>
+												<div className="ccard">
+													<div className="ccard-header">{key} 00:08:10</div>
+													<div className="ccard-image-wrapper">
+														<div className="ccard-image">
+															<img
+																src={'/'}
+																alt="svg"
+															/>
 														</div>
+													</div>
 
-														<div className="ccard-info-block">
-															<div className="ccard-title">{key} </div>
-															<div className="ccard-details">
-																• materialcode
-																• label
-																• thickness mm
-															</div>
-															<div className="ccard-details">
-																• dimx mm
-																• dimy mm
-															</div>
+													<div className="ccard-info-block">
+														<div className="ccard-title">{key} </div>
+														<div className="ccard-details">
+															• materialcode
+															• label
+															• thickness mm
 														</div>
-
+														<div className="ccard-details">
+															• dimx mm
+															• dimy mm
+														</div>
 													</div>
 
 												</div>
-											</SwiperSlide>
-										)
-									}
-								</Swiper>
-							</div>
+
+											</div>
+										</SwiperSlide>
+									)
+								}
+							</Swiper>
 						</div>
-					</motion.div>
-				}
-			</AnimatePresence>
+					</div>
+				</motion.div>
+			</div>
+
 		</>
 
 	)

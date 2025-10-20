@@ -202,5 +202,6 @@ const en: Record<string, string> = {
 	"Login": "Login",
 	"Password": "Password",
 	"Please fill all fields.": "Please fill all fields.",
+	"Upload error:": "Upload error:",
 }
 export default en;

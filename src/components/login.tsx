@@ -76,7 +76,7 @@ const LoginPage = () => {
 			style={{
 				bottom:"0px",
 				right:"0px",
-				background: "url('/src/assets/images/222082.gif",
+				background: "url('/images/222082.gif",
 				width: "100vw",
 				height: "500vh",
 				mixBlendMode: "luminosity",

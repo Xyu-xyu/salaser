@@ -1,5 +1,5 @@
 const constants = {
-	api: '192.168.11.004',
+	
 	SERVER_URL:import.meta.env.DEV ? 'http://localhost:5005' : '',
 	languages: [
 		{ lang: 'ru', name: 'Русский' },

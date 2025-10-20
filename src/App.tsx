@@ -39,7 +39,7 @@ const App = observer(() => {
 						initial={{ opacity: 0, x: 0 }}
 						animate={
 							!isLogined
-								? { opacity: 1, x: 0, zIndex: 10000, pointerEvents: "auto" }
+								? { opacity: 1, x: 0, zIndex: 2, pointerEvents: "auto" }
 								: { opacity: 0, x: 0, zIndex: 1, pointerEvents: "none" }
 						}
 						transition={{ duration: 0.4, ease: "easeInOut" }}
