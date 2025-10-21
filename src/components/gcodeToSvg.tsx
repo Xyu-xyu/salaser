@@ -36,8 +36,8 @@ const GCodeToSvg = observer(() => {
  	const panZoomRef = useRef<any>(null);
 	const [listing, setListing] = useState("");
 	const data = JSON.parse(loadResult)
-	const width = (isVertical ? Number(data.result.jobinfo.attr?.dimy) : Number(data.result.jobinfo.attr?.dimx) )|| 3000;
-	const height = (isVertical ? Number(data.result.jobinfo.attr?.dimx) : Number(data.result.jobinfo.attr?.dimy) ) || 1500;
+	const width = (isVertical ? Number(data.result.jobinfo.attr?.dimy) : Number(data.result.jobinfo.attr?.dimx) )|| (isVertical? 1500 : 3000);
+	const height = (isVertical ? Number(data.result.jobinfo.attr?.dimx) : Number(data.result.jobinfo.attr?.dimy) ) || (isVertical? 3000 : 1500);
 	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState<PathItem[]>([]);//useState([]);
 	const [labels, setLabels] = useState<ReactNode[]>([]); // Храним готовые метки
@@ -461,8 +461,8 @@ const GCodeToSvg = observer(() => {
 			 style={{
 				border: "2px solid grey",
 				borderRadius: "10px",
-			/* 	width: "1300px",
-				height: "650px", */
+			 	width: (isVertical ? 650 : 1300)+"px",
+				height: (isVertical ? 1300 : 650)+"px", 
 				touchAction: "none",
 				position: "relative",
 			}} 
@@ -585,7 +585,7 @@ const GCodeToSvg = observer(() => {
 								className={`sgn_main_els ${showInners ? " showInners " : " hideInners "}  ${showLabels ? " showLeabels " : " hideLabels "}`}
 								transform={
 									isVertical
-									  ? `rotate(-90) translate(${-width * 2}, ${-height * 0.5})`
+									  ? `rotate(-90) translate(${-height},${width-height} )` 
 									  : undefined
 								}
 								style={{
