@@ -8,8 +8,8 @@ import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
 import viewStore from '../store/viewStore';
 import { observer } from 'mobx-react-lite';
-import GCodeToSvg from "./gcodeToSvg1";
-import { AnimatePresence, motion } from "framer-motion";
+import GCodeToSvg from "./gcodeToSvg";
+import { motion } from "framer-motion";
 
 interface ParamItem {
 	name: string;

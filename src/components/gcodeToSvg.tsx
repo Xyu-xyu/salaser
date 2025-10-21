@@ -9,6 +9,17 @@ import utils from "../scripts/util";
 import { Form } from "react-bootstrap";
 import { showToast } from "./toast";
 import { useTranslation } from 'react-i18next';
+import viewStore from "../store/viewStore";
+import Hammer from "hammerjs";
+
+interface CustomEventsHandler {
+	haltEventListeners: string[];
+	hammer?: HammerManager;
+	init: (options: { instance: ReturnType<typeof svgPanZoom>; svgElement: SVGSVGElement }) => void;
+	destroy: () => void;
+}
+
+
 
 interface PathItem {
 	path: string;
@@ -17,15 +28,16 @@ interface PathItem {
 }
 
 
-const GCodeToSvg1 = observer(() => {
+const GCodeToSvg = observer(() => {
 
 	const { loadResult } = laserStore
+	const { isVertical } = viewStore
 	const containerRef = useRef<HTMLDivElement | null>(null);
  	const panZoomRef = useRef<any>(null);
 	const [listing, setListing] = useState("");
 	const data = JSON.parse(loadResult)
-	const width = Number(data.result.jobinfo.attr?.dimx) || 3000;
-	const height = Number(data.result.jobinfo.attr?.dimy) || 1500;
+	const width = (isVertical ? Number(data.result.jobinfo.attr?.dimy) : Number(data.result.jobinfo.attr?.dimx) )|| 3000;
+	const height = (isVertical ? Number(data.result.jobinfo.attr?.dimx) : Number(data.result.jobinfo.attr?.dimy) ) || 1500;
 	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState<PathItem[]>([]);//useState([]);
 	const [labels, setLabels] = useState<ReactNode[]>([]); // Храним готовые метки
@@ -61,6 +73,45 @@ const GCodeToSvg1 = observer(() => {
 			panZoomRef.current = null;
 		}
 
+		const eventsHandler: CustomEventsHandler = {
+			haltEventListeners: ["touchstart", "touchend", "touchmove", "touchleave", "touchcancel"],
+
+			init(options) {
+				const instance = options.instance;
+				const svgElement = options.svgElement;
+				let initialScale = 1;
+				let pannedX = 0;
+				let pannedY = 0;
+
+				// Создаем Hammer и сохраняем в this.hammer
+				this.hammer = new Hammer(svgElement);
+				this.hammer.get("pinch").set({ enable: true });
+
+				this.hammer.on("panstart panmove", (ev) => {
+					if (ev.type === "panstart") {
+						pannedX = 0;
+						pannedY = 0;
+					}
+					instance.panBy({ x: ev.deltaX - pannedX, y: ev.deltaY - pannedY });
+					pannedX = ev.deltaX;
+					pannedY = ev.deltaY;
+				});
+
+				this.hammer.on("pinchstart pinchmove", (ev) => {
+					if (ev.type === "pinchstart") initialScale = instance.getZoom();
+					instance.zoomAtPoint(initialScale * ev.scale, { x: ev.center.x, y: ev.center.y });
+				});
+
+				this.hammer.on("doubletap", () => instance.zoomIn());
+
+				svgElement.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
+			},
+
+			destroy() {
+				this.hammer?.destroy();
+			},
+		};
+
 		const panZoomInstance = svgPanZoom(svgElement, {
 			zoomEnabled: true,
 			controlIconsEnabled: false,
@@ -68,7 +119,8 @@ const GCodeToSvg1 = observer(() => {
 			center: true,
 			minZoom: 0.1,
 			maxZoom: 20,
-			zoomScaleSensitivity: 0.4
+			zoomScaleSensitivity: 0.4,
+			customEventsHandler: eventsHandler,
 		});
 
 		panZoomRef.current = panZoomInstance;
@@ -406,14 +458,14 @@ const GCodeToSvg1 = observer(() => {
 
 	return (
 		<div
-			style={{
+			 style={{
 				border: "2px solid grey",
 				borderRadius: "10px",
-				width: "1300px",
-				height: "650px",
+			/* 	width: "1300px",
+				height: "650px", */
 				touchAction: "none",
 				position: "relative",
-			}}
+			}} 
 		>
 			{/* Кнопки */}
 			<div className="d-flex flex-column position-absolute">
@@ -531,7 +583,16 @@ const GCodeToSvg1 = observer(() => {
 							/>
 							<g
 								className={`sgn_main_els ${showInners ? " showInners " : " hideInners "}  ${showLabels ? " showLeabels " : " hideLabels "}`}
-								style={{ fill: "none", strokeWidth: 0.5, stroke: "black" }}
+								transform={
+									isVertical
+									  ? `rotate(-90) translate(${-width * 2}, ${-height * 0.5})`
+									  : undefined
+								}
+								style={{
+								  fill: "none",
+								  strokeWidth: 0.5,
+								  stroke: "black",
+								}}
 							>
 								{paths && (() => {
 									const groupedResult: ReactNode[] = [];
@@ -610,4 +671,4 @@ const GCodeToSvg1 = observer(() => {
 	);
 });
 
-export default GCodeToSvg1;
+export default GCodeToSvg;
