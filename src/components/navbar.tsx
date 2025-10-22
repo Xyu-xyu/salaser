@@ -12,16 +12,13 @@ import LanguageButton from "./navbar/languageButton";
 
 const NavBar = observer(() => {
 
-	const { rightMode, knobMode, centralBarMode } = laserStore
+	const { knobMode, centralBarMode } = laserStore
 
 
 	const handleClick = () => {
 		laserStore.setVal('knobMode', !knobMode);
 	};
 
-	const handleClickRightMode = () => {
-		laserStore.setVal('rightMode', !rightMode);
-	};
 
 	const execute = async () => {
 		
@@ -154,17 +151,6 @@ const NavBar = observer(() => {
 					</button>
 				</div>
 
-				<div className="ms-2">
-					<button className={`${rightMode ? "violet_button" : "white_button"} navbar_button`} onPointerDown={handleClickRightMode}>
-						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="ph:function-bold"
-								width="36"
-								height="36"
-								style={{ color: rightMode ? 'white' : 'black' }}
-							/>
-						</div>
-					</button>
-				</div>
 				<FavoritesButton />
 				<div className="ms-2">
 					<button className="white_button navbar_button">

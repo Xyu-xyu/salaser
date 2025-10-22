@@ -34,7 +34,7 @@ const MidBar = observer(() => {
 	}, []);
 
 
-	const { carouselInPlan, tasks } = laserStore
+	const { leftMode, tasks } = laserStore
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const { isVertical } = viewStore
 
@@ -52,9 +52,9 @@ const MidBar = observer(() => {
 					key="blockA"
 					initial={false}
 					animate={{
-						opacity: !carouselInPlan ? 1 : 0,
-						x: !carouselInPlan ? 0 : -20,
-						pointerEvents: !carouselInPlan ? "auto" : "none",
+						opacity: leftMode === 'sheet' ? 1 : 0,
+						x: leftMode === 'sheet' ? 0 : -20,
+						pointerEvents: leftMode === 'sheet' ? "auto" : "none",
 					}}
 					transition={{ duration: 0.25, ease: "easeInOut" }}
 					style={{
@@ -127,9 +127,9 @@ const MidBar = observer(() => {
 					key="blockB"
 					initial={false}
 					animate={{
-						opacity: carouselInPlan ? 1 : 0,
-						x: carouselInPlan ? 0 : 20,
-						pointerEvents: carouselInPlan ? "auto" : "none",
+						opacity: leftMode === 'plan' ? 1 : 0,
+						x: leftMode === 'plan' ? 0 : 20,
+						pointerEvents: leftMode === 'plan' ? "auto" : "none",
 					}}
 					transition={{ duration: 0.25, ease: "easeInOut" }}
 					style={{

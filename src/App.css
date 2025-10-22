@@ -288,10 +288,23 @@ body {
   margin-top: 8px;
 }
 
+#FunctionBar{
+  min-width: 315px;
+  max-width: 315px;
+  height: 100%;
+  background-color: var(--white) ;
+  border: 1px solid var(--white) ;
+  border-top-left-radius: 10px;
+  margin-top: 8px;
+}
+
+
+#FunctionBar div:not(.list-group-item),
 #RightBar div:not(.list-group-item) {
   margin: 5px;
 }
 
+#FunctionBar button,
 #favoritesButtonModal button,
 #RightBar button {
   background-color: var(--grey-progress);
@@ -303,16 +316,20 @@ body {
   transition: background-color 0.2s ease;
 }
 
+#FunctionBar button:active,
+#FunctionBar button:focus:active,
 #RightBar button:active,
 #RightBar button:focus:active {
   background-color: var(--grey-main) !important;
 }
 
 /* Чтобы dropdown-items тянулись на всю ширину */
+#FunctionBar .dropdown-menu, 
 #RightBar .dropdown-menu {
   width: 100%;
 }
 
+#FunctionBar button:disabled,
 #RightBar button:disabled {
   background-color: var(--grey-main); /* Более тусклый фон */
   border: 1px solid var(--grey-main);
@@ -323,6 +340,9 @@ body {
 }
 
 /* Чтобы при наведении или нажатии disabled не менялся */
+#FunctionBar button:disabled:hover,
+#FunctionBar button:disabled:active,
+#FunctionBar button:disabled:focus,
 #RightBar button:disabled:hover,
 #RightBar button:disabled:active,
 #RightBar button:disabled:focus {

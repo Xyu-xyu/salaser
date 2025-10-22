@@ -437,7 +437,8 @@ const GCodeToSvg = observer(() => {
 							textAnchor="middle"
 							fill="#fff"
 							stroke="none"
-							dy=".35em"   // сдвиг по вертикали для центрирования
+							dy=".35em" // сдвиг по вертикали для центрирования
+							transform={isVertical ? `rotate(90, ${cx}, ${cy})` : undefined}
 						>
 							{labelNum}
 						</text>

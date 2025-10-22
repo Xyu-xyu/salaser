@@ -6,7 +6,7 @@ import { UploadButton } from "./uploadButton";
 import { AnimatePresence, motion } from "framer-motion";
 
 const RightBar = observer(() => {
-	const { carouselInPlan, rightMode } = laserStore;
+	const { rightMode } = laserStore;
 	const { t } = useTranslation();
 
 	// Настройки анимации для появления/исчезновения
@@ -18,7 +18,7 @@ const RightBar = observer(() => {
 
 	return (
 		<AnimatePresence mode="wait">
-			{rightMode && (
+			{true && (
 				<motion.div
 					key="rightBar"
 					initial="hidden"
@@ -26,11 +26,11 @@ const RightBar = observer(() => {
 					exit="exit"
 					variants={fadeVariants}
 					transition={{ duration: 0.4, ease: "easeInOut" }}
-					id="RightBar"
+					id={ rightMode === 'function'? "FunctionBar" : "RightBar" }
 					className="d-flex flex-column"
 					style={{ position: "relative" }}
 				>
-					{carouselInPlan ? (
+					{ rightMode === 'plan' && 
 						<div>
 							<div className="mt-2">
 								<h5>{t("Plans")}</h5>
@@ -101,7 +101,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" onClick={()=> laserStore.setVal ('rightMode', 'parameter')}>
 									<div className="d-flex align-items-center">
 										<Icon
 											icon="tabler:chart-dots-3"
@@ -116,7 +116,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" onClick={()=> laserStore.setVal ('rightMode', 'function')}>
 									<div className="d-flex align-items-center">
 										<Icon
 											icon="ph:function"
@@ -164,7 +164,10 @@ const RightBar = observer(() => {
 								<h5>{t("View")}</h5>
 							</div>
 						</div>
-					) : (
+					}
+
+					{ rightMode === 'parameter' && 
+
 						<div>
 							<div className="mt-2">
 								<h5>{t("Parameters")}</h5>
@@ -224,7 +227,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" onClick={()=> laserStore.setVal ('rightMode', 'function')} >
 									<div className="d-flex align-items-center">
 										<Icon
 											icon="hugeicons:function"
@@ -302,7 +305,15 @@ const RightBar = observer(() => {
 								</button>
 							</div>
 						</div>
-					)}
+					}
+					{ rightMode === 'function' &&
+						<div>
+							<div className="mt-2">
+								<h5>{t("Functions")}</h5>
+							</div>
+						</div>
+
+					}
 				</motion.div>
 			)}
 		</AnimatePresence>
