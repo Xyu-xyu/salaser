@@ -5,6 +5,7 @@ import laserStore from "../store/laserStore";
 import { UploadButton } from "./uploadButton";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import FunctionsForm from "./formFunctionsorm";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
@@ -397,7 +398,7 @@ const RightBar = observer(() => {
 										</div>
 									</button>
 								</div>
-
+								<FunctionsForm />
 
 
 

@@ -35,25 +35,62 @@
 				"enabled"
 			]
 		},
-		"Programmed_reference": {
+		"Edge_detection": {
 			"type": "object",
 			"additionalProperties": false,
 			"properties": {
-				"Programmed_reference_x": {
-					"type": "number",
-					"minimum": 0,
-					"maximum": 100,
-					"default": 0,
-					"title": "Programmed_reference_x",
-					"description": "Значение в миллиметрах"
+				"Detection_method": {
+					"type": "string",
+					"enum": [
+						"Capacitive",
+						"Detection eye"
+					],
+					"title": "Detection method"
 				},
-				"Programmed_reference_y": {
+				"Detection": {
+					"type": "string",
+					"enum": [
+						"X",
+						"Y",
+						"angle"
+					],
+					"title": "Detection",
+					"description": "Always required"
+				},
+				"Move_to_starting_point_manually": {
+					"type": "boolean",
+					"default": false,
+					"title": "Move to starting point manually"
+				},
+				"Detection_corner": {
+					"type": "string",
+					"enum": [
+						"Fl",
+						"Fr",
+						"Br",
+						"Bl"
+					],
+					"title": "Detection corner"
+				},
+				"Sheet_loading": {
+					"type": "string",
+					"enum": [
+						"Fl",
+						"Fr",
+						"Br",
+						"Bl"
+					],
+					"title": "Sheet loading"
+				},
+				"Sheet_dimension_offset_long_edge": {
 					"type": "number",
-					"minimum": 0,
-					"maximum": 100,
 					"default": 0,
-					"title": "Programmed_reference_y",
-					"description": "Значение в миллиметрах"
+					"title": "Sheet dimension offset long edge (mm)"
+				},
+				"Angle_or_sheet_corner": {
+					"type": "number",
+					"default": 90,
+					"title": "Angle or sheet corner (deg)"
 				},
 				"enabled": {
 					"type": "boolean",
@@ -63,154 +100,11 @@
 				}
 			},
 			"required": [
-				"Programmed_reference_x",
-				"Programmed_reference_y",
-				"enabled"
-			]
-		},
-		"Nozzle_cleaning": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"enabled": {
-					"type": "boolean",
-					"default": false,
-					"title": "Nozzle_cleaning enabled",
-					"description": "Indicates if the Nozzle_cleaning function is enabled"
-				},
-				"value": {
-					"type": "boolean",
-					"default": false,
-					"title": "Nozzle_cleaning value",
-					"description": "Clean nozzle when cutting plan finished"
-				}
-			},
-			"required": [
-				"enabled",
-				"value"
-			]
-		},
-		"inverse": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"enabled": {
-					"type": "boolean",
-					"default": false,
-					"title": "Inverse enabled",
-					"description": "Indicates if the Inverse function is enabled"
-				},
-				"value": {
-					"type": "boolean",
-					"default": false,
-					"title": "Inverse value",
-					"description": "Reverse the logical state (true = inverted)"
-				}
-			},
-			"required": [
-				"enabled",
-				"value"
-			]
-		},
-		"Sensor_field": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"enabled": {
-					"type": "boolean",
-					"default": false,
-					"title": "Sensor_field enabled",
-					"description": "Indicates if the Sensor_field function is enabled"
-				},
-				"value": {
-					"type": "boolean",
-					"default": false,
-					"title": "Sensor_field value",
-					"description": "Indicates whether the sensor field is active"
-				}
-			},
-			"required": [
-				"enabled",
-				"value"
-			]
-		},
-		"Vaporisation": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"enabled": {
-					"type": "boolean",
-					"default": false,
-					"title": "Vaporisation enabled",
-					"description": "Indicates if the Vaporisation function is enabled"
-				},
-				"value": {
-					"title": "Vaporisation",
-					"description": "Controls vaporisation behavior: part / plan / lead-in, or disabled (false)",
-					"oneOf": [
-						{
-							"type": "string",
-							"enum": [
-								"part",
-								"plan",
-								"lead-in"
-							]
-						},
-						{
-							"type": "boolean",
-							"enum": [
-								false
-							]
-						}
-					],
-					"default": false
-				}
-			},
-			"required": [
-				"enabled",
-				"value"
-			]
-		},
-		"Stops": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"Stop_before_part": {
-					"type": "number",
-					"minimum": 0,
-					"default": 0,
-					"title": "Stop_before_part",
-					"description": "0 = off"
-				},
-				"Stop_at": {
-					"type": "string",
-					"enum": [
-						"Off",
-						"Nozzle_change"
-					],
-					"default": "Off",
-					"title": "Stop_at"
-				},
-				"Stop_Select": {
-					"type": "string",
-					"enum": [
-						"Off",
-						"On"
-					],
-					"default": "Off",
-					"title": "Stop_Select"
-				},
-				"enabled": {
-					"type": "boolean",
-					"default": false,
-					"title": "Programmed_reference enabled",
-					"description": "Indicates if the Programmed_reference function is enabled"
-				}
-			},
-			"required": [
-				"Stop_before_part",
-				"Stop_at",
-				"Stop_Select",
+				"Detection_method",
+				"Detection",
+				"Move_to_starting_point_manually",
+				"Detection_corner",
+				"Sheet_loading",
 				"enabled"
 			]
 		},
@@ -307,62 +201,34 @@
 				"value"
 			]
 		},
-		"Edge_detection": {
+		"Stops": {
 			"type": "object",
 			"additionalProperties": false,
 			"properties": {
-				"Detection_method": {
-					"type": "string",
-					"enum": [
-						"Capacitive",
-						"Detection eye"
-					],
-					"title": "Detection method"
-				},
-				"Detection": {
-					"type": "string",
-					"enum": [
-						"X",
-						"Y",
-						"angle"
-					],
-					"title": "Detection",
-					"description": "Always required"
-				},
-				"Move_to_starting_point_manually": {
-					"type": "boolean",
-					"default": false,
-					"title": "Move to starting point manually"
-				},
-				"Detection_corner": {
-					"type": "string",
-					"enum": [
-						"Fl",
-						"Fr",
-						"Br",
-						"Bl"
-					],
-					"title": "Detection corner"
-				},
-				"Sheet_loading": {
-					"type": "string",
-					"enum": [
-						"Fl",
-						"Fr",
-						"Br",
-						"Bl"
-					],
-					"title": "Sheet loading"
-				},
-				"Sheet_dimension_offset_long_edge": {
+				"Stop_before_part": {
 					"type": "number",
+					"minimum": 0,
 					"default": 0,
-					"title": "Sheet dimension offset long edge (mm)"
+					"title": "Stop_before_part",
+					"description": "0 = off"
 				},
-				"Angle_or_sheet_corner": {
-					"type": "number",
-					"default": 90,
-					"title": "Angle or sheet corner (deg)"
+				"Stop_at": {
+					"type": "string",
+					"enum": [
+						"Off",
+						"Nozzle_change"
+					],
+					"default": "Off",
+					"title": "Stop_at"
+				},
+				"Stop_Select": {
+					"type": "string",
+					"enum": [
+						"Off",
+						"On"
+					],
+					"default": "Off",
+					"title": "Stop_Select"
 				},
 				"enabled": {
 					"type": "boolean",
@@ -372,12 +238,146 @@
 				}
 			},
 			"required": [
-				"Detection_method",
-				"Detection",
-				"Move_to_starting_point_manually",
-				"Detection_corner",
-				"Sheet_loading",
+				"Stop_before_part",
+				"Stop_at",
+				"Stop_Select",
 				"enabled"
+			]
+		},
+		"Nozzle_cleaning": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"enabled": {
+					"type": "boolean",
+					"default": false,
+					"title": "Nozzle_cleaning enabled",
+					"description": "Indicates if the Nozzle_cleaning function is enabled"
+				},
+				"value": {
+					"type": "boolean",
+					"default": false,
+					"title": "Nozzle_cleaning value",
+					"description": "Clean nozzle when cutting plan finished"
+				}
+			},
+			"required": [
+				"enabled",
+				"value"
+			]
+		},
+		"Programmed_reference": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"Programmed_reference_x": {
+					"type": "number",
+					"minimum": 0,
+					"maximum": 100,
+					"default": 0,
+					"title": "Programmed_reference_x",
+					"description": "Значение в миллиметрах"
+				},
+				"Programmed_reference_y": {
+					"type": "number",
+					"minimum": 0,
+					"maximum": 100,
+					"default": 0,
+					"title": "Programmed_reference_y",
+					"description": "Значение в миллиметрах"
+				},
+				"enabled": {
+					"type": "boolean",
+					"default": false,
+					"title": "Programmed_reference enabled",
+					"description": "Indicates if the Programmed_reference function is enabled"
+				}
+			},
+			"required": [
+				"Programmed_reference_x",
+				"Programmed_reference_y",
+				"enabled"
+			]
+		},
+		"Vaporisation": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"enabled": {
+					"type": "boolean",
+					"default": false,
+					"title": "Vaporisation enabled",
+					"description": "Indicates if the Vaporisation function is enabled"
+				},
+				"value": {
+					"title": "Vaporisation",
+					"description": "Controls vaporisation behavior: part / plan / lead-in, or disabled (false)",
+					"oneOf": [
+						{
+							"type": "string",
+							"enum": [
+								"part",
+								"plan",
+								"lead-in"
+							]
+						},
+						{
+							"type": "boolean",
+							"enum": [
+								false
+							]
+						}
+					],
+					"default": false
+				}
+			},
+			"required": [
+				"enabled",
+				"value"
+			]
+		},
+		"inverse": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"enabled": {
+					"type": "boolean",
+					"default": false,
+					"title": "Inverse enabled",
+					"description": "Indicates if the Inverse function is enabled"
+				},
+				"value": {
+					"type": "boolean",
+					"default": false,
+					"title": "Inverse value",
+					"description": "Reverse the logical state (true = inverted)"
+				}
+			},
+			"required": [
+				"enabled",
+				"value"
+			]
+		},
+		"Sensor_field": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"enabled": {
+					"type": "boolean",
+					"default": false,
+					"title": "Sensor_field enabled",
+					"description": "Indicates if the Sensor_field function is enabled"
+				},
+				"value": {
+					"type": "boolean",
+					"default": false,
+					"title": "Sensor_field value",
+					"description": "Indicates whether the sensor field is active"
+				}
+			},
+			"required": [
+				"enabled",
+				"value"
 			]
 		}
 	},
