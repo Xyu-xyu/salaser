@@ -205,5 +205,14 @@ const zh: Record<string, string> = {
 	"Upload error:": "上传错误：",
 	"Cutting": "切割",
 	"Automation": "自动化",
-}
+	"Microjoints": "微接头",
+	"Edge detection": "边缘检测",
+	"Programmed reference": "编程参考",
+	"Origin offset": "原点偏移",
+	"Sensor field": "传感器领域",
+	"Nozzle cleaning": "喷嘴清洗",
+	"Stops": "停止",
+ 	"Vaporisation": "蒸发",
+ 	"inverse": "反转",
+ }
 export default zh;

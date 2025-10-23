@@ -115,7 +115,7 @@ const MidBar = observer(() => {
 						</div>
 
 						<div className="d-flex w-100 h-100 flex-center align-items-center">
-							<div className="planMain" style={{ border: "2px solid grey", borderRadius: "10px" }}>
+							<div className="planMain" >
 								<GCodeToSvg />
 							</div>
 						</div>

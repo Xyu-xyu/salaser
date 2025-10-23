@@ -1,11 +1,19 @@
-import Form from "@rjsf/mui";
-import validator from "@rjsf/validator-ajv8";
+//import Form from "@rjsf/mui";
+//import validator from "@rjsf/validator-ajv8";
 import { observer } from "mobx-react-lite";
-import functions  from "../store/functions.json";
+import functions from "../store/functions.json";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import laserStore from "../store/laserStore";
+
 
 const FunctionsForm = observer(() => {
 
-	const data =  {
+	const { t } = useTranslation();
+	const [rotated, setRotated] = useState(false);
+
+	const data = {
 		"Origin_offset": { "x_offset": 0, "y_offset": 0, "enabled": false },
 		"Edge_detection": {
 			"enabled": false,
@@ -23,24 +31,111 @@ const FunctionsForm = observer(() => {
 		"Programmed_reference": { "Programmed_reference_x": 0, "Programmed_reference_y": 0, "enabled": false },
 		"Vaporisation": { "enabled": false, "value": false },
 		"inverse": { "enabled": false, "value": false },
-		"Sensor_field": { "enabled": false, "value": false }		
-	  }
-	  
+		"Sensor_field": { "enabled": false, "value": false }
+	}
+
 
 	return (
-		<Form
-			schema={functions}                // схема JSON Schema
-			formData={data}    // данные для формы
-			validator={validator}                    // ajv8 валидатор
-			onSubmit={(e) => {
-				console.log("✅ данные валидны:", e.formData);
-			}}
-			onError={(errors) => {
-				console.error("⚠️ ошибки валидации:", errors);
-			}}
-		/>
+
+		<div className="d-flex flex-column">
+			<div className="d-flex  align-items-center justify-content-between">
+				<div className="mt-2">
+					<h5>{t("Functions")}</h5>
+				</div>
+				<div>
+					<button className="white_button navbar_button"
+						onClick={() => {
+							setRotated(!rotated)
+							setTimeout(() => {
+								laserStore.setVal('rightMode', 'parameter')
+							}, 500)
+						}
+						}
+						style={{
+							background: "none",
+							border: "none",
+							cursor: "pointer",
+							padding: "8px",
+						}}
+					>
+						<Icon
+							icon="si:expand-more-alt-fill"
+							width="24"
+							height="24"
+							style={{
+								color: "black",
+								transform: `rotate(${rotated ? 0 : -90}deg)`,
+								transition: "transform 0.3s ease",
+							}}
+						/>
+					</button>
+				</div>
+			</div>
+			<div className="d-flex  align-items-center justify-content-between">
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon
+								icon="fluent:edit-24-regular"
+								width="24"
+								height="24"
+								style={{ color: "black" }}
+								className="ms-1"
+							/>
+							<div className="flex-grow-1 text-center">{t("Automation")}</div>
+						</div>
+					</button>
+				</div>
+
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon
+								icon="fluent:edit-24-regular"
+								width="24"
+								height="24"
+								style={{ color: "black" }}
+								className="ms-1"
+							/>
+							<div className="flex-grow-1 text-center">{t("Cutting")}</div>
+						</div>
+					</button>
+				</div>
+
+
+				<div>
+					<button className="w-100">
+						<div className="d-flex align-items-center">
+							<Icon
+								icon="gg:arrow-up-o"
+								width="24"
+								height="24"
+								style={{ color: "black" }}
+								className="ms-1"
+							/>
+							<Icon
+								icon="si:expand-more-alt-fill"
+								width="24"
+								height="24"
+								style={{
+									color: "black",
+								}}
+							/>
+						</div>
+					</button>
+				</div>
+			</div>
+			<div className="d-flex flex-column">
+				{
+					Object.keys(data).map((a: string) => {
+						return <div key={a}>
+							<p>{t(a.replace("_", " "))}</p>
+						</div>
+					})
+				}
+			</div>
+		</div>
 	);
 });
 
 export default FunctionsForm;
-

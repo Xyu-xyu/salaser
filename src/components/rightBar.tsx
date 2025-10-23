@@ -4,12 +4,10 @@ import { useTranslation } from "react-i18next";
 import laserStore from "../store/laserStore";
 import { UploadButton } from "./uploadButton";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
 import FunctionsForm from "./formFunctionsorm";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
-	const [rotated, setRotated] = useState(false);
 	const { t } = useTranslation();
 
 	// Настройки анимации для появления/исчезновения
@@ -310,100 +308,7 @@ const RightBar = observer(() => {
 						</div>
 					}
 					{rightMode === 'function' &&
-						<div className="d-flex flex-column">
-							<div className="d-flex  align-items-center justify-content-between">
-								<div className="mt-2">
-									<h5>{t("Functions")}</h5>
-								</div> 
-								<div>
-								<button className="white_button navbar_button"
-									onClick={() => { 
-											setRotated(!rotated)
-											setTimeout(() =>{
-												laserStore.setVal('rightMode', 'parameter')
-											}, 500)										
-										}
-									}
-									style={{
-										background: "none",
-										border: "none",
-										cursor: "pointer",
-										padding: "8px",
-									}}
-								>
-									<Icon
-										icon="si:expand-more-alt-fill"
-										width="24"
-										height="24"
-										style={{
-											color: "black",
-											transform: `rotate(${rotated ? 0 : -90}deg)`,
-											transition: "transform 0.3s ease",
-										}}
-									/>
-								</button>
-
-								</div>								
-							</div>
-							<div className="d-flex  align-items-center justify-content-between">
-								<div>
-									<button className="w-100">
-										<div className="d-flex align-items-center">
-											<Icon
-												icon="fluent:edit-24-regular"
-												width="24"
-												height="24"
-												style={{ color: "black" }}
-												className="ms-1"
-											/>
-											<div className="flex-grow-1 text-center">{t("Automation")}</div>
-										</div>
-									</button>
-								</div>  
-
-								<div>
-									<button className="w-100">
-										<div className="d-flex align-items-center">
-											<Icon
-												icon="fluent:edit-24-regular"
-												width="24"
-												height="24"
-												style={{ color: "black" }}
-												className="ms-1"
-											/>
-											<div className="flex-grow-1 text-center">{t("Cutting")}</div>
-										</div>
-									</button>
-								</div>
-
-
-								<div>
-									<button className="w-100">
-										<div className="d-flex align-items-center">
-											<Icon
-												icon="gg:arrow-up-o"
-												width="24"
-												height="24"
-												style={{ color: "black" }}
-												className="ms-1"
-											/>
-											<Icon
-												icon="si:expand-more-alt-fill"
-												width="24"
-												height="24"
-												style={{
-													color: "black",
-												}}
-											/>
-										</div>
-									</button>
-								</div>
-								<FunctionsForm />
-
-
-
-							</div>							
-						</div>
+						<FunctionsForm />
 					}
 				</motion.div>
 			)}

@@ -205,5 +205,13 @@ const en: Record<string, string> = {
 	"Upload error:": "Upload error:",
 	"Cutting": "Cutting",
 	"Automation": "Automation",
+	"Stops": "Stops",
+	"Microjoints": "Microjoints",
+	"inverse": "inverse",
+	"Vaporisation": "Vaporisation",
+	"Origin offset": "Origin offset",
+	"Sensor field": "Sensor field",
+	"Edge detection": "Edge detection",
+	"Nozzle cleaning": "Nozzle cleaning",
 }
 export default en;

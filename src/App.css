@@ -123,7 +123,7 @@ body {
     width: 650px;
     height: 650px;
     background-color: #fff;
-    border: 2px solid var(--grey-button-bottom);
+    border: 1px solid var(--grey-nav);
     border-radius: 10px;
     overflow: hidden;
    }
@@ -379,7 +379,7 @@ body {
   width: 600px;
   height: fit-content;
   max-height: 800px;  
-  border: 2px solid var(--grey-progress);
+  border: 1px solid var(--grey-nav);
   border-radius: 10px;
   padding: 1em;
   background-color: var(--white);
@@ -1037,6 +1037,7 @@ height: fit-content;}
   --stroke-width-mul: 1px;
   --default-stroke-width: 0.5%;
   stroke-width: 1px;
+  background-color: white;
 
 }
 

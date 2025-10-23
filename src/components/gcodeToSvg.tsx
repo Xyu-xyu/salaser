@@ -460,12 +460,13 @@ const GCodeToSvg = observer(() => {
 	return (
 		<div
 			 style={{
-				border: "2px solid grey",
+				border: "1px solid var(--grey-progress)",
 				borderRadius: "10px",
 			 	width: (isVertical ? 650 : 1300)+"px",
 				height: (isVertical ? 1300 : 650)+"px", 
 				touchAction: "none",
 				position: "relative",
+				zIndex:1
 			}} 
 		>
 			{/* Кнопки */}

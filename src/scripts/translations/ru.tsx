@@ -100,6 +100,7 @@ const ru: Record<string, string> = {
 	"PULSE": "импульс",
 	"ENGRAVING": "гравировка",
 	"EDGING": "окантовка",
+	"сross_blow": "oбдув",
 	"Delete all stages": "Удалить все этапы",
 	"Delete stage": "Удалить шаг",
 	"Delete slide": "Удалить врезку",
@@ -203,5 +204,15 @@ const ru: Record<string, string> = {
 	"Upload error:": "Ошибка загрузки:",
 	"Cutting": "Резка",
 	"Automation": "Авто",
+	"Stops": "Остановки",
+	"Edge detection": "Определение края листа",
+	"Vaporisation": "Испарение",
+	"Sensor field": "Поле датчика",
+	"Programmed reference": "Запрограммированное задание",
+	"Origin offset": "Смещение начала координат",
+	"Nozzle cleaning": "Очистка форсунок",
+	"inverse": "Инверсия",
+	"Microjoints": "Микроперемычки",
+	"Code": "Код",	
 }
 export default ru;
