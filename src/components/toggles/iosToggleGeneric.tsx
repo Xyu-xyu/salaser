@@ -5,56 +5,59 @@ import IosToggleForm from './iosToggleForm';
 import { useTranslation } from 'react-i18next';
 
 interface IosToggleGenericProps {
-	title: string;
-	checked: boolean;
-	onChange: () => void;
-	isVertical?: boolean;
-
+  title: string;
+  checked: boolean;
+  onChange: () => void;
+  isVertical?: boolean;
+  hideLabels?: boolean; // 🔹 Новый параметр
 }
 
 const IosToggleGeneric: React.FC<IosToggleGenericProps> = observer(({
-		title,
-		checked,
-		onChange,
-		isVertical = false,
-	}) => {
+  title,
+  checked,
+  onChange,
+  isVertical = false,
+  hideLabels = false, // 🔹 По умолчанию показываем подписи
+}) => {
 
-	const { t } = useTranslation()
+  const { t } = useTranslation();
 
-	return (
-		<div className='IosToggleGeneric w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
-			<div className='col-12 h-100 d-flex align-items-center justify-content-center'>
-				<svg
-					id={useId()}
-					className="svgChart"
-					version="1.1"
-					width="100%" height="100%"
-					viewBox="0 0 100 100" overflow="hidden"
-				>
-					{ (t(title)).split(', ')[0].split(' ').map((a: string, i: number) => (
-						<text
-							key={i}
-							x={isVertical ? "5" :"-28"}
-							y={isVertical ? (-15 + i * 12) : (15 + i * 12)}
-							className="moderat"
-							fill="var(--knobMainText)"
-							fontSize={isVertical ? 10 : 12}
-						>
-							{a}
-						</text>
-					))}
-				</svg>
+  return (
+    <div className='IosToggleGeneric w-100 h-100 d-flex align-items-center justify-content-center flex-column'>
+      <div className='col-12 h-100 d-flex align-items-center justify-content-center'>
+        <svg
+          id={useId()}
+          className="svgChart"
+          version="1.1"
+          width="100%"
+          height="100%"
+          viewBox="0 0 100 100"
+          overflow="hidden"
+        >
+          {!hideLabels && (t(title)).split(', ')[0].split(' ').map((a: string, i: number) => (
+            <text
+              key={i}
+              x={isVertical ? "5" : "-28"}
+              y={isVertical ? (-15 + i * 12) : (15 + i * 12)}
+              className="moderat"
+              fill="var(--knobMainText)"
+              fontSize={isVertical ? 10 : 12}
+            >
+              {a}
+            </text>
+          ))}
+        </svg>
 
-				<IosToggleForm
-					id={useId()}
-					checked={checked}
-					onChange={onChange}
-					dataOff={t("Off")}
-					dataOn={t("On")}
-				/>
-			</div>
-		</div>
-	);
+        <IosToggleForm
+          id={useId()}
+          checked={checked}
+          onChange={onChange}
+          dataOff={hideLabels ? "" : t("Off")} // 🔹 если hideLabels = true — не передаём подписи
+          dataOn={hideLabels ? "" : t("On")}
+        />
+      </div>
+    </div>
+  );
 });
 
 export default IosToggleGeneric;

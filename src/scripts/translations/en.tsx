@@ -213,5 +213,10 @@ const en: Record<string, string> = {
 	"Sensor field": "Sensor field",
 	"Edge detection": "Edge detection",
 	"Nozzle cleaning": "Nozzle cleaning",
+	"Nozzle_cleaning": "Nozzle_cleaning",
+	"Edge_detection": "Edge_detection",
+	"Origin_offset": "Origin_offset",
+	"Programmed_reference": "Programmed_reference",
+	"Sensor_field": "Sensor_field",
 }
 export default en;

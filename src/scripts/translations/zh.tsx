@@ -212,7 +212,11 @@ const zh: Record<string, string> = {
 	"Sensor field": "传感器领域",
 	"Nozzle cleaning": "喷嘴清洗",
 	"Stops": "停止",
- 	"Vaporisation": "蒸发",
- 	"inverse": "反转",
- }
+	"Vaporisation": "蒸发",
+	"inverse": "反转",
+	"Origin_offset": "原点_偏移量",
+	"Programmed_reference": "编程参考",
+	"Edge_detection": "边缘检测",
+	"Sensor_field": "传感器场",
+}
 export default zh;

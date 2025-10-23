@@ -1,11 +1,13 @@
 //import Form from "@rjsf/mui";
 //import validator from "@rjsf/validator-ajv8";
 import { observer } from "mobx-react-lite";
-import functions from "../store/functions.json";
+//import functions from "../store/functions.json";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import laserStore from "../store/laserStore";
+import LaserIcon from "../../public/images/laserIcon";
+import IosToggleGeneric from "./toggles/iosToggleGeneric";
 
 
 const FunctionsForm = observer(() => {
@@ -76,7 +78,7 @@ const FunctionsForm = observer(() => {
 					<button className="w-100">
 						<div className="d-flex align-items-center">
 							<Icon
-								icon="fluent:edit-24-regular"
+								icon="mdi:automatic"
 								width="24"
 								height="24"
 								style={{ color: "black" }}
@@ -90,12 +92,10 @@ const FunctionsForm = observer(() => {
 				<div>
 					<button className="w-100">
 						<div className="d-flex align-items-center">
-							<Icon
-								icon="fluent:edit-24-regular"
-								width="24"
-								height="24"
-								style={{ color: "black" }}
-								className="ms-1"
+							<LaserIcon
+								size={40}
+								color={"black"}
+								strokeWidth={1.5}
 							/>
 							<div className="flex-grow-1 text-center">{t("Cutting")}</div>
 						</div>
@@ -125,11 +125,60 @@ const FunctionsForm = observer(() => {
 					</button>
 				</div>
 			</div>
-			<div className="d-flex flex-column">
+			<div className="d-flex flex-column mt-2">
 				{
 					Object.keys(data).map((a: string) => {
 						return <div key={a}>
-							<p>{t(a.replace("_", " "))}</p>
+
+							<div className="w-100 d-flex align-items-center justify-content-between functionItem list-group-item">
+								<div className="d-flex align-items-center">
+									<button className="navbar_button"
+										onClick={() => {
+											setRotated(!rotated)
+											setTimeout(() => {
+												laserStore.setVal('rightMode', 'parameter')
+											}, 500)
+										}
+										}
+										style={{
+											width: "fit-content"
+										}}
+									>
+										<Icon
+											icon="si:expand-more-alt-fill"
+											width="24"
+											height="24"
+											style={{
+												color: "black",
+												transform: `rotate(${0}deg)`,
+												transition: "transform 0.3s ease",
+											}}
+										/>
+									</button>
+									<div>
+										<h6 className="p-0 m-0">{t(a.replace("_", " "))}</h6>
+									</div>
+								</div>
+								
+								<div>
+									<div 
+
+									style={{
+										width: "70px",
+										height: "50px",
+										marginTop: "20px"
+									}}
+									>
+										<IosToggleGeneric
+											title={""}
+											checked={data?.a?.enabled}
+											onChange={() => { }}
+											isVertical={false}
+											hideLabels={true}
+										/>
+									</div>
+								</div>
+							</div>
 						</div>
 					})
 				}
@@ -139,3 +188,4 @@ const FunctionsForm = observer(() => {
 });
 
 export default FunctionsForm;
+

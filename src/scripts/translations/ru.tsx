@@ -208,11 +208,15 @@ const ru: Record<string, string> = {
 	"Edge detection": "Определение края листа",
 	"Vaporisation": "Испарение",
 	"Sensor field": "Поле датчика",
-	"Programmed reference": "Запрограммированное задание",
-	"Origin offset": "Смещение начала координат",
+	"Programmed reference": "Программная ссылка ",
+	"Origin offset": "Отступ координат",
 	"Nozzle cleaning": "Очистка форсунок",
 	"inverse": "Инверсия",
 	"Microjoints": "Микроперемычки",
-	"Code": "Код",	
+	"Code": "Код",
+	"Origin_offset": "Origin_offset",
+	"Programmed_reference": "Программируемая_ссылка",
+	"Edge_detection": "Edge_detection",
+	"Sensor_field": "Поле_датчика",
 }
 export default ru;
