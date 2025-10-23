@@ -203,5 +203,7 @@ const en: Record<string, string> = {
 	"Password": "Password",
 	"Please fill all fields.": "Please fill all fields.",
 	"Upload error:": "Upload error:",
+	"Cutting": "Cutting",
+	"Automation": "Automation",
 }
 export default en;

@@ -203,5 +203,7 @@ const zh: Record<string, string> = {
 	"Login": "登录",
 	"Please fill all fields.": "请填写所有字段。",
 	"Upload error:": "上传错误：",
+	"Cutting": "切割",
+	"Automation": "自动化",
 }
 export default zh;
