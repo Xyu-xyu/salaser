@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Modal } from 'react-bootstrap';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import UniversalKnob from './universalKnob';
 import MacrosSelector from './macrosSelector';
 import IosToggleBlowInMacros from './toggles/iosToggleBlowInMacros';
@@ -13,13 +13,13 @@ import StringComponent from './stringComponent';
 
 const MacrosEditModalPanel = observer(() => {
 	const handleClose = () => {
-		viewStore.setModal(false, 'macros');
+		macrosStore.setModal(false, 'macros');
 	};
-	const { isVertical } = viewStore;
+	const { isVertical } = macrosStore;
 
 	return (
 		<>
-			<Modal show={viewStore.macrosModalEdit} onHide={handleClose} fullscreen centered >
+			<Modal show={macrosStore.macrosModalEdit} onHide={handleClose} fullscreen centered >
 			<Modal.Header className="d-flex justify-content-between align-items-center">
 					<Modal.Title></Modal.Title>
 					<button

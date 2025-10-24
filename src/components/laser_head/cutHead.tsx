@@ -1,6 +1,6 @@
 import  {  useEffect } from "react";
 import { observer } from 'mobx-react-lite';
-import viewStore from '../../store/viewStore';
+import macrosStore from '../../store/macrosStore';
 //import { Icon } from "@iconify/react/dist/iconify.js";
 import utils from "../../scripts/util";
 
@@ -37,7 +37,7 @@ interface ComponentInt {
 
 export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 
-    const { technology, selectedPiercingStage, selectedPiercingMacro, animProgress, isAnimating,  isPaused , atEnd } = viewStore;
+    const { technology, selectedPiercingStage, selectedPiercingMacro, animProgress, isAnimating,  isPaused , atEnd } = macrosStore;
     const bs: number = 175.0;
  	const macro: PiercingStage[] = technology.piercingMacros[selectedPiercingMacro]['stages'];
   
@@ -54,7 +54,7 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 				} catch (e) {
 					if ( technology.piercingMacros[selectedPiercingMacro].stages.length < selectedPiercingStage ) {
 						let length = technology.piercingMacros[selectedPiercingMacro].stages.length - 1
-						viewStore.setselectedPiercingStage ( length )
+						macrosStore.setselectedPiercingStage ( length )
 						return technology.piercingMacros[selectedPiercingMacro].stages[selectedPiercingStage - 1][param];
 					}
 				}
@@ -77,10 +77,10 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 	useEffect(() => {
 		if (!isAnimating) return;
 		if (animProgress.stage >= macro.length) {
-			viewStore.setIsAnimating(false);
-			viewStore.setPaused(false)
-			viewStore.setselectedPiercingStage(macro.length);
-			viewStore.setAtEnd(!atEnd)
+			macrosStore.setIsAnimating(false);
+			macrosStore.setPaused(false)
+			macrosStore.setselectedPiercingStage(macro.length);
+			macrosStore.setAtEnd(!atEnd)
 			return;
 		}
 	
@@ -107,21 +107,21 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 			const step = (timestamp: number) => {
 				if (isPaused) {
 					// Сохраняем текущий прогресс и выходим
-					viewStore.setAnimProgress(animProgress.stage,  animProgress.progress );
+					macrosStore.setAnimProgress(animProgress.stage,  animProgress.progress );
 					return;
 				}	
 
 				if (!currentStage.enabled) {
-					viewStore.setAnimProgress(animProgress.stage + 1, 0);
+					macrosStore.setAnimProgress(animProgress.stage + 1, 0);
 				} else {
 					if (!start) start = timestamp - initialProgress * duration;;
 					const progress = (timestamp - start) / duration;
 
 					if (progress  <  stageTime[animProgress.stage + 1] ) {
-						viewStore.setAnimProgress(animProgress.stage, progress);
+						macrosStore.setAnimProgress(animProgress.stage, progress);
 						animationFrameId = requestAnimationFrame(step);
 					} else {
-						viewStore.setAnimProgress(animProgress.stage + 1, 0);
+						macrosStore.setAnimProgress(animProgress.stage + 1, 0);
 					}
 				} 
 			};

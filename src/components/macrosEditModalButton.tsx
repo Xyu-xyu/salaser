@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Icon } from "@iconify/react/dist/iconify.js";
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 
 interface MacrosEditModalButtonProps {
 	param: string;
@@ -8,7 +8,7 @@ interface MacrosEditModalButtonProps {
 
 const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) => {
 
-	const { isVertical } = viewStore
+	const { isVertical } = macrosStore
 	const x1 = isVertical ? 83 : 110
 	const y1 = isVertical ? -12 : 20
 
@@ -16,7 +16,7 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 	const ICON_H = 14;
 
 	const handleShow = () => {
-		viewStore.setModal(true, param)
+		macrosStore.setModal(true, param)
 	}
 
 

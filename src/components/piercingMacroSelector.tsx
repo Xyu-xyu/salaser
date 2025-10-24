@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useEffect, useRef } from 'react';
 import utils from '../scripts/util';
 import cut_settings from '../store/cut_settings';
@@ -10,7 +10,7 @@ const piercingMacroSelector = observer(() => {
 	const param =  "piercingMacros"
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const { selectedMacros, isVertical, selectedPiercingMacro, technology } = viewStore
+	const { selectedMacros, isVertical, selectedPiercingMacro, technology } = macrosStore
 	const { t } = useTranslation()
 
  	let minimum:number = 0 
@@ -46,8 +46,8 @@ const piercingMacroSelector = observer(() => {
 		const knob = technology.macros[selectedMacros]
 		let val = knob['piercingMacro']
 		const path = utils.getPath( val, minimum, maximum, sweepAngle, r1, r2, startAngle);
-		viewStore.setKnobPath( param, path)
-		//viewStore.setSelectedPiercingMacro( val )		
+		macrosStore.setKnobPath( param, path)
+		//macrosStore.setSelectedPiercingMacro( val )		
 
 	}, []);
 
@@ -57,13 +57,13 @@ const piercingMacroSelector = observer(() => {
 		if (!svg) return;
 
 		const path = utils.getPath( selectedPiercingMacro, minimum, maximum, sweepAngle, r1, r2, startAngle);
-		viewStore.setKnobPath( param, path)
+		macrosStore.setKnobPath( param, path)
 
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
 			const newValue = selectedPiercingMacro + (e.deltaY < 0 ? step : -step)
 			console.log (newValue)
-			//viewStore.setSelectedPiercingMacro( newValue );			
+			//macrosStore.setSelectedPiercingMacro( newValue );			
 		};
 
 		svg.addEventListener('wheel', handleWheel);
@@ -75,13 +75,13 @@ const piercingMacroSelector = observer(() => {
 	const increase = () => {
 		let newval = selectedPiercingMacro + stepBig
 		console.log (newval)
-		//viewStore.setSelectedPiercingMacro( newval );
+		//macrosStore.setSelectedPiercingMacro( newval );
 	}
 
 	const decrease = () => {
 		let newval = selectedPiercingMacro - stepBig
 		console.log (newval)
-		//viewStore.setSelectedPiercingMacro( newval );
+		//macrosStore.setSelectedPiercingMacro( newval );
 	}
 
 	return (
@@ -114,7 +114,7 @@ const piercingMacroSelector = observer(() => {
 						}
 
 						<path
-							d={ viewStore.getKnobPath(param)}
+							d={ macrosStore.getKnobPath(param)}
 							fill="var(--knobMainText)"
 							stroke="var(--knobMainText)"
 							strokeWidth="2"

@@ -1,6 +1,6 @@
 import { ListGroup, Form } from 'react-bootstrap';
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 
 interface MacrosEditListInt {
 	param: string;
@@ -9,13 +9,13 @@ interface MacrosEditListInt {
   
 const MacrosEditList: React.FC<MacrosEditListInt> = observer(({ param, keyParam }) => {
 
-	const { macrosProperties } = viewStore
-	let val:string = viewStore.getTecnologyValue(param, keyParam)
+	const { macrosProperties } = macrosStore
+	let val:string = macrosStore.getTecnologyValue(param, keyParam)
 	
 	let property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
 	const { title } = property;	
 	const setSelectedOption =(val:string) =>{
- 		viewStore.setValString ( param, val, keyParam)
+ 		macrosStore.setValString ( param, val, keyParam)
 	}
 
 

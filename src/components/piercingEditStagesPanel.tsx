@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import UniversalKnob from './universalKnob';
 import IosToggleBlowInStage from './toggles/iosToggleBlowInStage';
 import IosToggleMacrosInStage from './toggles/iosToggleMacrosInStage';
@@ -30,7 +30,7 @@ const data0: Record<Param0, string> = {
 
 
 const PiercingEditStagesPanel = observer(() => {
-	const { isVertical, selectedPiercingStage } = viewStore;
+	const { isVertical, selectedPiercingStage } = macrosStore;
 
 	return (
 		<>

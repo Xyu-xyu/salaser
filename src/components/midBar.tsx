@@ -6,7 +6,7 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/scrollbar';
 import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { observer } from 'mobx-react-lite';
 import GCodeToSvg from "./gcodeToSvg";
 import { motion } from "framer-motion";
@@ -36,7 +36,7 @@ const MidBar = observer(() => {
 
 	const { leftMode, tasks } = laserStore
 	const swiperRef = useRef<SwiperClass | null>(null);
-	const { isVertical } = viewStore
+	const { isVertical } = macrosStore
 
 
 	if (laserStore.loading) return <div>Загрузка...</div>;
@@ -154,7 +154,7 @@ const MidBar = observer(() => {
 								grabCursor={true}
 								centeredSlides={true}
 								slidesPerView={5}
-								initialSlide={viewStore.selectedModulationMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
+								initialSlide={macrosStore.selectedModulationMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
 								freeMode={false}
 								coverflowEffect={{
 									rotate: 0,
@@ -174,7 +174,7 @@ const MidBar = observer(() => {
 								}}
 								onSlideChange={(swiper) => {
 									const currentSlide = swiper.activeIndex;
-									viewStore.setSelectedSlide(currentSlide);
+									macrosStore.setSelectedSlide(currentSlide);
 								}}
 							>
 								{

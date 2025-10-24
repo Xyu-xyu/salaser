@@ -9,7 +9,7 @@ import utils from "../scripts/util";
 import { Form } from "react-bootstrap";
 import { showToast } from "./toast";
 import { useTranslation } from 'react-i18next';
-import viewStore from "../store/viewStore";
+import macrosStore from "../store/macrosStore";
 import Hammer from "hammerjs";
 
 interface CustomEventsHandler {
@@ -31,7 +31,7 @@ interface PathItem {
 const GCodeToSvg = observer(() => {
 
 	const { loadResult } = laserStore
-	const { isVertical } = viewStore
+	const { isVertical } = macrosStore
 	const containerRef = useRef<HTMLDivElement | null>(null);
  	const panZoomRef = useRef<any>(null);
 	const [listing, setListing] = useState("");

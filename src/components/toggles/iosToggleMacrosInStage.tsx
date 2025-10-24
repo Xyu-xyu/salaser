@@ -1,13 +1,13 @@
 // IosToggle4.tsx
 import { observer } from 'mobx-react-lite';
-import viewStore from '../../store/viewStore';
+import macrosStore from '../../store/macrosStore';
 import IosToggleGeneric from './iosToggleGeneric';
 
 const iosToggleMacrosInStage = observer(() => {
-	const { isVertical  } = viewStore;
+	const { isVertical  } = macrosStore;
 	const param = 'enabled';
- 	const val = viewStore.getTecnologyValue (param, 'stages')
-	 const setVal = () => viewStore.setTecnologyValueBoolean( !val, param, 'stages');
+ 	const val = macrosStore.getTecnologyValue (param, 'stages')
+	 const setVal = () => macrosStore.setTecnologyValueBoolean( !val, param, 'stages');
 
 	return (
 		<IosToggleGeneric

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useRef, useState, useEffect, useId } from 'react';
 import utils from '../scripts/util';
 import MacrosEditModalButton from './macrosEditModalButton'
@@ -23,7 +23,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 	let maximum = utils.deepFind(false, [keyParam, param, 'maximum'])
 	let isArray = utils.deepFind(false, [keyParam, param, '$wvEnumRef'])
 
-	const { isVertical, knobStep, knobRound, selectedMacros, selectedModulationMacro, technology, selectedPiercingMacro } = viewStore
+	const { isVertical, knobStep, knobRound, selectedMacros, selectedModulationMacro, technology, selectedPiercingMacro } = macrosStore
 
 	if (isArray) {
 		let paramName = isArray.split('/').reverse()[0]
@@ -52,7 +52,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 		} else if (keyParam === 'piercingMacros') {
 			val = technology.piercingMacros[keyInd][param]
 		} else if (keyParam === 'stages') {
-			val = viewStore.getTecnologyValue(param, keyParam, keyInd)
+			val = macrosStore.getTecnologyValue(param, keyParam, keyInd)
 		}
 
 	} else {
@@ -67,7 +67,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 		} else if (keyParam === 'piercingMacros') {
 			val = technology.piercingMacros[selectedPiercingMacro][param]
 		} else if (keyParam === 'stages') {
-			val = viewStore.getTecnologyValue(param, keyParam, keyInd)
+			val = macrosStore.getTecnologyValue(param, keyParam, keyInd)
 		}
 	}
 
@@ -89,9 +89,9 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 	}
 
 	const setVal = (step: number) => {
-		let currentValue = viewStore.getTecnologyValue(param, keyParam, keyInd)
+		let currentValue = macrosStore.getTecnologyValue(param, keyParam, keyInd)
 		let newValue = currentValue + step
-		viewStore.setTecnologyValue(newValue, param, keyParam, minimum, maximum, keyInd)
+		macrosStore.setTecnologyValue(newValue, param, keyParam, minimum, maximum, keyInd)
 		if (newValue >= minimum && newValue <= maximum) {
 			const rotStep = 270 / (maximum - minimum);
 			setRotation(prev => prev + (newValue - currentValue) * rotStep);
@@ -117,12 +117,12 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 
 	const onHover = () => {
 		console.log(param)
-		viewStore.setDiagActive(param)
+		macrosStore.setDiagActive(param)
 	}
 
 	const onLeave = () => {
 		console.log('onLeave')
-		viewStore.setDiagActive('false')
+		macrosStore.setDiagActive('false')
 	}
 
 	const [show, setShow] = useState(false);
@@ -179,7 +179,7 @@ const UniversalKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam, ke
 	const handleSubmit = () => {
 		const num = parseFloat(inputValue);
 		if (!isNaN(num) && !error) {
-			viewStore.setTecnologyValue(num, param, keyParam, minimum, maximum, keyInd);
+			macrosStore.setTecnologyValue(num, param, keyParam, minimum, maximum, keyInd);
 			setShow(false);
 		}
 	};

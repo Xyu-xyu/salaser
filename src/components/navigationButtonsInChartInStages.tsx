@@ -1,48 +1,48 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
-import viewStore from "../store/viewStore";
+import macrosStore from "../store/macrosStore";
 import { useTranslation } from 'react-i18next';
 import Timer from "./timer";
  
 
 const NavigationButtonsInChartInStages = observer(() => {
 	const { t } = useTranslation()
- 	const {  isAnimating,  isPaused, atEnd } = viewStore;
+ 	const {  isAnimating,  isPaused, atEnd } = macrosStore;
 
 
 	const cloneThis = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to copy and add this piercing macro step?',
 			confirmText: 'Copy',
 			cancelText: 'Cancel',
-			func: viewStore.addStage,
+			func: macrosStore.addStage,
 			args: []
 		})
 	}
 
 	const deleteStage = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to delete this piercing macro step?',
 			confirmText: 'Delete',
 			confirmText1: 'Delete all stages',
 			cancelText: 'Cancel',
-			func: viewStore.deleteStage,
+			func: macrosStore.deleteStage,
 			args: []
 		})
 	}
 
 	const deleteAllStages = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to delete all steps in piercing macro?',
 			confirmText: 'Delete all stages',
 			cancelText: 'Cancel',
-			func: viewStore.deleteStage,
+			func: macrosStore.deleteStage,
 			args: ['all']
 		})
 	}
@@ -50,25 +50,25 @@ const NavigationButtonsInChartInStages = observer(() => {
 	const toggleAnimation = () => {
 		if (!atEnd) {
 			if (!isAnimating && !isPaused) {
-				viewStore.setIsAnimating(true);
+				macrosStore.setIsAnimating(true);
 			} else if (!isAnimating && isPaused) {
-				viewStore.setPaused(false)
-				viewStore.setIsAnimating(true);
+				macrosStore.setPaused(false)
+				macrosStore.setIsAnimating(true);
 			} else if (isAnimating && !isPaused) {
-				viewStore.setPaused(true)
-				viewStore.setIsAnimating(false);
+				macrosStore.setPaused(true)
+				macrosStore.setIsAnimating(false);
 			}
 		} else {
-			viewStore.setAtEnd(!atEnd)
+			macrosStore.setAtEnd(!atEnd)
 			rewind()
-			viewStore.setIsAnimating(true);
+			macrosStore.setIsAnimating(true);
 		}
 	};
 
 	const rewind = () => {
-		viewStore.setIsAnimating(false);
-		viewStore.setPaused(false)
-		viewStore.setAnimProgress(0, 0)
+		macrosStore.setIsAnimating(false);
+		macrosStore.setPaused(false)
+		macrosStore.setAnimProgress(0, 0)
 	}
  
 

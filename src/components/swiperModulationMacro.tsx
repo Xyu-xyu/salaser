@@ -6,7 +6,7 @@ import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/scrollbar';
 import UniversalKnob from './universalKnob';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
 import { Icon } from '@iconify/react/dist/iconify.js';
@@ -15,40 +15,40 @@ import { useTranslation } from 'react-i18next';
 
 const swiperModulationMacro = observer(() => {
 	const swiperRef = useRef<SwiperClass | null>(null);
-	const { isVertical, modulationMacroinUse, technology, selectedModulationMacro, selectedSlide } = viewStore
+	const { isVertical, modulationMacroinUse, technology, selectedModulationMacro, selectedSlide } = macrosStore
 	let arr = Array.from({ length: technology.modulationMacros.length })
 	const { t } = useTranslation()
 
 	useEffect(() => {
-		viewStore.setSelectedSlide(viewStore.selectedModulationMacro)
+		macrosStore.setSelectedSlide(macrosStore.selectedModulationMacro)
 	}, [])
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation(); 
-		viewStore.setTecnologyValue(selectedSlide, 'modulationMacro', 'macros', 0, 15, false)
+		macrosStore.setTecnologyValue(selectedSlide, 'modulationMacro', 'macros', 0, 15, false)
 	};
 
 	const cloneThis = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setModalProps ({
+		macrosStore.setModalProps ({
 		   show:true,
 			modalBody: 'Do you want to copy and add this macro?',
 		   confirmText: 'Copy',
 		   cancelText:'Cancel',
-		   func: viewStore.AddAndUpdate,
-		   args:['modulationMacros', viewStore.selectedSlide, 'modulationMacro']
+		   func: macrosStore.AddAndUpdate,
+		   args:['modulationMacros', macrosStore.selectedSlide, 'modulationMacro']
 	   })
    }
 
    const deleteThis = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setModalProps ({
+		macrosStore.setModalProps ({
 		   show:true,
 			modalBody: 'Do you want to delete this macro?',
 		   confirmText: 'Delete',
 		   cancelText:'Cancel',
-		   func: viewStore.deleteAndUpdate,
-		   args:['modulationMacros', viewStore.selectedSlide, 'modulationMacro']
+		   func: macrosStore.deleteAndUpdate,
+		   args:['modulationMacros', macrosStore.selectedSlide, 'modulationMacro']
 	   })
    }
 
@@ -68,7 +68,7 @@ const swiperModulationMacro = observer(() => {
 				grabCursor={true}
 				centeredSlides={true}
 				slidesPerView={5}
-				initialSlide={viewStore.selectedModulationMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
+				initialSlide={macrosStore.selectedModulationMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
 				freeMode={false}
 				coverflowEffect={{
 					rotate: 0,
@@ -88,7 +88,7 @@ const swiperModulationMacro = observer(() => {
 				}}
 				onSlideChange={(swiper) => {
 					const currentSlide = swiper.activeIndex;
-					viewStore.setSelectedSlide(currentSlide);
+					macrosStore.setSelectedSlide(currentSlide);
 				}}
 			>
 				{
@@ -100,9 +100,9 @@ const swiperModulationMacro = observer(() => {
 								>
 									<div className='text-center'>
 										<p className=''>
-											{viewStore.getTecnologyValue('name', 'modulationMacros', ii)}:&nbsp;
-											{viewStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', ii)}%,&nbsp;
-											{viewStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', ii)}Hz
+											{macrosStore.getTecnologyValue('name', 'modulationMacros', ii)}:&nbsp;
+											{macrosStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', ii)}%,&nbsp;
+											{macrosStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', ii)}Hz
 										</p>
 									</div>
 								</div>
@@ -133,7 +133,7 @@ const swiperModulationMacro = observer(() => {
 										</div>	
 									</div>
 									<div className='mt-50 d-flex d-flex w-100 align-items-center justify-content-center'>
-									{ viewStore.selectedModulationMacro !== ii &&		
+									{ macrosStore.selectedModulationMacro !== ii &&		
 										<button className="carousel_btn violet_button m-2"	onClick={(e) => handleMouseDown(e)}>
 											<div className="d-flex align-items-center justify-content-center">
 												<Icon

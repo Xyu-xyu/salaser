@@ -1,6 +1,6 @@
 import { showToast } from '../components/toast';
 import cutting_settings_schema from '../store/cut_settings_schema';
-import viewStore, { Properties } from '../store/viewStore';
+import macrosStore, { Properties } from '../store/macrosStore';
 import validator from "@rjsf/validator-ajv8";
 import { getDefaultFormState } from "@rjsf/utils";
 
@@ -349,7 +349,7 @@ class Utils {
 
 	getChartData(keyInd: number ): ResultItem[] {
 		const result: ResultItem[] = [];
-		const data = viewStore.technology.piercingMacros[keyInd]
+		const data = macrosStore.technology.piercingMacros[keyInd]
 		const chartKeys: string[] = ['focus','initial_focus','height','initial_height','pressure', 'initial_pressure','power','initial_power'];
 		const minmax: MinMax = {};
 
@@ -576,7 +576,7 @@ class Utils {
 	}
 
 	validateCuttingSettings( technology:Properties ) {
-		const { schema } = viewStore
+		const { schema } = macrosStore
 		const result = validator.validateFormData(technology, schema);
 		//console.log(result)
 
@@ -619,7 +619,7 @@ class Utils {
 	}
 
 	getDefaultsFromSchema() {
-		const { schema } = viewStore;
+		const { schema } = macrosStore;
 		if (!schema) return {};
 		const safeSchema = this.ensureMinItems(schema);
 		const defaults = getDefaultFormState(validator, safeSchema, undefined);

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useEffect, useRef } from 'react';
 import MacrosEditModalButton from './macrosEditModalButton';
 import utils from '../scripts/util';
@@ -10,7 +10,7 @@ const MacrosSelector = observer(() => {
 	const param = 'macros'
 	const svgRef = useRef<SVGGElement>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const { technology, selectedMacros, macrosModalEdit, isVertical } = viewStore
+	const { technology, selectedMacros, macrosModalEdit, isVertical } = macrosStore
 	const { t } = useTranslation()
  
 	const minimum = 0 
@@ -40,7 +40,7 @@ const MacrosSelector = observer(() => {
 	useEffect(() => {
 
 		const path = utils.getPath(selectedMacros, minimum, maximum, sweepAngle, r1, r2, startAngle);
-		viewStore.setKnobPath('macros', path)
+		macrosStore.setKnobPath('macros', path)
 
 	}, [ selectedMacros]);
 
@@ -52,7 +52,7 @@ const MacrosSelector = observer(() => {
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault();
 			const newValue = selectedMacros + (e.deltaY < 0 ? step : -step)
-			viewStore.setVal('selector', newValue, minimum, maximum);
+			macrosStore.setVal('selector', newValue, minimum, maximum);
 		};
 
 		svg.addEventListener('wheel', handleWheel);
@@ -63,12 +63,12 @@ const MacrosSelector = observer(() => {
 
 	const increase = () => {
 		let newval = selectedMacros + stepBig
-		viewStore.setVal('selector', newval, minimum, maximum);
+		macrosStore.setVal('selector', newval, minimum, maximum);
 	}
 
 	const decrease = () => {
 		let newval = selectedMacros - stepBig
-		viewStore.setVal('selector', newval, minimum, maximum);
+		macrosStore.setVal('selector', newval, minimum, maximum);
 	}
 
 	return (
@@ -105,7 +105,7 @@ const MacrosSelector = observer(() => {
 						}
 
 						<path
-							d={viewStore.getKnobPath(param) }
+							d={macrosStore.getKnobPath(param) }
 							fill="var(--knobSecText)"
 							stroke="var(--knobSecText)"
 							strokeWidth="2"

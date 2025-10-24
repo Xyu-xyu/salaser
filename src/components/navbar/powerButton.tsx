@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
-import viewStore from "../../store/viewStore";
+import macrosStore from "../../store/macrosStore";
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
 
@@ -19,7 +19,7 @@ const powerButton = observer(() => {
 
 	const reload = () => {
 		//setShow(false)
-		viewStore.setModalProps ({
+		macrosStore.setModalProps ({
 		   show:true,
 			modalBody: 'Do you want to start laser reload?',
 		   confirmText: 'OK',
@@ -35,7 +35,7 @@ const powerButton = observer(() => {
 
    const powerOff = () => {
 		//setShow(false)
-		viewStore.setModalProps ({
+		macrosStore.setModalProps ({
 		   show:true,
 			modalBody: 'Do you want to power off?',
 		   confirmText: 'OK',

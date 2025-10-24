@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useRef, useEffect, useState } from 'react';
 import utils from '../scripts/util';
 import MacrosEditModalButton from './macrosEditModalButton'
@@ -22,7 +22,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 	let maximum = utils.deepFind ( false, [keyParam, param, 'maximum'])
 	let isArray = utils.deepFind ( false, [keyParam, param, '$wvEnumRef'])
 
-	const { knobStep, selectedMacros, selectedModulationMacro, technology, selectedPiercingMacro, isVertical} = viewStore	
+	const { knobStep, selectedMacros, selectedModulationMacro, technology, selectedPiercingMacro, isVertical} = macrosStore	
 
 	if (isArray) {
 		let paramName = isArray.split('/').reverse()[0]		
@@ -58,7 +58,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 			val = technology.piercingMacros[keyInd][param]
 		} else if (keyParam === 'stages') {
 			console.log ("stages stages stages stages stages !!!")
-			val = viewStore.getTecnologyValue (param, keyParam, keyInd)
+			val = macrosStore.getTecnologyValue (param, keyParam, keyInd)
 		}
 
 	} else {
@@ -73,7 +73,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 		} else if (keyParam === 'piercingMacros') {
 			val = technology.piercingMacros[selectedPiercingMacro][param]
 		} else if (keyParam === 'stages') {
-			val = viewStore.getTecnologyValue (param, keyParam, keyInd)
+			val = macrosStore.getTecnologyValue (param, keyParam, keyInd)
 		}
 	}
 
@@ -87,11 +87,11 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 
 	const setVal =(step:number) =>{
 		console.log('step  ' + step )
-		let currentValue= viewStore.getTecnologyValue(param, keyParam, keyInd)
+		let currentValue= macrosStore.getTecnologyValue(param, keyParam, keyInd)
 		const range = maximum - minimum +1 // количество элементов
 		let newValue = ((currentValue - minimum + step) % range + range) % range + minimum;
 		//console.log (newValue, maximum, minimum )
-		viewStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum, keyInd )
+		macrosStore.setTecnologyValue( newValue, param, keyParam, minimum, maximum, keyInd )
 		step > 0 ? setRotation(prev => prev + (360/(maximum+1))) : setRotation(prev => prev - (360/(maximum+1)));
 	
 	}
@@ -100,17 +100,17 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
 		let note: Array<string> = [];
 		if ( param  === 'modulationMacro' || param === 'initial_modulationMacro') {
 		
-			 note.push(viewStore.getTecnologyValue('name', 'modulationMacros', val )+ ": ")
-			 note.push(viewStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', val)+"% ") 
-			 note.push(viewStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', val)+"Hz")
+			 note.push(macrosStore.getTecnologyValue('name', 'modulationMacros', val )+ ": ")
+			 note.push(macrosStore.getTecnologyValue('pulseFill_percent', 'modulationMacros', val)+"% ") 
+			 note.push(macrosStore.getTecnologyValue('pulseFrequency_Hz', 'modulationMacros', val)+"Hz")
 
 
 
 		} else if ( param === 'piercingMacro'){
 
-			note.push( viewStore.getTecnologyValue('name', 'piercingMacros',selectedPiercingMacro )+": ")
-			note.push(viewStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', selectedPiercingMacro)+"Hz ")
-			note.push( viewStore.getTecnologyValue('stages', 'piercingMacros', selectedPiercingMacro).length+" stages" )
+			note.push( macrosStore.getTecnologyValue('name', 'piercingMacros',selectedPiercingMacro )+": ")
+			note.push(macrosStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', selectedPiercingMacro)+"Hz ")
+			note.push( macrosStore.getTecnologyValue('stages', 'piercingMacros', selectedPiercingMacro).length+" stages" )
 
 		} 
 		return note

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Modal } from 'react-bootstrap';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import PiercingEditStagesPanel from './piercingEditStagesPanel'
 import StringComponent from './stringComponent';
 import NavigationModalinStages from './navigationModalinStages';
@@ -15,13 +15,13 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 const PiercingEditModalPanel = observer(() => {
 
 	const handleClose = () => {
-		viewStore.setModal(false, 'piercingMacro');
+		macrosStore.setModal(false, 'piercingMacro');
 	};
-	const { isVertical, carouselModeInPiercing, selectedPiercingMacro } = viewStore;
+	const { isVertical, carouselModeInPiercing, selectedPiercingMacro } = macrosStore;
 
 	return (
 		<>
-			<Modal show={viewStore.piercingMacroModalEdit} onHide={handleClose} fullscreen centered >
+			<Modal show={macrosStore.piercingMacroModalEdit} onHide={handleClose} fullscreen centered >
 			<Modal.Header className="d-flex justify-content-between align-items-center">
 					<Modal.Title></Modal.Title>
 					<button

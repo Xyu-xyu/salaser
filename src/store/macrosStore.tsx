@@ -581,7 +581,7 @@ export interface FeedLimitMmS2 {
 
 
 
-class ViewStore {
+class MacrosStore {
 
     modalProps: ModalProps = {
         show: false,
@@ -673,9 +673,9 @@ class ViewStore {
             if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
 
             const data = await resp.json();
-            viewStore.setCutSettings(data.result)
-            //viewStore.cut_settings = data.result;
-            //viewStore.technology = data.result.technology
+            macrosStore.setCutSettings(data.result)
+            //macrosStore.cut_settings = data.result;
+            //macrosStore.technology = data.result.technology
             showToast({
                 type: 'success',
                 message: "Upload settings form core 0 success!",
@@ -693,9 +693,9 @@ class ViewStore {
             });
         console.log ( "Upload settings from core error" + err.message)
             // remove in production
-            //viewStore.cut_settings = cut_settings;
-            //viewStore.technology = cut_settings.technology
-            viewStore.setCutSettings(cut_settings)
+            //macrosStore.cut_settings = cut_settings;
+            //macrosStore.technology = cut_settings.technology
+            macrosStore.setCutSettings(cut_settings)
         } finally {
             this.loading = false;
         }
@@ -709,8 +709,8 @@ class ViewStore {
             if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
 
             const data = await resp.json();
-            viewStore.schema = data.result
-            viewStore.macrosProperties = data.result.properties.technology.properties.macros.items.properties
+            macrosStore.schema = data.result
+            macrosStore.macrosProperties = data.result.properties.technology.properties.macros.items.properties
             showToast({
                 type: 'success',
                 message: "Upload  schema from core 0 success!",
@@ -728,8 +728,8 @@ class ViewStore {
             });
             console.log ("Upload schema from core error" + err.message)
 
-            viewStore.schema = cut_settings_schema
-            viewStore.macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
+            macrosStore.schema = cut_settings_schema
+            macrosStore.macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
             
         } finally {
             this.loading = false;
@@ -738,8 +738,8 @@ class ViewStore {
 
     async sentSettingsToLaser( settings:Properties ) {
         if(!settings ) {
-            viewStore.cut_settings.technology = viewStore.technology
-            settings = viewStore.cut_settings
+            macrosStore.cut_settings.technology = macrosStore.technology
+            settings = macrosStore.cut_settings
         }
         //yobaniy kostyl remove
         if ("id" in settings) {
@@ -845,12 +845,12 @@ class ViewStore {
                 if (this.presetMode.endsWith('edit')) {
                     let id:number  = Number ( this.presetMode.split('_')[0])
                     console.log ("update preset "+ id  )
-                    viewStore.setModalProps({
+                    macrosStore.setModalProps({
                         show: true,
                         modalBody: 'Do you want to save settings preset?',
                         confirmText: 'OK',
                         cancelText: 'Cancel',
-                        func: viewStore.updatePreset                        ,
+                        func: macrosStore.updatePreset                        ,
                         args: [id]
                     })
                 }
@@ -1075,13 +1075,13 @@ class ViewStore {
 
     deleteAndUpdate(deleteKey: string, deleteIndex: number, adjustKey: string) {
         //console.log ( arguments )
-        //console.log (JSON.stringify(viewStore.technology))
+        //console.log (JSON.stringify(macrosStore.technology))
 
-        if (viewStore.technology[deleteKey]
-            && Array.isArray(viewStore.technology[deleteKey])
-            && viewStore.technology[deleteKey].length > 1) {
-            viewStore.technology[deleteKey].splice(deleteIndex, 1);
-            viewStore.setselectedPiercingStage(0)
+        if (macrosStore.technology[deleteKey]
+            && Array.isArray(macrosStore.technology[deleteKey])
+            && macrosStore.technology[deleteKey].length > 1) {
+            macrosStore.technology[deleteKey].splice(deleteIndex, 1);
+            macrosStore.setselectedPiercingStage(0)
         } else {
             showToast({
                 type: 'warning',
@@ -1120,19 +1120,19 @@ class ViewStore {
             };
         }
 
-        adjustValues(viewStore.technology);
-        //console.log (JSON.stringify(viewStore.technology))
+        adjustValues(macrosStore.technology);
+        //console.log (JSON.stringify(macrosStore.technology))
     };
 
     AddAndUpdate(key: string, selectedSlide: number, adjustKey: string) {
         //console.log ( arguments )
         const max = utils.deepFind(false, [adjustKey, 'maximum']);
-        if (viewStore.technology[key]
-            && Array.isArray(viewStore.technology[key])
-            && viewStore.technology[key].length < max + 1) {
+        if (macrosStore.technology[key]
+            && Array.isArray(macrosStore.technology[key])
+            && macrosStore.technology[key].length < max + 1) {
 
-            const itemCopy = { ...viewStore.technology[key][selectedSlide] };
-            viewStore.technology[key].splice(selectedSlide + 1, 0, itemCopy);
+            const itemCopy = { ...macrosStore.technology[key][selectedSlide] };
+            macrosStore.technology[key].splice(selectedSlide + 1, 0, itemCopy);
             const adjustValues = (currentObj: any) => {
                 for (const key in currentObj) {
                     if (currentObj.hasOwnProperty(key)) {
@@ -1146,8 +1146,8 @@ class ViewStore {
                     }
                 }
             };
-            adjustValues(viewStore.technology);
-            viewStore.setselectedPiercingStage(0)
+            adjustValues(macrosStore.technology);
+            macrosStore.setselectedPiercingStage(0)
         } else {
             showToast({
                 type: 'warning',
@@ -1161,12 +1161,12 @@ class ViewStore {
     deleteStage(arg: string) {
 
         if (arg === 'all') {
-            viewStore.setselectedPiercingStage(0)
-            viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages = []
+            macrosStore.setselectedPiercingStage(0)
+            macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages = []
             return
         }
 
-        if (viewStore.selectedPiercingStage === 0) {
+        if (macrosStore.selectedPiercingStage === 0) {
             showToast({
                 type: 'warning',
                 message: "Cannot delete this splice step!",
@@ -1175,13 +1175,13 @@ class ViewStore {
             });
 
         } else {
-            if (viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length > 1 &&
-                typeof viewStore.selectedPiercingStage === 'number'
+            if (macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages.length > 1 &&
+                typeof macrosStore.selectedPiercingStage === 'number'
             ) {
 
-                viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.splice(viewStore.selectedPiercingStage - 1, 1);
-                if (viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length < viewStore.selectedPiercingStage) {
-                    viewStore.setselectedPiercingStage(viewStore.selectedPiercingStage - 1)
+                macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages.splice(macrosStore.selectedPiercingStage - 1, 1);
+                if (macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages.length < macrosStore.selectedPiercingStage) {
+                    macrosStore.setselectedPiercingStage(macrosStore.selectedPiercingStage - 1)
                 }
 
                 showToast({
@@ -1197,7 +1197,7 @@ class ViewStore {
 
     addStage() {
         const max = 16
-        if (viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages.length >= max) {
+        if (macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages.length >= max) {
             showToast({
                 type: 'warning',
                 message: "Maximum value reached!",
@@ -1209,15 +1209,15 @@ class ViewStore {
 
         console.log()
 
-        let stages = viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro].stages;
+        let stages = macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages;
 
-        if (viewStore.selectedPiercingStage !== 0) {
-            const index = viewStore.selectedPiercingStage - 1;
+        if (macrosStore.selectedPiercingStage !== 0) {
+            const index = macrosStore.selectedPiercingStage - 1;
             const stepPaste = stages[index];
             stages.splice(index + 1, 0, { ...stepPaste });
 
         } else {
-            let donor = viewStore.technology.piercingMacros[viewStore.selectedPiercingMacro]
+            let donor = macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro]
             const stepPaste = {
                 "pressure": donor.initial_pressure,
                 "power": donor.initial_power,
@@ -1276,14 +1276,14 @@ class ViewStore {
     async updatePreset (id:number) {
         console.log ("update id " + id)
         const api_host = constants.SERVER_URL;
-        viewStore.cut_settings.technology = viewStore.technology
+        macrosStore.cut_settings.technology = macrosStore.technology
 
         await fetch(api_host + `/db/updatepreset`, {
 			method: "PUT",
             headers: {
 				/* "Content-Type": "application/json" */
 			},
-             body: JSON.stringify({ id, ...viewStore.cut_settings })
+             body: JSON.stringify({ id, ...macrosStore.cut_settings })
 		}).then(() => {
 			
             showToast({
@@ -1301,13 +1301,13 @@ class ViewStore {
                 position: 'bottom-right',
                 autoClose: 2500
             }); 
-            viewStore.loadCutSettings()
-            viewStore.setPresetMode('none')
+            macrosStore.loadCutSettings()
+            macrosStore.setPresetMode('none')
             
 		})
     }
     
 }
 
-const viewStore = new ViewStore();
-export default viewStore;         
+const macrosStore = new MacrosStore();
+export default macrosStore;         

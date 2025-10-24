@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useTranslation } from 'react-i18next';
 
  
@@ -15,28 +15,28 @@ const modalGeneric = observer(() => {
 	}
 
 	const handleClose = () => {
- 		viewStore.setModalProps ( def )
+ 		macrosStore.setModalProps ( def )
 	};
 
 	const { t } = useTranslation()
 
 	const handleSubmit = () => {
-		if (viewStore.modalProps.func && Array.isArray(viewStore.modalProps.args)) {
-			viewStore.modalProps.func(...viewStore.modalProps.args);
-			viewStore.setModalProps ( def )
+		if (macrosStore.modalProps.func && Array.isArray(macrosStore.modalProps.args)) {
+			macrosStore.modalProps.func(...macrosStore.modalProps.args);
+			macrosStore.setModalProps ( def )
 		}
  	};
 
 	 const handleSubmit1 = () => {
-		if (viewStore.modalProps.func1 && Array.isArray(viewStore.modalProps.args)) {
-			viewStore.modalProps.func1(...viewStore.modalProps.args);
-			viewStore.setModalProps ( def )
+		if (macrosStore.modalProps.func1 && Array.isArray(macrosStore.modalProps.args)) {
+			macrosStore.modalProps.func1(...macrosStore.modalProps.args);
+			macrosStore.setModalProps ( def )
 		}
  	};
 
 	return (
 		<>
-			<Modal show={ Boolean(viewStore.modalProps.show) }      
+			<Modal show={ Boolean(macrosStore.modalProps.show) }      
 				 size="lg" 
 				 centered 
 				 onHide={handleClose} 
@@ -46,7 +46,7 @@ const modalGeneric = observer(() => {
  					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className="position-relative">
-					<div className='modulatiomNacroName text-center'>{t(viewStore.modalProps.modalBody)}</div>
+					<div className='modulatiomNacroName text-center'>{t(macrosStore.modalProps.modalBody)}</div>
 				</Modal.Body>
 				<Modal.Footer className="position-relative">
 					<Button
@@ -55,16 +55,16 @@ const modalGeneric = observer(() => {
  						size="lg"
 						className='violet_button m-2 py-3 px-5'
 					>
-						{t(viewStore.modalProps.cancelText)}
+						{t(macrosStore.modalProps.cancelText)}
 					</Button>
-					{ viewStore.modalProps.func1 && viewStore.modalProps.confirmText1 &&
+					{ macrosStore.modalProps.func1 && macrosStore.modalProps.confirmText1 &&
 							<Button
 							variant="danger"
 							onClick={handleSubmit1}
 							size="lg"
 							className='ms-2 m-2 py-3 px-5'
 							>
-							{t(viewStore.modalProps.confirmText1)}
+							{t(macrosStore.modalProps.confirmText1)}
 						</Button>					
 					}
 					<Button
@@ -73,7 +73,7 @@ const modalGeneric = observer(() => {
 						size="lg"
 						className='ms-2 m-2 py-3 px-5'
  					>
-						{t(viewStore.modalProps.confirmText)}
+						{t(macrosStore.modalProps.confirmText)}
 					</Button>
 				</Modal.Footer>
  			</Modal>

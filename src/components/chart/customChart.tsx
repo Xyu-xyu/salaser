@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import utils from '../../scripts/util';
-import viewStore from '../../store/viewStore';
+import macrosStore from '../../store/macrosStore';
 
 interface ComponentInt {
 	keyInd: number;
@@ -24,7 +24,7 @@ type ResultItem = {
 export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 
 	const data: ResultItem[] = utils.getChartData(keyInd);
-	const { animProgress, diagActive, carouselModeInPiercing } =  viewStore
+	const { animProgress, diagActive, carouselModeInPiercing } =  macrosStore
 	const {t} = useTranslation()
 	const chartWidth = 580;
 	const startX = 80;
@@ -56,7 +56,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 
 	const showToolTip = (index:number) =>{
 		console.log ("Show tooltip for step: " + index)
-		viewStore.setselectedPiercingStage(index)
+		macrosStore.setselectedPiercingStage(index)
 	}
 
 
@@ -88,7 +88,7 @@ export const CustomChart: React.FC<ComponentInt> = observer(({ keyInd }) => {
 		return startX + activeField* (res/totalTime) || startX;
 	}
 
-	const { selectedPiercingStage } =viewStore
+	const { selectedPiercingStage } =macrosStore
 
 	return (
 		<div className="recharts-responsive-container" style={{ width: '100%', height: '250px', minWidth: '0px', transition: 'none' }}>

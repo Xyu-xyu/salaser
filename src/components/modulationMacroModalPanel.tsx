@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Modal } from 'react-bootstrap';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import SwiperModulationMacro from './swiperModulationMacro'
 import { Icon } from '@iconify/react/dist/iconify.js';
 
@@ -9,11 +9,11 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 const ModulationMacroModalPanel = observer(() => {
 
 	const handleClose = () => {
-		viewStore.setModal(false, 'modulationMacro');
+		macrosStore.setModal(false, 'modulationMacro');
 	};
   	return (
 		<>
-			<Modal show={viewStore.modulationMacroModalEdit} onHide={handleClose} fullscreen centered >
+			<Modal show={macrosStore.modulationMacroModalEdit} onHide={handleClose} fullscreen centered >
 			<Modal.Header className="d-flex justify-content-between align-items-center">
 					<Modal.Title></Modal.Title>
 					<button

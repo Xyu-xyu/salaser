@@ -9,7 +9,7 @@ import NavBar from "./navbar";
 import UniversalNamedKnob from "./universalNamedKnob";
 import CentralBar from "./centralBar";
 import { useTranslation } from 'react-i18next';
-import viewStore from "../store/viewStore";
+import macrosStore from "../store/macrosStore";
 import { useEffect } from "react";
 import ServiceBar from "./serviceBar";
 import { AnimatePresence, motion } from "framer-motion";
@@ -20,8 +20,8 @@ const Main = observer(() => {
 	const { t } = useTranslation()
 
 	useEffect(() => {
-		if (!viewStore.schema) viewStore.loadCutSettingsSchema()
-		if (!viewStore.cut_settings) viewStore.loadCutSettings()
+		if (!macrosStore.schema) macrosStore.loadCutSettingsSchema()
+		if (!macrosStore.cut_settings) macrosStore.loadCutSettings()
 		/* if (import.meta.env.DEV) {
 			alert ('DEV MODE')
 		} else {

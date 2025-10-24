@@ -5,7 +5,7 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/scrollbar';
 import { Swiper as SwiperClass } from 'swiper/types';
 import { EffectCoverflow, /* Mousewheel */ } from 'swiper/modules';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
 import { CustomChart } from './chart/customChart'
@@ -17,39 +17,39 @@ import { useTranslation } from 'react-i18next';
 const swiperPiercingMacro = observer(() => {
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const { t } = useTranslation()
-	const { isVertical, piercingMacroinUse, technology, selectedPiercingMacro, selectedSlide } = viewStore
+	const { isVertical, piercingMacroinUse, technology, selectedPiercingMacro, selectedSlide } = macrosStore
 	let arr = Array.from({ length: technology.piercingMacros.length })
 	useEffect(() => {
-		viewStore.setSelectedSlide(viewStore.selectedPiercingMacro)
+		macrosStore.setSelectedSlide(macrosStore.selectedPiercingMacro)
 	}, [])
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setTecnologyValue(selectedSlide, 'piercingMacro', 'macros', 0, 7, false)
+		macrosStore.setTecnologyValue(selectedSlide, 'piercingMacro', 'macros', 0, 7, false)
 	};
 
 
 	const cloneThis = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to copy and add this piercing macro?',
 			confirmText: 'Clone',
 			cancelText: 'Cancel',
-			func: viewStore.AddAndUpdate,
-			args: ['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
+			func: macrosStore.AddAndUpdate,
+			args: ['piercingMacros', macrosStore.selectedSlide, 'piercingMacro']
 		})
 }
 
 	const deleteThis = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to delete piercing macro?',
 			confirmText: 'Delete',
 			cancelText: 'Cancel',
-			func: viewStore.deleteAndUpdate,
-			args: ['piercingMacros', viewStore.selectedSlide, 'piercingMacro']
+			func: macrosStore.deleteAndUpdate,
+			args: ['piercingMacros', macrosStore.selectedSlide, 'piercingMacro']
 		})
 	}
 
@@ -68,7 +68,7 @@ const swiperPiercingMacro = observer(() => {
 				grabCursor={true}
 				centeredSlides={true}
 				slidesPerView={isVertical ? 6 : 5}
-				initialSlide={viewStore.selectedPiercingMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
+				initialSlide={macrosStore.selectedPiercingMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
 				freeMode={false}
 				coverflowEffect={{
 					rotate: 0,
@@ -87,7 +87,7 @@ const swiperPiercingMacro = observer(() => {
 				}}
 				onSlideChange={(swiper) => {
 					const currentSlide = swiper.activeIndex;
-					viewStore.setSelectedSlide(currentSlide);
+					macrosStore.setSelectedSlide(currentSlide);
 				}}
 			>
 				{
@@ -100,9 +100,9 @@ const swiperPiercingMacro = observer(() => {
 								>
 									<div className='text-center'>
 										<p>
-											{viewStore.getTecnologyValue('name', 'piercingMacros', ii)}:&nbsp;
-											{viewStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', ii)}&nbsp;Hz,&nbsp;
-											{viewStore.getTecnologyValue('stages', 'piercingMacros', ii).length}&nbsp;stages
+											{macrosStore.getTecnologyValue('name', 'piercingMacros', ii)}:&nbsp;
+											{macrosStore.getTecnologyValue('initial_modulationFrequency_Hz', 'piercingMacros', ii)}&nbsp;Hz,&nbsp;
+											{macrosStore.getTecnologyValue('stages', 'piercingMacros', ii).length}&nbsp;stages
 										</p>
 									</div>
 								</div>

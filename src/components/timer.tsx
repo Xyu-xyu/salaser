@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useEffect, useRef } from 'react';
 import utils from '../scripts/util';
 
@@ -17,7 +17,7 @@ type ResultItem = {
 };
 
 const Timer = observer(() => {
-	const { atEnd, isPaused, isAnimating, selectedPiercingMacro, elapsed, animProgress } = viewStore;
+	const { atEnd, isPaused, isAnimating, selectedPiercingMacro, elapsed, animProgress } = macrosStore;
 
 	// Текущее время в секундах (с дробной частью)
 	const timerRef = useRef<any | null>(null);
@@ -45,7 +45,7 @@ const Timer = observer(() => {
 		// Если конец анимации → останавливаем таймер
 		if (atEnd) {
 			if (timerRef.current) clearInterval(timerRef.current);
-			viewStore.setElapsed(totalTime)
+			macrosStore.setElapsed(totalTime)
 			return;
 		}
 
@@ -53,7 +53,7 @@ const Timer = observer(() => {
 		if (isAnimating && !isPaused) {
 			const start = Date.now() - elapsed * 1000; // чтобы продолжать с паузы
 			timerRef.current = setInterval(() => {
-				viewStore.setElapsed( ((Date.now() - start) / 1000) % totalTime ) ;
+				macrosStore.setElapsed( ((Date.now() - start) / 1000) % totalTime ) ;
 			}, 10);
 		}
 

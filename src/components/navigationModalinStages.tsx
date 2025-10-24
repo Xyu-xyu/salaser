@@ -1,15 +1,15 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useTranslation } from 'react-i18next';
 
 
 const NavigationModalinStages = observer(() => {
 
-	const { carouselModeInPiercing } = viewStore
+	const { carouselModeInPiercing } = macrosStore
 	const { t } = useTranslation()
 	const carousel = () => {
-		viewStore.setCarouselModeInPiercing(!carouselModeInPiercing)
+		macrosStore.setCarouselModeInPiercing(!carouselModeInPiercing)
 	}
 
 	return (

@@ -1,38 +1,38 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useTranslation } from 'react-i18next';
 
 
 const NavigationModal = observer(() => {
 
-	const { carouselMode } = viewStore
+	const { carouselMode } = macrosStore
 	const { t } = useTranslation()
 
 	const cloneThis = () => {
- 		viewStore.setModalProps ({
+ 		macrosStore.setModalProps ({
 			show:true,
  			modalBody: 'Do you want to copy and add this macro?',
 			confirmText: 'Copy',
 			cancelText:'Cancel',
-			func: viewStore.AddAndUpdate,
-			args:['modulationMacros', viewStore.selectedSlide, 'modulationMacro']
+			func: macrosStore.AddAndUpdate,
+			args:['modulationMacros', macrosStore.selectedSlide, 'modulationMacro']
 		})
 	}
 
 	const deleteThis = () => {
- 		viewStore.setModalProps ({
+ 		macrosStore.setModalProps ({
 			show:true,
  			modalBody: 'Do you want to delete this macro?',
 			confirmText: 'Delete',
 			cancelText:'Cancel',
-			func: viewStore.deleteAndUpdate,
-			args:['modulationMacros', viewStore.selectedSlide, 'modulationMacro']
+			func: macrosStore.deleteAndUpdate,
+			args:['modulationMacros', macrosStore.selectedSlide, 'modulationMacro']
 		})
 	}
 
 	const carousel = () =>{
-		viewStore.setCarouselMode ( !carouselMode)
+		macrosStore.setCarouselMode ( !carouselMode)
 	}
 
 

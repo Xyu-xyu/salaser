@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useRef, useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import utils from '../scripts/util';
@@ -13,12 +13,12 @@ interface CustomKnobProps {
 const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyParam }) => {
     const svgRef = useRef<SVGGElement>(null);
     const { t } = useTranslation();
-    const { isVertical, macrosProperties } = viewStore;
+    const { isVertical, macrosProperties } = macrosStore;
     const { x1, x2, x4, y1, y2, y3 } = utils.getKnobLayout(isVertical);
     const property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
     const { title } = property;
     const values: string[] = property.enum;
-    const val: string = viewStore.getTecnologyValue(param, keyParam);
+    const val: string = macrosStore.getTecnologyValue(param, keyParam);
     const index = values.indexOf(val);
 
     const [rotation, setRotation] = useState(0);
@@ -33,7 +33,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
     }
 
     const handleClick = (step: number) => {
-        const currentVal = viewStore.getTecnologyValue(param, keyParam);
+        const currentVal = macrosStore.getTecnologyValue(param, keyParam);
         const currentIndex = values.indexOf(currentVal);
         if (currentIndex === -1) return;
 
@@ -43,7 +43,7 @@ const UniversalNamedKnob: React.FC<CustomKnobProps> = observer(({ param, keyPara
             : (currentIndex + 1) % values.length;
 
         const newVal = values[newIndex];
-        viewStore.setValString(param, newVal, keyParam);
+        macrosStore.setValString(param, newVal, keyParam);
         setRotation(prev => prev + step);
     };
 

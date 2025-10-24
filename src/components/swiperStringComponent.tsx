@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import viewStore from '../store/viewStore';
+import macrosStore from '../store/macrosStore';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +12,7 @@ interface StringComponentInt {
 
 const SwiperStringComponent: React.FC<StringComponentInt> = observer(({param, keyParam, keyInd}) => {
     const [error, setError] = useState<boolean>(false);
-	const { selectedPiercingMacro, selectedModulationMacro } = viewStore
+	const { selectedPiercingMacro, selectedModulationMacro } = macrosStore
     const { t } = useTranslation()
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
@@ -25,13 +25,13 @@ const SwiperStringComponent: React.FC<StringComponentInt> = observer(({param, ke
         } else {
             setError( false);
         }
-        viewStore.setValString( param, newValue, keyParam, keyInd)
+        macrosStore.setValString( param, newValue, keyParam, keyInd)
     };
 
-	let value = viewStore.getTecnologyValue( param, keyParam, keyInd)
+	let value = macrosStore.getTecnologyValue( param, keyParam, keyInd)
 
 	useEffect (()=>{
-		value = viewStore.getTecnologyValue( param, keyParam, keyInd)
+		value = macrosStore.getTecnologyValue( param, keyParam, keyInd)
 		if (value.length < 1) {
             setError( true);
 			return

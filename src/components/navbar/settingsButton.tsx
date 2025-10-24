@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
-import viewStore from "../../store/viewStore";
+import macrosStore from "../../store/macrosStore";
 import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 //import { showToast } from "../toast";
@@ -22,7 +22,7 @@ type SortOrder = "asc" | "desc";
 
 
 const SettingsButton = observer(() => {
-	const { presetMode } = viewStore
+	const { presetMode } = macrosStore
 	const [show, setShow] = useState(false);
 	const [update, setUpdate] = useState(true);
 	const [presets, setPresets] = useState<Preset[]>([]);
@@ -82,7 +82,7 @@ const SettingsButton = observer(() => {
 
 
 	const deleteP = (id: number) => {
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to delete this presets from DB?',
 			confirmText: 'OK',
@@ -103,7 +103,7 @@ const SettingsButton = observer(() => {
 
 
 	const copyP = (id: number) => {
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to copy this presets?',
 			confirmText: 'OK',
@@ -157,7 +157,7 @@ const SettingsButton = observer(() => {
 	}
 
 	const deleteAll = () => {
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to delete ALL presets from DB?',
 			confirmText: 'OK',
@@ -173,7 +173,7 @@ const SettingsButton = observer(() => {
 
 	async function editPreset (id: number) {
 		try {
-			viewStore.setPresetMode ( String(id)+"_edit")
+			macrosStore.setPresetMode ( String(id)+"_edit")
 			const resp = await fetch(`${api_host}/db/get_preset?id=${id}`, {
 				method: "GET",
 			});
@@ -181,9 +181,9 @@ const SettingsButton = observer(() => {
 			
 			const data = await resp.json();
 			//console.log("📦 Получен пресет:", data);
-			viewStore.setCutSettings( data.preset);
+			macrosStore.setCutSettings( data.preset);
 			handleClose()
-			viewStore.setModal(true, 'macros')
+			macrosStore.setModal(true, 'macros')
 
 		} catch (err) {
 			console.error("Ошибка при загрузке пресета:", err);
@@ -198,14 +198,14 @@ const SettingsButton = observer(() => {
 		if (!resp.ok) throw new Error(`Ошибка: ${resp.statusText}`);
 		
 		const data = await resp.json();
-		viewStore.setCutSettings( data.preset );
+		macrosStore.setCutSettings( data.preset );
 		handleClose()
-		viewStore.setModalProps({
+		macrosStore.setModalProps({
 			show: true,
 			modalBody: 'Do you want to sent settings to laser ?',
 			confirmText: 'OK',
 			cancelText: 'Cancel',
-			func: viewStore.sentSettingsToLaser,
+			func: macrosStore.sentSettingsToLaser,
 			args: [data.preset]}
 		)
 	}
