@@ -31,7 +31,7 @@ const FunctionsForm = observer(() => {
 
 	return (
 
-		<div className="d-flex flex-column">
+		<div className="d-flex flex-column" id="FormFumction">
 			<div className="d-flex  align-items-center justify-content-between">
 				<div className="mt-2">
 					<h5>{t("Functions")}</h5>
@@ -59,7 +59,7 @@ const FunctionsForm = observer(() => {
 							style={{
 								color: "black",
 								transform: `rotate(${rotated ? 0 : -90}deg)`,
-								transition: "transform 0.3s ease",
+								transition: "transform 0.5s ease-in-out",
 							}}
 						/>
 					</button>
@@ -122,15 +122,13 @@ const FunctionsForm = observer(() => {
 					const isOpen = openDropdown === a;
 
 					return (
-						<div key={a}>
+						<div key={a} className="m-0">
 							<div className="w-100 d-flex align-items-center justify-content-between functionItem list-group-item">
 								<div className="d-flex align-items-center">
 									<button
 										className="navbar_button"
-										onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => {
-											e.preventDefault(); // предотвращает дефолтное поведение
-											e.stopPropagation(); // останавливает всплытие
-											handleToggle(a); // переключаем дропдаун
+										onPointerDown={() => {
+											handleToggle(a);
 										}}
 										style={{ width: "fit-content" }}
 										aria-expanded={isOpen}
@@ -143,7 +141,7 @@ const FunctionsForm = observer(() => {
 											style={{
 												color: "black",
 												transform: `rotate(${isOpen ? 180 : 0}deg)`,
-												transition: "transform 0.5s ease",
+												transition: "transform 0.5s ease-in-out",
 											}}
 										/>
 									</button>
@@ -170,10 +168,10 @@ const FunctionsForm = observer(() => {
 							<div
 								id={`panel-${a}`}
 								style={{
-									maxHeight: isOpen ? "600px" : "0px",
+									maxHeight: isOpen ? "100px" : "0px",
 									overflow: "hidden",
-									transition: "max-height 0.5s ease, padding 0.5s ease",
-									padding: isOpen ? "12px 16px" : "0px 16px",
+									transition: "max-height 0.5s ease-in-out",
+									padding:  "0px 16px",
 									background: isOpen ? "#fafafa" : "transparent",
 									borderBottom: isOpen ? "1px solid #eee" : "none",
 								}}
@@ -196,4 +194,3 @@ const FunctionsForm = observer(() => {
 });
 
 export default FunctionsForm;
-
