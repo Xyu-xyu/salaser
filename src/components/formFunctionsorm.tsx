@@ -8,33 +8,25 @@ import { useState } from "react";
 import laserStore from "../store/laserStore";
 import LaserIcon from "../../public/images/laserIcon";
 import IosToggleGeneric from "./toggles/iosToggleGeneric";
+import functionStore from "../store/functionStore";
 
 
 const FunctionsForm = observer(() => {
 
 	const { t } = useTranslation();
+	const { vermatic } = functionStore
 	const [rotated, setRotated] = useState(false);
+	const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-	const data = {
-		"Origin_offset": { "x_offset": 0, "y_offset": 0, "enabled": false },
-		"Edge_detection": {
-			"enabled": false,
-			"Detection_method": "Capacitive",
-			"Detection": "X",
-			"Move_to_starting_point_manually": false,
-			"Detection_corner": "Fl",
-			"Sheet_loading": "Fl",
-			"Sheet_dimension_offset_long_edge": 0,
-			"Angle_or_sheet_corner": 90
-		},
-		"Microjoints": { "enabled": false, "value": { "function": false } },
-		"Stops": { "Stop_before_part": 0, "Stop_at": "Off", "Stop_Select": "Off", "enabled": false },
-		"Nozzle_cleaning": { "enabled": false, "value": false },
-		"Programmed_reference": { "Programmed_reference_x": 0, "Programmed_reference_y": 0, "enabled": false },
-		"Vaporisation": { "enabled": false, "value": false },
-		"inverse": { "enabled": false, "value": false },
-		"Sensor_field": { "enabled": false, "value": false }
-	}
+	const handleToggle = (name: string) => {
+		if (openDropdown === name) {
+			// закрыть текущий
+			setOpenDropdown(null);
+		} else {			
+			setOpenDropdown(name);
+		}
+	};
+
 
 
 	return (
@@ -102,7 +94,6 @@ const FunctionsForm = observer(() => {
 					</button>
 				</div>
 
-
 				<div>
 					<button className="w-100">
 						<div className="d-flex align-items-center">
@@ -126,23 +117,24 @@ const FunctionsForm = observer(() => {
 				</div>
 			</div>
 			<div className="d-flex flex-column mt-2">
-				{
-					Object.keys(data).map((a: string) => {
-						return <div key={a}>
+				{Object.keys(vermatic).map((a: string) => {
+					const item = vermatic[a as keyof typeof vermatic];
+					const isOpen = openDropdown === a;
 
+					return (
+						<div key={a}>
 							<div className="w-100 d-flex align-items-center justify-content-between functionItem list-group-item">
 								<div className="d-flex align-items-center">
-									<button className="navbar_button"
-										onClick={() => {
-											setRotated(!rotated)
-											setTimeout(() => {
-												laserStore.setVal('rightMode', 'parameter')
-											}, 500)
-										}
-										}
-										style={{
-											width: "fit-content"
+									<button
+										className="navbar_button"
+										onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => {
+											e.preventDefault(); // предотвращает дефолтное поведение
+											e.stopPropagation(); // останавливает всплытие
+											handleToggle(a); // переключаем дропдаун
 										}}
+										style={{ width: "fit-content" }}
+										aria-expanded={isOpen}
+										aria-controls={`panel-${a}`}
 									>
 										<Icon
 											icon="si:expand-more-alt-fill"
@@ -150,38 +142,54 @@ const FunctionsForm = observer(() => {
 											height="24"
 											style={{
 												color: "black",
-												transform: `rotate(${0}deg)`,
-												transition: "transform 0.3s ease",
+												transform: `rotate(${isOpen ? 180 : 0}deg)`,
+												transition: "transform 0.5s ease",
 											}}
 										/>
 									</button>
+
 									<div>
 										<h6 className="p-0 m-0">{t(a.replace("_", " "))}</h6>
 									</div>
 								</div>
-								
-								<div>
-									<div 
 
-									style={{
-										width: "70px",
-										height: "50px",
-										marginTop: "20px"
-									}}
-									>
+								<div>
+									<div style={{ height: "50px", marginTop: "20px" }}>
 										<IosToggleGeneric
-											title={""}
-											checked={data?.a?.enabled}
-											onChange={() => { }}
+											title=""
+											checked={!!item.enabled}
+											onChange={() => functionStore.updateValue(`${a}.enabled`, !item.enabled)}
 											isVertical={false}
 											hideLabels={true}
 										/>
 									</div>
 								</div>
 							</div>
+
+							{/* Дропдаун-контент: плавное разворачивание по isOpen */}
+							<div
+								id={`panel-${a}`}
+								style={{
+									maxHeight: isOpen ? "600px" : "0px",
+									overflow: "hidden",
+									transition: "max-height 0.5s ease, padding 0.5s ease",
+									padding: isOpen ? "12px 16px" : "0px 16px",
+									background: isOpen ? "#fafafa" : "transparent",
+									borderBottom: isOpen ? "1px solid #eee" : "none",
+								}}
+							>
+								{isOpen && (
+									// Здесь вы можете рендерить реальные контролы для item (inputs, selects и т.д.)
+									<div>
+										{/* Пример: показать объект (замените на реальные контролы) */}
+										<pre style={{ margin: 0, fontSize: 13 }}>{JSON.stringify(item, null, 2)}</pre>
+									</div>
+								)}
+							</div>
 						</div>
-					})
-				}
+					);
+				})}
+
 			</div>
 		</div>
 	);
