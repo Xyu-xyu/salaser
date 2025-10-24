@@ -167,23 +167,52 @@ const FunctionsForm = observer(() => {
 							{/* Дропдаун-контент: плавное разворачивание по isOpen */}
 							<div
 								id={`panel-${a}`}
+								className="m-0 mb-1"
 								style={{
-									maxHeight: isOpen ? "100px" : "0px",
+									maxHeight: isOpen ? "250px" : "0px",
 									overflow: "hidden",
 									transition: "max-height 0.5s ease-in-out",
-									padding:  "0px 16px",
-									background: isOpen ? "#fafafa" : "transparent",
-									borderBottom: isOpen ? "1px solid #eee" : "none",
+									background: isOpen ? "var(--grey-main)" : "transparent",
+									borderBottom: isOpen ? "2px solid var(--grey-nav)" : "none",
 								}}
 							>
 								{isOpen && (
 									// Здесь вы можете рендерить реальные контролы для item (inputs, selects и т.д.)
 									<div>
 										{/* Пример: показать объект (замените на реальные контролы) */}
-										<pre style={{ margin: 0, fontSize: 13 }}>{JSON.stringify(item, null, 2)}</pre>
+										{Object.keys(item)
+  .filter((key) => key !== "enabled")
+  .map((inner_item, index) => {
+    const { label, unit, value } = functionStore.getTitleAndUnit(a, inner_item);
+
+    // если значение — объект (например, value у Microjoints)
+    const displayValue =
+      value && typeof value === "object"
+        ? JSON.stringify(value, null, 1).replace(/[{}"]/g, "")
+        : typeof value === "boolean"
+        ? value
+          ? "On"
+          : "Off"
+        : value ?? "";
+
+    return (
+      <div
+        className="d-flex justify-content-between mx-2 align-items-center"
+        key={index}
+      >
+        <div className="functionsLabel">{label}</div>
+        <div className="d-flex">
+          <div className="functionsValue">{displayValue}</div>
+          <div className="functionsUnit">{unit}</div>
+        </div>
+      </div>
+    );
+  })}
+
 									</div>
 								)}
 							</div>
+							{/* Дропдаун-контент:K O Н Е Ц */}
 						</div>
 					);
 				})}

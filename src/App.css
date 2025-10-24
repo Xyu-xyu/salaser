@@ -1159,12 +1159,13 @@ height: fit-content;}
 #workarea svg .selected {
   stroke: white !important;
   /* fill: white !important; */
+  
 }
 
 
 .sgn_sheet {
   fill: url(#grid);
-/*   stroke: var(--gridColorStroke);
+  stroke: var(--grey-nav);
   stroke-width: 1px/*  calc(var(--default-stroke-width) * 0.35%) */;  
   touch-action: none !important;
 }
@@ -1393,4 +1394,16 @@ height: fit-content;}
   height: 50px;
   color: black;
   transition: background-color 0.2s ease;  
+}
+
+
+.functionsValue {
+  background-color: white;
+  border: 1px solid var(--grey-progress);
+  padding: 0 15px;
+}
+
+.functionsUnit,
+.functionsLabel {
+  font-size: 14px;
 }

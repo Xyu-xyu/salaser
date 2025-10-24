@@ -13,19 +13,19 @@
 					"minimum": 0,
 					"maximum": 100,
 					"default": 0,
-					"title": "Origin_offset_x"
+					"title": "Origin offset x, mm"
 				},
 				"y_offset": {
 					"type": "number",
 					"minimum": 0,
 					"maximum": 100,
 					"default": 0,
-					"title": "Origin_offset_y"
+					"title": "Origin offsety, mm"
 				},
 				"enabled": {
 					"type": "boolean",
 					"default": false,
-					"title": "Programmed_reference enabled",
+					"title": "Programmed reference enabled",
 					"description": "Indicates if the Programmed_reference function is enabled"
 				}
 			},
@@ -85,12 +85,12 @@
 				"Sheet_dimension_offset_long_edge": {
 					"type": "number",
 					"default": 0,
-					"title": "Sheet dimension offset long edge (mm)"
+					"title": "Sheet dimension offset long edge, mm"
 				},
 				"Angle_or_sheet_corner": {
 					"type": "number",
 					"default": 90,
-					"title": "Angle or sheet corner (deg)"
+					"title": "Angle or sheet corner, deg"
 				},
 				"enabled": {
 					"type": "boolean",
@@ -148,22 +148,22 @@
 						"min_x_dimension": {
 							"type": "number",
 							"minimum": 0,
-							"title": "Min X dimension (mm)"
+							"title": "Min X dimension, mm"
 						},
 						"max_x_dimension": {
 							"type": "number",
 							"minimum": 0,
-							"title": "Max X dimension (mm)"
+							"title": "Max X dimension, mm"
 						},
 						"min_y_dimension": {
 							"type": "number",
 							"minimum": 0,
-							"title": "Min Y dimension (mm)"
+							"title": "Min Y dimension, mm"
 						},
 						"max_y_dimension": {
 							"type": "number",
 							"minimum": 0,
-							"title": "Max Y dimension (mm)"
+							"title": "Max Y dimension, mm"
 						}
 					},
 					"required": [
@@ -209,7 +209,7 @@
 					"type": "number",
 					"minimum": 0,
 					"default": 0,
-					"title": "Stop_before_part",
+					"title": "Stop before part",
 					"description": "0 = off"
 				},
 				"Stop_at": {
@@ -219,7 +219,7 @@
 						"Nozzle_change"
 					],
 					"default": "Off",
-					"title": "Stop_at"
+					"title": "Stop at"
 				},
 				"Stop_Select": {
 					"type": "string",
@@ -228,12 +228,12 @@
 						"On"
 					],
 					"default": "Off",
-					"title": "Stop_Select"
+					"title": "Stop Select"
 				},
 				"enabled": {
 					"type": "boolean",
 					"default": false,
-					"title": "Programmed_reference enabled",
+					"title": "Programmed reference enabled",
 					"description": "Indicates if the Programmed_reference function is enabled"
 				}
 			},
@@ -251,7 +251,7 @@
 				"enabled": {
 					"type": "boolean",
 					"default": false,
-					"title": "Nozzle_cleaning enabled",
+					"title": "Nozzle cleaning enabled",
 					"description": "Indicates if the Nozzle_cleaning function is enabled"
 				},
 				"value": {
@@ -275,7 +275,7 @@
 					"minimum": 0,
 					"maximum": 100,
 					"default": 0,
-					"title": "Programmed_reference_x",
+					"title": "Programmed reference x, mm",
 					"description": "Значение в миллиметрах"
 				},
 				"Programmed_reference_y": {
@@ -283,13 +283,13 @@
 					"minimum": 0,
 					"maximum": 100,
 					"default": 0,
-					"title": "Programmed_reference_y",
+					"title": "Programmed reference y, mm",
 					"description": "Значение в миллиметрах"
 				},
 				"enabled": {
 					"type": "boolean",
 					"default": false,
-					"title": "Programmed_reference enabled",
+					"title": "Programmed reference enabled",
 					"description": "Indicates if the Programmed_reference function is enabled"
 				}
 			},
@@ -365,13 +365,13 @@
 				"enabled": {
 					"type": "boolean",
 					"default": false,
-					"title": "Sensor_field enabled",
+					"title": "Sensor field enabled",
 					"description": "Indicates if the Sensor_field function is enabled"
 				},
 				"value": {
 					"type": "boolean",
 					"default": false,
-					"title": "Sensor_field value",
+					"title": "Sensor field value",
 					"description": "Indicates whether the sensor field is active"
 				}
 			},

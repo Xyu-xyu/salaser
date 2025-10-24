@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import schema from './functions.json'
 
 /* ---------------- Типизация для Vermatic schema ---------------- */
 
@@ -76,7 +77,7 @@ class FunctionStore {
 		Programmed_reference: { Programmed_reference_x: 0, Programmed_reference_y: 0, enabled: false },
 		Nozzle_cleaning: { enabled: false, value: false },
 		inverse: { enabled: false, value: false },
-		Sensor_field: { enabled: false, value: false },
+		Sensor_field: { enabled: false, value: true },
 		Vaporisation: { enabled: false, value: false },
 		Stops: { Stop_before_part: 0, Stop_at: "Off", Stop_Select: "Off", enabled: false },
 		Microjoints: { enabled: false, value: { function: false } },
@@ -101,9 +102,9 @@ class FunctionStore {
 	 * @param path - строка пути, например "Stops.Stop_before_part"
 	 * @param newValue - новое значение
 	 */
-	
+
 	updateValue(path: string, newValue: any) {
-		console.log (" updateValue ")
+		console.log(" updateValue ")
 		const keys = path.split(".");
 		let current: any = this.vermatic;
 
@@ -122,6 +123,42 @@ class FunctionStore {
 
 		current[lastKey] = newValue;
 	}
+
+	getTitleAndUnit(blockKey: string, propKey: string) {
+		const block = schema.properties?.[blockKey as keyof typeof schema.properties] as
+			| { properties?: Record<string, any> }
+			| undefined;
+	
+		const props = block?.properties || {};
+		const propSchema = props[propKey];
+	
+		// Получаем значение из текущего состояния
+		const blockValue = functionStore.vermatic?.[blockKey as keyof typeof functionStore.vermatic];
+		const value =
+			blockValue && propKey in (blockValue as object)
+				? (blockValue as any)[propKey]
+				: undefined;
+	
+		// Если схема не найдена — возвращаем ключ и значение как fallback
+		if (!propSchema) {
+			return { label: propKey, unit: "", value };
+		}
+	
+		// Разделяем title на имя и единицу измерения
+		const [rawLabel, rawUnit] = (propSchema.title || propKey).split(",");
+	
+		// Убираем ".value" из имени (если оно есть)
+		const label =
+			propKey === "value"
+				? rawLabel.replace(/ value$/i, "").trim()
+				: rawLabel.trim();
+	
+		const unit = rawUnit?.trim() || "";
+	
+		return { label, unit, value };
+	}
+	
+
 }
 
 const functionStore = new FunctionStore();

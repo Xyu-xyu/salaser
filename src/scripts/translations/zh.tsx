@@ -218,5 +218,6 @@ const zh: Record<string, string> = {
 	"Programmed_reference": "编程参考",
 	"Edge_detection": "边缘检测",
 	"Sensor_field": "传感器场",
+	"Loading failed": "加载失败",
 }
 export default zh;

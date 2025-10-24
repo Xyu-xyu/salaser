@@ -218,5 +218,6 @@ const en: Record<string, string> = {
 	"Origin_offset": "Origin_offset",
 	"Programmed_reference": "Programmed_reference",
 	"Sensor_field": "Sensor_field",
+	"Loading failed": "Loading failed",
 }
 export default en;

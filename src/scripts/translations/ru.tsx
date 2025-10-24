@@ -218,5 +218,6 @@ const ru: Record<string, string> = {
 	"Programmed_reference": "Программируемая_ссылка",
 	"Edge_detection": "Edge_detection",
 	"Sensor_field": "Поле_датчика",
+	"Loading failed": "Загрузка не удалась",
 }
 export default ru;
