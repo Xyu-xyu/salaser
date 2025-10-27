@@ -9,6 +9,7 @@ import laserStore from "../store/laserStore";
 import LaserIcon from "../../public/images/laserIcon";
 import IosToggleGeneric from "./toggles/iosToggleGeneric";
 import functionStore from "../store/functionStore";
+import { Modal } from "react-bootstrap";
 
 
 const FunctionsForm = observer(() => {
@@ -16,16 +17,34 @@ const FunctionsForm = observer(() => {
 	const { t } = useTranslation();
 	const { vermatic } = functionStore
 	const [rotated, setRotated] = useState(false);
+	const [ modalInnerVal, setModalInnerVal] = useState('')
 	const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
 	const handleToggle = (name: string) => {
 		if (openDropdown === name) {
 			// закрыть текущий
-			setOpenDropdown(null);
+			setOpenDropdown(null);			
 		} else {			
 			setOpenDropdown(name);
 		}
 	};
+
+	const [show, setShow] = useState(false);
+
+	// Открыть модалку
+	const showModal = (a:string,b:string) => {
+		setModalInnerVal(a+b)
+		setShow(true);
+	};
+
+	// Закрыть модалку
+	const handleClose = () => { 
+		setShow(false)
+		setModalInnerVal("")
+	};
+
+
+	
 
 
 
@@ -202,9 +221,15 @@ const FunctionsForm = observer(() => {
 												>
 													<div className="functionsLabel">{label}</div>
 													<div className="d-flex">
-													<div className="functionsValue">{displayValue}</div>
+													<div 
+														className="functionsValue" 
+														onMouseDown={()=>{
+															showModal(a,inner_item)
+														}}
+													>{displayValue}</div>
 													<div className="functionsUnit">{unit}</div>
 													</div>
+													
 												</div>
 												);
 											})}
@@ -218,8 +243,20 @@ const FunctionsForm = observer(() => {
 				})}
 
 			</div>
-		</div>
-	);
+			<Modal
+				show={show}
+				onHide={handleClose}				
+				className="with-inner-backdrop powerButton-navbar-modal"
+				centered={false} // убираем выравнивание по центру
+			>
+				<div className="m-1">
+					<div className="d-flex flex-column">
+						<h1>{ modalInnerVal }</h1>
+					</div>
+				</div>
+			</Modal>
+</div>
+);
 });
 
 export default FunctionsForm;

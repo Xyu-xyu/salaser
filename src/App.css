@@ -289,8 +289,8 @@ body {
 }
 
 #FunctionBar{
-  min-width: 330px;
-  max-width: 330px;
+  min-width: 400px;
+  max-width: 400px;
   height: 100%;
   background-color: var(--white) ;
   border: 1px solid var(--white) ;

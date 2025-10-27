@@ -71,20 +71,6 @@ export interface VermaticSchema {
 class FunctionStore {
 	vermatic: VermaticSchema = {
 		Origin_offset: { x_offset: 0, y_offset: 0, enabled: false },
-		Programmed_reference: { Programmed_reference_x: 0, Programmed_reference_y: 0, enabled: false },
-		Nozzle_cleaning: { enabled: false, value: false },
-		inverse: { enabled: false, value: false },
-		Sensor_field: { enabled: false, value: true },
-		Vaporisation: { enabled: false, value: false },
-		Stops: { Stop_before_part: 0, Stop_at: "Off", Stop_Select: "Off", enabled: false },
-		Microjoints: { 
-			enabled: false, 
-			function: "Programmed", 
-			min_x_dimension: 0,
-			max_x_dimension: 0,
-			min_y_dimension: 0,
-			max_y_dimension: 0
-		},
 		Edge_detection: {
 			Detection_method: "Capacitive",
 			Detection: "X",
@@ -95,6 +81,22 @@ class FunctionStore {
 			Angle_or_sheet_corner: 90,
 			enabled: false,
 		},
+		Microjoints: { 
+			enabled: false, 
+			function: "Programmed", 
+			min_x_dimension: 0,
+			max_x_dimension: 0,
+			min_y_dimension: 0,
+			max_y_dimension: 0
+		},
+		Stops: { Stop_before_part: 0, Stop_at: "Off", Stop_Select: "Off", enabled: false },
+		Nozzle_cleaning: { enabled: false, value: false },
+		Programmed_reference: { Programmed_reference_x: 0, Programmed_reference_y: 0, enabled: false },
+		Vaporisation: { enabled: false, value: false },
+		inverse: { enabled: false, value: false },
+		Sensor_field: { enabled: false, value: true },
+		
+		
 	};
 
 	constructor() {
