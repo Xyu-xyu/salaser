@@ -134,35 +134,42 @@ class FunctionStore {
 		const block = schema.properties?.[blockKey as keyof typeof schema.properties] as
 			| { properties?: Record<string, any> }
 			| undefined;
-	
+		
 		const props = block?.properties || {};
 		const propSchema = props[propKey];
-	
+		
 		// Получаем значение из текущего состояния
 		const blockValue = functionStore.vermatic?.[blockKey as keyof typeof functionStore.vermatic];
 		const value =
 			blockValue && propKey in (blockValue as object)
 				? (blockValue as any)[propKey]
 				: undefined;
-	
+		
 		// Если схема не найдена — возвращаем ключ и значение как fallback
 		if (!propSchema) {
-			return { label: propKey, unit: "", value };
+			return { label: propKey, unit: "", value, type: false, enum: false, min: false, max: false };
 		}
-	
+		
 		// Разделяем title на имя и единицу измерения
 		const [rawLabel, rawUnit] = (propSchema.title || propKey).split(",");
-	
+		
 		// Убираем ".value" из имени (если оно есть)
 		const label =
 			propKey === "value"
 				? rawLabel.replace(/ value$/i, "").trim()
 				: rawLabel.trim();
-	
+		
 		const unit = rawUnit?.trim() || "";
+		
+		// Получаем дополнительные данные типа, enum, min, max
+		const type = propSchema.type || false;
+		const enumValues = Array.isArray(propSchema.enum) ? propSchema.enum : false;
+		const min = typeof propSchema.min === "number" ? propSchema.min : false;
+		const max = typeof propSchema.max === "number" ? propSchema.max : false;
 	
-		return { label, unit, value };
+		return { label, unit, value, type, enum: enumValues, min, max };
 	}
+	
 	
 
 }

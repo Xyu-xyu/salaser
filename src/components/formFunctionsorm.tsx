@@ -4,20 +4,22 @@ import { observer } from "mobx-react-lite";
 //import functions from "../store/functions.json";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import laserStore from "../store/laserStore";
 import LaserIcon from "../../public/images/laserIcon";
 import IosToggleGeneric from "./toggles/iosToggleGeneric";
 import functionStore from "../store/functionStore";
-import { Modal } from "react-bootstrap";
+import { Form, ListGroup, Modal } from "react-bootstrap";
 
 
 const FunctionsForm = observer(() => {
 
+	console.log ('обновляем компонент')
+
 	const { t } = useTranslation();
 	const { vermatic } = functionStore
 	const [rotated, setRotated] = useState(false);
-	const [ modalInnerVal, setModalInnerVal] = useState('')
+	const [modalInnerVal, setModalInnerVal] = useState<React.ReactNode>(null);
 	const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
 	const handleToggle = (name: string) => {
@@ -30,21 +32,70 @@ const FunctionsForm = observer(() => {
 	};
 
 	const [show, setShow] = useState(false);
-
+	
 	// Открыть модалку
 	const showModal = (a:string,b:string) => {
-		setModalInnerVal(a+b)
+		console.log ('обновляем модалку')
+		const { label, unit, value, type, enum:enumValues, min, max } = functionStore.getTitleAndUnit(a,b)
+
+		console.log (label, unit, value, type,  enumValues, min, max)
+ 		if (type && type === 'number') {
+			setModalInnerVal("Number Selector")
+		} else if (type && type === 'boolean') {
+			setModalInnerVal(
+				<div style={{ padding: ".25rem" }}>
+					<div
+						style={{
+							minWidth: "calc(100vw * 0.2)",
+							height: "fit-content",
+							overflowY: "auto",
+							overflowX: "hidden",
+						}}
+						className="d-flex"
+					>
+						<ListGroup style={{ 
+								width: "100%",
+								padding: 0, // убираем внутренние отступы
+								border: "none", // опционально
+							}}>
+							<ListGroup>
+								{[true, false].map((option, index) => (
+									<ListGroup.Item className="w-100" key={index}>
+									<Form.Check
+										style={{ fontSize: "large"}}
+										type="radio"
+										id={`radio-${index}`}
+										label={option ? 'On' : 'Off'}
+										name="tf-options" 
+										value={option ? 'On' : 'Off'}
+										checked={value === option}
+										onChange={() => { 
+											console.log ('cur val  '+ value + '    new val: ' + option)
+											functionStore.updateValue(`${a}.${b}`, option)
+											//handleClose()
+										}} 
+										className="w-100 px-2 py-0"
+									/>
+									</ListGroup.Item>
+								))}
+							</ListGroup>
+						</ListGroup>
+					</div>
+				</div>
+				)
+
+		} else if ( Array.isArray(enumValues)) {
+			setModalInnerVal("ListSelector")
+		}	
+
 		setShow(true);
-	};
+	}
 
 	// Закрыть модалку
 	const handleClose = () => { 
 		setShow(false)
 		setModalInnerVal("")
 	};
-
-
-	
 
 
 

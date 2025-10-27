@@ -122,6 +122,7 @@
 				"function": {
 					"title": "Microjoints function",
 					"description": "Select microjoints function or false to disable",
+					"type": "string",
 					"enum": [
 						"Programmed",
 						"Programmed + Measurement",
