@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 //import functions from "../store/functions.json";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import laserStore from "../store/laserStore";
 import LaserIcon from "../../public/images/laserIcon";
 import IosToggleGeneric from "./toggles/iosToggleGeneric";
@@ -17,9 +17,8 @@ const FunctionsForm = observer(() => {
 	console.log ('обновляем компонент')
 
 	const { t } = useTranslation();
-	const { vermatic } = functionStore
+	const { vermatic, aKey, bKey } = functionStore
 	const [rotated, setRotated] = useState(false);
-	const [modalInnerVal, setModalInnerVal] = useState<React.ReactNode>(null);
 	const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
 	const handleToggle = (name: string) => {
@@ -34,15 +33,22 @@ const FunctionsForm = observer(() => {
 	const [show, setShow] = useState(false);
 	
 	// Открыть модалку
-	const showModal = (a:string,b:string) => {
-		console.log ('обновляем модалку')
-		const { label, unit, value, type, enum:enumValues, min, max } = functionStore.getTitleAndUnit(a,b)
+	const showModal = () => {
+	  setShow(true);
+	}
 
+	// Закрыть модалку
+	const handleClose = () => { 
+		setShow(false)
+	};
+
+	const generateInnerModal = () =>{
+		const { label, unit, value, type, enum:enumValues, min, max } = functionStore.getTitleAndUnit( aKey, bKey)
 		console.log (label, unit, value, type,  enumValues, min, max)
  		if (type && type === 'number') {
-			setModalInnerVal("Number Selector")
+			return ("number")
 		} else if (type && type === 'boolean') {
-			setModalInnerVal(
+			return (
 				<div style={{ padding: ".25rem" }}>
 					<div
 						style={{
@@ -71,7 +77,7 @@ const FunctionsForm = observer(() => {
 										checked={value === option}
 										onChange={() => { 
 											console.log ('cur val  '+ value + '    new val: ' + option)
-											functionStore.updateValue(`${a}.${b}`, option)
+											functionStore.updateValue(`${aKey}.${bKey}`, option)
 											//handleClose()
 										}} 
 										className="w-100 px-2 py-0"
@@ -85,17 +91,51 @@ const FunctionsForm = observer(() => {
 				)
 
 		} else if ( Array.isArray(enumValues)) {
-			setModalInnerVal("ListSelector")
+ 			return (
+				<div style={{ padding: ".25rem" }}>
+					<div
+						style={{
+							minWidth: "calc(100vw * 0.2)",
+							height: "fit-content",
+							overflowY: "auto",
+							overflowX: "hidden",
+						}}
+						className="d-flex"
+					>
+						<ListGroup style={{ 
+								width: "100%",
+								padding: 0, // убираем внутренние отступы
+								border: "none", // опционально
+							}}>
+							<ListGroup>
+								{enumValues.map((option, index) => (
+									<ListGroup.Item className="w-100" key={index}>
+									<Form.Check
+										style={{ fontSize: "large"}}
+										type="radio"
+										id={`radio-${index}`}
+										label={option }
+										name="tf-options" 
+										value={option }
+										checked={value === option}
+										onChange={() => { 
+											console.log ('cur val  '+ value + '    new val: ' + option)
+											functionStore.updateValue(`${aKey}.${bKey}`, option)
+											//handleClose()
+										}} 
+										className="w-100 px-2 py-0"
+									/>
+									</ListGroup.Item>
+								))}
+							</ListGroup>
+						</ListGroup>
+					</div>
+				</div>
+				)
 		}	
 
-		setShow(true);
-	}
 
-	// Закрыть модалку
-	const handleClose = () => { 
-		setShow(false)
-		setModalInnerVal("")
-	};
+	}
 
 
 
@@ -275,7 +315,11 @@ const FunctionsForm = observer(() => {
 													<div 
 														className="functionsValue" 
 														onMouseDown={()=>{
-															showModal(a,inner_item)
+															
+															functionStore.setVal ("aKey", a)
+															functionStore.setVal ("bKey", inner_item)
+															showModal()
+
 														}}
 													>{displayValue}</div>
 													<div className="functionsUnit">{unit}</div>
@@ -302,7 +346,7 @@ const FunctionsForm = observer(() => {
 			>
 				<div className="m-1">
 					<div className="d-flex flex-column">
-						<h1>{ modalInnerVal }</h1>
+						{show && generateInnerModal()}
 					</div>
 				</div>
 			</Modal>

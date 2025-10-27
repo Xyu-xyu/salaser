@@ -99,6 +99,9 @@ class FunctionStore {
 		
 	};
 
+	aKey: string = ""
+	bKey: string = ""
+
 	constructor() {
 		makeAutoObservable(this);
 	}
@@ -108,6 +111,12 @@ class FunctionStore {
 	 * @param path - строка пути, например "Stops.Stop_before_part"
 	 * @param newValue - новое значение
 	 */
+
+	setVal<T extends keyof this>(key: T, value: this[T]) {
+		if (key in this) {
+			this[key] = value;
+		}
+	}
 
 	updateValue(path: string, newValue: any) {
 		console.log(" updateValue ")
