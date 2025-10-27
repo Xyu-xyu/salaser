@@ -33,17 +33,14 @@ interface Stops {
 	enabled: boolean;
 }
 
-interface MicrojointsValue {
-	function: "Programmed" | "Programmed + Measurement" | "Measurement" | "Programmed + position" | "Position" | false;
+
+interface Microjoints {
+	enabled: boolean;
+	function: "Programmed" | "Programmed + Measurement" | "Measurement" | "Programmed + position" | "Position" ;
 	min_x_dimension?: number;
 	max_x_dimension?: number;
 	min_y_dimension?: number;
 	max_y_dimension?: number;
-}
-
-interface Microjoints {
-	enabled: boolean;
-	value: MicrojointsValue;
 }
 
 interface EdgeDetection {
@@ -80,7 +77,14 @@ class FunctionStore {
 		Sensor_field: { enabled: false, value: true },
 		Vaporisation: { enabled: false, value: false },
 		Stops: { Stop_before_part: 0, Stop_at: "Off", Stop_Select: "Off", enabled: false },
-		Microjoints: { enabled: false, value: { function: false } },
+		Microjoints: { 
+			enabled: false, 
+			function: "Programmed", 
+			min_x_dimension: 0,
+			max_x_dimension: 0,
+			min_y_dimension: 0,
+			max_y_dimension: 0
+		},
 		Edge_detection: {
 			Detection_method: "Capacitive",
 			Detection: "X",

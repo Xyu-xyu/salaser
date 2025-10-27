@@ -1401,9 +1401,18 @@ height: fit-content;}
   background-color: white;
   border: 1px solid var(--grey-progress);
   padding: 0 15px;
+  min-width: 60px;
+  text-align: center;
+  font-size: 14px;  
 }
 
 .functionsUnit,
 .functionsLabel {
-  font-size: 14px;
+  font-size: 14px;  
+}
+
+
+.functionsUnit {
+  width: 30px;
+
 }

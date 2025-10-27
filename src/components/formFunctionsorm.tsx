@@ -152,7 +152,7 @@ const FunctionsForm = observer(() => {
 								</div>
 
 								<div>
-									<div style={{ height: "50px", marginTop: "20px" }}>
+									<div style={{ height: "50px", marginTop: "20px", transform: "scale(0.75)" }}>
 										<IosToggleGeneric
 											title=""
 											checked={!!item.enabled}
@@ -181,33 +181,33 @@ const FunctionsForm = observer(() => {
 									<div>
 										{/* Пример: показать объект (замените на реальные контролы) */}
 										{Object.keys(item)
-  .filter((key) => key !== "enabled")
-  .map((inner_item, index) => {
-    const { label, unit, value } = functionStore.getTitleAndUnit(a, inner_item);
+											.filter((key) => key !== "enabled")
+											.map((inner_item, index) => {
+												const { label, unit, value } = functionStore.getTitleAndUnit(a, inner_item);
 
-    // если значение — объект (например, value у Microjoints)
-    const displayValue =
-      value && typeof value === "object"
-        ? JSON.stringify(value, null, 1).replace(/[{}"]/g, "")
-        : typeof value === "boolean"
-        ? value
-          ? "On"
-          : "Off"
-        : value ?? "";
+												// если значение — объект (например, value у Microjoints)
+												const displayValue =
+												value && typeof value === "object"
+													? JSON.stringify(value, null, 1).replace(/[{}"]/g, "")
+													: typeof value === "boolean"
+													? value
+													? "On"
+													: "Off"
+													: value ?? "";
 
-    return (
-      <div
-        className="d-flex justify-content-between mx-2 align-items-center"
-        key={index}
-      >
-        <div className="functionsLabel">{label}</div>
-        <div className="d-flex">
-          <div className="functionsValue">{displayValue}</div>
-          <div className="functionsUnit">{unit}</div>
-        </div>
-      </div>
-    );
-  })}
+												return (
+												<div
+													className="d-flex justify-content-between mx-2 align-items-center"
+													key={index}
+												>
+													<div className="functionsLabel">{label}</div>
+													<div className="d-flex">
+													<div className="functionsValue">{displayValue}</div>
+													<div className="functionsUnit">{unit}</div>
+													</div>
+												</div>
+												);
+											})}
 
 									</div>
 								)}

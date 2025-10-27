@@ -118,87 +118,46 @@
 					"title": "Microjoints enabled",
 					"description": "Indicates if the Microjoints function is enabled"
 				},
-				"value": {
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"function": {
-							"title": "Microjoints function",
-							"description": "Select microjoints function or false to disable",
-							"oneOf": [
-								{
-									"type": "string",
-									"enum": [
-										"Programmed",
-										"Programmed + Measurement",
-										"Measurement",
-										"Programmed + position",
-										"Position"
-									]
-								},
-								{
-									"type": "boolean",
-									"enum": [
-										false
-									]
-								}
-							],
-							"default": false
-						},
-						"min_x_dimension": {
-							"type": "number",
-							"minimum": 0,
-							"title": "Min X dimension, mm"
-						},
-						"max_x_dimension": {
-							"type": "number",
-							"minimum": 0,
-							"title": "Max X dimension, mm"
-						},
-						"min_y_dimension": {
-							"type": "number",
-							"minimum": 0,
-							"title": "Min Y dimension, mm"
-						},
-						"max_y_dimension": {
-							"type": "number",
-							"minimum": 0,
-							"title": "Max Y dimension, mm"
-						}
-					},
-					"required": [
-						"function"
-					],
-					"if": {
-						"properties": {
-							"function": {
-								"enum": [
-									false
-								]
-							}
-						}
-					},
-					"then": {
-						"properties": {
-							"min_x_dimension": false,
-							"max_x_dimension": false,
-							"min_y_dimension": false,
-							"max_y_dimension": false
-						}
-					},
-					"else": {
-						"required": [
-							"min_x_dimension",
-							"max_x_dimension",
-							"min_y_dimension",
-							"max_y_dimension"
-						]
-					}
+
+				"function": {
+					"title": "Microjoints function",
+					"description": "Select microjoints function or false to disable",
+					"enum": [
+						"Programmed",
+						"Programmed + Measurement",
+						"Measurement",
+						"Programmed + position",
+						"Position"
+					]
+				},
+				"min_x_dimension": {
+					"type": "number",
+					"minimum": 0,
+					"title": "Min X dimension, mm"
+				},
+				"max_x_dimension": {
+					"type": "number",
+					"minimum": 0,
+					"title": "Max X dimension, mm"
+				},
+				"min_y_dimension": {
+					"type": "number",
+					"minimum": 0,
+					"title": "Min Y dimension, mm"
+				},
+				"max_y_dimension": {
+					"type": "number",
+					"minimum": 0,
+					"title": "Max Y dimension, mm"
 				}
 			},
 			"required": [
 				"enabled",
-				"value"
+				"function",
+				"min_x_dimension",
+				"max_x_dimension",
+				"min_y_dimension",
+				"max_y_dimension"
 			]
 		},
 		"Stops": {
