@@ -11,6 +11,7 @@ import IosToggleGeneric from "./toggles/iosToggleGeneric";
 import functionStore from "../store/functionStore";
 import { Form, ListGroup, Modal } from "react-bootstrap";
 import CalculatorModal from "./calculatorModal";
+import { showToast } from './toast';
 
 
 const FunctionsForm = observer(() => {
@@ -40,6 +41,15 @@ const FunctionsForm = observer(() => {
 	const handleClose = () => { 
 		setShow(false)
 	};
+
+	const unknown =()=>{
+		showToast({
+			type: 'error',
+			message: "Unknown button",
+			position: 'bottom-right',
+			autoClose: 2500
+		});
+	}
 
 	const generateInnerModal = () =>{
 		const { label, unit, value, type, enum:enumValues, min, max, def } = functionStore.getTitleAndUnit( aKey, bKey)
@@ -80,15 +90,13 @@ const FunctionsForm = observer(() => {
 										style={{ fontSize: "large"}}
 										type="radio"
 										id={`radio-${index}`}
-										label={option ? 'On' : 'Off'}
+										label={option ? t('On') : t('Off')}
 										name="tf-options" 
-										value={option ? 'On' : 'Off'}
+										value={option ? t('On') : t('Off')}
 										checked={value === option}
 										onChange={() => { 
-											console.log ('cur val  '+ value + '    new val: ' + option)
-											functionStore.updateValue(`${aKey}.${bKey}`, option)
-											//handleClose()
-										}} 
+ 											functionStore.updateValue(`${aKey}.${bKey}`, option)
+ 										}} 
 										className="w-100 px-2 py-0"
 									/>
 									</ListGroup.Item>
@@ -123,15 +131,14 @@ const FunctionsForm = observer(() => {
 										style={{ fontSize: "large"}}
 										type="radio"
 										id={`radio-${index}`}
-										label={option }
+										label={t(option)}
 										name="tf-options" 
-										value={option }
+										value={t(option)}
 										checked={value === option}
 										onChange={() => { 
-											console.log ('cur val  '+ value + '    new val: ' + option)
+											//console.log ('cur val  '+ value + '    new val: ' + option)
 											functionStore.updateValue(`${aKey}.${bKey}`, option)
-											//handleClose()
-										}} 
+ 										}} 
 										className="w-100 px-2 py-0"
 									/>
 									</ListGroup.Item>
@@ -186,7 +193,7 @@ const FunctionsForm = observer(() => {
 			</div>
 			<div className="d-flex  align-items-center justify-content-between">
 				<div>
-					<button className="w-100">
+					<button className="w-100" onClick={ unknown}>
 						<div className="d-flex align-items-center">
 							<Icon
 								icon="mdi:automatic"
@@ -201,20 +208,20 @@ const FunctionsForm = observer(() => {
 				</div>
 
 				<div>
-					<button className="w-100">
+					<button className="w-100 violet_button">
 						<div className="d-flex align-items-center">
 							<LaserIcon
 								size={40}
-								color={"black"}
+								color={"white"}
 								strokeWidth={1.5}
 							/>
-							<div className="flex-grow-1 text-center">{t("Cutting")}</div>
+							<div className="flex-grow-1 text-center text-white">{t("Cutting")}</div>
 						</div>
 					</button>
 				</div>
 
 				<div>
-					<button className="w-100">
+					<button className="w-100" onClick={ unknown }>
 						<div className="d-flex align-items-center">
 							<Icon
 								icon="gg:arrow-up-o"
@@ -310,8 +317,8 @@ const FunctionsForm = observer(() => {
 													? JSON.stringify(value, null, 1).replace(/[{}"]/g, "")
 													: typeof value === "boolean"
 													? value
-													? "On"
-													: "Off"
+													? t("On")
+													: t("Off")
 													: value ?? "";
 
 												return (
@@ -319,7 +326,7 @@ const FunctionsForm = observer(() => {
 													className="d-flex justify-content-between mx-2 align-items-center"
 													key={index}
 												>
-													<div className="functionsLabel">{label}</div>
+													<div className="functionsLabel">{t(label)}</div>
 													<div className="d-flex">
 													<div 
 														className="functionsValue" 
@@ -330,8 +337,8 @@ const FunctionsForm = observer(() => {
 															showModal()
 
 														}}
-													>{displayValue}</div>
-													<div className="functionsUnit">{unit}</div>
+													>{t(displayValue)}</div>
+													<div className="functionsUnit">{t(unit)}</div>
 													</div>
 													
 												</div>

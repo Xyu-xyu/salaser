@@ -55,7 +55,7 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 	};
 
 	const handleClear = () => {
-		setInput('0');
+ 		setInput('0');
 		setDisplay('0');
 	};
 
@@ -89,9 +89,33 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 			const result = Function('"use strict"; return (' + expression + ')')();
 			const num = parseFloat(result.toFixed(6));
 
-			if (isNaN(num)) return defaultValue;
+			if (isNaN(num)) {
+				showToast({
+					type: 'error',
+					message: "Invalid value.",
+					position: 'bottom-right',
+					autoClose: 2500
+				});
+				return defaultValue;
+			}
+
+			if (min > num || num > max) {
+				showToast({
+					type: 'error',
+					message: "Invalid value.",
+					position: 'bottom-right',
+					autoClose: 2500
+				});
+			}
+
 			return Math.max(min, Math.min(max, num));
 		} catch {
+			showToast({
+				type: 'error',
+				message: "Invalid value.",
+				position: 'bottom-right',
+				autoClose: 2500
+			});
 			return defaultValue;
 		}
 	};
@@ -120,7 +144,7 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 					<Icon icon="bytesize:edit" width="18" height="18" style={{ color: "black" }} />
 				</div>
 				<div>
-					<h5 className='m-0 p-0'>{t(label)}</h5>
+					<h6 className='m-0 p-0'>{t(label)}</h6>
 				</div>
 			</div>
 
@@ -226,7 +250,7 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 
 			<Button
 				className="w-100 mt-1 downButton"
-				onClick={() => { handleClear }}
+				onClick={ handleClear }
 				style={{ backgroundColor: "var(--grey-progress)" }}
 			>{t("Cancel")}</Button>
 			<Button

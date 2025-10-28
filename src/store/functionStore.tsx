@@ -176,7 +176,6 @@ class FunctionStore {
 		const min = typeof propSchema.minimum === "number" ? propSchema.minimum : false;
 		const max = typeof propSchema.maximum === "number" ? propSchema.maximum : false;
 		const def = typeof propSchema.default === "number" ? propSchema.default : false;
-		console.log ( 'min '+min, 'max '+max, 'def '+def )
 		return { label, unit, value, type, enum: enumValues, min, max, def };
 	}
 	

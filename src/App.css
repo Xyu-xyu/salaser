@@ -1398,7 +1398,7 @@ height: fit-content;}
   transition: background-color 0.2s ease;  
 }
 
-
+/* 
 .functionsValue {
   background-color: white;
   border: 1px solid var(--grey-progress);
@@ -1406,6 +1406,22 @@ height: fit-content;}
   min-width: 60px;
   text-align: center;
   font-size: 14px;  
+}
+ */
+
+ .functionsValue {
+  background-color: white;
+  border: 1px solid var(--grey-progress);
+  padding: 0 15px;
+  min-width: 40px;
+  max-width: 150px;
+  text-align: center;
+  font-size: 14px;
+    
+  /* Добавьте эти свойства для ellipsis */
+  white-space: nowrap;       /* Запрещает перенос текста */
+  overflow: hidden;          /* Скрывает переполненный текст */
+  text-overflow: ellipsis;   /* Добавляет многоточие */
 }
 
 .functionsUnit,
