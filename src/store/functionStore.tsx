@@ -45,7 +45,7 @@ interface Microjoints {
 
 interface EdgeDetection {
 	Detection_method: "Capacitive" | "Detection eye";
-	Detection: "X" | "Y" | "angle";
+	Detection: "X" | "Y" | "angle" | "X/Y" | "X/Y/angle";
 	Move_to_starting_point_manually: boolean;
 	Detection_corner: "Fl" | "Fr" | "Br" | "Bl";
 	Sheet_loading: "Fl" | "Fr" | "Br" | "Bl";
@@ -73,7 +73,7 @@ class FunctionStore {
 		Origin_offset: { x_offset: 0, y_offset: 0, enabled: false },
 		Edge_detection: {
 			Detection_method: "Capacitive",
-			Detection: "X",
+			Detection: "X/Y/angle",
 			Move_to_starting_point_manually: false,
 			Detection_corner: "Fl",
 			Sheet_loading: "Fl",

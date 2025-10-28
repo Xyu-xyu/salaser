@@ -219,5 +219,6 @@ const en: Record<string, string> = {
 	"Programmed_reference": "Programmed_reference",
 	"Sensor_field": "Sensor_field",
 	"Loading failed": "Loading failed",
+	"Programmed reference": "Programmed reference",
 }
 export default en;

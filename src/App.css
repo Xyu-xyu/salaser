@@ -755,7 +755,7 @@ height: fit-content;}
 }
 
 
-
+.functionButton-navbar-modal .modal-dialog, 
 .favoritesButton-navbar-modal .modal-dialog, 
 .powerButton-navbar-modal .modal-dialog,
 .settingsButton-navbar-modal .modal-dialog {
@@ -777,6 +777,10 @@ height: fit-content;}
 .favoritesButton-navbar-modal .modal-dialog {
   right: 4px;
 } 
+
+.functionButton-navbar-modal .modal-dialog {
+  top: 145px;
+}
  
 
 #timer {

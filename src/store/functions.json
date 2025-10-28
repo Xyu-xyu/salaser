@@ -52,7 +52,9 @@
 					"enum": [
 						"X",
 						"Y",
-						"angle"
+						"angle",
+						"X/Y",
+						"X/Y/angle"
 					],
 					"title": "Detection",
 					"description": "Always required"

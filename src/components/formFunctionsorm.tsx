@@ -10,6 +10,7 @@ import LaserIcon from "../../public/images/laserIcon";
 import IosToggleGeneric from "./toggles/iosToggleGeneric";
 import functionStore from "../store/functionStore";
 import { Form, ListGroup, Modal } from "react-bootstrap";
+import CalculatorModal from "./calculatorModal";
 
 
 const FunctionsForm = observer(() => {
@@ -46,7 +47,16 @@ const FunctionsForm = observer(() => {
 		const { label, unit, value, type, enum:enumValues, min, max } = functionStore.getTitleAndUnit( aKey, bKey)
 		console.log (label, unit, value, type,  enumValues, min, max)
  		if (type && type === 'number') {
-			return ("number")
+			return  (
+				<CalculatorModal
+					min={min ?? 0}
+					max={max ?? 25}
+					defaultValue={value ?? 0}
+					label={label}
+					aKey={aKey}
+					bKey={bKey}
+      />
+			)
 		} else if (type && type === 'boolean') {
 			return (
 				<div style={{ padding: ".25rem" }}>
@@ -341,7 +351,7 @@ const FunctionsForm = observer(() => {
 			<Modal
 				show={show}
 				onHide={handleClose}				
-				className="with-inner-backdrop powerButton-navbar-modal"
+				className="with-inner-backdrop functionButton-navbar-modal"
 				centered={false} // убираем выравнивание по центру
 			>
 				<div className="m-1">

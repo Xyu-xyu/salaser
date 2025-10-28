@@ -208,7 +208,7 @@ const ru: Record<string, string> = {
 	"Edge detection": "Определение края листа",
 	"Vaporisation": "Испарение",
 	"Sensor field": "Поле датчика",
-	"Programmed reference": "Программная ссылка ",
+	"Programmed reference": "Запрограммированное задание",
 	"Origin offset": "Отступ координат",
 	"Nozzle cleaning": "Очистка форсунок",
 	"inverse": "Инверсия",
