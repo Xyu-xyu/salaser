@@ -89,7 +89,7 @@ class FunctionStore {
 			min_y_dimension: 0,
 			max_y_dimension: 0
 		},
-		Stops: { Stop_before_part: 0, Stop_at: "Off", Stop_Select: "Off", enabled: false },
+		Stops: { Stop_before_part: 25, Stop_at: "Off", Stop_Select: "Off", enabled: false },
 		Nozzle_cleaning: { enabled: false, value: false },
 		Programmed_reference: { Programmed_reference_x: 0, Programmed_reference_y: 0, enabled: false },
 		Vaporisation: { enabled: false, value: false },
@@ -173,10 +173,11 @@ class FunctionStore {
 		// Получаем дополнительные данные типа, enum, min, max
 		const type = propSchema.type || false;
 		const enumValues = Array.isArray(propSchema.enum) ? propSchema.enum : false;
-		const min = typeof propSchema.min === "number" ? propSchema.min : false;
-		const max = typeof propSchema.max === "number" ? propSchema.max : false;
-	
-		return { label, unit, value, type, enum: enumValues, min, max };
+		const min = typeof propSchema.minimum === "number" ? propSchema.minimum : false;
+		const max = typeof propSchema.maximum === "number" ? propSchema.maximum : false;
+		const def = typeof propSchema.default === "number" ? propSchema.default : false;
+		console.log ( 'min '+min, 'max '+max, 'def '+def )
+		return { label, unit, value, type, enum: enumValues, min, max, def };
 	}
 	
 	

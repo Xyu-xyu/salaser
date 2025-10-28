@@ -20,7 +20,7 @@
 					"minimum": 0,
 					"maximum": 100,
 					"default": 0,
-					"title": "Origin offsety, mm"
+					"title": "Origin offset y, mm"
 				},
 				"enabled": {
 					"type": "boolean",
@@ -87,11 +87,15 @@
 				"Sheet_dimension_offset_long_edge": {
 					"type": "number",
 					"default": 0,
+					"minimum": 0,
+					"maximum": 100,
 					"title": "Sheet dimension offset long edge, mm"
 				},
 				"Angle_or_sheet_corner": {
 					"type": "number",
 					"default": 90,
+					"minimum": 0,
+					"maximum": 360,
 					"title": "Angle or sheet corner, deg"
 				},
 				"enabled": {
@@ -136,21 +140,29 @@
 				"min_x_dimension": {
 					"type": "number",
 					"minimum": 0,
+					"maximum": 100,
+					"default":0,
 					"title": "Min X dimension, mm"
 				},
 				"max_x_dimension": {
 					"type": "number",
 					"minimum": 0,
+					"maximum": 100,
+					"default":0,
 					"title": "Max X dimension, mm"
 				},
 				"min_y_dimension": {
 					"type": "number",
 					"minimum": 0,
+					"maximum": 100,
+					"default":0,
 					"title": "Min Y dimension, mm"
 				},
 				"max_y_dimension": {
 					"type": "number",
 					"minimum": 0,
+					"maximum": 100,
+					"default":0,
 					"title": "Max Y dimension, mm"
 				}
 			},
@@ -170,7 +182,8 @@
 				"Stop_before_part": {
 					"type": "number",
 					"minimum": 0,
-					"default": 0,
+					"maximum": 100,
+					"default":25,
 					"title": "Stop before part",
 					"description": "0 = off"
 				},
@@ -219,7 +232,7 @@
 				"value": {
 					"type": "boolean",
 					"default": false,
-					"title": "Nozzle_cleaning value",
+					"title": "Nozzle cleaning value",
 					"description": "Clean nozzle when cutting plan finished"
 				}
 			},

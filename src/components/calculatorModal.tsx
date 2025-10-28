@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, InputGroup, FormControl } from 'react-bootstrap';
 import functionStore from '../store/functionStore';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 interface CalculatorModalProps {
 	min: number;
@@ -9,6 +10,7 @@ interface CalculatorModalProps {
 	label: string;
 	aKey: string;
 	bKey: string;
+	def:number;
 
 }
 
@@ -19,6 +21,7 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 	label,
 	aKey,
 	bKey,
+	def
 
 }) => {
 	const [input, setInput] = useState<string>(defaultValue.toString());
@@ -104,16 +107,29 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 
 	return (
 
-		<div className='p-1'>
-			<h6>{label}</h6>
+		<div className='p-1'
+			style={{width:"300px"}}
+		>
+			<div className='d-flex align-items-center'>
+				<div className='me-1'>
+					<Icon icon="bytesize:edit" width="18" height="18"  style={{color:"black"}} />	
+				</div>			
+				<div>
+					<h6 className='m-0 p-0'>{label}</h6>
+				</div>
+			</div>
+	
+			<div className='d-flex'>
+			</div>
 			<InputGroup className="mb-3">
 				<FormControl
 					value={display}
 					readOnly
-					className="text-right fs-3"
+					className="text-end fs-3"
 					aria-label="Calculator display"
 				/>
 			</InputGroup>
+
 
 			{/* Info */}
 			<div className="mb-3">
@@ -127,7 +143,7 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 				</div>
 				<div className="d-flex justify-content-between">
 					<span>Default:</span>
-					<span>{defaultValue}</span>
+					<span>{def}</span>
 				</div>
 			</div>
 
@@ -231,8 +247,6 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 
 			<Button variant="secondary" className="w-100 mt-1" onClick={() => { }}>Cancel</Button>
 			<Button variant="primary" className="w-100 mt-1" onClick={handleConfirm}>OK</Button>
-
-
 
 		</div>
 

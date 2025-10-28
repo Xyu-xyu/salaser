@@ -15,8 +15,6 @@ import CalculatorModal from "./calculatorModal";
 
 const FunctionsForm = observer(() => {
 
-	console.log ('обновляем компонент')
-
 	const { t } = useTranslation();
 	const { vermatic, aKey, bKey } = functionStore
 	const [rotated, setRotated] = useState(false);
@@ -44,8 +42,8 @@ const FunctionsForm = observer(() => {
 	};
 
 	const generateInnerModal = () =>{
-		const { label, unit, value, type, enum:enumValues, min, max } = functionStore.getTitleAndUnit( aKey, bKey)
-		console.log (label, unit, value, type,  enumValues, min, max)
+		const { label, unit, value, type, enum:enumValues, min, max, def } = functionStore.getTitleAndUnit( aKey, bKey)
+		console.log (label, unit, value, type,  enumValues, min, max, def)
  		if (type && type === 'number') {
 			return  (
 				<CalculatorModal
@@ -55,6 +53,7 @@ const FunctionsForm = observer(() => {
 					label={label}
 					aKey={aKey}
 					bKey={bKey}
+					def={def}
       />
 			)
 		} else if (type && type === 'boolean') {
