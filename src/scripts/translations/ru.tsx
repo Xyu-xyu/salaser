@@ -219,5 +219,8 @@ const ru: Record<string, string> = {
 	"Edge_detection": "Edge_detection",
 	"Sensor_field": "Поле_датчика",
 	"Loading failed": "Загрузка не удалась",
+	"Minimum": "Минимум",
+	"Default": "По умолчанию",
+	"Origin offset x": "Смещение начала координат x",
 }
 export default ru;

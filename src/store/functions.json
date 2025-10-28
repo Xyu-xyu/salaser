@@ -284,26 +284,15 @@
 					"title": "Vaporisation enabled",
 					"description": "Indicates if the Vaporisation function is enabled"
 				},
-				"value": {
+				"function": {
 					"title": "Vaporisation",
 					"description": "Controls vaporisation behavior: part / plan / lead-in, or disabled (false)",
-					"oneOf": [
-						{
-							"type": "string",
-							"enum": [
-								"part",
-								"plan",
-								"lead-in"
-							]
-						},
-						{
-							"type": "boolean",
-							"enum": [
-								false
-							]
-						}
-					],
-					"default": false
+					"type": "string",
+					"enum": [
+						"part",
+						"plan",
+						"lead-in"
+					]		
 				}
 			},
 			"required": [

@@ -23,7 +23,7 @@ interface ProgrammedReference {
 
 interface Vaporisation {
 	enabled: boolean;
-	value: "part" | "plan" | "lead-in" | false;
+	function: "part" | "plan" | "lead-in" | false;
 }
 
 interface Stops {
@@ -92,7 +92,7 @@ class FunctionStore {
 		Stops: { Stop_before_part: 25, Stop_at: "Off", Stop_Select: "Off", enabled: false },
 		Nozzle_cleaning: { enabled: false, value: false },
 		Programmed_reference: { Programmed_reference_x: 0, Programmed_reference_y: 0, enabled: false },
-		Vaporisation: { enabled: false, value: false },
+		Vaporisation: { enabled: false, function: false },
 		inverse: { enabled: false, value: false },
 		Sensor_field: { enabled: false, value: true },
 		

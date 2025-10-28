@@ -219,5 +219,8 @@ const zh: Record<string, string> = {
 	"Edge_detection": "边缘检测",
 	"Sensor_field": "传感器场",
 	"Loading failed": "加载失败",
+	"Origin offset x": "原点偏移 x",
+	"Default": "默认",
+	"Minimum": "最低限度",
 }
 export default zh;

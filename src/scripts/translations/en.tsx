@@ -220,5 +220,9 @@ const en: Record<string, string> = {
 	"Sensor_field": "Sensor_field",
 	"Loading failed": "Loading failed",
 	"Programmed reference": "Programmed reference",
+	"Maximum": "Maximum",
+	"Default": "Default",
+	"Minimum": "Minimum",
+	"Origin offset x": "Origin offset x",
 }
 export default en;

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, InputGroup, FormControl } from 'react-bootstrap';
 import functionStore from '../store/functionStore';
 import { Icon } from '@iconify/react/dist/iconify.js';
+import { showToast } from './toast';
+import { useTranslation } from 'react-i18next';
 
 interface CalculatorModalProps {
 	min: number;
@@ -10,7 +12,7 @@ interface CalculatorModalProps {
 	label: string;
 	aKey: string;
 	bKey: string;
-	def:number;
+	def: number;
 
 }
 
@@ -26,6 +28,8 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 }) => {
 	const [input, setInput] = useState<string>(defaultValue.toString());
 	const [display, setDisplay] = useState<string>(defaultValue.toString());
+	const { t } = useTranslation()
+
 
 	useEffect(() => {
 		setInput(defaultValue.toString());
@@ -108,17 +112,18 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 	return (
 
 		<div className='p-1'
-			style={{width:"300px"}}
+			style={{ width: "300px" }}
+			id="CalculatorModal"
 		>
-			<div className='d-flex align-items-center'>
+			<div className='d-flex align-items-center mb-2'>
 				<div className='me-1'>
-					<Icon icon="bytesize:edit" width="18" height="18"  style={{color:"black"}} />	
-				</div>			
+					<Icon icon="bytesize:edit" width="18" height="18" style={{ color: "black" }} />
+				</div>
 				<div>
-					<h6 className='m-0 p-0'>{label}</h6>
+					<h5 className='m-0 p-0'>{t(label)}</h5>
 				</div>
 			</div>
-	
+
 			<div className='d-flex'>
 			</div>
 			<InputGroup className="mb-3">
@@ -132,24 +137,28 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 
 
 			{/* Info */}
-			<div className="mb-3">
-				<div className="d-flex justify-content-between">
-					<span>Minimum:</span>
-					<span>{min}</span>
+			{[
+				{ label: "Minimum", value: min },
+				{ label: "Maximum", value: max },
+				{ label: "Default", value: def }
+			].map((item, index) => (
+				<div key={index} className="w-100" style={{ height: "48px" }}>
+					<div className="col-9 h-100">
+						<div className="d-flex w-100 align-items-center h-100">
+							<Button className='col-8 m-0 p-0 h-100'>
+								{t(item.label)}
+							</Button>
+							<div className="calculatorItem d-flex align-items-center justify-content-center col-4 text-center h-100">
+								<div>{item.value}</div>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div className="d-flex justify-content-between">
-					<span>Maximum:</span>
-					<span>{max}</span>
-				</div>
-				<div className="d-flex justify-content-between">
-					<span>Default:</span>
-					<span>{def}</span>
-				</div>
-			</div>
+			))}
 
 			{/* Keypad */}
 			<div className="d-flex flex-column mt-1">
- 				<div className='d-flex w-100'>
+				<div className='d-flex w-100'>
 
 					<div className='col-9'>
 						<div className="d-flex flex-wrap justify-content-between  w-100">
@@ -158,85 +167,55 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 							</div>
 							{/* Первая строка */}
 							<div className="d-flex w-100 ">
-								<Button variant="light" onClick={handleBackspace} className='col-4'>
+								<Button onClick={handleBackspace} className='col-4'>
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
 									</svg>
 								</Button>
-								<Button variant="light" onClick={handleClear} className='col-4'>
+								<Button onClick={handleClear} className='col-4'>
 									C
 								</Button>
-								<Button variant="light" onClick={handleToggleSign} className='col-4'>
+								<Button onClick={handleToggleSign} className='col-4'>
 									±
 								</Button>
 							</div>
 
-
-							<div className="d-flex w-100 ">
-		 						<Button variant="light" onClick={() => handleNumber('7')} className="flex-fill">
-									7
-								</Button>
-								<Button variant="light" onClick={() => handleNumber('8')} className="flex-fill">
-									8
-								</Button>
-								<Button variant="light" onClick={() => handleNumber('9')} className="flex-fill">
-									9
-								</Button>
-							</div>
-
-							{/* Вторая строка */}
-							<div className="d-flex w-100 ">
-								<Button variant="light" onClick={() => handleNumber('4')} className="flex-fill">
-									4
-								</Button>
-								<Button variant="light" onClick={() => handleNumber('5')} className="flex-fill">
-									5
-								</Button>
-								<Button variant="light" onClick={() => handleNumber('6')} className="flex-fill">
-									6
-								</Button>
-							</div>
-
-							{/* Третья строка */}
-							<div className="d-flex w-100 ">
-								<Button variant="light" onClick={() => handleNumber('1')} className="flex-fill">
-									1
-								</Button>
-								<Button variant="light" onClick={() => handleNumber('2')} className="flex-fill">
-									2
-								</Button>
-								<Button variant="light" onClick={() => handleNumber('3')} className="flex-fill">
-									3
-								</Button>
-							</div>
-
-							{/* Четвертая строка */}
-							<div className="d-flex w-100 ">
-								<Button variant="light" onClick={() => handleNumber('0')} className="flex-fill">
-									0
-								</Button>
-								<Button variant="light" onClick={() => handleNumber('.')} className="flex-fill">
-									.
-								</Button>
-							</div>
+							{[
+								{ numbers: ['7', '8', '9'], classes: ['flex-fill', 'flex-fill', 'flex-fill'] },
+								{ numbers: ['4', '5', '6'], classes: ['flex-fill', 'flex-fill', 'flex-fill'] },
+								{ numbers: ['1', '2', '3'], classes: ['flex-fill', 'flex-fill', 'flex-fill'] },
+								{ numbers: ['0', '.'], classes: ['col-8 flex-fill', 'col-4 flex-fill'] }
+							].map((row, rowIndex) => (
+								<div key={rowIndex} className="d-flex w-100">
+									{row.numbers.map((number, index) => (
+										<Button
+											key={number}
+											onClick={() => handleNumber(number)}
+											className={row.classes[index]}
+										>
+											{number}
+										</Button>
+									))}
+								</div>
+							))}
 						</div>
 					</div>
 
 					<div className='d-flex flex-column col-3'>
-						<Button variant="warning" onClick={() => handleOperator('/')}>
+						<Button className='rightButton' onClick={() => handleOperator('/')}>
 							/
 						</Button>
-						<Button variant="warning" onClick={() => handleOperator('x')}>
+						<Button className='rightButton' onClick={() => handleOperator('x')}>
 							x
 						</Button>
-						<Button variant="warning" onClick={() => handleOperator('-')}>
+						<Button className='rightButton' onClick={() => handleOperator('-')}>
 							-
 						</Button>
-						<Button variant="warning" onClick={() => handleOperator('+')}>
+						<Button className='rightButton' onClick={() => handleOperator('+')}>
 							+
 						</Button>
 
-						<Button variant="success" onClick={handleEquals} className="col-span-2">
+						<Button className='rightButton col-span-2' onClick={handleEquals}>
 							=
 						</Button>
 					</div>
@@ -245,9 +224,16 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 
 			{/* Footer */}
 
-			<Button variant="secondary" className="w-100 mt-1" onClick={() => { }}>Cancel</Button>
-			<Button variant="primary" className="w-100 mt-1" onClick={handleConfirm}>OK</Button>
-
+			<Button
+				className="w-100 mt-1 downButton"
+				onClick={() => { handleClear }}
+				style={{ backgroundColor: "var(--grey-progress)" }}
+			>{t("Cancel")}</Button>
+			<Button
+				className="w-100 mt-1 downButton"
+				onClick={handleConfirm}
+				style={{ backgroundColor: "var(--grey-progress)" }}
+			>OK</Button>
 		</div>
 
 	);

@@ -761,7 +761,7 @@ height: fit-content;}
 .settingsButton-navbar-modal .modal-dialog {
   position: absolute;
   top: 65px;
-  right: 0;
+  right: 150px;
   margin: 0;              /* убираем стандартные отступы */
   width: fit-content;      /* ширина по содержимому */
   max-width: none;         /* отключаем ограничение bootstrap */
@@ -781,8 +781,6 @@ height: fit-content;}
 .functionButton-navbar-modal .modal-dialog {
   top: 145px;
 }
- 
-
 #timer {
  font-size: 10px;
  display: flex;
@@ -1419,4 +1417,21 @@ height: fit-content;}
 .functionsUnit {
   width: 30px;
 
+}
+
+.calculatorItem {
+  background-color: var(--grey-progress);
+  border: 3px solid rgb(244, 244,247) !important;
+  border-radius: 5px;
+}
+
+
+#CalculatorModal .btn:not(.downButton) {
+  background-color: white !important;
+  border: 3px solid rgb(244, 244, 247) !important;
+  height: 48px;
+}
+
+#CalculatorModal .btn.rightButton {
+  background-color: rgb(200, 175, 100) !important;
 }
