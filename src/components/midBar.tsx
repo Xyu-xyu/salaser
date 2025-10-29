@@ -64,62 +64,70 @@ const MidBar = observer(() => {
 						height: "100%",
 					}}
 				>
+
 					<div className="d-flex flex-column w-100">
-						<div className="d-flex mx-2 flex-wrap">
-							{paramsLimit.map((item: ParamItem, i: number) => (
-								<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
-									<div className="currentPlanMeasureWpapper">
-										<div className="currentPlanMeasure">
-											<div className="currentPlanMeasureNameCont">
-												<div className="currentPlanMeasureName">{item.name}</div>
+						<div className={isVertical ? "d-flex w-100" : ""}>
+
+							{/* Параметры с лимитами */}
+							<div className="d-flex mx-2 flex-wrap">
+								{paramsLimit.map((item: ParamItem, i: number) => (
+									<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
+										<div className="currentPlanMeasureWpapper">
+											<div className="currentPlanMeasure">
+												<div className="currentPlanMeasureNameCont">
+													<div className="currentPlanMeasureName">{item.name}</div>
+												</div>
+												<div className="currentPlanMeasureValConainer d-flex align-items-center">
+													<div className="currentPlanMeasureValue">{item.val.toFixed(2)}</div>
+													<div className="currentPlanMeasureItem mx-1">{item.measure}</div>
+												</div>
 											</div>
-											<div className="currentPlanMeasureValConainer d-flex align-items-center">
-												<div className="currentPlanMeasureValue">{item.val.toFixed(2)}</div>
-												<div className="currentPlanMeasureItem mx-1">{item.measure}</div>
+										</div>
+										<div className="currentPlanLimits my-2 ms-2">
+											<div className="d-flex flex-column">
+												<div className="d-flex align-items-center mb-1">
+													<div className={item.val > 500 ? "led-green-medium" : "led-gray-medium"}></div>
+													<div className="limitText">Limit-</div>
+												</div>
+												<div className="d-flex align-items-center">
+													<div className={item.val < 500 ? "led-green-medium" : "led-gray-medium"}></div>
+													<div className="limitText">Limit+</div>
+												</div>
 											</div>
 										</div>
 									</div>
-									<div className="currentPlanLimits my-2 ms-2">
-										<div className="d-flex flex-column">
-											<div className="d-flex align-items-center mb-1">
-												<div className={item.val > 500 ? "led-green-medium" : "led-gray-medium"}></div>
-												<div className="limitText">Limit-</div>
-											</div>
-											<div className="d-flex align-items-center">
-												<div className={item.val < 500 ? "led-green-medium" : "led-gray-medium"}></div>
-												<div className="limitText">Limit+</div>
+								))}
+							</div>
+
+							{/* Параметры без лимитов */}
+							<div className="d-flex mx-2 flex-wrap">
+								{params.map((item, i) => (
+									<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
+										<div className="currentPlanMeasureWpapper">
+											<div className="currentPlanMeasure">
+												<div className="currentPlanMeasureNameCont">
+													<div className="currentPlanMeasureName">{item.name}</div>
+												</div>
+												<div className="currentPlanMeasureValConainer d-flex align-items-center">
+													<div className="currentPlanMeasureValue">{item.val.toFixed(2)}</div>
+													<div className="currentPlanMeasureItem mx-1">{item.measure}</div>
+												</div>
 											</div>
 										</div>
+										<div className="currentPlanLimits"></div>
 									</div>
-								</div>
-							))}
+								))}
+							</div>
 						</div>
 
-						<div className="d-flex mx-2 flex-wrap">
-							{params.map((item, i) => (
-								<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
-									<div className="currentPlanMeasureWpapper">
-										<div className="currentPlanMeasure">
-											<div className="currentPlanMeasureNameCont">
-												<div className="currentPlanMeasureName">{item.name}</div>
-											</div>
-											<div className="currentPlanMeasureValConainer d-flex align-items-center">
-												<div className="currentPlanMeasureValue">{item.val.toFixed(2)}</div>
-												<div className="currentPlanMeasureItem mx-1">{item.measure}</div>
-											</div>
-										</div>
-									</div>
-									<div className="currentPlanLimits"></div>
-								</div>
-							))}
-						</div>
-
-						<div className="d-flex w-100 h-100 flex-center align-items-center">
-							<div className="planMain" >
+						{/* SVG компонент */}
+						<div className={`d-flex w-100 h-100 flex-center align-items-center ${isVertical ? "mt-2 ms-2" : ""}`}>
+							<div className="planMain">
 								<GCodeToSvg />
 							</div>
 						</div>
 					</div>
+
 				</motion.div>
 
 				{/* Второй блок */}
