@@ -52,9 +52,8 @@ const FunctionsForm = observer(() => {
 	}
 
 	const generateInnerModal = () =>{
-		const { label, unit, value, type, enum:enumValues, min, max, def } = functionStore.getTitleAndUnit( aKey, bKey)
-		console.log (label, unit, value, type,  enumValues, min, max, def)
- 		if (type && type === 'number') {
+		const { label, value, type, enum:enumValues, min, max, def } = functionStore.getTitleAndUnit( aKey, bKey)
+		if (type && type === 'number') {
 			return  (
 				<CalculatorModal
 					min={min ?? 0}
@@ -136,7 +135,6 @@ const FunctionsForm = observer(() => {
 										value={t(option)}
 										checked={value === option}
 										onChange={() => { 
-											//console.log ('cur val  '+ value + '    new val: ' + option)
 											functionStore.updateValue(`${aKey}.${bKey}`, option)
  										}} 
 										className="w-100 px-2 py-0"
@@ -337,7 +335,7 @@ const FunctionsForm = observer(() => {
 															showModal()
 
 														}}
-													>{t(displayValue)}</div>
+													>{typeof displayValue === 'number' ? displayValue : t(displayValue)}</div>
 													<div className="functionsUnit">{t(unit)}</div>
 													</div>
 													

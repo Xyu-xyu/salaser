@@ -25,7 +25,7 @@ i18n
     missingKeyHandler: function (lng, ns, key, fallbackValue) {
       console.warn(`[i18n] Missing translation for key: "${key}" ${ns} in language: "${lng}"${fallbackValue}`);
       
-      if (import.meta.env.DEV) {
+      if (import.meta.env.DEV && key.length) {
         fetch(`${constants.SERVER_URL}/api/translate?phrase=${encodeURIComponent(key)}`)
         .then((response) => {
           if (!response.ok) {

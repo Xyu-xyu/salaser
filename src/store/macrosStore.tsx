@@ -1207,8 +1207,6 @@ class MacrosStore {
             return;
         }
 
-        console.log()
-
         let stages = macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages;
 
         if (macrosStore.selectedPiercingStage !== 0) {

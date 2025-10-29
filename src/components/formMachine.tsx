@@ -18,7 +18,7 @@ const CuttingSettingsForm = observer(() => {
 				console.log("✅ данные валидны:", e.formData);
 			}}
 			onError={(errors) => {
-				console.error("⚠️ ошибки валидации:", errors);
+				console.error("❌ ошибки валидации:", errors);
 			}}
 		/>
 	);

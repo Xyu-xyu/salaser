@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import schema from './functions.json'
+import constants from "./constants";
 
 /* ---------------- Типизация для Vermatic schema ---------------- */
 
@@ -36,7 +37,7 @@ interface Stops {
 
 interface Microjoints {
 	enabled: boolean;
-	function: "Programmed" | "Programmed + Measurement" | "Measurement" | "Programmed + position" | "Position" ;
+	function: "Programmed" | "Programmed + Measurement" | "Measurement" | "Programmed + position" | "Position";
 	min_x_dimension?: number;
 	max_x_dimension?: number;
 	min_y_dimension?: number;
@@ -81,9 +82,9 @@ class FunctionStore {
 			Angle_or_sheet_corner: 90,
 			enabled: false,
 		},
-		Microjoints: { 
-			enabled: false, 
-			function: "Programmed", 
+		Microjoints: {
+			enabled: false,
+			function: "Programmed",
 			min_x_dimension: 0,
 			max_x_dimension: 0,
 			min_y_dimension: 0,
@@ -95,8 +96,6 @@ class FunctionStore {
 		Vaporisation: { enabled: false, function: false },
 		inverse: { enabled: false, value: false },
 		Sensor_field: { enabled: false, value: true },
-		
-		
 	};
 
 	aKey: string = ""
@@ -137,39 +136,40 @@ class FunctionStore {
 		}
 
 		current[lastKey] = newValue;
+		this.saveFunctions()
 	}
 
 	getTitleAndUnit(blockKey: string, propKey: string) {
 		const block = schema.properties?.[blockKey as keyof typeof schema.properties] as
 			| { properties?: Record<string, any> }
 			| undefined;
-		
+
 		const props = block?.properties || {};
 		const propSchema = props[propKey];
-		
+
 		// Получаем значение из текущего состояния
 		const blockValue = functionStore.vermatic?.[blockKey as keyof typeof functionStore.vermatic];
 		const value =
 			blockValue && propKey in (blockValue as object)
 				? (blockValue as any)[propKey]
 				: undefined;
-		
+
 		// Если схема не найдена — возвращаем ключ и значение как fallback
 		if (!propSchema) {
 			return { label: propKey, unit: "", value, type: false, enum: false, min: false, max: false };
 		}
-		
+
 		// Разделяем title на имя и единицу измерения
 		const [rawLabel, rawUnit] = (propSchema.title || propKey).split(",");
-		
+
 		// Убираем ".value" из имени (если оно есть)
 		const label =
 			propKey === "value"
 				? rawLabel.replace(/ value$/i, "").trim()
 				: rawLabel.trim();
-		
+
 		const unit = rawUnit?.trim() || "";
-		
+
 		// Получаем дополнительные данные типа, enum, min, max
 		const type = propSchema.type || false;
 		const enumValues = Array.isArray(propSchema.enum) ? propSchema.enum : false;
@@ -178,10 +178,43 @@ class FunctionStore {
 		const def = typeof propSchema.default === "number" ? propSchema.default : false;
 		return { label, unit, value, type, enum: enumValues, min, max, def };
 	}
-	
-	
 
+	async loadFunctions() {
+		try {
+			const response = await fetch( `${constants.SERVER_URL}/api/get_functions`);
+			if (!response.ok) throw new Error('Failed to load functions');
+
+			const data = await response.json();
+ 			if (Array.isArray(data) && data.length > 0) {
+				functionStore.setVermatic(data[0]); 
+			} else if (data && typeof data === 'object') {
+				functionStore.setVermatic(data);
+			}
+			console.log('SUCCESS in loading functions');
+
+		} catch (error) {
+			console.error('Error loading functions:', error);
+		}
+	}
+
+	
+	async saveFunctions() {
+		await fetch(`${constants.SERVER_URL}/api/save_functions`, {
+			method: "POST",
+			headers: {
+				/* "Content-Type": "application/json" */
+			},
+			body: JSON.stringify(this.vermatic), 
+		}).then(() => {
+			console.log ("SUCCESS saveFunctions")
+		})
+	}
+
+	setVermatic(data: Partial<VermaticSchema>) {
+		this.vermatic = { ...this.vermatic, ...data };
+	}
 }
 
 const functionStore = new FunctionStore();
+functionStore.loadFunctions()
 export default functionStore;
