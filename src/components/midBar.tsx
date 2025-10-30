@@ -10,6 +10,7 @@ import macrosStore from '../store/macrosStore';
 import { observer } from 'mobx-react-lite';
 import GCodeToSvg from "./gcodeToSvg";
 import { motion } from "framer-motion";
+import CanBan from "./canBan";
 
 interface ParamItem {
 	name: string;
@@ -24,7 +25,7 @@ const MidBar = observer(() => {
 		{ name: 'f', measure: 'kHz', val: 88.7 },
 	]
 
-	const { paramsLimit } = laserStore;
+	const { paramsLimit, planViewType } = laserStore;
 	useEffect(() => {
 		laserStore.fetchTasks();
 
@@ -147,83 +148,116 @@ const MidBar = observer(() => {
 						height: "100%",
 					}}
 				>
-					<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
-						<div className="planMain">
-							{/* Ваш контент для режима carousel */}
-							<Swiper
-								onSwiper={(swiper) => {
-									swiperRef.current = swiper;
-								}}
-								modules={[EffectCoverflow, /* Mousewheel */]}
-								direction={'horizontal'}
-								effect="coverflow"
-								loop={false}
-								slideToClickedSlide={true}
-								grabCursor={true}
-								centeredSlides={true}
-								slidesPerView={5}
-								initialSlide={macrosStore.selectedModulationMacro} // Нумерация с 0 (0=1-й слайд, 3=4-й слайд)
-								freeMode={false}
-								coverflowEffect={{
-									rotate: 0,
-									stretch: 0,
-									depth: 450,
-									modifier: isVertical ? 1 : 0.8,
-									slideShadows: false,
-								}}
-
-
-								style={{
-									height: isVertical ? '1600px' : '800px',
-									width: isVertical ? '800px' : '1600px',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-								}}
-								onSlideChange={(swiper) => {
-									const currentSlide = swiper.activeIndex;
-									macrosStore.setSelectedSlide(currentSlide);
-								}}
-							>
-								{
-									tasks.map((key: any) =>
-										<SwiperSlide>
-											<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
-
-												<div className="ccard">
-													<div className="ccard-header">{key} 00:08:10</div>
-													<div className="ccard-image-wrapper">
-														<div className="ccard-image">
-															<img
-																src={'/'}
-																alt="svg"
-															/>
+					{/* Плавное переключение содержимого */}
+					<motion.div
+						key="content"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.25 }}
+						style={{
+							position: "absolute",
+							inset: 0,
+							width: "100%",
+							height: "100%",
+						}}
+					>
+						<div
+							style={{
+								opacity: planViewType === "Carousel" ? 1 : 0,
+								transition: "opacity 0.25s ease-in-out",
+							}}
+						>
+							{/* Первый блок (Carousel) */}
+							<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
+								<div className="planMain">
+									<Swiper
+										onSwiper={(swiper) => {
+											swiperRef.current = swiper;
+										}}
+										modules={[EffectCoverflow]}
+										direction={'horizontal'}
+										effect="coverflow"
+										loop={false}
+										slideToClickedSlide={true}
+										grabCursor={true}
+										centeredSlides={true}
+										slidesPerView={5}
+										initialSlide={macrosStore.selectedModulationMacro}
+										freeMode={false}
+										coverflowEffect={{
+											rotate: 0,
+											stretch: 0,
+											depth: 450,
+											modifier: isVertical ? 1 : 0.8,
+											slideShadows: false,
+										}}
+										style={{
+											height: isVertical ? '1600px' : '800px',
+											width: isVertical ? '800px' : '1600px',
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+										}}
+										onSlideChange={(swiper) => {
+											const currentSlide = swiper.activeIndex;
+											macrosStore.setSelectedSlide(currentSlide);
+										}}
+									>
+										{tasks.map((key: any) => (
+											<SwiperSlide key={key}>
+												<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
+													<div className="ccard">
+														<div className="ccard-header">{key} 00:08:10</div>
+														<div className="ccard-image-wrapper">
+															<div className="ccard-image">
+																<img src={'/'} alt="svg" />
+															</div>
+														</div>
+														<div className="ccard-info-block">
+															<div className="ccard-title">{key}</div>
+															<div className="ccard-details">
+																• materialcode • label • thickness mm
+															</div>
+															<div className="ccard-details">
+																• dimx mm • dimy mm
+															</div>
 														</div>
 													</div>
-
-													<div className="ccard-info-block">
-														<div className="ccard-title">{key} </div>
-														<div className="ccard-details">
-															• materialcode
-															• label
-															• thickness mm
-														</div>
-														<div className="ccard-details">
-															• dimx mm
-															• dimy mm
-														</div>
-													</div>
-
 												</div>
-
-											</div>
-										</SwiperSlide>
-									)
-								}
-							</Swiper>
+											</SwiperSlide>
+										))}
+									</Swiper>
+								</div>
+							</div>
 						</div>
-					</div>
+					</motion.div>
+
+					<motion.div
+						key="content1"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: planViewType === "CanBan" ? 1 : 0 }}
+						transition={{ duration: 0.25 }}
+						style={{
+							position: "absolute",
+							inset: 0,
+							width: "100%",
+							height: "100%",
+						}}
+					>
+						{/* Второй блок (CanBan) */}
+						<div
+							style={{
+								opacity: planViewType === "CanBan" ? 1 : 0,
+								transition: "opacity 0.25s ease-in-out",
+  							}}
+						>
+							<div><CanBan /></div>
+						</div>
+					</motion.div>
 				</motion.div>
+
+
 			</div>
 
 		</>
@@ -232,3 +266,10 @@ const MidBar = observer(() => {
 });
 
 export default MidBar;
+
+/* style={{
+	position: "absolute",
+	inset: 0,
+	width: "100%",
+	height: "100%",
+}} */

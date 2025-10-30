@@ -275,5 +275,10 @@ const ru: Record<string, string> = {
 	"view": "вид",
 	"Carousel": "Карусель",
 	"CanBan": "КанБан",
+	"Loaded": "Загружено",
+	"Completed": "Выполнено",
+	"done": "выполнен",
+	"No tasks": "Нет задач",
+	"Pending": "Ожидание"
 }
 export default ru;

@@ -278,5 +278,10 @@ const en: Record<string, string> = {
 	"view": "view",
 	"Carousel": "Carousel",
 	"CanBan": "CanBan",
+	"Completed": "Completed",
+	"Pending": "Pending",
+	"Loaded": "Loaded",
+	"done": "done",
+	"No tasks": "No tasks",
 }
 export default en;

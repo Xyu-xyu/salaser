@@ -274,5 +274,9 @@ const zh: Record<string, string> = {
 	"view": "看法",
 	"Carousel": "轮播",
 	"CanBan": "坎班",
+	"Pending": "待办的",
+	"Completed": "完全的",
+	"done": "完毕",
+	"No tasks": "没有任务",
 }
 export default zh;
