@@ -112,7 +112,7 @@ const ru: Record<string, string> = {
 	"Play demo": "Демо",
 	"View all": "Показать все",
 	"Do you want to delete all steps in piercing macro?": "Вы хотите удалить все шаги врезки?",
-	"Edit": "Редактировать",
+	"Edit": "Изменить",
 	"Enter a number": "Введите число",
 	"Only single decimal place values are allowed": "Допускаются только значения с одним десятичным знаком",
 	"Only whole numbers are allowed": "Допускаются только целые числа",
@@ -272,5 +272,8 @@ const ru: Record<string, string> = {
 	"Invalid value. Value was not changed!": "Недопустимое значение. ",
 	"Invalid value.": "Недопустимое значение.",
 	"Unknown button": "Неизвестная кнопка",
+	"view": "вид",
+	"Carousel": "Карусель",
+	"CanBan": "КанБан",
 }
 export default ru;

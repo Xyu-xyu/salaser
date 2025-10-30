@@ -275,5 +275,8 @@ const en: Record<string, string> = {
 	"Invalid value. Value was not changed!": "Invalid value. Value was not changed!",
 	"Invalid value.": "Invalid value.",
 	"Unknown button": "Unknown button",
+	"view": "view",
+	"Carousel": "Carousel",
+	"CanBan": "CanBan",
 }
 export default en;

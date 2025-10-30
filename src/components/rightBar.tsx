@@ -5,6 +5,7 @@ import laserStore from "../store/laserStore";
 import { UploadButton } from "./uploadButton";
 import { AnimatePresence, motion } from "framer-motion";
 import FunctionsForm from "./formFunctionsorm";
+import PlanViewSwitcher from "./planViewSwitcher";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
@@ -150,7 +151,7 @@ const RightBar = observer(() => {
 								<button className="w-100">
 									<div className="d-flex align-items-center">
 										<Icon
-											icon="fluent:edit-24-regular"
+											icon="bytesize:edit"
 											width="24"
 											height="24"
 											style={{ color: "black" }}
@@ -161,9 +162,8 @@ const RightBar = observer(() => {
 								</button>
 							</div>
 
-							<div className="mt-4">
-								<h5>{t("View")}</h5>
-							</div>
+							<PlanViewSwitcher />
+
 						</div>
 					}
 
@@ -197,7 +197,7 @@ const RightBar = observer(() => {
 								<button className="w-100">
 									<div className="d-flex align-items-center">
 										<Icon
-											icon="fa7-solid:list-check"
+											icon="bytesize:edit"
 											width="24"
 											height="24"
 											style={{ color: "black" }}
@@ -271,7 +271,7 @@ const RightBar = observer(() => {
 											style={{ color: "black" }}
 											className="ms-1"
 										/>
-										<div className="flex-grow-1 text-center">{t("Display")}</div>
+										<div className="flex-grow-1 text-center">{t("Details")}</div>
 									</div>
 								</button>
 							</div>

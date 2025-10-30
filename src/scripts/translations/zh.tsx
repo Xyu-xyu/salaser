@@ -271,5 +271,8 @@ const zh: Record<string, string> = {
 	"100": "100",
 	"Invalid value.": "无效值。",
 	"Unknown button": "未知按钮",
+	"view": "看法",
+	"Carousel": "轮播",
+	"CanBan": "坎班",
 }
 export default zh;

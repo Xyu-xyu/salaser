@@ -304,6 +304,10 @@ body {
   margin: 5px;
 }
 
+#PlanViewSwitcher div:not(.list-group-item) {
+  margin: 0px;
+}
+
 #FunctionBar button,
 #favoritesButtonModal button,
 #RightBar button {
@@ -761,7 +765,6 @@ height: fit-content;}
 .settingsButton-navbar-modal .modal-dialog {
   position: absolute;
   top: 65px;
-  right: 150px;
   margin: 0;              /* убираем стандартные отступы */
   width: fit-content;      /* ширина по содержимому */
   max-width: none;         /* отключаем ограничение bootstrap */
@@ -770,17 +773,27 @@ height: fit-content;}
 }
 
 
+.functionButton-navbar-modal .modal-dialog {
+  right: 165px;
+} 
+
+.powerButton-navbar-modal .modal-dialog {
+  right:2px;
+}
+
+
 .settingsButton-navbar-modal .modal-dialog {
-  right: 68px;
+  right: 2px;
 }
 
 .favoritesButton-navbar-modal .modal-dialog {
-  right: 4px;
+  right: 2px;
 } 
 
 .functionButton-navbar-modal .modal-dialog {
   top: 145px;
 }
+
 #timer {
  font-size: 10px;
  display: flex;

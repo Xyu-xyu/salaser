@@ -1,0 +1,139 @@
+import { observer } from "mobx-react-lite";
+import { Icon } from "@iconify/react";
+import { useTranslation } from "react-i18next";
+import laserStore from "../store/laserStore";
+import { useState } from "react";
+import { showToast } from "./toast";
+import { ListGroup, Form } from "react-bootstrap";
+
+const PlanViewSwitcher = observer(() => {
+
+	const { t } = useTranslation();
+	const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+	const {  planViewType } = laserStore
+
+	const handleToggle = (name: string) => {
+		if (openDropdown === name) {
+			// закрыть текущий
+			setOpenDropdown(null);
+		} else {
+			setOpenDropdown(name);
+		}
+	};
+
+
+	return (
+		<>
+			<div className="mt-4">
+				<h5>{t("View")}</h5>
+			</div>
+			<div className="d-flex flex-column mt-2" id="PlanViewSwitcher">
+				{['View'].map((a: string) => {
+					const isOpen = openDropdown === a;
+
+					return (
+						<div key={a} className="m-0">
+							<div className="w-100 d-flex align-items-center justify-content-between functionItem list-group-item">
+								<div className="d-flex align-items-center">
+									<button
+										className="navbar_button"
+										onPointerDown={() => {
+											handleToggle(a);
+										}}
+										style={{ width: "fit-content" }}
+										aria-expanded={isOpen}
+										aria-controls={`panel-${a}`}
+									>
+										<Icon
+											icon="si:expand-more-alt-fill"
+											width="24"
+											height="24"
+											style={{
+												color: "black",
+												transform: `rotate(${isOpen ? 180 : 0}deg)`,
+												transition: "transform 0.5s ease-in-out",
+											}}
+										/>
+									</button>
+
+									<div>
+										<h6 className="p-0 m-0">{t(a.replace("_", " "))}</h6>
+									</div>
+								</div>
+
+							</div>
+
+							{/* Дропдаун-контент: плавное разворачивание по isOpen */}
+							<div
+								id={`panel-${a}`}
+								className="m-0 mb-1"
+								style={{
+									maxHeight: isOpen ? "250px" : "0px",
+									overflow: "hidden",
+									transition: "max-height 0.5s ease-in-out",
+									background: isOpen ? "var(--grey-main)" : "transparent",
+									borderBottom: isOpen ? "2px solid var(--grey-nav)" : "none",
+								}}
+							>
+								{isOpen && (
+									// Здесь вы можете рендерить реальные контролы для item (inputs, selects и т.д.)
+									<div>
+										<div
+											style={{
+												minWidth: "calc(100vw * 0.2)",
+												height: "fit-content",
+												overflowY: "auto",
+												overflowX: "hidden",
+											}}
+											className="d-flex"
+										>
+											<ListGroup style={{
+												width: "100%",
+												padding: 0, // убираем внутренние отступы
+												border: "none", // опционально
+											}}>
+												<ListGroup>
+													{[
+														"Carousel",
+														"CanBan",
+													].map((option, index) => (
+														<ListGroup.Item className="w-100 m-0" key={index}>
+															<Form.Check
+																style={{ fontSize: "large" }}
+																type="radio"
+																id={`radio-${index}`}
+																label={t(option)}
+																name="tf-options"
+																value={t(option)}
+																checked={planViewType === option}
+																onChange={() => {
+																	laserStore.setVal(`planViewType`, option)
+																}}
+																className="w-100 px-2 py-0"
+															/>
+														</ListGroup.Item>
+													))}
+												</ListGroup>
+											</ListGroup>
+										</div>
+									</div>
+
+								)}
+							</div>
+							{/* Дропдаун-контент:K O Н Е Ц */}
+						</div>
+					);
+				})}
+
+			</div>
+		</>
+
+
+
+
+	);
+});
+
+export default PlanViewSwitcher;
+
+

@@ -20,6 +20,7 @@ const FunctionsForm = observer(() => {
 	const { vermatic, aKey, bKey } = functionStore
 	const [rotated, setRotated] = useState(false);
 	const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+	const { leftMode } = laserStore
 
 	const handleToggle = (name: string) => {
 		if (openDropdown === name) {
@@ -165,7 +166,8 @@ const FunctionsForm = observer(() => {
 						onClick={() => {
 							setRotated(!rotated)
 							setTimeout(() => {
-								laserStore.setVal('rightMode', 'parameter')
+								// здесь переключалка когда закрываем раздел функции								
+								laserStore.setVal('rightMode', leftMode === "plan" ? "plan" : "parameter")
 							}, 500)
 						}
 						}
