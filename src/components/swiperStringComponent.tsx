@@ -45,7 +45,7 @@ const SwiperStringComponent: React.FC<StringComponentInt> = observer(({param, ke
 	},[ selectedPiercingMacro, selectedModulationMacro ])
 
     return (
-        <div className='stringComponentContainer px-2'>
+        <div className='stringComponentContainer px-2 m-2'>
 			<div className='stringComponentLabel mx-2' >
 				{t('Name')}
 			</div>

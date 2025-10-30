@@ -86,7 +86,7 @@ const StringComponent: React.FC<StringComponentInt> = observer(({ param, keyPara
         </div>
       )}
 
-      <div className="stringComponentContainer px-2">
+      <div className="stringComponentContainer px-2 m-2">
         <div className="stringComponentLabel mx-2">{keyParam === 'preset' ? param : 'Name'}</div>
         <input
           type={param === 'thickness' ? 'number' : 'text'}

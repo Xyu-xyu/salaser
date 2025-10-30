@@ -35,7 +35,7 @@ const MacrosEditModalPanel = observer(() => {
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container-fluid w-100 h-100 d-flex flex-column justify-content-evenly">
-					<div className={'d-flex justify-content-evenly ' + (isVertical ? "mt-10" : "mt-4")}>
+					<div className={'d-flex  ' + (isVertical ? "mt-10 flex-column justify-content-evenly my-2 align-items-center" : "mt-4 justify-content-evenly")}>
 						<StringComponent keyParam={'preset'} param={'name'} />
 						<StringComponent keyParam={'preset'} param={'thickness'} />
 					</div>
