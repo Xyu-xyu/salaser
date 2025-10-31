@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 import laserStore from "../store/laserStore";
 import { useState } from "react";
-import { showToast } from "./toast";
+//import { showToast } from "./toast";
 import { ListGroup, Form } from "react-bootstrap";
 
 const PlanViewSwitcher = observer(() => {
@@ -72,7 +72,8 @@ const PlanViewSwitcher = observer(() => {
 									overflow: "hidden",
 									transition: "max-height 0.5s ease-in-out",
 									background: isOpen ? "var(--grey-main)" : "transparent",
-									borderBottom: isOpen ? "2px solid var(--grey-nav)" : "none",
+ 									borderBottom: isOpen ? "2px solid var(--grey-nav)" : "none",
+									borderRadius:"5px"
 								}}
 							>
 								{isOpen && (
@@ -80,7 +81,7 @@ const PlanViewSwitcher = observer(() => {
 									<div>
 										<div
 											style={{
-												minWidth: "calc(100vw * 0.2)",
+												minWidth: "40px",
 												height: "fit-content",
 												overflowY: "auto",
 												overflowX: "hidden",
@@ -97,7 +98,7 @@ const PlanViewSwitcher = observer(() => {
 														"Carousel",
 														"CanBan",
 													].map((option, index) => (
-														<ListGroup.Item className="w-100 m-0" key={index}>
+														<ListGroup.Item className="m-0" key={index}>
 															<Form.Check
 																style={{ fontSize: "large" }}
 																type="radio"
@@ -109,7 +110,7 @@ const PlanViewSwitcher = observer(() => {
 																onChange={() => {
 																	laserStore.setVal(`planViewType`, option)
 																}}
-																className="w-100 px-2 py-0"
+																className="px-2 py-0"
 															/>
 														</ListGroup.Item>
 													))}
