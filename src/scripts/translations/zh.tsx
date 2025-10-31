@@ -278,5 +278,17 @@ const zh: Record<string, string> = {
 	"Completed": "完全的",
 	"done": "完毕",
 	"No tasks": "没有任务",
+	"Width": "宽度",
+	"Time": "时间",
+	"Height sheet": "高度表",
+	"Macros": "宏",
+	"min": "分钟",
+	"Material": "材料",
+	"Width sheet": "宽度片材",
+	"Height": "高度",
+	"Gas": "气体",
+	"Sheet": "床单",
+	"Macro": "宏",
+	"macro": "宏",
 }
 export default zh;

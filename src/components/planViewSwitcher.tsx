@@ -32,14 +32,17 @@ const PlanViewSwitcher = observer(() => {
 					const isOpen = openDropdown === a;
 
 					return (
-						<div key={a} className="m-0">
-							<div className="w-100 d-flex align-items-center justify-content-between functionItem list-group-item">
+						<div key={a} className="m-0"			>
+							<div className={`w-100 d-flex align-items-center justify-content-between ${isOpen ? "functionItemPlanOpen" : "functionItemPlan"}  list-group-item`}
+							
+									onPointerDown={() => {
+										handleToggle(a);
+									}}
+							>
 								<div className="d-flex align-items-center">
 									<button
 										className="navbar_button"
-										onPointerDown={() => {
-											handleToggle(a);
-										}}
+									
 										style={{ width: "fit-content" }}
 										aria-expanded={isOpen}
 										aria-controls={`panel-${a}`}

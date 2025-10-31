@@ -3,41 +3,58 @@ import { useTranslation } from 'react-i18next';
 
 interface Card {
 	id: number;
-	title: string;
+	fileName: string;
 	progress: number;
+	time: number,
+	width?: number,
+	widthSheet?: number,
+	heigth?: number,
+	heigthSheet?: number,
+	material?: string,
+	materialCode?: string,
+	gas?: string,
+	macros?: string,
+	thickness?: number,
+	imgSrc?: string
 }
 
 const mockCards: Record<string, Card[]> = {
 	Loaded: [
-		{ id: 1, title: 'Order #1001', progress: 75 },
-		{ id: 2, title: 'Order #1002', progress: 30 },
-		{ id: 1000, title: "Order #1001", progress: 83 },
-		{ id: 999,  title: "Order #1002", progress: 12 },
-		{ id: 998,  title: "Order #1003", progress: 95 },
-		{ id: 997,  title: "Order #1004", progress: 47 },
-		{ id: 996,  title: "Order #1005", progress: 61 },
-		{ id: 995,  title: "Order #1001", progress: 29 },
-		{ id: 1000, title: "Order #1001", progress: 83 },
-		{ id: 9,  title: "Order #1002", progress: 12 },
-		{ id: 98,  title: "Order #1003", progress: 95 },
-		{ id: 97,  title: "Order #1004", progress: 47 },
-		{ id: 96,  title: "Order #1005", progress: 61 },
-		{ id: 9,  title: "Order #1001", progress: 29 },
-		{ id: 29,  title: "Order #1002", progress: 12 },
-		{ id: 2298,  title: "Order #1003", progress: 95 },
-		{ id: 22297,  title: "Order #1004", progress: 47 },
-		{ id: 2296,  title: "Order #1005", progress: 61 },
-		{ id: 229,  title: "Order #1001", progress: 29 },
+		{
+			id: 1,
+			fileName: "nakladka_1.5_steel.ncp",	progress: 10,time: 25.5,width: 3000,heigth: 1500,
+			material: "steel",materialCode: "STEEL",gas: "O₂",macros: "STEEL 2",thickness: 2,
+			imgSrc: 'public/images/06.08 1,5мм-01.svg'
+		},
+		{
+			id: 21,
+			fileName: "nakladka_1.5_steel.ncp",	progress: 10,time: 25.5,width: 3000,heigth: 1500,
+			material: "steel",materialCode: "STEEL",gas: "O₂",macros: "STEEL 2",thickness: 2,
+			imgSrc: 'public/images/06.08 1,5мм-01.svg'
+		},
+		{
+			id: 3,
+			fileName: "nakladka_1.5_steel.ncp",	progress: 10,time: 25.5,width: 3000,heigth: 1500,
+			material: "steel",materialCode: "STEEL",gas: "O₂",macros: "STEEL 2",thickness: 2,
+			imgSrc: 'public/images/06.08 1,5мм-01.svg'
+		},
+		{
+			id: 4,
+			fileName: "nakladka_1.5_steel.ncp",	progress: 10,time: 25.5,width: 3000,heigth: 1500,
+			material: "steel",materialCode: "STEEL",gas: "O₂",macros: "STEEL 2",thickness: 2,
+			imgSrc: 'public/images/06.08 1,5мм-01.svg'
+		},
+		{
+			id: 5,
+			fileName: "nakladka_1.5_steel.ncp",	progress: 10,time: 25.5,width: 3000,heigth: 1500,
+			material: "steel",materialCode: "STEEL",gas: "O₂",macros: "STEEL 2",thickness: 2,
+			imgSrc: 'public/images/06.08 1,5мм-01.svg'
+		},	
 
 	],
-	Cutting: [
-		{ id: 3, title: 'Order #1003', progress: 50 },
-	],
+	Cutting: [],
 	Pending: [],
-	Completed: [
-		{ id: 4, title: 'Order #1004', progress: 100 },
-		{ id: 5, title: 'Order #1005', progress: 100 },
-	],
+	Completed: [],
 };
 
 const CanBan: React.FC = observer(() => {
@@ -60,25 +77,28 @@ const CanBan: React.FC = observer(() => {
 							{cards.length > 0 ? (
 								cards.map((card) => (
 									<div key={card.id} className="kanbanCard">
-										<div className="cardTitle">{card.title}</div>
+										<div className="cardfileName">{card.fileName}</div>
 
-										{card.progress < 100 ? (
-											<div className="progressContainer">
-												<div className="progressLabel">
-													{card.progress}% {t('done')}
-												</div>
-												<div className="progressBar">
-													<div
-														className="progressFill"
-														style={{ width: `${100}%` }}
-													/>
-												</div>
-											</div>
-										) : (
-											<div className="completedBadge">
-												{t('Completed')}
+										{card.imgSrc && (
+											<div className="cardImage">
+												<img src={card.imgSrc} alt={card.fileName} />
 											</div>
 										)}
+
+										<div className='mt-2'>
+											{/* Time */}
+												<div className="cardTime">
+													• {card.time} {t('min')}											
+												</div>	
+												{/* Material info */}
+												<div className="cardMaterial">
+												• {card.thickness} {t("mm")} {card.material} • {card.width} * {card.heigth} {t("mm")} 											
+												</div>
+												{/* Gas & Macros */}
+												<div className="cardTech">
+												• {t("macro")}:{card.macros}  • {card.gas} 
+												</div>
+										</div>									
 									</div>
 								))
 							) : (

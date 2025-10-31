@@ -283,5 +283,17 @@ const en: Record<string, string> = {
 	"Loaded": "Loaded",
 	"done": "done",
 	"No tasks": "No tasks",
+	"Time": "Time",
+	"Height": "Height",
+	"min": "min",
+	"Width": "Width",
+	"Material": "Material",
+	"Gas": "Gas",
+	"Width sheet": "Width sheet",
+	"Height sheet": "Height sheet",
+	"Macros": "Macros",
+	"Sheet": "Sheet",
+	"Macro": "Macro",
+	"macro": "macro",
 }
 export default en;

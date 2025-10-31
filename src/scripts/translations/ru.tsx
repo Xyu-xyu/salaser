@@ -279,6 +279,18 @@ const ru: Record<string, string> = {
 	"Completed": "Выполнено",
 	"done": "выполнен",
 	"No tasks": "Нет задач",
-	"Pending": "Ожидание"
+	"Pending": "Ожидание",
+	"Width": "Ширина",
+	"Time": "Время",
+	"Height": "Высота",
+	"Gas": "Газ",
+	"min": "мин",
+	"Material": "Материал",
+	"Width sheet": "Ширина листа",
+	"Macros": "Макросы",
+	"Height sheet": "Высота листа",
+	"Sheet": "Лист",
+	"Macro": "Макрос",
+	"macro": "макрос",
 }
 export default ru;
