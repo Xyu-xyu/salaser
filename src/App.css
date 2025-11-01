@@ -1509,12 +1509,12 @@ height: fit-content;}
   flex-direction: column;
   border: var(--default-stroke-width) solid var(--grey-nav);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+/*   transition: transform 0.2s ease, box-shadow 0.2s ease;
+ */}
 
 .kanbanColumn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(93, 83, 247, 0.12);
+/*   transform: translateY(-4px);
+ */  box-shadow: 0 8px 20px rgba(93, 83, 247, 0.12);
 }
 
 .columnHeader {
@@ -1553,16 +1553,17 @@ height: fit-content;}
   border-radius: 12px;
   padding: 14px;
   font-size: 14px;
-  transition: all 0.2s ease;
-  cursor: grab;
+  max-height: 330px;
+/*   transition: all 0.2s ease;
+ */  cursor: grab;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .kanbanCard:hover {
   border-color: var(--violet);
   box-shadow: 0 4px 12px rgba(93, 83, 247, 0.15);
-  transform: translateY(-2px);
-}
+/*   transform: translateY(-2px);
+ */}
 
 .cardTitle {
   font-weight: 600;
@@ -1571,7 +1572,7 @@ height: fit-content;}
   font-size: 0.95rem;
 }
 
-.progressContainer {
+/* .progressContainer {
   margin-top: 8px;
 }
 
@@ -1593,7 +1594,7 @@ height: fit-content;}
   background: linear-gradient(90deg, var(--violet), #a29bfe);
   border-radius: 3px;
   transition: width 0.3s ease;
-}
+} */
 
 .completedBadge {
   margin-top: 8px;
@@ -1663,3 +1664,30 @@ height: fit-content;}
 }
 
 /* c a n b a n e n d */
+
+
+.gridWrapper {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.sortableGhost {
+  opacity: 0.5;
+  background-color: #0F0;
+
+}
+
+.sortableDrag {
+  opacity: 0.5;
+  background-color: rgb(255, 0, 149);
+
+}
+
+.sortableContainerClass {
+  width: 100%;
+  height: fit-content;
+  min-height: 900px;
+
+}
