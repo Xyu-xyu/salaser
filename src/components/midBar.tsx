@@ -1,5 +1,5 @@
 import laserStore from "../store/laserStore";
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -11,6 +11,9 @@ import { observer } from 'mobx-react-lite';
 import GCodeToSvg from "./gcodeToSvg";
 import { motion } from "framer-motion";
 import CanBan from "./canBan";
+import jobStore from "../store/jobStore";
+import { useTranslation } from 'react-i18next';
+import constants from "../store/constants";
 
 interface ParamItem {
 	name: string;
@@ -25,19 +28,15 @@ const MidBar = observer(() => {
 		{ name: 'f', measure: 'kHz', val: 88.7 },
 	]
 
+	const { t } = useTranslation();
+
+
 	const { paramsLimit, planViewType } = laserStore;
-	useEffect(() => {
-		laserStore.fetchTasks();
-
-		return () => {
-			laserStore.stopPolling();
-		};
-	}, []);
-
-
-	const { leftMode, tasks } = laserStore
+	const { leftMode } = laserStore
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const { isVertical } = macrosStore
+	const { mockCards } = jobStore
+	const tasks = mockCards.Cutting
 
 
 	if (laserStore.loading) return <div>Загрузка...</div>;
@@ -204,23 +203,27 @@ const MidBar = observer(() => {
 											macrosStore.setSelectedSlide(currentSlide);
 										}}
 									>
-										{tasks.map((key: any) => (
-											<SwiperSlide key={key}>
+										{tasks.map((card: any) => (
+											<SwiperSlide key={card.id}>
 												<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
 													<div className="ccard">
-														<div className="ccard-header">{key} 00:08:10</div>
+														<div className="ccard-header">{ card.fileName }</div>
 														<div className="ccard-image-wrapper">
 															<div className="ccard-image">
-																<img src={'/'} alt="svg" />
+																<img src={`${constants.SERVER_URL}/api/random-image?random=${card.id}`} alt={card.fileName} />
 															</div>
 														</div>
 														<div className="ccard-info-block">
-															<div className="ccard-title">{key}</div>
-															<div className="ccard-details">
-																• materialcode • label • thickness mm
-															</div>
-															<div className="ccard-details">
-																• dimx mm • dimy mm
+															<div className="mt-2">
+																<div className="cardTime">
+																	• {card.time} {t('min')}
+																</div>
+																<div className="cardMaterial">
+																	• {card.thickness} {t('mm')} {card.material} • {card.width} * {card.heigth} {t('mm')}
+																</div>
+																<div className="cardMaterial">
+																	• {t('macro')}: {card.macros} • {card.gas}
+																</div>
 															</div>
 														</div>
 													</div>
@@ -250,7 +253,7 @@ const MidBar = observer(() => {
 							style={{
 								opacity: planViewType === "CanBan" ? 1 : 0,
 								transition: "opacity 0.25s ease-in-out",
-  							}}
+							}}
 						>
 							<div><CanBan /></div>
 						</div>
@@ -266,10 +269,3 @@ const MidBar = observer(() => {
 });
 
 export default MidBar;
-
-/* style={{
-	position: "absolute",
-	inset: 0,
-	width: "100%",
-	height: "100%",
-}} */

@@ -42,7 +42,7 @@ const CanBan: React.FC = observer(() => {
 						  const movedCardId = evt.item?.dataset?.id;
 						  const targetStatus = evt.item?.dataset?.status;  // Колонка, откуда карточка была перемещена
 						  const newStatus = evt.to?.id
- 						  //console.log(`Card with ID ${movedCardId} moved from ${targetStatus} to ${newStatus}`);
+ 						  console.log(`Card with ID ${movedCardId} moved from ${targetStatus} to ${newStatus}`);
 						}}
 					  >
 						{cards.length > 0 ? (
