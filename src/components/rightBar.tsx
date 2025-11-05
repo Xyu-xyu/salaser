@@ -6,6 +6,7 @@ import { UploadButton } from "./uploadButton";
 import { AnimatePresence, motion } from "framer-motion";
 import FunctionsForm from "./formFunctionsorm";
 import PlanViewSwitcher from "./planViewSwitcher";
+import AddPlanButton from "./navbar/addPlanButton";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
@@ -38,20 +39,7 @@ const RightBar = observer(() => {
 								<h5>{t("Plans")}</h5>
 							</div>
 
-							<div>
-								<button className="w-100">
-									<div className="d-flex align-items-center">
-										<Icon
-											icon="fluent:copy-add-20-regular"
-											width="24"
-											height="24"
-											style={{ color: "black" }}
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Add")}</div>
-									</div>
-								</button>
-							</div>
+							<AddPlanButton />
 
 							<div>
 								<button className="w-100">

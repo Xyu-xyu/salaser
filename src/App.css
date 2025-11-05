@@ -757,7 +757,7 @@ height: fit-content;}
   z-index: -1;
 }
 
-
+.addPlanButton-navbar-modal .modal-dialog,
 .functionButton-navbar-modal .modal-dialog, 
 .favoritesButton-navbar-modal .modal-dialog, 
 .powerButton-navbar-modal .modal-dialog,
@@ -771,6 +771,10 @@ height: fit-content;}
   padding: 0;              /* убрать лишние отступы */
 }
 
+.addPlanButton-navbar-modal .modal-dialog {
+  top:165px;
+  right: 0px;
+} 
 
 .functionButton-navbar-modal .modal-dialog {
   right: 165px;
@@ -779,7 +783,6 @@ height: fit-content;}
 .powerButton-navbar-modal .modal-dialog {
   right:2px;
 }
-
 
 .settingsButton-navbar-modal .modal-dialog {
   right: 2px;
