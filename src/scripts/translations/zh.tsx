@@ -290,5 +290,11 @@ const zh: Record<string, string> = {
 	"Sheet": "床单",
 	"Macro": "宏",
 	"macro": "宏",
+	"Download": "下载",
+	"Submit": "提交",
+	"Files saved with success": "文件保存成功",
+	"Select files": "选择文件",
+	"Cutting preset not chosen": "未选择切割预设",
+	"Files not selected": "未选择的文件",
 }
 export default zh;

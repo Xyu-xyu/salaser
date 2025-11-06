@@ -295,5 +295,11 @@ const en: Record<string, string> = {
 	"Sheet": "Sheet",
 	"Macro": "Macro",
 	"macro": "macro",
+	"Download": "Download",
+	"Submit": "Submit",
+	"Files saved with success": "Files saved with success",
+	"Select files": "Select files",
+	"Cutting preset not chosen": "Cutting preset not chosen",
+	"Files not selected": "Files not selected",
 }
 export default en;

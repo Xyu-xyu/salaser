@@ -1,15 +1,16 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from "mobx-react-lite";
 import { useRef, useState, useEffect } from "react";
-import { Modal } from "react-bootstrap";
+import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import constants from "../../store/constants";
+import { showToast } from "../toast";
 
 type FileData = {
 	name: string;
 	thickness: number;
 	quantity: number;
-	preset: string;
+	preset: number | null;
 	material: string;
 	materialLabel: string;
 	dimX: number;
@@ -31,9 +32,9 @@ const AddPlanButton = observer(() => {
 	const [show, setShow] = useState(false);
 	const [presets, setPresets] = useState<Preset[]>([]);
 
-	useEffect(()=>{
+	useEffect(() => {
 		listPresets()
-	},[])
+	}, [])
 
 
 	// Открыть модалку
@@ -74,13 +75,13 @@ const AddPlanButton = observer(() => {
 						const dimX = getAttribute("DimX", trunc);
 						const dimY = getAttribute("DimY", trunc);
 						const repeat = getAttribute("Repeat", trunc);
-						const preset = selectPreset(thickness, materialCode)
+						//const preset = selectPreset(thickness, materialCode)
 
 						const fileData: FileData = {
 							name: file.name,
 							thickness: thickness ? parseFloat(thickness) : 0,
 							quantity: repeat ? parseInt(repeat) : 1,
-							preset: "none",
+							preset: null,
 							material: label || "Неизвестный материал",
 							materialLabel: materialCode || "Неизвестный MaterialCode",
 							dimX: dimX ? parseInt(dimX) : 0,
@@ -125,27 +126,62 @@ const AddPlanButton = observer(() => {
 		return truncatedLines.join("\n");
 	};
 
-	const selectPreset = (thickness:string|null, materialCode:string|null)=> {
-		return presets[0].name	
-	}
 
 	async function listPresets() {
 		let resp = await fetch(constants.SERVER_URL + "/db/listpresets");
 		resp.json().then((data) => {
 			setPresets(data);
-			console.log (data)
+			console.log(data)
 		});
 	}
 
-	const handleMaterialChange = (index: number, selectedValue: string) => {
-		console.log (index, selectedValue)
+	// Обновленный обработчик для изменения выбранного preset по ID
+	const handleMaterialChange = (index: number, presetId: number) => {
 		setFiles((prevFiles) =>
-		  prevFiles.map((file, idx) =>
-			idx === index ? { ...file, preset: selectedValue } : file
-		  )
+			prevFiles.map((file, idx) =>
+				idx === index ? { ...file, preset: presetId } : file
+			)
 		);
-		console.log (files)
 	};
+
+
+	const handleSubmit =()=>{
+
+		console.log (files)
+
+		if (!files.length) {
+
+			showToast({
+				type: 'error',
+				message: "Files not selected",
+				position: 'bottom-right',
+				autoClose: 2500
+			})
+			return
+		}
+
+		for (let file of files) {
+			if (file?.preset === null) {
+				showToast({
+					type: 'error',
+					message: "Cutting preset not chosen",
+					position: 'bottom-right',
+					autoClose: 2500
+				});
+				return;
+			}
+		}
+
+		setFiles([])
+		showToast({
+			type: 'success',
+			message: "Files saved with success",
+			position: 'bottom-right',
+			autoClose: 2500
+		})
+	}
+	
+
 
 
 	return (
@@ -160,7 +196,7 @@ const AddPlanButton = observer(() => {
 							style={{ color: "black" }}
 							className="ms-1"
 						/>
-						<div className="flex-grow-1 text-center">{t("Add")}</div>
+						<div className="flex-grow-1 text-center">{t("Upload")}</div>
 					</div>
 				</button>
 			</div>
@@ -184,19 +220,19 @@ const AddPlanButton = observer(() => {
 					>
 						<div className="m-2">
 							<button
-								className="violet_button text-white p-2"
+								className="violet_button text-white p-1 br-5"
 								type="button"
 								onClick={handleClick}
 							>
 								<div className="d-flex align-items-center p-2">
 									<Icon
-										icon="fluent:copy-add-20-regular"
+										icon="fluent:multiselect-16-filled"
 										width="24"
 										height="24"
 										style={{ color: "white" }}
 										className="ms-1"
 									/>
-									<div className="flex-grow-1 text-center ms-2">{t("Upload")}</div>
+									<div className="flex-grow-1 text-center ms-2">{t("Select files")}</div>
 								</div>
 							</button>
 
@@ -253,18 +289,27 @@ const AddPlanButton = observer(() => {
 											<td style={{ verticalAlign: "middle" }}>{item.name}</td>
 											<td style={{ verticalAlign: "middle" }}>{item.quantity}</td>
 											<td style={{ verticalAlign: "middle" }}>
-											
-											<select
-												className="selectPreset"
-												value={item.preset} // контролируемый элемент
-												onChange={(e) => handleMaterialChange(index, e.target.value)} // обработка изменения
-												>
-												{presets.map((preset, index) => (
-													<option value={preset.name} key={index}>
-													{preset.name}
-													</option>
-												))}
-											</select>
+
+												<Dropdown>
+													<DropdownButton
+														variant="outline-primary"
+														title={presets.find(preset => preset.id === item.preset)?.name || "Select Preset"} // Отображаем имя для текущего preset
+														id={`preset-dropdown-${index}`}
+														className="w-100"
+													>
+														{/* Мапим все presets в список */}
+														{presets.map((preset, idx) => (
+															<Dropdown.Item
+																key={idx}
+																eventKey={preset.id}
+																onClick={() => handleMaterialChange(index, preset.id)}
+																active={preset.id === item.preset}
+															>
+																{preset.name}
+															</Dropdown.Item>
+														))}
+													</DropdownButton>
+												</Dropdown>
 
 											</td>
 											<td style={{ verticalAlign: "middle" }}>{item.thickness}</td>
@@ -276,6 +321,24 @@ const AddPlanButton = observer(() => {
 						</table>
 					</div>
 				</div>
+				<div className="m-2 d-flex justify-content-end">
+					<button
+						className="violet_button text-white p-1 br-5"
+						type="button"
+						onClick={handleSubmit}
+					>
+						<div className="d-flex align-items-center p-2">
+							<Icon
+								icon="line-md:square-to-confirm-square-transition"
+								width="24"
+								height="24"
+								style={{ color: "white" }}
+								className="ms-1"
+							/>
+							<div className="flex-grow-1 text-center ms-2">{t("Submit")}</div>
+						</div>
+					</button>
+				</div>				
 			</Modal>
 		</div>
 	);

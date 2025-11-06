@@ -292,5 +292,11 @@ const ru: Record<string, string> = {
 	"Sheet": "Лист",
 	"Macro": "Макрос",
 	"macro": "макрос",
+	"Download": "Скачать",
+	"Submit": "Подтвердить",
+	"Files saved with success": "Файлы успешно сохранены",
+	"Select files": "Выберите файлы",
+	"Cutting preset not chosen": "Макросы резки для файлов не выбраны",
+	"Files not selected": "Файлы не выбраны",
 }
 export default ru;
