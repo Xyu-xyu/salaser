@@ -1,8 +1,9 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from "mobx-react-lite";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+import constants from "../../store/constants";
 
 type FileData = {
 	name: string;
@@ -15,11 +16,25 @@ type FileData = {
 	dimY: number;
 };
 
+interface Preset {
+	id: number;
+	code: string;
+	name: string;
+	thickness: number;
+	ts: string;
+}
+
 const AddPlanButton = observer(() => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { t } = useTranslation();
 	const [files, setFiles] = useState<FileData[]>([]);
 	const [show, setShow] = useState(false);
+	const [presets, setPresets] = useState<Preset[]>([]);
+
+	useEffect(()=>{
+		listPresets()
+	},[])
+
 
 	// Открыть модалку
 	const showModal = () => {
@@ -59,6 +74,7 @@ const AddPlanButton = observer(() => {
 						const dimX = getAttribute("DimX", trunc);
 						const dimY = getAttribute("DimY", trunc);
 						const repeat = getAttribute("Repeat", trunc);
+						const preset = selectPreset(thickness, materialCode)
 
 						const fileData: FileData = {
 							name: file.name,
@@ -108,6 +124,29 @@ const AddPlanButton = observer(() => {
 		const truncatedLines = lines.slice(0, n);
 		return truncatedLines.join("\n");
 	};
+
+	const selectPreset = (thickness:string|null, materialCode:string|null)=> {
+		return presets[0].name	
+	}
+
+	async function listPresets() {
+		let resp = await fetch(constants.SERVER_URL + "/db/listpresets");
+		resp.json().then((data) => {
+			setPresets(data);
+			console.log (data)
+		});
+	}
+
+	const handleMaterialChange = (index: number, selectedValue: string) => {
+		console.log (index, selectedValue)
+		setFiles((prevFiles) =>
+		  prevFiles.map((file, idx) =>
+			idx === index ? { ...file, preset: selectedValue } : file
+		  )
+		);
+		console.log (files)
+	};
+
 
 	return (
 		<div className="">
@@ -191,6 +230,7 @@ const AddPlanButton = observer(() => {
 										{ key: "preset", label: "Preset" },
 										{ key: "thickness", label: "Thickness" },
 										{ key: "material", label: "Material" },
+										{ key: "workingArea", label: "Working Area" },
 									].map((col) => (
 										<th
 											style={{
@@ -212,9 +252,24 @@ const AddPlanButton = observer(() => {
 										<tr key={index}>
 											<td style={{ verticalAlign: "middle" }}>{item.name}</td>
 											<td style={{ verticalAlign: "middle" }}>{item.quantity}</td>
-											<td style={{ verticalAlign: "middle" }}>{item.preset}</td>
+											<td style={{ verticalAlign: "middle" }}>
+											
+											<select
+												className="selectPreset"
+												value={item.preset} // контролируемый элемент
+												onChange={(e) => handleMaterialChange(index, e.target.value)} // обработка изменения
+												>
+												{presets.map((preset, index) => (
+													<option value={preset.name} key={index}>
+													{preset.name}
+													</option>
+												))}
+											</select>
+
+											</td>
 											<td style={{ verticalAlign: "middle" }}>{item.thickness}</td>
 											<td style={{ verticalAlign: "middle" }}>{item.material}</td>
+											<td style={{ verticalAlign: "middle" }}>{item.dimX} • {item.dimY} mm</td>
 										</tr>
 									))}
 							</tbody>
