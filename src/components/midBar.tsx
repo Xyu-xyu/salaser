@@ -1,5 +1,5 @@
 import laserStore from "../store/laserStore";
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -30,13 +30,17 @@ const MidBar = observer(() => {
 
 	const { t } = useTranslation();
 
+	useEffect(()=>{
+		jobStore.loadJobs()
+	},[])
+
 
 	const { paramsLimit, planViewType } = laserStore;
 	const { leftMode } = laserStore
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const { isVertical } = macrosStore
 	const { mockCards } = jobStore
-	const tasks = mockCards.Cutting
+	const tasks = mockCards.Cutting||[]
 
 
 	if (laserStore.loading) return <div>Загрузка...</div>;

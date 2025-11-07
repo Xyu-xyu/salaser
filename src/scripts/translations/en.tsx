@@ -301,5 +301,7 @@ const en: Record<string, string> = {
 	"Select files": "Select files",
 	"Cutting preset not chosen": "Cutting preset not chosen",
 	"Files not selected": "Files not selected",
+	"Clear Base": "Clear Base",
+	"Network error or server is down": "Network error or server is down",
 }
 export default en;

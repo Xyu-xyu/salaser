@@ -296,5 +296,7 @@ const zh: Record<string, string> = {
 	"Select files": "选择文件",
 	"Cutting preset not chosen": "未选择切割预设",
 	"Files not selected": "未选择的文件",
+	"Clear Base": "清除基地",
+	"Network error or server is down": "网络错误或服务器已关闭",
 }
 export default zh;

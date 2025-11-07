@@ -1,4 +1,6 @@
 import { makeAutoObservable } from "mobx";
+import { showToast } from "../components/toast";
+import constants from "./constants";
 
 interface Card {
 	id: number;
@@ -21,7 +23,7 @@ class JobStore {
 
 
 	mockCards: Record<string, Card[]> = {
-		Loaded: [
+	/* 	Loaded: [
 			{
 				id: 1,
 				fileName: "nakladka_1.5_steel.ncp", progress: 10, time: 25.5, width: 3000, heigth: 1500,
@@ -93,45 +95,50 @@ class JobStore {
 			material: "steel", materialCode: "STEEL", gas: "O₂", macros: "STEEL 2", thickness: 2,
 			imgSrc: 'public/images/06.08 1,5мм-01.svg'
 		},],
-		Completed: [],
+		Completed: [], */
 	};
 
 	constructor() {
 		makeAutoObservable(this, {});
 	}
 
-	/* 	// Перемещение карточки внутри одной колонки
-		moveCardWithinColumn(status: string, fromIndex: number, toIndex: number) {
-			const cards = this.mockCards[status];
-			if (cards && fromIndex >= 0 && toIndex >= 0 && fromIndex < cards.length && toIndex < cards.length) {
-				const [movedCard] = cards.splice(fromIndex, 1); // Убираем карточку из текущей позиции
-				cards.splice(toIndex, 0, movedCard); // Вставляем на новое место
-			}
-		}
-	
-		moveCardBetweenColumns(fromStatus: string, toStatus: string, cardId: number, toIndex: number) {
-			const fromColumn = this.mockCards[fromStatus];
-			const toColumn = this.mockCards[toStatus];
-		
-			// Находим карточку, которую нужно переместить
-			const cardIndex = fromColumn.findIndex(card => card.id === cardId);
-			if (cardIndex !== -1) {
-				const [movedCard] = fromColumn.splice(cardIndex, 1); // Убираем карточку из исходной колонки
-				// Проверяем, если toIndex больше длины целевой колонки, то вставляем в конец
-				if (toIndex > toColumn.length) {
-					toColumn.push(movedCard);
-				} else {
-					toColumn.splice(toIndex, 0, movedCard);
-				}
-			}
-		} */
-
 	setCardOrder(status: string, newList: Card[]) {
 		console.log("update jobs")
 		this.mockCards[status] = newList;
 	}
 
+	async loadJobs() {
 
+		/*		
+			Чтобы получить данные с фильтрами, можно сделать HTTP GET-запрос с параметрами:
+			GET /get_jobs?limit=10&offset=0&status=1&start_date=2023-01-01&end_date=2023-12-31&material=steel
+			limit=10 — возвращает 10 записей.
+			offset=0 — смещение на 0, то есть первая страница.
+			status=1 — фильтрация по статусу (например, 1 для активных записей).
+			start_date=2023-01-01 — фильтрация по дате начала.
+			end_date=2023-12-31 — фильтрация по дате окончания.
+			material=steel — фильтрация по материалу, содержащему слово steel.
+		*/
+
+		let resp = await fetch(`${constants.SERVER_URL}/jdb/get_jobs?limit=10`, {
+			method: "GET",
+			headers: {/*"Content-Type": "application/json"*/}
+
+		});
+		resp.json().then((data) => {
+			if (!data) {
+				showToast({
+					type: 'error',
+					message: "Loading failed",
+					position: 'bottom-right',
+					autoClose: 2500
+				});
+			} else {
+				console.log(data)
+			}
+
+		})
+	}
 }
 
 const jobStore = new JobStore();

@@ -53,6 +53,7 @@ const AddPlanButton = observer(() => {
 	};
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		console.log ("handleFileChange")
 		const input = e.target;
 		const selectedFiles = input.files;
 
@@ -63,35 +64,34 @@ const AddPlanButton = observer(() => {
 			return new Promise<FileData>((resolve, reject) => {
 				const reader = new FileReader();
 				// Вместо readAsText используем readAsDataURL, чтобы получить base64 строку.
-		reader.readAsDataURL(file);
+				reader.readAsDataURL(file);
 
-		reader.onload = () => {
-			if (typeof reader.result === 'string') {
-				const content = reader.result;
-				const trunc = truncateStringByLines(content, 10);
+				reader.onload = () => {
+					if (typeof reader.result === 'string') {
+						const content = reader.result;
+						const trunc = truncateStringByLines(content, 10);
 
-				// Извлекаем часть данных после запятой для base64 строки
-				const base64File = content.split(',')[1];
+						// Извлекаем часть данных после запятой для base64 строки
+						const base64File = content.split(',')[1];
 
-				const fileData: FileData = {
-					name: file.name,
-					thickness: getAttribute("Thickness", trunc) ? parseFloat(getAttribute("Thickness", trunc)!) : 0,
-					quantity: getAttribute("Repeat", trunc) ? parseInt(getAttribute("Repeat", trunc)!) : 1,
-					preset: null,
-					material: getAttribute("Label", trunc) || "Неизвестный материал",
-					materialLabel: getAttribute("MaterialCode", trunc) || "Неизвестный MaterialCode",
-					dimX: getAttribute("DimX", trunc) ? parseInt(getAttribute("DimX", trunc)!) : 0,
-					dimY: getAttribute("DimY", trunc) ? parseInt(getAttribute("DimY", trunc)!) : 0,
-					file: base64File
+						const fileData: FileData = {
+							name: file.name,
+							thickness: getAttribute("Thickness", trunc) ? parseFloat(getAttribute("Thickness", trunc)!) : 0,
+							quantity: getAttribute("Repeat", trunc) ? parseInt(getAttribute("Repeat", trunc)!) : 1,
+							preset: null,
+							material: getAttribute("Label", trunc) || "Неизвестный материал",
+							materialLabel: getAttribute("MaterialCode", trunc) || "Неизвестный MaterialCode",
+							dimX: getAttribute("DimX", trunc) ? parseInt(getAttribute("DimX", trunc)!) : 0,
+							dimY: getAttribute("DimY", trunc) ? parseInt(getAttribute("DimY", trunc)!) : 0,
+							file: base64File
+						};
+
+						resolve(fileData);
+					} else {
+						console.error('Ошибка: файл не содержит корректных данных');
+					}
 				};
-
-				resolve(fileData);
-			} else {
-				console.error('Ошибка: файл не содержит корректных данных');
-			}
-		};
-
-		reader.onerror = () => reject(reader.error);
+				reader.onerror = () => reject(reader.error);
 			});
 		};
 
@@ -139,6 +139,17 @@ const AddPlanButton = observer(() => {
 		);
 	};
 
+	async  function clearBase () {
+		let resp = await fetch(constants.SERVER_URL + "/jdb/clear_all",
+		{
+			method: "POST",
+			headers: {/* "Content-Type": "application/json" */},			
+		});
+		resp.json().then((data) => {
+			setPresets(data);
+			console.log(data)
+		});
+	}
 
 	const handleSubmit = () => {
 		if (!files.length) {
@@ -167,23 +178,46 @@ const AddPlanButton = observer(() => {
 	}
 
 	async function addJobs() {
-		await fetch(constants.SERVER_URL + "/jdb/upload_files", {
-			method: "POST",
-			headers: { /* "Content-Type": "application/json" */ },
-			body: JSON.stringify(files)
-		}).then(() => {
-
-			setFiles([])
+		try {
+			// Отправляем POST запрос на сервер
+			const response = await fetch(constants.SERVER_URL + "/jdb/upload_files", {
+				method: "POST",
+				headers: {
+					/*"Content-Type": "application/json"*/
+				},
+				body: JSON.stringify(files)
+			});
+	
+			// Проверяем, был ли запрос успешным
+			if (response.ok) {
+				// Если ответ успешный (HTTP 200), показываем success toast
+				setFiles([]); // Очищаем файлы
+				showToast({
+					type: 'success',
+					message: "Files saved with success",
+					position: 'bottom-right',
+					autoClose: 2500
+				});
+			} else {
+				// Если ответ не успешный (например, 400 или 500), показываем error toast
+				const errorData = await response.json(); // Можем получить данные об ошибке из тела ответа
+				showToast({
+					type: 'error',
+					message: errorData.message || "Something went wrong",
+					position: 'bottom-right',
+					autoClose: 2500
+				});
+			}
+		} catch (error) {
+			// Обрабатываем ошибки, если запрос не удалось выполнить (например, проблема с сетью)
 			showToast({
-				type: 'success',
-				message: "Files saved with success",
+				type: 'error',
+				message: "Network error or server is down",
 				position: 'bottom-right',
 				autoClose: 2500
-			})
-		})
+			});
+		}
 	}
-
-
 
 	return (
 		<div className="">
@@ -323,6 +357,23 @@ const AddPlanButton = observer(() => {
 					</div>
 				</div>
 				<div className="m-2 d-flex justify-content-end">
+					
+					<button
+						className="violet_button text-white p-1 br-5 me-2"
+						type="button"
+						onClick={clearBase}
+					>
+						<div className="d-flex align-items-center p-2">
+							<Icon
+								icon="material-symbols:delete-outline-sharp"
+								width="24"
+								height="24"
+								style={{ color: "white" }}
+								className="ms-1"
+							/>
+							<div className="flex-grow-1 text-center ms-2">{t("Clear Base")}</div>
+						</div>
+					</button>
 					<button
 						className="violet_button text-white p-1 br-5"
 						type="button"

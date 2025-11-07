@@ -60,7 +60,7 @@ const RightBar = observer(() => {
 								<button className="w-100">
 									<div className="d-flex align-items-center">
 										<Icon
-											icon="fluent-mdl2:remove-from-trash"
+											icon="material-symbols:delete-outline-sharp"
 											width="24"
 											height="24"
 											style={{ color: "black" }}

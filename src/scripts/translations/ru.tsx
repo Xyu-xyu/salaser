@@ -298,5 +298,7 @@ const ru: Record<string, string> = {
 	"Select files": "Выберите файлы",
 	"Cutting preset not chosen": "Макросы резки для файлов не выбраны",
 	"Files not selected": "Файлы не выбраны",
+	"Clear Base": "Прозрачная база",
+	"Network error or server is down": "Ошибка сети или сервер не работает",
 }
 export default ru;
