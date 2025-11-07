@@ -15,6 +15,7 @@ type FileData = {
 	materialLabel: string;
 	dimX: number;
 	dimY: number;
+	file: any;
 };
 
 interface Preset {
@@ -58,45 +59,39 @@ const AddPlanButton = observer(() => {
 		if (!selectedFiles || selectedFiles.length === 0) return;
 
 		const fileArray = Array.from(selectedFiles);
-
 		const parseFileContent = (file: File) => {
 			return new Promise<FileData>((resolve, reject) => {
 				const reader = new FileReader();
-				reader.readAsText(file);
+				// Вместо readAsText используем readAsDataURL, чтобы получить base64 строку.
+		reader.readAsDataURL(file);
 
-				reader.onload = () => {
-					const content = reader.result as string;
+		reader.onload = () => {
+			if (typeof reader.result === 'string') {
+				const content = reader.result;
+				const trunc = truncateStringByLines(content, 10);
 
-					try {
-						let trunc = truncateStringByLines(content, 10);
-						const thickness = getAttribute("Thickness", trunc);
-						const label = getAttribute("Label", trunc);
-						const materialCode = getAttribute("MaterialCode", trunc);
-						const dimX = getAttribute("DimX", trunc);
-						const dimY = getAttribute("DimY", trunc);
-						const repeat = getAttribute("Repeat", trunc);
-						//const preset = selectPreset(thickness, materialCode)
+				// Извлекаем часть данных после запятой для base64 строки
+				const base64File = content.split(',')[1];
 
-						const fileData: FileData = {
-							name: file.name,
-							thickness: thickness ? parseFloat(thickness) : 0,
-							quantity: repeat ? parseInt(repeat) : 1,
-							preset: null,
-							material: label || "Неизвестный материал",
-							materialLabel: materialCode || "Неизвестный MaterialCode",
-							dimX: dimX ? parseInt(dimX) : 0,
-							dimY: dimY ? parseInt(dimY) : 0,
-						};
-
-						resolve(fileData);
-					} catch (err) {
-						reject(err);
-					}
+				const fileData: FileData = {
+					name: file.name,
+					thickness: getAttribute("Thickness", trunc) ? parseFloat(getAttribute("Thickness", trunc)!) : 0,
+					quantity: getAttribute("Repeat", trunc) ? parseInt(getAttribute("Repeat", trunc)!) : 1,
+					preset: null,
+					material: getAttribute("Label", trunc) || "Неизвестный материал",
+					materialLabel: getAttribute("MaterialCode", trunc) || "Неизвестный MaterialCode",
+					dimX: getAttribute("DimX", trunc) ? parseInt(getAttribute("DimX", trunc)!) : 0,
+					dimY: getAttribute("DimY", trunc) ? parseInt(getAttribute("DimY", trunc)!) : 0,
+					file: base64File
 				};
 
-				reader.onerror = (error) => {
-					reject(error);
-				};
+				resolve(fileData);
+			} else {
+				console.error('Ошибка: файл не содержит корректных данных');
+			}
+		};
+
+		reader.onerror = () => reject(reader.error);
 			});
 		};
 
@@ -145,10 +140,7 @@ const AddPlanButton = observer(() => {
 	};
 
 
-	const handleSubmit =()=>{
-
-		console.log (files)
-
+	const handleSubmit = () => {
 		if (!files.length) {
 
 			showToast({
@@ -171,16 +163,25 @@ const AddPlanButton = observer(() => {
 				return;
 			}
 		}
+		addJobs()
+	}
 
-		setFiles([])
-		showToast({
-			type: 'success',
-			message: "Files saved with success",
-			position: 'bottom-right',
-			autoClose: 2500
+	async function addJobs() {
+		await fetch(constants.SERVER_URL + "/jdb/upload_files", {
+			method: "POST",
+			headers: { /* "Content-Type": "application/json" */ },
+			body: JSON.stringify(files)
+		}).then(() => {
+
+			setFiles([])
+			showToast({
+				type: 'success',
+				message: "Files saved with success",
+				position: 'bottom-right',
+				autoClose: 2500
+			})
 		})
 	}
-	
 
 
 
