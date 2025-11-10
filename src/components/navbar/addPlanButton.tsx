@@ -62,18 +62,17 @@ const AddPlanButton = observer(() => {
 		const fileArray = Array.from(selectedFiles);
 		const parseFileContent = (file: File) => {
 			return new Promise<FileData>((resolve, reject) => {
-				const reader = new FileReader();
-				// Вместо readAsText используем readAsDataURL, чтобы получить base64 строку.
-				reader.readAsDataURL(file);
-
-				reader.onload = () => {
-					if (typeof reader.result === 'string') {
-						const content = reader.result;
-						const trunc = truncateStringByLines(content, 10);
-
-						// Извлекаем часть данных после запятой для base64 строки
-						const base64File = content.split(',')[1];
-
+				const readerText = new FileReader();
+				const readerBase64 = new FileReader();
+		
+				let textContent: string | null = null;
+				let base64File: string | null = null;
+		
+				// Проверяем, готовы ли оба результата
+				const tryResolve = () => {
+					if (textContent && base64File) {
+						const trunc = truncateStringByLines(textContent, 10);
+		
 						const fileData: FileData = {
 							name: file.name,
 							thickness: getAttribute("Thickness", trunc) ? parseFloat(getAttribute("Thickness", trunc)!) : 0,
@@ -85,13 +84,37 @@ const AddPlanButton = observer(() => {
 							dimY: getAttribute("DimY", trunc) ? parseInt(getAttribute("DimY", trunc)!) : 0,
 							file: base64File
 						};
-
+		
 						resolve(fileData);
-					} else {
-						console.error('Ошибка: файл не содержит корректных данных');
 					}
 				};
-				reader.onerror = () => reject(reader.error);
+		
+				// === Чтение текста ===
+				readerText.onload = () => {
+					if (typeof readerText.result === 'string') {
+						textContent = readerText.result;
+						tryResolve();
+					} else {
+						reject(new Error("Не удалось прочитать текстовое содержимое файла"));
+					}
+				};
+		
+				// === Чтение base64 ===
+				readerBase64.onload = () => {
+					if (typeof readerBase64.result === 'string') {
+						base64File = readerBase64.result.split(',')[1]; // убираем префикс data:
+						tryResolve();
+					} else {
+						reject(new Error("Не удалось получить base64 файл"));
+					}
+				};
+		
+				readerText.onerror = () => reject(readerText.error);
+				readerBase64.onerror = () => reject(readerBase64.error);
+		
+				// Запускаем оба чтения
+				readerText.readAsText(file);
+				readerBase64.readAsDataURL(file);
 			});
 		};
 
