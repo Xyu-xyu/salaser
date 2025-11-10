@@ -305,5 +305,6 @@ const en: Record<string, string> = {
 	"Network error or server is down": "Network error or server is down",
 	"Mild steel": "Mild steel",
 	"Mild Steel": "Mild Steel",
+	"sheets": "sheets",
 }
 export default en;

@@ -2,11 +2,6 @@ import { makeAutoObservable } from "mobx";
 import { showToast } from "../components/toast";
 import constants from "./constants";
 
-interface JobInfoPart {
-	debit: string;
-	partcode: string;
-}
-
 interface JobInfoAttr {
 	thickness: string;
 	id: number;
@@ -28,14 +23,7 @@ class JobStore {
 
 
 	mockCards: Record<string, JobInfoAttr[]> = {
-		Loaded: [
-			/*{
-				id: 1,
-				fileName: "nakladka_1.5_steel.ncp", progress: 10, time: 25.5, width: 3000, heigth: 1500,
-				material: "steel", materialCode: "STEEL", gas: "O₂", macros: "STEEL 2", thickness: 2,
-				imgSrc: 'public/images/06.08 1,5мм-01.svg'
-			}*/
-		],
+		Loaded: [],
 		Cutting: [],
 		Pending: [],
 		Completed: [],

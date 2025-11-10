@@ -5,6 +5,7 @@ import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import constants from "../../store/constants";
 import { showToast } from "../toast";
+import macrosStore from "../../store/macrosStore";
 
 type FileData = {
 	name: string;
@@ -18,24 +19,14 @@ type FileData = {
 	file: any;
 };
 
-interface Preset {
-	id: number;
-	code: string;
-	name: string;
-	thickness: number;
-	ts: string;
-}
 
 const AddPlanButton = observer(() => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { t } = useTranslation();
 	const [files, setFiles] = useState<FileData[]>([]);
 	const [show, setShow] = useState(false);
-	const [presets, setPresets] = useState<Preset[]>([]);
+	const { presets } = macrosStore
 
-	useEffect(() => {
-		listPresets()
-	}, [])
 
 
 	// Открыть модалку
@@ -145,14 +136,6 @@ const AddPlanButton = observer(() => {
 	};
 
 
-	async function listPresets() {
-		let resp = await fetch(constants.SERVER_URL + "/db/listpresets");
-		resp.json().then((data) => {
-			setPresets(data);
-			console.log(data)
-		});
-	}
-
 	// Обновленный обработчик для изменения выбранного preset по ID
 	const handleMaterialChange = (index: number, presetId: number) => {
 		setFiles((prevFiles) =>
@@ -168,9 +151,8 @@ const AddPlanButton = observer(() => {
 			method: "POST",
 			headers: {/* "Content-Type": "application/json" */},			
 		});
-		resp.json().then((data) => {
-			setPresets(data);
-			console.log(data)
+		 resp.json().then(() => {
+			console.log("Base cleared")
 		});
 	}
 

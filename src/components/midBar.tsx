@@ -21,6 +21,21 @@ interface ParamItem {
 	measure: string;
 }
 
+interface JobInfoAttr {
+	thickness: string;
+	id: number;
+	preset: number;
+	status: number;
+	name: string;
+	dimX: number;
+	dimY: number;
+	materialLabel: string;
+	quantity: number;
+	created_at: string;
+	updated_at: string;
+	loadResult: string;
+}
+
 const MidBar = observer(() => {
 	let params = [
 		{ name: 'N2', measure: 'bar', val: 4.8 },
@@ -30,17 +45,17 @@ const MidBar = observer(() => {
 
 	const { t } = useTranslation();
 
-	useEffect(()=>{
+	useEffect(() => {
 		jobStore.loadJobs()
-	},[])
+	}, [])
 
 
 	const { paramsLimit, planViewType } = laserStore;
 	const { leftMode } = laserStore
 	const swiperRef = useRef<SwiperClass | null>(null);
-	const { isVertical } = macrosStore
+	const { isVertical, presets } = macrosStore
 	const { mockCards } = jobStore
-	const tasks = mockCards.Cutting||[]
+	const tasks = mockCards.Cutting || []
 
 
 	if (laserStore.loading) return <div>Загрузка...</div>;
@@ -207,33 +222,50 @@ const MidBar = observer(() => {
 											macrosStore.setSelectedSlide(currentSlide);
 										}}
 									>
-										{tasks.map((card: any) => (
-											<SwiperSlide key={card.id}>
-												<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
-													<div className="ccard">
-														<div className="ccard-header">{ card.fileName }</div>
-														<div className="ccard-image-wrapper">
-															<div className="ccard-image">
-																<img src={`${constants.SERVER_URL}/api/random-image?random=${card.id}`} alt={card.fileName} />
+										{tasks.map((card: JobInfoAttr) => {
+											// Парсим loadResult один раз
+											const loadResult = JSON.parse(card.loadResult);
+
+											return (
+												<SwiperSlide key={card.id}>
+													<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
+														<div className="ccard">
+															<div className="ccard-header">{card.name}</div>
+															<div className="ccard-image-wrapper">
+																<div className="ccard-image">
+																	<img src={`${constants.SERVER_URL}/api/random-image?random=${card.id}`} alt={card.name} />
+																</div>
 															</div>
-														</div>
-														<div className="ccard-info-block">
-															<div className="mt-2">
-																<div className="cardTime">
-																	• {card.time} {t('min')}
-																</div>
-																<div className="cardMaterial">
-																	• {card.thickness} {t('mm')} {card.material} • {card.width} * {card.heigth} {t('mm')}
-																</div>
-																<div className="cardMaterial">
-																	• {t('macro')}: {card.macros} • {card.gas}
+															<div className="ccard-info-block">
+																<div className="mt-2">
+																	<div className="cardTime">
+																		• {t('sheets')}:{ card.quantity }
+																	</div>
+																	<div className="cardMaterial">
+																		• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+																	</div>
+																	<div className="cardMaterial">
+																		• {card.dimX} * {card.dimY} {t('mm')}
+																	</div>
+																	
+																	<div className="cardMaterial">
+																		{presets.map((preset) =>
+																			preset.id === card.preset ? (
+																				<div className="cardTech" key={preset.id}>
+																					• {t('macro')}: {preset.name}
+																				</div>
+																			) : null
+																		)}
+																	</div>
 																</div>
 															</div>
 														</div>
 													</div>
-												</div>
-											</SwiperSlide>
-										))}
+												</SwiperSlide>
+											);
+										})}
+
+
 									</Swiper>
 								</div>
 							</div>

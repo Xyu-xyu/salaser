@@ -9,13 +9,6 @@ import utils from "../../scripts/util";
 import { useTranslation } from 'react-i18next';
 
 
-interface Preset {
-	id: number;
-	code: string;
-	name: string;
-	thickness: number;
-	ts: string;
-}
 
 type SortKey = "code" | "name" | "thickness" | "ts";
 type SortOrder = "asc" | "desc";
@@ -25,10 +18,10 @@ const SettingsButton = observer(() => {
 	const { presetMode } = macrosStore
 	const [show, setShow] = useState(false);
 	const [update, setUpdate] = useState(true);
-	const [presets, setPresets] = useState<Preset[]>([]);
 	const [sortKey, setSortKey] = useState<SortKey>("code");
 	const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 	const { t } = useTranslation()
+	const { presets } = macrosStore
 
 	const api_host = constants.SERVER_URL;
 
@@ -41,17 +34,10 @@ const SettingsButton = observer(() => {
 
 	useEffect(() => {
 		if (update) {
-			listPresets()
 			setUpdate(false)
 		}
 	}, [update])
 
-	async function listPresets() {
-		let resp = await fetch(api_host + "/db/listpresets");
-		resp.json().then((data) => {
-			setPresets(data);
-		});
-	}
 
 	function sortPresets(key: SortKey) {
 		if (sortKey === key) {

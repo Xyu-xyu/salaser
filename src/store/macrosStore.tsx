@@ -579,6 +579,14 @@ export interface FeedLimitMmS2 {
     title: string
 }
 
+export interface Preset {
+	id: number;
+	code: string;
+	name: string;
+	thickness: number;
+	ts: string;
+}
+
 
 
 class MacrosStore {
@@ -591,6 +599,10 @@ class MacrosStore {
         func: () => { },
         args: []
     };
+
+    //presets:Preset[]=[]
+    private _presets: Preset[] = []; 
+
 
     diagActive: string = ''
     macrosModalEdit: boolean = false;
@@ -1304,8 +1316,25 @@ class MacrosStore {
             
 		})
     }
+
+    async fetchPresets() {
+        try {
+          let resp = await fetch(constants.SERVER_URL + "/db/listpresets");
+          const data = await resp.json();
+          console.log(data); // Печать данных для отладки
+          this._presets = data;
+        } catch (error) {
+          console.error("Ошибка при загрузке пресетов:", error);
+        }
+      }
+    
+      // Геттер для получения пресетов
+      get presets() {
+        return this._presets;
+      }
     
 }
 
 const macrosStore = new MacrosStore();
+await macrosStore.fetchPresets();
 export default macrosStore;         

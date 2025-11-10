@@ -300,5 +300,6 @@ const zh: Record<string, string> = {
 	"Network error or server is down": "网络错误或服务器已关闭",
 	"Mild steel": "低碳钢",
 	"Mild Steel": "低碳钢",
+	"sheets": "床单",
 }
 export default zh;

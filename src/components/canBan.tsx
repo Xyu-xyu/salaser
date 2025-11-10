@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next';
 import jobStore from '../store/jobStore';
 import { ReactSortable } from 'react-sortablejs';
 //import { showToast } from './toast';
-import constants from '../store/constants';
+import macrosStore from '../store/macrosStore';
 
 const CanBan: React.FC = observer(() => {
 	const { t } = useTranslation();
 	const statuses: string[] = ['Loaded', 'Cutting', 'Pending', 'Completed'];
 	const { mockCards } = jobStore;
+	const { presets } = macrosStore;
 	const setList = (status: string) => (newList: any) => {
-		// Обновляем порядок карточек в соответствующем статусе
-		jobStore.setCardOrder(status, newList);
+ 		jobStore.setCardOrder(status, newList);
 	};
 
 	return (
@@ -47,7 +47,7 @@ const CanBan: React.FC = observer(() => {
 							>
 								{cards.length > 0 ? (
 									cards.map((card) => {
-										const loadResult =JSON.parse(card.loadResult)
+										const loadResult = JSON.parse(card.loadResult)
 
 										return (
 											<div key={card.id} className="kanbanCard" data-id={card.id} data-status={status} style={{ touchAction: 'none' }}>
@@ -57,18 +57,22 @@ const CanBan: React.FC = observer(() => {
 
 												<div className="mt-2">
 													<div className="cardTime">
-														• {t('min')}
+														• {t('sheets')}:{ card.quantity }
 													</div>
 													<div className="cardMaterial">
-														• { loadResult.result.jobinfo.attr.thickness} {t('mm')} 
-														• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} 
+														• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
 													</div>
 													<div className="cardMaterial">
 														• {card.dimX} * {card.dimY} {t('mm')}
 													</div>
-													{/* <div className="cardTech">
-											• {t('macro')}: {card.macros} • {card.gas}
-										</div> */}
+													{presets.map((preset) =>
+														preset.id === card.preset ? (
+															<div className="cardTech" key={preset.id}>
+																• {t('macro')}: {preset.name} 
+															</div>
+														) : null
+													)}
+
 												</div>
 											</div>
 										);

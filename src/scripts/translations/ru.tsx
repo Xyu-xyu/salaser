@@ -302,5 +302,6 @@ const ru: Record<string, string> = {
 	"Network error or server is down": "Ошибка сети или сервер не работает",
 	"Mild steel": "Мягкая сталь",
 	"Mild Steel": "Мягкая сталь",
+	"sheets": "листы",
 }
 export default ru;
