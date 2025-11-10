@@ -8,56 +8,21 @@ interface JobInfoPart {
 }
 
 interface JobInfoAttr {
-	materialcode: string;
-	dimx: string;
-	jobcode: string;
-	version: string;
-	units: string;
-	clamping: string;
-	label: string;
-	dimy: string;
-	cuttechnology: string;
-	formattype: string;
 	thickness: string;
 	id: number;
-	fileName: string;
 	preset: number;
-	status:number;
-}
-
-interface JobInfo {
-	parts: JobInfoPart[];
-	isSGN: boolean;
-	load_result: boolean;
-	attr: JobInfoAttr;
-	messages: any[];
-}
-
-interface LoadResult {
-	success: boolean;
-	result: {
-		jobinfo: JobInfo;
-		status: string;
-		mode: string;
-		workarea: number[];
-	};
-}
-
-
-export interface FileData {
-	id: string;
+	status: number;
 	name: string;
-	material: string;
-	materialLabel: string;
 	dimX: number;
 	dimY: number;
+	materialLabel: string;
 	quantity: number;
-	preset: number | null;
-	status: number;
 	created_at: string;
 	updated_at: string;
-	loadResult: string | LoadResult;
+	loadResult: string;
 }
+
+
 
 class JobStore {
 
@@ -106,9 +71,9 @@ class JobStore {
 					// "Content-Type": "application/json"
 				}
 			});
-	
+
 			const data = await resp.json(); // Перемещаем `.json()` в `await`
-	
+
 			if (!data || !data.jobs) {
 				// Если данные не загружены или отсутствуют
 				showToast({
@@ -119,33 +84,33 @@ class JobStore {
 				});
 				return;
 			}
-	
+
 			console.log(data);
-	
+
 			// Статусы
 			const statuses = ["Loaded", "Cutting", "Pending", "Completed"];
-	
+
 			// Очищаем старые данные
 			statuses.forEach(status => {
 				jobStore.mockCards[status] = [];
 			});
-	
+
 			// Перебираем все работы
 			data.jobs.forEach((job: JobInfoAttr) => {
 				// Проверяем, что status в допустимом диапазоне
 				if (job.status >= 0 && job.status < statuses.length) {
 					const statusKey = statuses[job.status];
-	
+
 					// Проверяем, что массив для текущего статуса существует
 					if (!jobStore.mockCards[statusKey]) {
 						jobStore.mockCards[statusKey] = [];
 					}
-	
+
 					// Добавляем работу в массив
 					jobStore.mockCards[statusKey].push(job);
 				}
 			});
-	
+
 		} catch (error) {
 			console.error("Error loading jobs:", error);
 			showToast({
@@ -156,8 +121,8 @@ class JobStore {
 			});
 		}
 	}
-	
-	
+
+
 }
 
 const jobStore = new JobStore();

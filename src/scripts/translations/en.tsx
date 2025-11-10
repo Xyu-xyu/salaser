@@ -303,5 +303,7 @@ const en: Record<string, string> = {
 	"Files not selected": "Files not selected",
 	"Clear Base": "Clear Base",
 	"Network error or server is down": "Network error or server is down",
+	"Mild steel": "Mild steel",
+	"Mild Steel": "Mild Steel",
 }
 export default en;

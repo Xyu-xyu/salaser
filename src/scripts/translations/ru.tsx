@@ -300,5 +300,7 @@ const ru: Record<string, string> = {
 	"Files not selected": "Файлы не выбраны",
 	"Clear Base": "Прозрачная база",
 	"Network error or server is down": "Ошибка сети или сервер не работает",
+	"Mild steel": "Мягкая сталь",
+	"Mild Steel": "Мягкая сталь",
 }
 export default ru;

@@ -298,5 +298,7 @@ const zh: Record<string, string> = {
 	"Files not selected": "未选择的文件",
 	"Clear Base": "清除基地",
 	"Network error or server is down": "网络错误或服务器已关闭",
+	"Mild steel": "低碳钢",
+	"Mild Steel": "低碳钢",
 }
 export default zh;
