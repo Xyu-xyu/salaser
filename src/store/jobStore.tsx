@@ -20,8 +20,6 @@ interface JobInfoAttr {
 
 
 class JobStore {
-
-
 	mockCards: Record<string, JobInfoAttr[]> = {
 		Loaded: [],
 		Cutting: [],
@@ -34,7 +32,6 @@ class JobStore {
 	}
 
 	setCardOrder(status: string, newList: JobInfoAttr[]) {
-		console.log("update jobs")
 		this.mockCards[status] = newList;
 	}
 
@@ -110,8 +107,38 @@ class JobStore {
 		}
 	}
 
-
+	updateJobs(param:string, id:string, newValue:any) {
+		console.log('Arguments:', param, id, newValue); // Для отладки
+	
+		// Отправка POST запроса на сервер
+		fetch(`${constants.SERVER_URL}/jdb/update_job`, {
+			method: 'POST',
+			headers: {/*'Content-Type': 'application/json',*/},
+			body: JSON.stringify({
+				param: param,
+				id: id,
+				value: newValue
+			})
+		})
+		.then(response => response.json())
+		.then(data => {
+			console.log('Server Response:', data);
+	
+			if (data.status === "success") {
+				// Если обновление прошло успешно, выводим сообщение на фронте
+				console.log (`Job ${param} updated successfully!`);
+				// Обновляем интерфейс (например, список задач или отображаем измененные данные)
+ 			} else {
+				// В случае ошибки выводим сообщение
+				console.log  (`Error: ${data.error || data.message}`);
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+ 		});
+	}
 }
 
 const jobStore = new JobStore();
+jobStore.loadJobs()
 export default jobStore;

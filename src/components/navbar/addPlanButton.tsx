@@ -1,11 +1,12 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from "mobx-react-lite";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import constants from "../../store/constants";
 import { showToast } from "../toast";
 import macrosStore from "../../store/macrosStore";
+import jobStore from "../../store/jobStore";
 
 type FileData = {
 	name: string;
@@ -153,6 +154,7 @@ const AddPlanButton = observer(() => {
 		});
 		 resp.json().then(() => {
 			console.log("Base cleared")
+			jobStore.loadJobs()
 		});
 	}
 
@@ -221,6 +223,9 @@ const AddPlanButton = observer(() => {
 				position: 'bottom-right',
 				autoClose: 2500
 			});
+		} finally {
+			jobStore.loadJobs()
+			setTimeout(()=> handleClose(), 1000)
 		}
 	}
 

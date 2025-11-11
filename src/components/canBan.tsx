@@ -37,12 +37,14 @@ const CanBan: React.FC = observer(() => {
 								animation={75}
 								easing="ease-out"
 								className="d-flex flex-column sortableContainerClass"
+								id={status}
 								group="kanban"  // Одна группа для всех колонок, чтобы элементы могли перемещаться между колонками
 								onEnd={(evt) => {
 									const movedCardId = evt.item?.dataset?.id;
-									const targetStatus = evt.item?.dataset?.status;  // Колонка, откуда карточка была перемещена
+									//const targetStatus = evt.item?.dataset?.status;  // Колонка, откуда карточка была перемещена
 									const newStatus = evt.to?.id
-									console.log(`Card with ID ${movedCardId} moved from ${targetStatus} to ${newStatus}`);
+									//console.log(`Card with ID ${movedCardId} moved from ${targetStatus} to ${newStatus}`);
+									jobStore.updateJobs('status', String(movedCardId), statuses.indexOf(newStatus) )
 								}}
 							>
 								{cards.length > 0 ? (
