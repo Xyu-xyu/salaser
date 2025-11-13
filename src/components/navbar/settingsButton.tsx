@@ -35,6 +35,7 @@ const SettingsButton = observer(() => {
 	useEffect(() => {
 		if (update) {
 			setUpdate(false)
+			macrosStore.fetchPresets()
 		}
 	}, [update])
 

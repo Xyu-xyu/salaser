@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from "mobx-react-lite";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import constants from "../../store/constants";
@@ -27,6 +27,9 @@ const AddPlanButton = observer(() => {
 	const [files, setFiles] = useState<FileData[]>([]);
 	const [show, setShow] = useState(false);
 	const { presets } = macrosStore
+	useEffect(()=>{
+		if (!presets) macrosStore.fetchPresets();
+	},[])
 
 
 

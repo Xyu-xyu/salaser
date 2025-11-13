@@ -1336,5 +1336,4 @@ class MacrosStore {
 }
 
 const macrosStore = new MacrosStore();
-await macrosStore.fetchPresets();
 export default macrosStore;         

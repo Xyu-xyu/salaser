@@ -233,8 +233,8 @@ const MidBar = observer(() => {
 															<div className="ccard-header">{card.name}</div>
 															<div className="ccard-image-wrapper">
 																<div className="ccard-image">
-																	<img src={`${constants.SERVER_URL}/api/random-image?random=${card.id}`} alt={card.name} />
-																</div>
+				    												<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
+ 																</div>
 															</div>
 															<div className="ccard-info-block">
 																<div className="mt-2">

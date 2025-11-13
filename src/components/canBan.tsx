@@ -4,6 +4,8 @@ import jobStore from '../store/jobStore';
 import { ReactSortable } from 'react-sortablejs';
 //import { showToast } from './toast';
 import macrosStore from '../store/macrosStore';
+import { useEffect } from 'react';
+import constants from '../store/constants';
 
 const CanBan: React.FC = observer(() => {
 	const { t } = useTranslation();
@@ -11,8 +13,12 @@ const CanBan: React.FC = observer(() => {
 	const { mockCards } = jobStore;
 	const { presets } = macrosStore;
 	const setList = (status: string) => (newList: any) => {
- 		jobStore.setCardOrder(status, newList);
+		jobStore.setCardOrder(status, newList);
 	};
+
+	useEffect(() => {
+		if (!presets.length) macrosStore.fetchPresets();
+	}, [])
 
 	return (
 		<div className="kanbanContainer">
@@ -44,12 +50,21 @@ const CanBan: React.FC = observer(() => {
 									//const targetStatus = evt.item?.dataset?.status;  // Колонка, откуда карточка была перемещена
 									const newStatus = evt.to?.id
 									//console.log(`Card with ID ${movedCardId} moved from ${targetStatus} to ${newStatus}`);
-									jobStore.updateJobs('status', String(movedCardId), statuses.indexOf(newStatus) )
+									jobStore.updateJobs('status', String(movedCardId), statuses.indexOf(newStatus))
 								}}
 							>
 								{cards.length > 0 ? (
 									cards.map((card) => {
-										const loadResult = JSON.parse(card.loadResult)
+										let loadResult = null;
+										try {
+											// Пытаемся распарсить, только если строка не пустая
+											if (card.loadResult && typeof card.loadResult === 'string' && card.loadResult.trim() !== '') {
+												loadResult = JSON.parse(card.loadResult);
+											}
+										} catch (e) {
+											console.warn('Failed to parse loadResult for card:', card.id, e);
+											loadResult = null; // В случае ошибки — считаем, что данных нет
+										}
 
 										return (
 											<div key={card.id} className="kanbanCard" data-id={card.id} data-status={status} style={{ touchAction: 'none' }}>
@@ -57,24 +72,37 @@ const CanBan: React.FC = observer(() => {
 													{card.name}
 												</div>
 
+												<div className="cardImage">
+    												<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
+												</div>
+
 												<div className="mt-2">
 													<div className="cardTime">
-														• {t('sheets')}:{ card.quantity }
+														• {t('sheets')}: {card.quantity}
 													</div>
-													<div className="cardMaterial">
-														• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
-													</div>
+
+													{/* Безопасно отображаем данные из loadResult */}
+													{loadResult?.result?.jobinfo?.attr ? (
+														<div className="cardMaterial">
+															• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+														</div>
+													) : (
+														<div className="cardMaterial text-muted">
+															• {t('No material info')}
+														</div>
+													)}
+
 													<div className="cardMaterial">
 														• {card.dimX} * {card.dimY} {t('mm')}
 													</div>
+
 													{presets.map((preset) =>
 														preset.id === card.preset ? (
 															<div className="cardTech" key={preset.id}>
-																• {t('macro')}: {preset.name} 
+																• {t('macro')}: {preset.name}
 															</div>
 														) : null
 													)}
-
 												</div>
 											</div>
 										);
