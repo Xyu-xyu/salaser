@@ -303,5 +303,7 @@ const ru: Record<string, string> = {
 	"Mild steel": "Мягкая сталь",
 	"Mild Steel": "Мягкая сталь",
 	"sheets": "листы",
+	"An error occurred while loading jobs.": "Произошла ошибка при загрузке заданий.",
+	"Success in save preset": "Успех в сохранении пресета",
 }
 export default ru;

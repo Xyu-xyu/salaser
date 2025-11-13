@@ -306,5 +306,7 @@ const en: Record<string, string> = {
 	"Mild steel": "Mild steel",
 	"Mild Steel": "Mild Steel",
 	"sheets": "sheets",
+	"An error occurred while loading jobs.": "An error occurred while loading jobs.",
+	"Success in save preset": "Success in save preset",
 }
 export default en;

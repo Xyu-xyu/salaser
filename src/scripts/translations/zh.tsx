@@ -301,5 +301,7 @@ const zh: Record<string, string> = {
 	"Mild steel": "低碳钢",
 	"Mild Steel": "低碳钢",
 	"sheets": "床单",
+	"An error occurred while loading jobs.": "加载作业时发生错误。",
+	"Success in save preset": "保存预设成功",
 }
 export default zh;

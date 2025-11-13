@@ -7,6 +7,7 @@ import { Modal } from "react-bootstrap";
 import constants from "../../store/constants";
 import utils from "../../scripts/util";
 import { useTranslation } from 'react-i18next';
+import UploadPresetFromFile from './../uploadPresetFromFile'
 
 
 
@@ -398,6 +399,7 @@ const SettingsButton = observer(() => {
 							/>
 						</div>
 					</button>
+					<UploadPresetFromFile />					
 				</div>
 			</Modal>
 		</div>
