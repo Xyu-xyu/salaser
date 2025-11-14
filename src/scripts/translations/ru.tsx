@@ -305,5 +305,7 @@ const ru: Record<string, string> = {
 	"sheets": "листы",
 	"An error occurred while loading jobs.": "Произошла ошибка при загрузке заданий.",
 	"Success in save preset": "Успех в сохранении пресета",
+	"Do you want to delete job ?": "Вы хотите удалить работу?",
+	"No one job selected": "Ни одна вакансия не выбрана",
 }
 export default ru;

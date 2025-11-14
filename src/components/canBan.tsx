@@ -10,11 +10,16 @@ import constants from '../store/constants';
 const CanBan: React.FC = observer(() => {
 	const { t } = useTranslation();
 	const statuses: string[] = ['Loaded', 'Cutting', 'Pending', 'Completed'];
-	const { mockCards } = jobStore;
+	const { mockCards, selectedId } = jobStore;
 	const { presets } = macrosStore;
 	const setList = (status: string) => (newList: any) => {
 		jobStore.setCardOrder(status, newList);
 	};
+	const handleMouseDown = (id: string) => {
+		console.log("Setting selected to:", id);
+		jobStore.setVal('selectedId', id);
+	  };
+
 
 	useEffect(() => {
 		if (!presets.length) macrosStore.fetchPresets();
@@ -67,7 +72,14 @@ const CanBan: React.FC = observer(() => {
 										}
 
 										return (
-											<div key={card.id} className="kanbanCard" data-id={card.id} data-status={status} style={{ touchAction: 'none' }}>
+											<div key={card.id} 
+												className={`kanbanCard ${card.id  === selectedId  ? "selected":""}`}
+												data-id={card.id} 
+												data-status={status} 
+												style={{ touchAction: 'none' }}											
+												onMouseDown={() =>{handleMouseDown(card.id)}}
+
+												>
 												<div className="cardfileName">
 													{card.name}
 												</div>

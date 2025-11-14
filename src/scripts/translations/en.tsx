@@ -308,5 +308,7 @@ const en: Record<string, string> = {
 	"sheets": "sheets",
 	"An error occurred while loading jobs.": "An error occurred while loading jobs.",
 	"Success in save preset": "Success in save preset",
+	"Do you want to delete job ?": "Do you want to delete job ?",
+	"No one job selected": "No one job selected",
 }
 export default en;

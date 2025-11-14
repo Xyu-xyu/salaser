@@ -178,6 +178,10 @@ const MidBar = observer(() => {
 							inset: 0,
 							width: "100%",
 							height: "100%",
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+
 						}}
 					>
 						<div
@@ -194,7 +198,7 @@ const MidBar = observer(() => {
 											swiperRef.current = swiper;
 										}}
 										modules={[EffectCoverflow]}
-										direction={'horizontal'}
+										direction={isVertical ? 'vertical' : 'horizontal'}
 										effect="coverflow"
 										loop={false}
 										slideToClickedSlide={true}
@@ -222,7 +226,7 @@ const MidBar = observer(() => {
 											macrosStore.setSelectedSlide(currentSlide);
 										}}
 									>
-										{tasks.map((card: JobInfoAttr) => {
+										{tasks.map((card) => {
 											// Парсим loadResult один раз
 											const loadResult = JSON.parse(card.loadResult);
 

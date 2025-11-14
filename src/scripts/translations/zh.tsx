@@ -303,5 +303,7 @@ const zh: Record<string, string> = {
 	"sheets": "床单",
 	"An error occurred while loading jobs.": "加载作业时发生错误。",
 	"Success in save preset": "保存预设成功",
+	"Do you want to delete job ?": "您想删除作业吗？",
+	"No one job selected": "没有选择任何一项工作",
 }
 export default zh;

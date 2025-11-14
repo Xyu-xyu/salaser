@@ -4,7 +4,7 @@ import constants from "./constants";
 
 interface JobInfoAttr {
 	thickness: string;
-	id: number;
+	id: string;
 	preset: number;
 	status: number;
 	name: string;
@@ -20,6 +20,7 @@ interface JobInfoAttr {
 
 
 class JobStore {
+	selectedId:string=""
 	mockCards: Record<string, JobInfoAttr[]> = {
 		Loaded: [],
 		Cutting: [],
@@ -136,6 +137,36 @@ class JobStore {
 		.catch(error => {
 			console.error('Error:', error);
  		});
+	}
+
+	setVal<T extends keyof this>(key: T, value: this[T]) {
+		if (key in this) {
+			this[key] = value;
+			console.log (key, value)
+		}
+	}
+
+	async deleteJob () {
+		if (jobStore.selectedId) {
+
+			fetch(constants.SERVER_URL + '/jdb/delete_job', {
+				method: "POST",
+				headers: {/*"Content-Type": "application/json"*/},
+				body: JSON.stringify({id:jobStore.selectedId})
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log('Server Response:', data);
+		
+				if (data.status === "success") {
+					jobStore.setVal('selectedId',"")
+					//ТУТ можно просто найти у удалить из массива такой id
+					jobStore.loadJobs()	
+				} else {
+					// В случае ошибки выводим сообщение
+					console.error("Ошибка при удалении:" );				}
+			})
+		}
 	}
 }
 

@@ -7,6 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import FunctionsForm from "./formFunctionsorm";
 import PlanViewSwitcher from "./planViewSwitcher";
 import AddPlanButton from "./navbar/addPlanButton";
+import jobStore from "../store/jobStore";
+import macrosStore from "../store/macrosStore";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
@@ -18,6 +20,17 @@ const RightBar = observer(() => {
 		visible: { opacity: 1, x: 0 },
 		exit: { opacity: 0, x: 40 },
 	};
+
+	const deleteJob =()=>{
+		macrosStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to delete job ?',
+			confirmText: 'Delete',
+			cancelText: 'Cancel',
+			func: jobStore.deleteJob,
+			args: []
+		})
+	}
 
 	return (
 		<AnimatePresence mode="wait">
@@ -57,7 +70,9 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100"
+									onMouseDown={ deleteJob }
+								>
 									<div className="d-flex align-items-center">
 										<Icon
 											icon="material-symbols:delete-outline-sharp"

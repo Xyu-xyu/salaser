@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { Icon } from "@iconify/react";
 import constants from "../store/constants";
-import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react-lite";
 import macrosStore from "../store/macrosStore";
 import utils from "../scripts/util";
@@ -14,9 +13,7 @@ interface Preset {
 
 export const uploadPresetFromFile = observer(() => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { t } = useTranslation();
-
-	const handleClick = () => {
+ 	const handleClick = () => {
 		fileInputRef.current?.click();
 	};
 
