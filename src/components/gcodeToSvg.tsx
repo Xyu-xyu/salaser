@@ -552,7 +552,7 @@ const GCodeToSvg = observer(() => {
 					<Form>
 						<Form.Check
 							type="checkbox"
-							id="custom-checkbox"
+							id="custom-checkbox1"
 							label={ t("show laserOff")}
 							checked={showInners}
 							onChange={ ()=>{ setShowInners( !showInners)}}

@@ -21,7 +21,7 @@ interface ParamItem {
 	measure: string;
 }
 
-interface JobInfoAttr {
+/* interface JobInfoAttr {
 	thickness: string;
 	id: number;
 	preset: number;
@@ -34,7 +34,7 @@ interface JobInfoAttr {
 	created_at: string;
 	updated_at: string;
 	loadResult: string;
-}
+} */
 
 const MidBar = observer(() => {
 	let params = [

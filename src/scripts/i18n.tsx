@@ -8,37 +8,39 @@ import constants from '../store/constants.tsx';
 const settedLang = localStorage.getItem('lng') || 'en'
 
 i18n
-  .use(initReactI18next)
-  .init({
-    resources: {
-      en: { translation: en },
-      ru: { translation: ru },
-      zh: { translation: zh }
-    },
-    lng: settedLang,
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false,
-    },
-    debug: false, // Можно включить при необходимости
-    saveMissing: true, // Включает событие "missingKey"
-    missingKeyHandler: function (lng, ns, key, fallbackValue) {
-      console.warn(`[i18n] Missing translation for key: "${key}" ${ns} in language: "${lng}"${fallbackValue}`);
-      
-      if (import.meta.env.DEV && key.length) {
-        fetch(`${constants.SERVER_URL}/api/translate?phrase=${encodeURIComponent(key)}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Ошибка при запросе перевода: ${response.statusText}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("[i18n] Автоматически добавлен перевод:", data);
-        })
-        .catch((err) => {
-          console.error("[i18n] Ошибка при автопереводе:", err);
-        });
-      }     
-    },
-  });
+	.use(initReactI18next)
+	.init({
+		resources: {
+			en: { translation: en },
+			ru: { translation: ru },
+			zh: { translation: zh }
+		},
+		lng: settedLang,
+		fallbackLng: 'en',
+		interpolation: {
+			escapeValue: false,
+		},
+		debug: false, // Можно включить при необходимости
+		saveMissing: true, // Включает событие "missingKey"
+		missingKeyHandler: function (lng, ns, key, fallbackValue) {
+			console.warn(`[i18n] Missing translation for key: "${key}" ${ns} in language: "${lng}"${fallbackValue}`);
+			key = key.replace(/"/gm, '`')
+			key = key.replace(/'/gm, '`')
+
+			if (import.meta.env.DEV && key.length) {
+				fetch(`${constants.SERVER_URL}/api/translate?phrase=${encodeURIComponent(key)}`)
+					.then((response) => {
+						if (!response.ok) {
+							throw new Error(`Ошибка при запросе перевода: ${response.statusText}`);
+						}
+						return response.json();
+					})
+					.then((data) => {
+						console.log("[i18n] Автоматически добавлен перевод:", data);
+					})
+					.catch((err) => {
+						console.error("[i18n] Ошибка при автопереводе:", err);
+					});
+			}
+		},
+	});

@@ -50,12 +50,13 @@ const CanBan: React.FC = observer(() => {
 								className="d-flex flex-column sortableContainerClass"
 								id={status}
 								group="kanban"  // Одна группа для всех колонок, чтобы элементы могли перемещаться между колонками
-								onEnd={(evt) => {
-									const movedCardId = evt.item?.dataset?.id;
-									//const targetStatus = evt.item?.dataset?.status;  // Колонка, откуда карточка была перемещена
-									const newStatus = evt.to?.id
+								onEnd={(/*evt*/) => {
+									//const movedCardId = evt.item?.dataset?.id;
+								    //const targetStatus = evt.from?.id;  // Колонка, откуда карточка была перемещена
+									//const newStatus = evt.to?.id
 									//console.log(`Card with ID ${movedCardId} moved from ${targetStatus} to ${newStatus}`);
-									jobStore.updateJobs('status', String(movedCardId), statuses.indexOf(newStatus))
+									//jobStore.updateJobs('status', String(movedCardId), statuses.indexOf(newStatus))
+									jobStore.updateAllJobs()
 								}}
 							>
 								{cards.length > 0 ? (

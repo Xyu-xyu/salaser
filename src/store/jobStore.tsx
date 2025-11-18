@@ -34,6 +34,7 @@ class JobStore {
 
 	setCardOrder(status: string, newList: JobInfoAttr[]) {
 		this.mockCards[status] = newList;
+		//console.log ( arguments )
 	}
 
 
@@ -168,6 +169,45 @@ class JobStore {
 			})
 		}
 	}
+
+	updateAllJobs() {
+
+		// Проходим по ключам объекта mockCards
+		const statuses = ['Loaded', 'Cutting', 'Pending', 'Completed'] as const;
+		const res: { id: string; array_id: number; status: number }[] = [];
+
+		for (const status of statuses) {
+			const cards = this.mockCards[status];
+			cards.forEach((card, index) => {
+				res.push({
+					id: card.id,
+					array_id: index,
+					status: statuses.indexOf(status), // или ваш объект statuses[status]
+				});
+			});
+		}
+
+		fetch(`${constants.SERVER_URL}/jdb/update_job_list`, {
+			method: 'POST',
+			headers: {/*'Content-Type': 'application/json',*/ },
+			body: JSON.stringify(res)
+		})
+			.then(response => response.json())
+			.then(data => {
+				console.log('Server Response:', data);
+
+				if (data.status === "success") {
+					console.log(`Jobs updated successfully!`);
+				} else {
+					// В случае ошибки выводим сообщение
+					console.log(`Error: ${data.error || data.message}`);
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+	}
+	
 }
 
 const jobStore = new JobStore();

@@ -137,10 +137,16 @@ body {
     display: flex;
     justify-content: center; 
     align-items: center;    
-    width: 1300px;          
+    width: 1300px;
+    height: 650px;          
     overflow:hidden;
     margin: 10px 0 0 10px;    
   }
+
+  .swiper-wrapper {
+    height: 650px;
+  }
+  
 }
 
 
@@ -178,6 +184,11 @@ body {
     height: 1300px;          
     overflow:hidden;    
   }
+
+  .swiper-wrapper {
+    height: 1600px;
+  }
+  
 } 
 
 #sidePanelWrapper {
@@ -355,11 +366,11 @@ body {
   cursor: not-allowed;
 }
 
-.swiper {
+/* .swiper {
   width: 100%;
   padding-top: 50px;
   padding-bottom: 50px;
-}
+} */
 
 .swiper-slide {
   background-position: center;
@@ -710,13 +721,6 @@ height: fit-content;}
   
 }
 
-
-.swiper-wrapper {
-  height: auto;
-}
-
-
-
 .recharts-responsive-container {
   display: flex;
   justify-content: center;
@@ -990,6 +994,8 @@ height: fit-content;}
     font-size: 18px;
     background-color: none;
     margin: 20px 0;
+    overflow-wrap: anywhere;
+    width: 80%;
 }
 
 .ccard-image-wrapper {
@@ -1561,6 +1567,7 @@ height: fit-content;}
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+.kanbanCard.selected,
 .kanbanCard:hover {
   border-color: var(--violet);
   box-shadow: 0 4px 12px rgba(93, 83, 247, 0.15);
@@ -1641,6 +1648,7 @@ height: fit-content;}
   font-size: 16px;
   color: #1a1a1a;
   font-family: Arial, Helvetica, sans-serif;
+  overflow-wrap:anywhere;
 }
  
 .progressText {
