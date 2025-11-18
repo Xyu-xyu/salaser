@@ -27,9 +27,9 @@ const AddPlanButton = observer(() => {
 	const [files, setFiles] = useState<FileData[]>([]);
 	const [show, setShow] = useState(false);
 	const { presets } = macrosStore
-	useEffect(()=>{
+	useEffect(() => {
 		if (!presets) macrosStore.fetchPresets();
-	},[])
+	}, [])
 
 
 
@@ -48,7 +48,7 @@ const AddPlanButton = observer(() => {
 	};
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log ("handleFileChange")
+		console.log("handleFileChange")
 		const input = e.target;
 		const selectedFiles = input.files;
 
@@ -59,15 +59,15 @@ const AddPlanButton = observer(() => {
 			return new Promise<FileData>((resolve, reject) => {
 				const readerText = new FileReader();
 				const readerBase64 = new FileReader();
-		
+
 				let textContent: string | null = null;
 				let base64File: string | null = null;
-		
+
 				// Проверяем, готовы ли оба результата
 				const tryResolve = () => {
 					if (textContent && base64File) {
 						const trunc = truncateStringByLines(textContent, 10);
-		
+
 						const fileData: FileData = {
 							name: file.name,
 							thickness: getAttribute("Thickness", trunc) ? parseFloat(getAttribute("Thickness", trunc)!) : 0,
@@ -79,11 +79,11 @@ const AddPlanButton = observer(() => {
 							dimY: getAttribute("DimY", trunc) ? parseInt(getAttribute("DimY", trunc)!) : 0,
 							file: base64File
 						};
-		
+
 						resolve(fileData);
 					}
 				};
-		
+
 				// === Чтение текста ===
 				readerText.onload = () => {
 					if (typeof readerText.result === 'string') {
@@ -93,7 +93,7 @@ const AddPlanButton = observer(() => {
 						reject(new Error("Не удалось прочитать текстовое содержимое файла"));
 					}
 				};
-		
+
 				// === Чтение base64 ===
 				readerBase64.onload = () => {
 					if (typeof readerBase64.result === 'string') {
@@ -103,10 +103,10 @@ const AddPlanButton = observer(() => {
 						reject(new Error("Не удалось получить base64 файл"));
 					}
 				};
-		
+
 				readerText.onerror = () => reject(readerText.error);
 				readerBase64.onerror = () => reject(readerBase64.error);
-		
+
 				// Запускаем оба чтения
 				readerText.readAsText(file);
 				readerBase64.readAsDataURL(file);
@@ -149,13 +149,13 @@ const AddPlanButton = observer(() => {
 		);
 	};
 
-	async  function clearBase () {
+	async function clearBase() {
 		let resp = await fetch(constants.SERVER_URL + "/jdb/clear_all",
-		{
-			method: "POST",
-			headers: {/* "Content-Type": "application/json" */},			
-		});
-		 resp.json().then(() => {
+			{
+				method: "POST",
+				headers: {/* "Content-Type": "application/json" */ },
+			});
+		resp.json().then(() => {
 			console.log("Base cleared")
 			jobStore.loadJobs()
 		});
@@ -187,50 +187,79 @@ const AddPlanButton = observer(() => {
 		addJobs()
 	}
 
-	async function addJobs() {
-		try {
-			// Отправляем POST запрос на сервер
-			const response = await fetch(constants.SERVER_URL + "/jdb/upload_files", {
-				method: "POST",
-				headers: {
-					/*"Content-Type": "application/json"*/
-				},
-				body: JSON.stringify(files)
+	const addJobs = async () => {
+		if (!files || files.length === 0) {
+			showToast({
+				type: 'warning',
+				message: 'Нет данных для отправки',
+				position: 'bottom-right',
+				autoClose: 3000,
 			});
-	
-			// Проверяем, был ли запрос успешным
-			if (response.ok) {
-				// Если ответ успешный (HTTP 200), показываем success toast
-				setFiles([]); // Очищаем файлы
+			return;
+		}
+
+		let hasError = false;
+
+		try {
+			for (const [index, jobData] of files.entries()) {
+				// jobData — это объект вида { name, thickness, quantity, file: "base64string", ... }
+
+				const response = await fetch(`${constants.SERVER_URL}/jdb/upload_files`, {
+					method: 'POST',
+					headers: {
+						/*'Content-Type': 'application/json',*/
+					},
+					body: JSON.stringify([jobData]), // отправляем весь объект как JSON
+				});
+
+				if (!response.ok) {
+					hasError = true;
+					const errorData = await response.json().catch(() => ({}));
+					showToast({
+						type: 'error',
+						message: errorData.message || `Ошибка при загрузке файла: ${jobData.name || index + 1}`,
+						position: 'bottom-right',
+						autoClose: 5000,
+					});
+					// Продолжаем отправку остальных файлов, но пометим, что была ошибка
+					continue;
+				}
+
+				// При успехе — можно ничего не делать, или логировать
+				console.log(`Файл ${jobData.name} успешно отправлен`);
+			}
+
+			// Если ВСЕ файлы успешно загружены
+			if (!hasError) {
 				showToast({
 					type: 'success',
-					message: "Files saved with success",
+					message: 'Все задания успешно добавлены',
 					position: 'bottom-right',
-					autoClose: 2500
+					autoClose: 3000,
 				});
+				setFiles([]); // очищаем только при полном успехе
 			} else {
-				// Если ответ не успешный (например, 400 или 500), показываем error toast
-				const errorData = await response.json(); // Можем получить данные об ошибке из тела ответа
 				showToast({
-					type: 'error',
-					message: errorData.message || "Something went wrong",
+					type: 'warning',
+					message: 'Некоторые задания не были добавлены',
 					position: 'bottom-right',
-					autoClose: 2500
+					autoClose: 5000,
 				});
 			}
 		} catch (error) {
-			// Обрабатываем ошибки, если запрос не удалось выполнить (например, проблема с сетью)
 			showToast({
 				type: 'error',
-				message: "Network error or server is down",
+				message: 'Ошибка сети. Проверьте подключение.',
 				position: 'bottom-right',
-				autoClose: 2500
+				autoClose: 5000,
 			});
+			console.error('Network error:', error);
 		} finally {
-			jobStore.loadJobs()
-			setTimeout(()=> handleClose(), 1000)
+			// Обновляем список заданий независимо от результата
+			await jobStore.loadJobs();
+			setTimeout(() => handleClose(), 1000);
 		}
-	}
+	};
 
 	return (
 		<div className="">
@@ -370,7 +399,7 @@ const AddPlanButton = observer(() => {
 					</div>
 				</div>
 				<div className="m-2 d-flex justify-content-end">
-					
+
 					<button
 						className="violet_button text-white p-1 br-5 me-2"
 						type="button"
@@ -403,7 +432,7 @@ const AddPlanButton = observer(() => {
 							<div className="flex-grow-1 text-center ms-2">{t("Submit")}</div>
 						</div>
 					</button>
-				</div>				
+				</div>
 			</Modal>
 		</div>
 	);

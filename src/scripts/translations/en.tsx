@@ -310,5 +310,9 @@ const en: Record<string, string> = {
 	"Success in save preset": "Success in save preset",
 	"Do you want to delete job ?": "Do you want to delete job ?",
 	"No one job selected": "No one job selected",
+	"Invalid data format": "Invalid data format",
+	"Ошибка сети. Проверьте подключение.": "Ошибка сети. Проверьте подключение.",
+	"Некоторые задания не были добавлены": "Некоторые задания не были добавлены",
+	"Все задания успешно добавлены": "Все задания успешно добавлены",
 }
 export default en;

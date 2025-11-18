@@ -305,5 +305,9 @@ const zh: Record<string, string> = {
 	"Success in save preset": "保存预设成功",
 	"Do you want to delete job ?": "您想删除作业吗？",
 	"No one job selected": "没有选择任何一项工作",
+	"Invalid data format": "数据格式无效",
+	"Ошибка сети. Проверьте подключение.": "Ошибка сети。 ",
+	"Некоторые задания не были добавлены": "Некоторые задания не были добавлены",
+	"Все задания успешно добавлены": "Все задания успешно добавлены",
 }
 export default zh;
