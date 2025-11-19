@@ -15,6 +15,8 @@ interface JobInfoAttr {
 	created_at: string;
 	updated_at: string;
 	loadResult: string;
+	is_cutting: number
+	array_id: number
 }
 
 

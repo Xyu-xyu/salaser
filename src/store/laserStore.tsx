@@ -15,7 +15,7 @@ class LaserStore {
 	rightMode: string = "plan"//plan, sheet, canBan ??
 	leftMode: string = "plan" //functions parameter, plan
 	planViewType: string ="CanBan"
-	knobMode: Boolean = false
+	knobMode: boolean = false
 	tasks:string[]  = [];
 	loading: boolean = false;
 	error: string | null = null;

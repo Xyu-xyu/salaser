@@ -662,9 +662,9 @@ class MacrosStore {
 
     presetMode:string = 'none'
 
-    isAnimating: Boolean = false;
-    isPaused: Boolean = false;
-    atEnd: Boolean = false;
+    isAnimating: boolean = false;
+    isPaused: boolean = false;
+    atEnd: boolean = false;
     elapsed: number = 0
 
     animProgress: { [key: string]: number } = { stage: 0, progress: 0 }
