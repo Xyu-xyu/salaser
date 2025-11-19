@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, InputGroup, FormControl } from 'react-bootstrap';
 import functionStore from '../store/functionStore';
-import { Icon } from '@iconify/react/dist/iconify.js';
 import { showToast } from './toast';
 import { useTranslation } from 'react-i18next';
+import CustomIcon from '../icons/customIcon';
 
 interface CalculatorModalProps {
 	min: number;
@@ -141,7 +141,7 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 		>
 			<div className='d-flex align-items-center mb-2'>
 				<div className='me-1'>
-					<Icon icon="bytesize:edit" width="18" height="18" style={{ color: "black" }} />
+					<CustomIcon icon="bytesize:edit" width="18" height="18" style={{ color: "black" }} />
 				</div>
 				<div>
 					<h6 className='m-0 p-0'>{t(label)}</h6>

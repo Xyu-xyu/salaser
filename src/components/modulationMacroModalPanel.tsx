@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { Modal } from 'react-bootstrap';
 import macrosStore from '../store/macrosStore';
 import SwiperModulationMacro from './swiperModulationMacro'
-import { Icon } from '@iconify/react/dist/iconify.js';
+import CustomIcon from '../icons/customIcon';
 
 
 
@@ -19,10 +19,11 @@ const ModulationMacroModalPanel = observer(() => {
 					<button
 						className={`violet_button navbar_button small_button40`} onClick={handleClose}>
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="material-symbols:close-rounded"
+							<CustomIcon icon="material-symbols:close-rounded"
 								width="36"
 								height="36"
-								style={{ color: 'white' }}
+								fill='white'
+								strokeWidth={0}
 							/>
 						</div>
 					</button>

@@ -1,10 +1,10 @@
 import React, { useRef } from "react";
-import { Icon } from "@iconify/react";
 import constants from "../store/constants";
 import { observer } from "mobx-react-lite";
 import macrosStore from "../store/macrosStore";
 import utils from "../scripts/util";
 import { showToast } from "../components/toast";
+import CustomIcon from "../icons/customIcon";
 
 interface Preset {
 	// Определите структуру пресета, если она известна
@@ -87,8 +87,8 @@ export const uploadPresetFromFile = observer(() => {
 				className="violet_button navbar_button small_button40 ms-1"
 			>
 				<div className="d-flex align-items-center justify-content-center">
-					<Icon
-						icon="line-md:upload-loop"
+					<CustomIcon
+						icon="upload"
 						width="36"
 						height="36"
 						style={{ color: 'white' }}

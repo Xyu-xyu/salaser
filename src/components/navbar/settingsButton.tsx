@@ -1,4 +1,3 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import macrosStore from "../../store/macrosStore";
 import { useState, useEffect } from "react";
@@ -8,6 +7,7 @@ import constants from "../../store/constants";
 import utils from "../../scripts/util";
 import { useTranslation } from 'react-i18next';
 import UploadPresetFromFile from './../uploadPresetFromFile'
+import CustomIcon from "../../icons/customIcon";
 
 
 
@@ -206,11 +206,13 @@ const SettingsButton = observer(() => {
 				onClick={showModal}
 			>
 				<div className="d-flex align-items-center justify-content-center">
-					<Icon
+					<CustomIcon
 						icon="octicon:gear-24"
 						width="36"
 						height="36"
-						style={{ color: show ? "white" : "black" }}
+						viewBox={'0 0 24 24'}
+						fill={ show ? "white" : "black" }
+						strokeWidth={0}
 					/>
 				</div>
 			</button>
@@ -259,10 +261,11 @@ const SettingsButton = observer(() => {
 														textAlign: "center",
 													}}
 												>
-													<Icon
+													<CustomIcon
 														icon="tabler:triangle-inverted-filled"
 														width="14"
 														height="14"
+														fill={'#514fff'}
 														style={{
 															color: "#514fff",
 															marginLeft: "4px",
@@ -293,11 +296,13 @@ const SettingsButton = observer(() => {
 															className="violet_button navbar_button small_button40"
 														>
 															<div className="d-flex align-items-center justify-content-center">
-																<Icon
+																<CustomIcon
 																	icon="charm:square-tick"
-																	width="24"
-																	height="24"
-																	style={{ color: 'white' }}
+																	width="36"
+																	height="36"
+																	strokeWidth={1}
+																	color='white'
+																	viewBox='0 0 16 16'																				
 																/>
 															</div>
 														</button>
@@ -310,7 +315,7 @@ const SettingsButton = observer(() => {
 																className="violet_button navbar_button small_button40"
 															>
 																<div className="d-flex align-items-center justify-content-center">
-																	<Icon
+																	<CustomIcon
 																		icon="fa-regular:edit"
 																		width="36"
 																		height="36"
@@ -325,7 +330,7 @@ const SettingsButton = observer(() => {
 																className="violet_button navbar_button small_button40"
 															>
 																<div className="d-flex align-items-center justify-content-center">
-																	<Icon
+																	<CustomIcon
 																		icon="fa-regular:copy"
 																		width="24"
 																		height="24"
@@ -340,7 +345,7 @@ const SettingsButton = observer(() => {
 																className="violet_button navbar_button small_button40"
 															>
 																<div className="d-flex align-items-center justify-content-center">
-																	<Icon
+																	<CustomIcon
 																		icon="bi:send-arrow-up"
 																		width="36"
 																		height="36"
@@ -355,11 +360,12 @@ const SettingsButton = observer(() => {
 																className="violet_button navbar_button small_button40"
 															>
 																<div className="d-flex align-items-center justify-content-center">
-																	<Icon
+																	<CustomIcon
 																		icon="ic:twotone-delete-outline"
 																		width="36"
 																		height="36"
-																		style={{ color: 'white' }}
+																		fill='white'
+																		strokeWidth={0}
 																	/>
 																</div>
 															</button>
@@ -378,11 +384,14 @@ const SettingsButton = observer(() => {
 						className="violet_button navbar_button small_button40"
 					>
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon
+							<CustomIcon
 								icon="ix:clear"
 								width="36"
 								height="36"
-								style={{ color: 'white' }}
+								color='white'
+								fill='white'
+								strokeWidth={0}
+								viewBox='0 0 512 512'
 							/>
 						</div>
 					</button>
@@ -391,11 +400,14 @@ const SettingsButton = observer(() => {
 						className="violet_button navbar_button small_button40 ms-1"
 					>
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon
+							<CustomIcon
 								icon="fluent:copy-add-20-regular"
 								width="36"
 								height="36"
-								style={{ color: 'white' }}
+								color='white'
+								fill='white'
+								strokeWidth={0}
+								viewBox='0 0 512 512'
 							/>
 						</div>
 					</button>

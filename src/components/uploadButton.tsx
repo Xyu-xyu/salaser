@@ -1,12 +1,12 @@
 import React, { useRef } from "react";
-import { Icon } from "@iconify/react";
 import constants from "../store/constants";
 import { useTranslation } from "react-i18next";
 import laserStore from "../store/laserStore";
 import { observer } from "mobx-react-lite";
 import { showToast } from "../components/toast";
+import CustomIcon from "../icons/customIcon";
 
-
+// !!!   COMPONENT NOT IN USE
 export const UploadButton = observer(() => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const core = 0
@@ -114,14 +114,16 @@ export const UploadButton = observer(() => {
 
 	return (
 		<>
-			<button className="w-100" type="button" onClick={handleClick}>
+			<button className="w-100" type="button" onClick={handleClick} disabled>
 				<div className="d-flex align-items-center">
-					<Icon
+					<CustomIcon
 						icon="fluent:copy-add-20-regular"
-						width="24"
-						height="24"
-						style={{ color: "black" }}
-						className="ms-1"
+						width="26"
+						height="26"
+						color='black'
+						fill='black'
+						strokeWidth={0.5}
+						viewBox="0 0 20 20"
 					/>
 					<div className="flex-grow-1 text-center">{t("Upload")}</div>
 				</div>

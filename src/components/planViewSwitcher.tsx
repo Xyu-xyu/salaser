@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite";
-import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 import laserStore from "../store/laserStore";
 import { useState } from "react";
 //import { showToast } from "./toast";
 import { ListGroup, Form } from "react-bootstrap";
+import CustomIcon from "../icons/customIcon";
 
 const PlanViewSwitcher = observer(() => {
 
@@ -47,7 +47,7 @@ const PlanViewSwitcher = observer(() => {
 										aria-expanded={isOpen}
 										aria-controls={`panel-${a}`}
 									>
-										<Icon
+										<CustomIcon
 											icon="si:expand-more-alt-fill"
 											width="24"
 											height="24"

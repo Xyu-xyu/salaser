@@ -1,8 +1,8 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import macrosStore from "../../store/macrosStore";
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
+import CustomIcon from "../../icons/customIcon";
 
 
 const powerButton = observer(() => {
@@ -57,10 +57,13 @@ const powerButton = observer(() => {
 				className={`navbar_button me-1 ${show ? "violet_button" : "white_button"}`}
 				onClick={showModal}>
 				<div className="d-flex align-items-center justify-content-center">
-					<Icon icon="fluent:power-20-filled"
+					<CustomIcon icon="fluent:power-20-filled"
 						width="36"
 						height="36"
 						style={{ color: show ? "white" : "black" }}
+						viewBox='0 0 20 20'
+						fill='black'
+						strokeWidth={0}
 					/>
 				</div>
 			</button>
@@ -75,19 +78,36 @@ const powerButton = observer(() => {
 					<div className="d-flex flex-column">
 						<button className="white_button navbar_button m-1">
 							<div className="d-flex align-items-center justify-content-center">
-								<Icon icon="stash:user-cog" width="36" height="36" style={{ color: 'black' }} />
+								<CustomIcon 
+									icon="stash:user-cog" 
+									width="36" 
+									height="36" 
+									fill="black"
+									strokeWidth={0}
+									/>
 							</div>
 						</button>
 
 						<button className="white_button navbar_button m-1" onClick={ powerOff }>
 							<div className="d-flex align-items-center justify-content-center">
-								<Icon icon="fluent:power-20-filled" width="36" height="36" style={{ color: 'black' }} />
+								<CustomIcon 
+									icon="fluent:power-20-filled" 
+									width="36" height="36"
+									fill="black"
+									strokeWidth={0} 
+									viewBox='0 0 20 20'
+									/>
 							</div>
 						</button>
 
 						<button className="white_button navbar_button m-1" onClick={ reload }>
 							<div className="d-flex align-items-center justify-content-center">
-								<Icon icon="ix:reboot" width="36" height="36" style={{ color: 'black' }} />
+								<CustomIcon 
+									icon="ix:reboot" 
+									width="36" height="36" style={{ color: 'black' }} 
+									viewBox='0 0 512 512'
+									fill={'black'} 
+									strokeWidth={0}/>
 							</div>
 						</button>
 					</div>

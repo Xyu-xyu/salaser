@@ -1,10 +1,10 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { Form, ListGroup, Modal } from "react-bootstrap";
 //import { showToast } from "../toast";
 import { useTranslation } from "react-i18next";
 import constants from "../../store/constants";
+import CustomIcon from "../../icons/customIcon";
 
 
 
@@ -24,11 +24,14 @@ const LanguageButton: React.FC = observer(() => {
 				onClick={showModal}
 			>
 				<div className="d-flex align-items-center justify-content-center">
-					<Icon
+					<CustomIcon
 						icon="fluent-mdl2:world"
 						width="30"
 						height="30"
 						style={{ color: show ? "white" : "black" }}
+						viewBox={"0 0 2048 2048"}
+						strokeWidth={1}
+						fill="black"
 					/>
 				</div>
 			</button>

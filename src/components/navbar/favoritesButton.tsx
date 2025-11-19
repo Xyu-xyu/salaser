@@ -1,9 +1,9 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { showToast } from "../toast";
 import { useTranslation } from "react-i18next";
+import CustomIcon from "../../icons/customIcon";
 
 // Интерфейс для одного пункта меню
 interface MenuItem {
@@ -64,7 +64,7 @@ const FavoritesButton: React.FC = observer(() => {
 		<div>
 			<button className="w-100 m-1" onClick={onClick}>
 				<div className="d-flex align-items-center justify-content-center">
-					<Icon
+					<CustomIcon
 						icon={icon}
 						width="36"
 						height="36"
@@ -100,11 +100,14 @@ const FavoritesButton: React.FC = observer(() => {
         onClick={showModal}
       >
         <div className="d-flex align-items-center justify-content-center">
-          <Icon
+          <CustomIcon
             icon="fluent:star-16-regular"
             width="36"
             height="36"
             style={{ color: show ? "white" : "black" }}
+            viewBox="0 0 16 16"
+            fill={ 'black'} 
+						strokeWidth={0.1}
           />
         </div>
       </button>

@@ -1,7 +1,7 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import macrosStore from '../store/macrosStore';
 import { useTranslation } from 'react-i18next';
+import CustomIcon from "../icons/customIcon";
 
 
 const NavigationModal = observer(() => {
@@ -45,14 +45,14 @@ const NavigationModal = observer(() => {
 						onMouseDown={carousel}
 					>
 						{carouselMode ? (
-							<Icon
+							<CustomIcon
 								icon="material-symbols:rectangle-outline-rounded"
 								width="48"
 								height="48"
 								style={{ color: 'white' }}
 							/>
 						) : (
-							<Icon
+							<CustomIcon
 								icon="hugeicons:carousel-horizontal-02"
 								width="48"
 								height="48"
@@ -71,7 +71,7 @@ const NavigationModal = observer(() => {
 							className="d-flex align-items-center justify-content-center mx-2"
 							onMouseDown={cloneThis}
 						>
-							<Icon
+							<CustomIcon
 								icon="fa-regular:clone"
 								width="36"
 								height="48"
@@ -90,7 +90,7 @@ const NavigationModal = observer(() => {
 							className="d-flex align-items-center justify-content-center mx-2"
 							onMouseDown={deleteThis}
 						>
-							<Icon
+							<CustomIcon
 								icon="ic:twotone-delete-outline"
 								width="48"
 								height="48"

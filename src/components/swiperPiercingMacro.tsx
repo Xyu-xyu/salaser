@@ -9,8 +9,8 @@ import macrosStore from '../store/macrosStore';
 import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
 import { CustomChart } from './chart/customChart'
-import { Icon } from '@iconify/react/dist/iconify.js';
 import { useTranslation } from 'react-i18next';
+import CustomIcon from '../icons/customIcon';
 
 
 
@@ -122,11 +122,13 @@ const swiperPiercingMacro = observer(() => {
 												onClick={(e) => handleMouseDown(e)}
 											>
 												<div className="d-flex align-items-center justify-content-center">
-													<Icon
+													<CustomIcon
 														icon="charm:square-tick"
 														width="48"
 														height="48"
-														style={{ color: 'white' }} />
+														strokeWidth={1}
+														color='white'
+														viewBox='0 0 16 16' />
 													<div className="mx-2 d-flex align-items-center">
 														<p className="text-white mb-0 font25">{t('Set')}</p>
 													</div>
@@ -140,10 +142,12 @@ const swiperPiercingMacro = observer(() => {
 													
 												>
 
-													<Icon icon="fa-regular:clone"
+													<CustomIcon icon="fa-regular:clone"
 														width="36"
 														height="48"
-														style={{ color: 'white' }} />
+														color= 'white'
+														fill = 'white'
+														viewBox='0 0 512 512' />
 													<div className="mx-2 d-flex align-items-center">
 														<p className="text-white mb-0 font25">{t('Copy')}</p>
 													</div>
@@ -155,11 +159,12 @@ const swiperPiercingMacro = observer(() => {
 												<div
 													className="d-flex align-items-center justify-content-center mx-2"
 													>
-													<Icon
+													<CustomIcon
 														icon="ic:twotone-delete-outline"
 														width="48"
 														height="48"
-														style={{ color: 'white' }} />
+														fill='white'
+														strokeWidth={0}/>
 
 													<div className="mx-2 d-flex align-items-center">
 														<p className="text-white mb-0 font25">{t('Delete')}</p>

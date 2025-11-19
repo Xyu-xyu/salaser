@@ -1,8 +1,8 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import macrosStore from "../store/macrosStore";
 import { useTranslation } from 'react-i18next';
 import Timer from "./timer";
+import CustomIcon from "../icons/customIcon";
  
 
 const NavigationButtonsInChartInStages = observer(() => {
@@ -79,11 +79,12 @@ const NavigationButtonsInChartInStages = observer(() => {
 					onMouseDown={(e) => { deleteStage(e) }}
 				>
 					<div className="d-flex align-items-center justify-content-center">
-						<Icon
+						<CustomIcon
 							icon="ic:twotone-delete-outline"
 							width="24"
 							height="24"
-							style={{ color: 'white' }}
+							fill='white'
+							strokeWidth={0}
 						/>
 						<div className="mx-1 d-flex align-items-center">
 							<p className="text-white mb-0">{t('Delete step')}</p>
@@ -97,11 +98,12 @@ const NavigationButtonsInChartInStages = observer(() => {
 						className="d-flex align-items-center justify-content-center"
 						onMouseDown={() => { }}
 					>
-						<Icon
+						<CustomIcon
 							icon="ic:twotone-delete-outline"
 							width="24"
 							height="24"
-							style={{ color: 'white' }}
+							fill='white'
+							strokeWidth={0}
 						/>
 						<div className="mx-1 d-flex align-items-center">
 							<p className="text-white mb-0">{t('Clear')}</p>
@@ -115,11 +117,13 @@ const NavigationButtonsInChartInStages = observer(() => {
 						className="d-flex align-items-center justify-content-center"
 						onMouseDown={() => { }}
 					>
-						<Icon
+						<CustomIcon
 							icon="fluent:copy-add-20-regular"
 							width="24"
 							height="24"
-							style={{ color: 'white' }}
+							color='white'
+							fill='white'
+							strokeWidth={1}
 						/>
 						<div className="mx-1 d-flex align-items-center">
 							<p className="text-white mb-0">{t('Copy step')}</p>
@@ -131,11 +135,14 @@ const NavigationButtonsInChartInStages = observer(() => {
 				>
 					<div className="d-flex align-items-center justify-content-center">
 						{!isAnimating ?
-							<Icon icon="fluent:play-24-filled" width="16" height="16"
-								style={{ color: 'white' }}
+							<CustomIcon icon="fluent:play-24-filled" width="16" height="16"
+								 color='white'
+								 fill='white'
 							/> :
-							<Icon icon="fluent:pause-24-filled" width="16" height="16"
-								style={{ color: 'white' }}
+							<CustomIcon icon="fluent:pause-24-filled" width="16" height="16"
+								color='white'
+								fill='white'
+								strokeWidth={0}
 							/>
 
 						}

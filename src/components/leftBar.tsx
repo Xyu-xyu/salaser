@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import LaserIcon from "./../../public/images/laserIcon"
+import CustomIcon from "../icons/customIcon";
 
 
 const LeftBar = observer(() => {
@@ -19,9 +18,10 @@ const LeftBar = observer(() => {
 							}} 
 							className={`${leftMode === 'plan' ? "viotet_button" : "grey_button"} navbar_button w-100`}>
 							<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="hugeicons:carousel-horizontal-02"
+							<CustomIcon icon="hugeicons:carousel-horizontal-02"
 								width="36"
 								height="36"
+								strokeWidth={1.5}
 								color={leftMode === 'plan'? "white":  'black'}
 							/>
 							</div>
@@ -35,9 +35,12 @@ const LeftBar = observer(() => {
 							}} 
 							className={`${leftMode !== 'plan' ? "viotet_button" :"grey_button"} navbar_button w-100`}>
 							<div className="d-flex align-items-center justify-content-center">
-								<LaserIcon size={60} 
-								color={leftMode !== 'plan'? "white":  'black'}
-								strokeWidth={1.5} />
+								<CustomIcon 
+									viewBox={'0 0 36 36'} 								
+									icon="LaserIcon" 
+									width={60} height={60} 
+									style={{ color: leftMode !== 'plan'? "white": 'black' }} 
+									strokeWidth={1.5} />
 							</div>	
 						</button>
 					</div>

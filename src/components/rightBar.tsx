@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 import laserStore from "../store/laserStore";
 import { UploadButton } from "./uploadButton";
@@ -9,6 +8,7 @@ import PlanViewSwitcher from "./planViewSwitcher";
 import AddPlanButton from "./navbar/addPlanButton";
 import jobStore from "../store/jobStore";
 import macrosStore from "../store/macrosStore";
+import CustomIcon from "../icons/customIcon";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
@@ -57,7 +57,7 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="fluent:tab-new-24-filled"
 											width="24"
 											height="24"
@@ -74,7 +74,7 @@ const RightBar = observer(() => {
 									onMouseDown={ deleteJob }
 								>
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="material-symbols:delete-outline-sharp"
 											width="24"
 											height="24"
@@ -89,7 +89,7 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="fluent:group-24-regular"
 											width="24"
 											height="24"
@@ -108,7 +108,7 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100" onClick={() => laserStore.setVal('rightMode', 'parameter')}>
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="tabler:chart-dots-3"
 											width="24"
 											height="24"
@@ -123,7 +123,7 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100" onClick={() => laserStore.setVal('rightMode', 'function')}>
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="ph:function"
 											width="24"
 											height="24"
@@ -138,7 +138,7 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="fluent:clipboard-more-20-regular"
 											width="24"
 											height="24"
@@ -153,7 +153,7 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="bytesize:edit"
 											width="24"
 											height="24"
@@ -184,11 +184,13 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="fa7-solid:list-check"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											fill="black"
+											viewBox="0 0 512 512"
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Select")}</div>
@@ -199,11 +201,13 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="bytesize:edit"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											viewBox="0 0 32 32"
+											strokeWidth={2}
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Edit")}</div>
@@ -214,11 +218,13 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100 disabled" disabled>
 									<div className="d-flex align-items-center">
-										<Icon
+									<CustomIcon
 											icon="fa7-solid:list-check"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											fill="black"
+											viewBox="0 0 512 512"
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Wizard")}</div>
@@ -233,11 +239,12 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100" onClick={() => laserStore.setVal('rightMode', 'function')} >
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="hugeicons:function"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											strokeWidth={1.5}
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Functions")}</div>
@@ -248,12 +255,14 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="solar:restart-bold"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											fill="black"
 											className="ms-1"
+											strokeWidth={0}
 										/>
 										<div className="flex-grow-1 text-center">{t("Restart")}</div>
 									</div>
@@ -267,11 +276,13 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="tabler:chart-dots-3"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											fill="black"
+											strokeWidth={1}
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Details")}</div>
@@ -282,12 +293,13 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="carbon:view"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
-											className="ms-1"
+											color="black"
+											fill="black"
+											viewBox="0 0 32 32"
 										/>
 										<div className="flex-grow-1 text-center">{t("View")}</div>
 									</div>
@@ -297,12 +309,11 @@ const RightBar = observer(() => {
 							<div>
 								<button className="w-100">
 									<div className="d-flex align-items-center">
-										<Icon
+										<CustomIcon
 											icon="flowbite:clipboard-list-outline"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
-											className="ms-1"
+											color="black"											
 										/>
 										<div className="flex-grow-1 text-center">{t("Key")}</div>
 									</div>

@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
-import { Icon } from "@iconify/react/dist/iconify.js";
+
 import macrosStore from '../store/macrosStore';
+import CustomIcon from '../icons/customIcon';
 
 interface MacrosEditModalButtonProps {
 	param: string;
@@ -34,12 +35,12 @@ const MacrosEditModalButton = observer(({ param }: MacrosEditModalButtonProps) =
 				/>
  				<g transform={`translate(${x1} ${y1})`}>
  					<g transform={`translate(${-ICON_W / 2} ${-ICON_H / 2})`}>
-						<Icon
+						<CustomIcon
 							icon="iwwa:settings"
 							width={ICON_W}
 							height={ICON_H}
-							stroke="var(--knobMainText)"
 							strokeWidth={2}
+							viewBox='0 0 40 40'
  							style={{ color: 'var(--knobMainText)' }}
 						/>
 					</g>

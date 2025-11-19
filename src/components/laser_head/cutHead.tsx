@@ -1,7 +1,6 @@
 import  {  useEffect } from "react";
 import { observer } from 'mobx-react-lite';
 import macrosStore from '../../store/macrosStore';
-//import { Icon } from "@iconify/react/dist/iconify.js";
 import utils from "../../scripts/util";
 
 
@@ -441,8 +440,8 @@ export const CutHead: React.FC<ComponentInt> = observer(({ keyInd }) => {
 					<div className="d-flex align-items-center justify-content-center"
 						   >
 						{	!isAnimating ?
-							<Icon icon="fluent:play-24-filled" width="24" height="24"  style={{color: "var(--knobMainText)"}} /> :
-							<Icon icon="fluent:pause-24-filled" width="24" height="24"  style={{color: "var(--knobMainText)"}} />
+							<CustomIcon icon="fluent:play-24-filled" width="24" height="24"  style={{color: "var(--knobMainText)"}} /> :
+							<CustomIcon icon="fluent:pause-24-filled" width="24" height="24"  style={{color: "var(--knobMainText)"}} />
 
 						}
 					</div>

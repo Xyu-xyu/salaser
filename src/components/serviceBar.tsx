@@ -1,4 +1,4 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
+import CustomIcon from "../icons/customIcon";
 import { showToast } from "./toast";
 import { useTranslation } from "react-i18next";
 
@@ -7,15 +7,16 @@ export default function serviceBar() {
 	// группируем кнопки по рядам
 	const { t } = useTranslation()
 	const items = [
-		{ name: "machine", icon: "fluent:hand-left-16-regular", onClick: () => handleClick("machine") },
-		{ name: "laser module", icon: "game-icons:laser-warning", onClick: () => handleClick("laser module") },
-		{ name: "IPC diagnostics", icon: "material-symbols:monitor-heart-outline-rounded", onClick: () => handleClick("IPC diagnostics") },
-		{ name: "cutting head", icon: "fluent:laser-tool-20-regular", onClick: () => handleClick("cutting head") },
-		{ name: "manage", icon: "streamline-plump:code-monitor-2", onClick: () => handleClick("manage") },
-		{ name: "operation log", icon: "hugeicons:book-edit", onClick: () => handleClick("operation log") },
-		{ name: "pallet change", icon: "icon-park:switch-contrast", onClick: () => handleClick("pallet change") },
-		{ name: "motion control", icon: "streamline-plump:code-monitor-2", onClick: () => handleClick("motion control") }
-	];
+		{ name: "machine", icon: "fluent:hand-left-16-regular", color:"black", fill:"black", strokeWidth:0, viewBox:" 0 0 16 16", onClick: () => handleClick("machine") },
+		{ name: "laser module", icon: "game-icons:laser-warning", color:"black", fill:"black", strokeWidth:0, viewBox:" 0 0 512 512",onClick: () => handleClick("laser module") },
+		{ name: "IPC diagnostics", icon: "material-symbols:monitor-heart-outline-rounded", color:"black", fill:"black", strokeWidth:0, viewBox:" 0 0 36 36", onClick: () => handleClick("IPC diagnostics") },
+		{ name: "cutting head", icon: "fluent:laser-tool-20-regular", color:"black", fill:"black", strokeWidth:0, viewBox:" 0 0 20 20",onClick: () => handleClick("cutting head") },
+		{ name: "motion control", icon: "streamline-plump:code-monitor-2", color:"black", fill:"none", strokeWidth: 2.5, viewBox:" 0 0 48 48", onClick: () => handleClick("motion control") },
+		{ name: "operation log", icon: "hugeicons:book-edit", color:"black", fill:"white", strokeWidth:1.5, viewBox:" 0 0 36 36", onClick: () => handleClick("operation log") },
+		{ name: "pallet change", icon: "icon-park:switch-contrast", color:"black", fill:"white", strokeWidth: 2.5, viewBox:" 0 0 48 48", onClick: () => handleClick("pallet change") },
+		{ name: "motion control", icon: "streamline-plump:code-monitor-2", color:"black", fill:"none", strokeWidth: 2.5, viewBox:" 0 0 48 48", onClick: () => handleClick("motion control") }
+	] as const;
+
 
 	const handleClick = (label: string): void => {
 		console.log(`Clicked on ${label}`);
@@ -43,16 +44,19 @@ export default function serviceBar() {
 			<div className="d-flex">
 				{rows.map((row, i) => (
 					<div key={i} className="d-flex flex-column col-4">
-						{row.map(({ name, icon, onClick }) => (
+						{row.map(({ name, icon, color, fill, strokeWidth, viewBox, onClick }) => (
 							<div key={name} className="p-2">
 								<button className="w-100 white_button" onClick={onClick}>
 									<div className="d-flex flex-column align-items-center justify-content-center">
 										<div>
-											<Icon
+											<CustomIcon
 												icon={icon}
 												width="72"
 												height="72"
-												style={{ color: "black" }}
+												color={color} 
+												strokeWidth={strokeWidth}
+												fill={fill}
+												viewBox={viewBox}
 												className="ms-2"
 											/>
 										</div>

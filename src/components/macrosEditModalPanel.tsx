@@ -7,8 +7,8 @@ import IosToggleBlowInMacros from './toggles/iosToggleBlowInMacros';
 import IosToggleMacrocInMacros from './toggles/iosToggleMacrosInMacros';
 import UniversalNamedKnob from './universalNamedKnob';
 import UniversalKnobList from './universalKnobList';
-import { Icon } from '@iconify/react/dist/iconify.js';
 import StringComponent from './stringComponent';
+import CustomIcon from '../icons/customIcon';
 
 
 const MacrosEditModalPanel = observer(() => {
@@ -25,10 +25,11 @@ const MacrosEditModalPanel = observer(() => {
 					<button
 						className={`violet_button navbar_button small_button40`} onClick={handleClose}>
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="material-symbols:close-rounded"
+							<CustomIcon icon="material-symbols:close-rounded"
 								width="36"
 								height="36"
-								style={{ color: 'white' }}
+								fill='white'
+								strokeWidth={0}
 							/>
 						</div>
 					</button>

@@ -9,8 +9,8 @@ import UniversalKnob from './universalKnob';
 import macrosStore from '../store/macrosStore';
 import { observer } from 'mobx-react-lite';
 import SwiperStringComponent from './swiperStringComponent';
-import { Icon } from '@iconify/react/dist/iconify.js';
 import { useTranslation } from 'react-i18next';
+import CustomIcon from '../icons/customIcon';
 
 
 const swiperModulationMacro = observer(() => {
@@ -136,11 +136,13 @@ const swiperModulationMacro = observer(() => {
 									{ macrosStore.selectedModulationMacro !== ii &&		
 										<button className="carousel_btn violet_button m-2"	onClick={(e) => handleMouseDown(e)}>
 											<div className="d-flex align-items-center justify-content-center">
-												<Icon
+												<CustomIcon
 													icon="charm:square-tick"
-													width="48"
-													height="48"
-													style={{ color: 'white' }} />
+													width="36"
+													height="36"
+													strokeWidth={1}
+													color='white'
+													viewBox='0 0 16 16' />
 												<div className="mx-2 d-flex align-items-center">
 													<p className="text-white mb-0 font25">{ t('Set') }</p>
 												</div>
@@ -150,11 +152,12 @@ const swiperModulationMacro = observer(() => {
 											<div
 												className="d-flex align-items-center justify-content-center mx-2"
 											>
-												<Icon
+												<CustomIcon
 													icon="ic:twotone-delete-outline"
-													width="48"
-													height="48"
-													style={{ color: 'white' }}
+													width="36"
+													height="36"
+													fill='white'
+													strokeWidth={0}
 												/>
 												<div className="mx-2 d-flex align-items-center">
 													<p className="text-white mb-0 font25">{ t('Delete') }</p>
@@ -166,11 +169,13 @@ const swiperModulationMacro = observer(() => {
 											<div
 												className="d-flex align-items-center justify-content-center mx-2"
 											>
-												<Icon
+												<CustomIcon
 													icon="fa-regular:clone"
-													width="36"
-													height="48"
-													style={{ color: 'white' }}
+													width="24"
+													height="36"
+													color= 'white'
+													fill = 'white'
+													viewBox='0 0 512 512'
 												/>
 												<div className="mx-2 d-flex align-items-center">
 													<p className="text-white mb-0 font25">{ t('Copy') }</p>

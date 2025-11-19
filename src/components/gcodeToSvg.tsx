@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState, ReactNode } from "react";
 import svgPanZoom from "svg-pan-zoom";
-import { Icon } from "@iconify/react";
-//import sampleListing from '../store/listing'
 import constants from "../store/constants";
 import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
@@ -11,6 +9,7 @@ import { showToast } from "./toast";
 import { useTranslation } from 'react-i18next';
 import macrosStore from "../store/macrosStore";
 import Hammer from "hammerjs";
+import CustomIcon from "../icons/customIcon";
 
 interface CustomEventsHandler {
 	haltEventListeners: string[];
@@ -476,10 +475,12 @@ const GCodeToSvg = observer(() => {
 						onClick={fit}
 						className={`violet_button navbar_button small_button40`} >
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="carbon:zoom-fit"
+							<CustomIcon icon="carbon:zoom-fit"
 								width="36"
 								height="36"
-								style={{ color: 'white' }}
+								fill='white'
+								color="none"
+								viewBox="0 0 32 32"
 							/>
 						</div>
 					</button>
@@ -489,10 +490,12 @@ const GCodeToSvg = observer(() => {
 						onClick={() => zoom('-')}
 						className={`violet_button navbar_button small_button40`} >
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="carbon:zoom-out"
+							<CustomIcon icon="carbon:zoom-out"
 								width="36"
 								height="36"
-								style={{ color: 'white' }}
+								fill='white'
+								color="none"
+								viewBox="0 0 32 32"
 							/>
 						</div>
 					</button>
@@ -502,10 +505,12 @@ const GCodeToSvg = observer(() => {
 						onClick={() => zoom('+')}
 						className={`violet_button navbar_button small_button40`} >
 						<div className="d-flex align-items-center justify-content-center">
-							<Icon icon="carbon:zoom-in"
+							<CustomIcon icon="carbon:zoom-in"
 								width="36"
 								height="36"
-								style={{ color: 'white' }}
+								fill='white'
+								color="none"
+								viewBox="0 0 32 32"
 							/>
 						</div>
 					</button>

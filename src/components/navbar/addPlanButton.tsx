@@ -1,4 +1,3 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
@@ -7,6 +6,7 @@ import constants from "../../store/constants";
 import { showToast } from "../toast";
 import macrosStore from "../../store/macrosStore";
 import jobStore from "../../store/jobStore";
+import CustomIcon from "../../icons/customIcon";
 
 type FileData = {
 	name: string;
@@ -266,7 +266,7 @@ const AddPlanButton = observer(() => {
 			<div className="m-0">
 				<button className={`w-100`} onClick={showModal}>
 					<div className="d-flex align-items-center">
-						<Icon
+						<CustomIcon
 							icon="fluent:copy-add-20-regular"
 							width="24"
 							height="24"
@@ -302,12 +302,14 @@ const AddPlanButton = observer(() => {
 								onClick={handleClick}
 							>
 								<div className="d-flex align-items-center p-2">
-									<Icon
+									<CustomIcon
 										icon="fluent:multiselect-16-filled"
 										width="24"
 										height="24"
-										style={{ color: "white" }}
+										fill= {"white"}
+										strokeWidth={0}
 										className="ms-1"
+										viewBox="0 0 16 16"
 									/>
 									<div className="flex-grow-1 text-center ms-2">{t("Select files")}</div>
 								</div>
@@ -406,11 +408,12 @@ const AddPlanButton = observer(() => {
 						onClick={clearBase}
 					>
 						<div className="d-flex align-items-center p-2">
-							<Icon
+							<CustomIcon
 								icon="material-symbols:delete-outline-sharp"
 								width="24"
 								height="24"
-								style={{ color: "white" }}
+								fill= {"white"}
+								strokeWidth={0}
 								className="ms-1"
 							/>
 							<div className="flex-grow-1 text-center ms-2">{t("Clear Base")}</div>
@@ -422,12 +425,13 @@ const AddPlanButton = observer(() => {
 						onClick={handleSubmit}
 					>
 						<div className="d-flex align-items-center p-2">
-							<Icon
+							<CustomIcon
 								icon="line-md:square-to-confirm-square-transition"
-								width="24"
-								height="24"
-								style={{ color: "white" }}
-								className="ms-1"
+								width="30"
+								height="30"
+								strokeWidth={1.5}
+								className="0"
+								color="white"
 							/>
 							<div className="flex-grow-1 text-center ms-2">{t("Submit")}</div>
 						</div>

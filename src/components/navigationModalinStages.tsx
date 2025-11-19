@@ -1,7 +1,7 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { observer } from 'mobx-react-lite';
 import macrosStore from '../store/macrosStore';
 import { useTranslation } from 'react-i18next';
+import CustomIcon from "../icons/customIcon";
 
 
 const NavigationModalinStages = observer(() => {
@@ -20,18 +20,22 @@ const NavigationModalinStages = observer(() => {
 						onMouseDown={carousel}
 					>
 						{carouselModeInPiercing ? (
-							<Icon
+							<CustomIcon
 								icon="material-symbols:rectangle-outline-rounded"
 								width="48"
 								height="48"
-								style={{ color: 'white' }}
+								color='white'
+								fill='white'
+								strokeWidth={0}
 							/>
 						) : (
-							<Icon
+							<CustomIcon
 								icon="hugeicons:carousel-horizontal-02"
 								width="48"
 								height="48"
-								style={{ color: 'white' }}
+								color='white'
+								strokeWidth={1.5}
+
 							/>
 						)}
 						<div className="mx-2 d-flex align-items-center">

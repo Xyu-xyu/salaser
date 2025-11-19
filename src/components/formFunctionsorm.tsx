@@ -2,16 +2,15 @@
 //import validator from "@rjsf/validator-ajv8";
 import { observer } from "mobx-react-lite";
 //import functions from "../store/functions.json";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import laserStore from "../store/laserStore";
-import LaserIcon from "../../public/images/laserIcon";
 import IosToggleGeneric from "./toggles/iosToggleGeneric";
 import functionStore from "../store/functionStore";
 import { Form, ListGroup, Modal } from "react-bootstrap";
 import CalculatorModal from "./calculatorModal";
 import { showToast } from './toast';
+import CustomIcon from "../icons/customIcon";
 
 
 const FunctionsForm = observer(() => {
@@ -146,10 +145,8 @@ const FunctionsForm = observer(() => {
 						</ListGroup>
 					</div>
 				</div>
-				)
+			)
 		}	
-
-
 	}
 
 
@@ -178,12 +175,15 @@ const FunctionsForm = observer(() => {
 							padding: "8px",
 						}}
 					>
-						<Icon
+						<CustomIcon
 							icon="si:expand-more-alt-fill"
-							width="24"
-							height="24"
+							width="30"
+							height="30"
+							color="black"
+							fill="black"
+							strokeWidth={0}
 							style={{
-								color: "black",
+ 								transformOrigin: `50% 50%`,
 								transform: `rotate(${rotated ? 0 : -90}deg)`,
 								transition: "transform 0.5s ease-in-out",
 							}}
@@ -195,11 +195,13 @@ const FunctionsForm = observer(() => {
 				<div>
 					<button className="w-100" onClick={ unknown}>
 						<div className="d-flex align-items-center">
-							<Icon
+							<CustomIcon
 								icon="mdi:automatic"
 								width="24"
 								height="24"
-								style={{ color: "black" }}
+								color="black"
+								fill="black"
+								strokeWidth={0}
 								className="ms-1"
 							/>
 							<div className="flex-grow-1 text-center">{t("Automation")}</div>
@@ -210,11 +212,14 @@ const FunctionsForm = observer(() => {
 				<div>
 					<button className="w-100 violet_button">
 						<div className="d-flex align-items-center">
-							<LaserIcon
-								size={40}
-								color={"white"}
-								strokeWidth={1.5}
-							/>
+							<CustomIcon 
+								viewBox={'0 0 36 36'} 								
+								icon="LaserIcon" 
+								width={40} 
+								height={40} 
+								color="white" 
+								strokeWidth={1.5} 
+								style={{ color: "red! important" }}/>
 							<div className="flex-grow-1 text-center text-white">{t("Cutting")}</div>
 						</div>
 					</button>
@@ -223,20 +228,13 @@ const FunctionsForm = observer(() => {
 				<div>
 					<button className="w-100" onClick={ unknown }>
 						<div className="d-flex align-items-center">
-							<Icon
-								icon="gg:arrow-up-o"
-								width="24"
-								height="24"
-								style={{ color: "black" }}
-								className="ms-1"
-							/>
-							<Icon
+							<CustomIcon
 								icon="si:expand-more-alt-fill"
 								width="24"
 								height="24"
-								style={{
-									color: "black",
-								}}
+								color="black"
+								fill="black"
+								strokeWidth={0}
 							/>
 						</div>
 					</button>
@@ -262,10 +260,13 @@ const FunctionsForm = observer(() => {
 										aria-expanded={isOpen}
 										aria-controls={`panel-${a}`}
 									>
-										<Icon
+										<CustomIcon
 											icon="si:expand-more-alt-fill"
 											width="24"
 											height="24"
+											color="black"
+											fill="black"
+											strokeWidth={0}
 											style={{
 												color: "black",
 												transform: `rotate(${isOpen ? 180 : 0}deg)`,
