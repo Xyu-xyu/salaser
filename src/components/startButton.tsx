@@ -139,6 +139,14 @@ export const StartButton = observer(() => {
 		}
 	}
 
+
+	const updateIsCutting = async (id: string) => {
+
+		jobStore.updateJobs('is_cutting', id, 1)
+		jobStore.updateJobById(id, 'is_cutting', 1)
+		
+	}
+
 	const handleClick = async () => {
 
 		if (!mockCards.hasOwnProperty("Cutting") ||
@@ -180,6 +188,7 @@ export const StartButton = observer(() => {
 			await getPresetAndSenTolaser(preset)
 			await sentFileTolaser(id)
 			await execute()
+			if (typeof id === 'string')	await updateIsCutting (id);
 
 		}
 	};
@@ -205,11 +214,11 @@ export const StartButton = observer(() => {
 // +получаем job_id и 
 // +preset_id на back
 // +отправляем preset on core 0
-// отправляем файл на core 0
-// отправялем load result frontend
-// если всё ок отправляем execute на  бэк
-// присваиваем id - is_cutting == true
-// обновляем joB_LIST
+// +отправляем файл на core 0
+// +отправялем load result frontend
+// +если всё ок отправляем execute на  бэк
+// +присваиваем id - is_cutting == true
+// +обновляем joB_LIST
 // +загружаем показания пресетов в текущие макросы.
 // запрещаем перемещать ??
 // остановка по азпросу ???

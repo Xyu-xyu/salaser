@@ -6,6 +6,7 @@ import { ReactSortable } from 'react-sortablejs';
 import macrosStore from '../store/macrosStore';
 import { useEffect } from 'react';
 import constants from '../store/constants';
+import CustomIcon from '../icons/customIcon';
 
 const CanBan: React.FC = observer(() => {
 	const { t } = useTranslation();
@@ -81,9 +82,24 @@ const CanBan: React.FC = observer(() => {
 												onMouseDown={() =>{handleMouseDown(card.id)}}
 
 												>
-												<div className="cardfileName">
-													{card.name}
-												</div>
+												<div className='d-flex justify-content-between align-items-center'>
+													<div className="cardfileName">
+														{card.name}
+													</div>
+													{card.is_cutting === 1 && 
+														<CustomIcon
+														icon="LaserInCut"
+														width="42"
+														height="42"
+														color="red"
+														fill="none"
+														strokeWidth={1.5}
+														className="ms-1"
+														viewBox='0 0 36 36'
+													/>
+													}												
+												</div>	
+							
 
 												<div className="cardImage">
     												<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />

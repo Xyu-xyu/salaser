@@ -22,7 +22,7 @@ interface JobInfoAttr {
 
 
 class JobStore {
-	selectedId:string=""
+	selectedId: string = ""
 	mockCards: Record<string, JobInfoAttr[]> = {
 		Loaded: [],
 		Cutting: [],
@@ -34,9 +34,34 @@ class JobStore {
 		makeAutoObservable(this, {});
 	}
 
+	get currentCuttingJobId(): string {
+		for (const statusKey of Object.keys(this.mockCards) as (keyof typeof this.mockCards)[]) {
+			const job = this.mockCards[statusKey].find(j => j.is_cutting === 1);
+			if (job) {
+				return job.id;
+			}
+		}
+		return ''; // ничего не режется
+	}
+
+	get isAnythingCutting(): boolean {
+		return this.currentCuttingJobId !== '';
+	}
+
+	// Вспомогательный метод: сбросить все is_cutting = 0 (на случай перезапуска)
+	clearAllCuttingFlags() {
+		for (const statusKey of Object.keys(this.mockCards) as (keyof typeof this.mockCards)[]) {
+			this.mockCards[statusKey].forEach(job => {
+				if (job.is_cutting === 1) {
+					job.is_cutting = 0;
+					this.updateJobById(job.id, 'is_cutting', 0)
+				}
+			});
+		}
+	}
+
 	setCardOrder(status: string, newList: JobInfoAttr[]) {
 		this.mockCards[status] = newList;
-		//console.log ( arguments )
 	}
 
 
@@ -111,64 +136,65 @@ class JobStore {
 		}
 	}
 
-	updateJobs(param:string, id:string, newValue:any) {
+	updateJobs(param: string, id: string, newValue: any) {
 		console.log('Arguments:', param, id, newValue); // Для отладки
-	
+
 		// Отправка POST запроса на сервер
 		fetch(`${constants.SERVER_URL}/jdb/update_job`, {
 			method: 'POST',
-			headers: {/*'Content-Type': 'application/json',*/},
+			headers: {/*'Content-Type': 'application/json',*/ },
 			body: JSON.stringify({
 				param: param,
 				id: id,
 				value: newValue
 			})
 		})
-		.then(response => response.json())
-		.then(data => {
-			console.log('Server Response:', data);
-	
-			if (data.status === "success") {
-				// Если обновление прошло успешно, выводим сообщение на фронте
-				console.log (`Job ${param} updated successfully!`);
-				// Обновляем интерфейс (например, список задач или отображаем измененные данные)
- 			} else {
-				// В случае ошибки выводим сообщение
-				console.log  (`Error: ${data.error || data.message}`);
-			}
-		})
-		.catch(error => {
-			console.error('Error:', error);
- 		});
+			.then(response => response.json())
+			.then(data => {
+				console.log('Server Response:', data);
+
+				if (data.status === "success") {
+					// Если обновление прошло успешно, выводим сообщение на фронте
+					console.log(`Job ${param} updated successfully!`);
+					// Обновляем интерфейс (например, список задач или отображаем измененные данные)
+				} else {
+					// В случае ошибки выводим сообщение
+					console.log(`Error: ${data.error || data.message}`);
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
 	}
 
 	setVal<T extends keyof this>(key: T, value: this[T]) {
 		if (key in this) {
 			this[key] = value;
-			console.log (key, value)
+			console.log(key, value)
 		}
 	}
 
-	async deleteJob () {
+	async deleteJob() {
 		if (jobStore.selectedId) {
 
 			fetch(constants.SERVER_URL + '/jdb/delete_job', {
 				method: "POST",
-				headers: {/*"Content-Type": "application/json"*/},
-				body: JSON.stringify({id:jobStore.selectedId})
+				headers: {/*"Content-Type": "application/json"*/ },
+				body: JSON.stringify({ id: jobStore.selectedId })
 			})
-			.then(response => response.json())
-			.then(data => {
-				console.log('Server Response:', data);
-		
-				if (data.status === "success") {
-					jobStore.setVal('selectedId',"")
-					//ТУТ можно просто найти у удалить из массива такой id
-					jobStore.loadJobs()	
-				} else {
-					// В случае ошибки выводим сообщение
-					console.error("Ошибка при удалении:" );				}
-			})
+				.then(response => response.json())
+				.then(data => {
+					console.log('Server Response:', data);
+
+					if (data.status === "success") {
+						jobStore.setVal('selectedId', "")
+						//ТУТ можно просто найти у удалить из массива такой id
+						jobStore.loadJobs()
+					} else {
+						// В случае ошибки выводим сообщение
+						console.error("Ошибка при удалении:");
+					}
+				})
 		}
 	}
 
@@ -209,7 +235,27 @@ class JobStore {
 				console.error('Error:', error);
 			});
 	}
-	
+
+	updateJobById(id: string, param: keyof JobInfoAttr, newValue: any) {
+		// Проходим по всем статусам
+		for (const statusKey of Object.keys(this.mockCards) as (keyof typeof this.mockCards)[]) {
+			const jobsArray = this.mockCards[statusKey];
+
+			const job = jobsArray.find(job => job.id === id);
+			if (job) {
+				// Прямое присваивание — MobX отследит изменение
+				(job as any)[param] = newValue;
+
+				// Если нужно — можно дополнительно триггерить реакцию
+				// Но в 99% случаев MobX сам всё увидит
+				return true; // найдено и обновлено
+			}
+		}
+
+		console.warn(`Job with id ${id} not found`);
+		return false; // не найдено
+	}
+
 }
 
 const jobStore = new JobStore();

@@ -9,6 +9,7 @@ import FavoritesButton from "./navbar/favoritesButton";
 import LanguageButton from "./navbar/languageButton";
 import { StartButton } from "./startButton";
 import CustomIcon from "../icons/customIcon";
+import jobStore from '../store/jobStore';
 
 const NavBar = observer(() => {
 
@@ -73,6 +74,22 @@ const NavBar = observer(() => {
 						</div>
 					</button>
 				</div> */}
+				<div className="ms-2">
+					<button 
+						className={`white_button navbar_button me-1` }
+						onPointerDown={()=>{jobStore.clearAllCuttingFlags()}}>
+						<div className="d-flex align-items-center justify-content-center">
+							<CustomIcon icon="finnish" 
+								width={48} 
+								height={48} 
+								color={ "black" } 
+								fill='black'
+								strokeWidth={0} 
+								viewBox={'0 0 32 32'} 								
+								/>
+						</div>
+					</button>
+				</div>	
 				<div className="ms-2">
 					<button className={`${knobMode ? "violet_button" : "white_button"} navbar_button`} onPointerDown={handleClick}>
 						<div className="d-flex align-items-center justify-content-center">
