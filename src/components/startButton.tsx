@@ -5,6 +5,7 @@ import jobStore from "../store/jobStore";
 import { observer } from "mobx-react-lite";
 import { showToast } from "./toast";
 import CustomIcon from "../icons/customIcon";
+import macrosStore from "../store/macrosStore";
 
 
 export const StartButton = observer(() => {
@@ -12,53 +13,28 @@ export const StartButton = observer(() => {
 	const { loadResult } = laserStore
 	const { mockCards } = jobStore
 
-
-	const handleClick = async () => {
-
-		if (!mockCards.hasOwnProperty("Cutting") ||
-		!mockCards["Cutting"].length
-		) {
-			showToast({
-				type: 'warning',
-				message: "Ooops, nothing to cut!",
-				position: 'bottom-right',
-				autoClose: 2500
-			});
-			return;
+	const getPresetAndSenTolaser = async (preset: number | boolean) => {
+		const resp = await fetch(`${constants.SERVER_URL}/db/get_preset?id=${preset}`, {
+			method: "GET",
+		});
+		if (!resp.ok) {
+			throw new Error(`Ошибка: ${resp.statusText}`)
+		} else {
+			const data = await resp.json();
+			// загружамемв настройки  макроссторе текущий пресет
+			macrosStore.setCutSettings(data.preset);
+			macrosStore.sentSettingsToLaser(data.preset)
 		}
+	}
 
-		let id:string|boolean = false;
-		let preset:number|boolean=false
+	const sentFileTolaser = async (id: string | boolean) => {
 
-		if ( mockCards.hasOwnProperty("Cutting") && mockCards["Cutting"].length) {
-
-			mockCards["Cutting"].forEach((item, index) =>{
-				if (item.hasOwnProperty("is_cutting") && item['is_cutting'] === 1){
-					showToast({
-						type: 'warning',
-						message: "Ooops, something is in cut " + item.name, 
-						position: 'bottom-right',
-						autoClose: 2500
-					});
-					return
-				}
-
-				if ( index ===0 ) {
-					id = item['id']
-					preset = item['preset']
-				}
-			})
-		}
-		
-		console.log (id, preset)
-		return
 		let upload_is_ok: boolean = true;
-
- 		try {
-			let resp = await fetch(`${constants.SERVER_URL}/api/laser_load`, {
-				method: "POST",
-				headers: {/* "Content-Type": "application/json" */ },
-				body: JSON.stringify({"id":id})
+		try {
+			let resp = await fetch(`${constants.SERVER_URL}/api/gcore/0/upload_from_id`, {
+				method: 'POST',
+				headers: { /*'Content-Type': 'application/json' */},
+				body: JSON.stringify({ 'id': id })
 			});
 
 			if (resp.ok) {
@@ -126,9 +102,7 @@ export const StartButton = observer(() => {
 			});
 			console.log("loadresult error:" + error)
 		}
-
-	};
-
+	}
 
 	const execute = async () => {
 
@@ -165,6 +139,51 @@ export const StartButton = observer(() => {
 		}
 	}
 
+	const handleClick = async () => {
+
+		if (!mockCards.hasOwnProperty("Cutting") ||
+			!mockCards["Cutting"].length
+		) {
+			showToast({
+				type: 'warning',
+				message: "Ooops, nothing to cut!",
+				position: 'bottom-right',
+				autoClose: 2500
+			});
+			return;
+		}
+
+		let id: string | boolean = false;
+		let preset: number | boolean = false
+
+		if (mockCards.hasOwnProperty("Cutting") && mockCards["Cutting"].length) {
+
+			mockCards["Cutting"].forEach((item, index) => {
+				if (item.hasOwnProperty("is_cutting") && item['is_cutting'] === 1) {
+					showToast({
+						type: 'warning',
+						message: "Ooops, something is in cut " + item.name,
+						position: 'bottom-right',
+						autoClose: 2500
+					});
+					return
+				}
+
+				if (index === 0) {
+					id = item['id']
+					preset = item['preset']
+				}
+			})
+		}
+
+		if (typeof preset === 'number') {
+			await getPresetAndSenTolaser(preset)
+			await sentFileTolaser(id)
+			await execute()
+
+		}
+	};
+
 	return (
 		<>
 			<button className="white_button navbar_button" onPointerDown={handleClick}>
@@ -183,13 +202,15 @@ export const StartButton = observer(() => {
 	);
 });
 
-// отправляем job_id и preset_id на back
-// отправляем preset on core 0
+// +получаем job_id и 
+// +preset_id на back
+// +отправляем preset on core 0
 // отправляем файл на core 0
 // отправялем load result frontend
 // если всё ок отправляем execute на  бэк
-// присраиваем id - is_cutting == true
+// присваиваем id - is_cutting == true
 // обновляем joB_LIST
+// +загружаем показания пресетов в текущие макросы.
 // запрещаем перемещать ??
 // остановка по азпросу ???
 //
