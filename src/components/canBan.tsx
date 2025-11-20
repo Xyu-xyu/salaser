@@ -19,7 +19,7 @@ const CanBan: React.FC = observer(() => {
 	const handleMouseDown = (id: string) => {
 		console.log("Setting selected to:", id);
 		jobStore.setVal('selectedId', id);
-	  };
+	};
 
 
 	useEffect(() => {
@@ -43,22 +43,47 @@ const CanBan: React.FC = observer(() => {
 							<ReactSortable
 								dragClass="sortableDrag"
 								ghostClass="sortableGhost"
-								filter=""
+								filter=".is_cutting"
 								list={cards}
 								setList={setList(status)} // Обновляем список карточек в store
 								animation={75}
 								easing="ease-out"
 								className="d-flex flex-column sortableContainerClass"
 								id={status}
-								group="kanban"  // Одна группа для всех колонок, чтобы элементы могли перемещаться между колонками
+								group="kanban"
+								draggable=".kanbanCard:not(.is_cutting)"   // только не-режущиеся можно брать
+
+								// УСЛОЖНЁННАЯ ЛОГИКА: блокируем вставку ТОЛЬКО ПЕРЕД is_cutting
+								onMove={(evt) => {
+									const { dragged, related } = evt;
+
+									// Если курсор над is_cutting элементом
+									if (related && related.classList.contains('is_cutting')) {
+										// Получаем координаты
+										const relatedRect = related.getBoundingClientRect();
+										const draggedRect = dragged.getBoundingClientRect();
+
+										// Проверяем, куда пытаются вставить: перед или после?
+										// (предполагаем вертикальный список — dragged.top > related.top значит "ниже" = после)
+										const isDroppingAfter = draggedRect.top > relatedRect.top + (relatedRect.height / 2);
+
+										if (!isDroppingAfter) {
+											return false; // ЗАПРЕЩАЕМ вставку ПЕРЕД is_cutting
+										}
+									}
+
+									return true; // Разрешаем в остальных случаях (включая ПОСЛЕ is_cutting)
+								}}// Одна группа для всех колонок, чтобы элементы могли перемещаться между колонками
 								onEnd={(/*evt*/) => {
 									//const movedCardId = evt.item?.dataset?.id;
-								    //const targetStatus = evt.from?.id;  // Колонка, откуда карточка была перемещена
+									//const targetStatus = evt.from?.id;  // Колонка, откуда карточка была перемещена
 									//const newStatus = evt.to?.id
 									//console.log(`Card with ID ${movedCardId} moved from ${targetStatus} to ${newStatus}`);
 									//jobStore.updateJobs('status', String(movedCardId), statuses.indexOf(newStatus))
 									jobStore.updateAllJobs()
 								}}
+
+
 							>
 								{cards.length > 0 ? (
 									cards.map((card) => {
@@ -74,35 +99,35 @@ const CanBan: React.FC = observer(() => {
 										}
 
 										return (
-											<div key={card.id} 
-												className={`kanbanCard ${card.id  === selectedId  ? "selected":""}`}
-												data-id={card.id} 
-												data-status={status} 
-												style={{ touchAction: 'none' }}											
-												onMouseDown={() =>{handleMouseDown(card.id)}}
+											<div key={card.id}
+												className={`${card.id === selectedId ? "selected" : ""} ${card.is_cutting === 1 ? " is_cutting" : "kanbanCard"}`}
+												data-id={card.id}
+												data-status={status}
+												style={{ touchAction: 'none' }}
+												onMouseDown={() => { handleMouseDown(card.id) }}
 
-												>
+											>
 												<div className='d-flex justify-content-between align-items-center'>
 													<div className="cardfileName">
 														{card.name}
 													</div>
-													{card.is_cutting === 1 && 
+													{card.is_cutting === 1 &&
 														<CustomIcon
-														icon="LaserInCut"
-														width="42"
-														height="42"
-														color="red"
-														fill="none"
-														strokeWidth={1.5}
-														className="ms-1"
-														viewBox='0 0 36 36'
-													/>
-													}												
-												</div>	
-							
+															icon="LaserInCut"
+															width="42"
+															height="42"
+															color="red"
+															fill="none"
+															strokeWidth={1.5}
+															className="ms-1"
+															viewBox='0 0 36 36'
+														/>
+													}
+												</div>
+
 
 												<div className="cardImage">
-    												<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
+													<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
 												</div>
 
 												<div className="mt-2">
