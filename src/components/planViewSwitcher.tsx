@@ -51,8 +51,10 @@ const PlanViewSwitcher = observer(() => {
 											icon="si:expand-more-alt-fill"
 											width="24"
 											height="24"
+											color="black"
+											fill="black"
+											strokeWidth={0}
 											style={{
-												color: "black",
 												transform: `rotate(${isOpen ? 180 : 0}deg)`,
 												transition: "transform 0.5s ease-in-out",
 											}}

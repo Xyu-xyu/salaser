@@ -61,8 +61,11 @@ const RightBar = observer(() => {
 											icon="fluent:tab-new-24-filled"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											viewBox="0 0 24 24"
+											strokeWidth={0}
 											className="ms-1"
+											fill="black"
 										/>
 										<div className="flex-grow-1 text-center">{t("New")}</div>
 									</div>
@@ -78,7 +81,8 @@ const RightBar = observer(() => {
 											icon="material-symbols:delete-outline-sharp"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											fill= {"black"}
+											strokeWidth={0}
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Tidy up")}</div>
@@ -93,7 +97,8 @@ const RightBar = observer(() => {
 											icon="fluent:group-24-regular"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											fill="black"
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Group")}</div>
@@ -112,7 +117,9 @@ const RightBar = observer(() => {
 											icon="tabler:chart-dots-3"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											fill="black"
+											strokeWidth={1}
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Parameters")}</div>
@@ -124,10 +131,11 @@ const RightBar = observer(() => {
 								<button className="w-100" onClick={() => laserStore.setVal('rightMode', 'function')}>
 									<div className="d-flex align-items-center">
 										<CustomIcon
-											icon="ph:function"
+											icon="hugeicons:function"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											strokeWidth={1.5}
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Functions")}</div>
@@ -157,7 +165,9 @@ const RightBar = observer(() => {
 											icon="bytesize:edit"
 											width="24"
 											height="24"
-											style={{ color: "black" }}
+											color="black"
+											viewBox="0 0 32 32"
+											strokeWidth={2}
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Edit")}</div>

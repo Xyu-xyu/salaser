@@ -268,10 +268,12 @@ const AddPlanButton = observer(() => {
 					<div className="d-flex align-items-center">
 						<CustomIcon
 							icon="fluent:copy-add-20-regular"
-							width="24"
-							height="24"
-							style={{ color: "black" }}
-							className="ms-1"
+							width="26"
+							height="26"
+							color='black'
+							fill='black'
+							strokeWidth={0}
+							viewBox="0 0 20 20"
 						/>
 						<div className="flex-grow-1 text-center">{t("Upload")}</div>
 					</div>

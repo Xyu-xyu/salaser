@@ -302,7 +302,7 @@ const SettingsButton = observer(() => {
 																	height="36"
 																	strokeWidth={1}
 																	color='white'
-																	viewBox='0 0 16 16'																				
+																	viewBox='0 0 16 16'																			
 																/>
 															</div>
 														</button>
@@ -319,7 +319,10 @@ const SettingsButton = observer(() => {
 																		icon="fa-regular:edit"
 																		width="36"
 																		height="36"
-																		style={{ color: 'white' }}
+																		color='white'
+																		fill='white'
+																		strokeWidth={0}
+																		viewBox='0 0 512 512'
 																	/>
 																</div>
 															</button>
@@ -331,10 +334,13 @@ const SettingsButton = observer(() => {
 															>
 																<div className="d-flex align-items-center justify-content-center">
 																	<CustomIcon
-																		icon="fa-regular:copy"
-																		width="24"
-																		height="24"
-																		style={{ color: 'white' }}
+																		icon="fluent:copy-add-20-regular"
+																		width="36"
+																		height="36"
+																		color='white'
+																		fill='white'
+																		strokeWidth={0}
+																		viewBox='0 0 24 24'
 																	/>
 																</div>
 															</button>
@@ -346,10 +352,13 @@ const SettingsButton = observer(() => {
 															>
 																<div className="d-flex align-items-center justify-content-center">
 																	<CustomIcon
-																		icon="bi:send-arrow-up"
+																		icon="send"
 																		width="36"
 																		height="36"
-																		style={{ color: 'white' }}
+																		viewBox='0 0 16 16'
+																		fill='white'
+																		strokeWidth={0.5}
+																		color='var(--violet)'
 																	/>
 																</div>
 															</button>
@@ -407,7 +416,7 @@ const SettingsButton = observer(() => {
 								color='white'
 								fill='white'
 								strokeWidth={0}
-								viewBox='0 0 512 512'
+								viewBox='0 0 24 24'
 							/>
 						</div>
 					</button>

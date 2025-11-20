@@ -91,7 +91,8 @@ export const uploadPresetFromFile = observer(() => {
 						icon="upload"
 						width="36"
 						height="36"
-						style={{ color: 'white' }}
+						color='white'
+						fill="white"
 					/>
 				</div>
 			</button>
