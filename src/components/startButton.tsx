@@ -141,10 +141,7 @@ export const StartButton = observer(() => {
 
 
 	const updateIsCutting = async (id: string) => {
-
-		jobStore.updateJobs('is_cutting', id, 1)
 		jobStore.updateJobById(id, 'is_cutting', 1)
-		
 	}
 
 	const handleClick = async () => {

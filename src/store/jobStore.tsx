@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import { showToast } from "../components/toast";
 import constants from "./constants";
 
@@ -53,8 +53,9 @@ class JobStore {
 		for (const statusKey of Object.keys(this.mockCards) as (keyof typeof this.mockCards)[]) {
 			this.mockCards[statusKey].forEach(job => {
 				if (job.is_cutting === 1) {
-					job.is_cutting = 0;
+					//job.is_cutting = 0;
 					this.updateJobById(job.id, 'is_cutting', 0)
+					this.updateJobById(job.id, 'status', 3)
 				}
 			});
 		}
@@ -135,38 +136,7 @@ class JobStore {
 			});
 		}
 	}
-
-	updateJobs(param: string, id: string, newValue: any) {
-		console.log('Arguments:', param, id, newValue); // Для отладки
-
-		// Отправка POST запроса на сервер
-		fetch(`${constants.SERVER_URL}/jdb/update_job`, {
-			method: 'POST',
-			headers: {/*'Content-Type': 'application/json',*/ },
-			body: JSON.stringify({
-				param: param,
-				id: id,
-				value: newValue
-			})
-		})
-			.then(response => response.json())
-			.then(data => {
-				console.log('Server Response:', data);
-
-				if (data.status === "success") {
-					// Если обновление прошло успешно, выводим сообщение на фронте
-					console.log(`Job ${param} updated successfully!`);
-					// Обновляем интерфейс (например, список задач или отображаем измененные данные)
-				} else {
-					// В случае ошибки выводим сообщение
-					console.log(`Error: ${data.error || data.message}`);
-				}
-			})
-			.catch(error => {
-				console.error('Error:', error);
-			});
-	}
-
+	
 	setVal<T extends keyof this>(key: T, value: this[T]) {
 		if (key in this) {
 			this[key] = value;
@@ -228,7 +198,7 @@ class JobStore {
 					console.log(`Jobs updated successfully!`);
 				} else {
 					// В случае ошибки выводим сообщение
-					console.log(`Error: ${data.error || data.message}`);
+					console.log(`Error: ${data.error || data.message} `+ data.status);
 				}
 			})
 			.catch(error => {
@@ -236,26 +206,78 @@ class JobStore {
 			});
 	}
 
-	updateJobById(id: string, param: keyof JobInfoAttr, newValue: any) {
-		// Проходим по всем статусам
-		for (const statusKey of Object.keys(this.mockCards) as (keyof typeof this.mockCards)[]) {
-			const jobsArray = this.mockCards[statusKey];
+	updateJobsInDB (param: string, id: string, newValue: any) {
+		console.log('Arguments:', param, id, newValue); // Для отладки
 
-			const job = jobsArray.find(job => job.id === id);
-			if (job) {
-				// Прямое присваивание — MobX отследит изменение
-				(job as any)[param] = newValue;
+		// Отправка POST запроса на сервер
+		fetch(`${constants.SERVER_URL}/jdb/update_job`, {
+			method: 'POST',
+			headers: {/*'Content-Type': 'application/json',*/ },
+			body: JSON.stringify({
+				"param": param,
+				"id": id,
+				"value": newValue
+			})
+		})
+		.then(response => response.json())
+		.then(data => {
+			console.log('Server Response:', data);
 
-				// Если нужно — можно дополнительно триггерить реакцию
-				// Но в 99% случаев MobX сам всё увидит
-				return true; // найдено и обновлено
+			if (data.status === "success") {
+				// Если обновление прошло успешно, выводим сообщение на фронте
+				console.log(`Job ${param} updated successfully to: ` + newValue);
+				// Обновляем интерфейс (например, список задач или отображаем измененные данные)
+			} else {
+				// В случае ошибки выводим сообщение
+				console.log(`Error: ${data.error || data.message}`);
 			}
-		}
-
-		console.warn(`Job with id ${id} not found`);
-		return false; // не найдено
+		})
+		.catch(error => {
+			console.error('Error:', error);
+		});
 	}
 
+	updateJobById(id: string, param: keyof JobInfoAttr, newValue: any): boolean {
+		const statuses = ["Loaded", "Cutting", "Pending", "Completed"] as const;
+	  
+		for (const statusKey of Object.keys(this.mockCards) as (keyof typeof this.mockCards)[]) {
+		  const jobsArray = this.mockCards[statusKey];
+	  
+		  const job = jobsArray.find(job => job.id === id);
+		  if (job) {
+			// Если меняется статус — перемещаем!
+			if (param === 'status' && typeof newValue === 'number') {
+			  const newStatusKey = statuses[newValue];
+	  
+			  if (newStatusKey && newStatusKey !== statusKey) {
+				runInAction(() => {
+				  // Удаляем из старого
+				  const index = jobsArray.indexOf(job);
+				  if (index !== -1) jobsArray.splice(index, 1);
+	  
+				  // Обновляем и добавляем в новый
+				  job.status = newValue;
+				  this.mockCards[newStatusKey].push(job);
+				});
+	  
+				this.updateJobsInDB(param, id, newValue);
+				return true;
+			  }
+			}
+	  
+			// Обычное обновление поля
+			runInAction(() => {
+			  (job as any)[param] = newValue;
+			});
+	  
+			this.updateJobsInDB(param, id, newValue);
+			return true;
+		  }
+		}
+	  
+		console.warn(`Job with id ${id} not found`);
+		return false;
+	  }
 }
 
 const jobStore = new JobStore();

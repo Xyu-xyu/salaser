@@ -79,7 +79,6 @@ const CanBan: React.FC = observer(() => {
 									//const targetStatus = evt.from?.id;  // Колонка, откуда карточка была перемещена
 									//const newStatus = evt.to?.id
 									//console.log(`Card with ID ${movedCardId} moved from ${targetStatus} to ${newStatus}`);
-									//jobStore.updateJobs('status', String(movedCardId), statuses.indexOf(newStatus))
 									jobStore.updateAllJobs()
 								}}
 
@@ -100,7 +99,7 @@ const CanBan: React.FC = observer(() => {
 
 										return (
 											<div key={card.id}
-												className={`${card.id === selectedId ? "selected" : ""} ${card.is_cutting === 1 ? " is_cutting" : "kanbanCard"}`}
+												className={`${card.id === selectedId ? "selected" : ""} ${card.is_cutting === 1 ? " is_cutting kanbanCard" : "kanbanCard"}`}
 												data-id={card.id}
 												data-status={status}
 												style={{ touchAction: 'none' }}
