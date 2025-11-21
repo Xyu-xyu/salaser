@@ -61,10 +61,19 @@ class JobStore {
 		}
 	}
 
-	setCardOrder(status: string, newList: JobInfoAttr[]) {
-		this.mockCards[status] = newList;
-	}
+	setCardOrder(statusKey: keyof typeof this.mockCards, newList: JobInfoAttr[]) {
+		const statuses = ["Loaded", "Cutting", "Pending", "Completed"] as const;
+		const statusIndex = statuses.indexOf(statusKey as any);
+		if (statusIndex === -1) return;
 
+		runInAction(() => {
+			this.mockCards[statusKey] = newList.map(job => ({
+				...job,
+				status: statusIndex,
+				// array_id: index, // раскомментируй, если нужно
+			}));
+		});
+	}
 
 	/*		
 	Чтобы получить данные с фильтрами, можно сделать HTTP GET-запрос с параметрами:

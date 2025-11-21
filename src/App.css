@@ -990,6 +990,13 @@ height: fit-content;}
     align-items: center;
     flex-direction: column;
 }
+
+.ccard-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
 .ccard-header {
     font-size: 18px;
     background-color: none;

@@ -14,6 +14,7 @@ import CanBan from "./canBan";
 import jobStore from "../store/jobStore";
 import { useTranslation } from 'react-i18next';
 import constants from "../store/constants";
+import CustomIcon from "../icons/customIcon";
 
 interface ParamItem {
 	name: string;
@@ -55,7 +56,11 @@ const MidBar = observer(() => {
 	const swiperRef = useRef<SwiperClass | null>(null);
 	const { isVertical, presets } = macrosStore
 	const { mockCards } = jobStore
-	const tasks = mockCards.Cutting || []
+	let tasks = []
+	if (mockCards.Completed && mockCards.Completed.length) {
+		tasks.push(mockCards.Completed[mockCards.Completed.length-1])
+	}
+	tasks = [...tasks, ...mockCards.Cutting]
 
 
 	if (laserStore.loading) return <div>Загрузка...</div>;
@@ -234,7 +239,52 @@ const MidBar = observer(() => {
 												<SwiperSlide key={card.id}>
 													<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
 														<div className="ccard">
-															<div className="ccard-header">{card.name}</div>
+															<div className="ccard-header">{card.name} {card.status} {card.is_cutting}</div>
+															<div className="ccard-icon">
+
+															{card.is_cutting === 1 &&
+																<CustomIcon
+																	icon="LaserInCut"
+																	width="42"
+																	height="42"
+																	color="red"
+																	fill="none"
+																	strokeWidth={1}
+																	className="ms-1"
+																	viewBox='0 0 36 36'
+																/>
+															}
+
+
+															{card.is_cutting === 0 && card.status === 1 &&																<CustomIcon
+																	icon="LaserPending"
+																	width="42"
+																	height="42"
+																	color="green"
+																	fill="none"
+																	strokeWidth={1}
+																	className="ms-1"
+																	viewBox='0 0 36 36'
+																/>
+															}
+
+															{card.is_cutting === 0 && card.status === 3 &&					
+																<CustomIcon
+																	icon="LaserComplete"
+																	width="42"
+																	height="42"
+																	color="var(--violet)"
+																	fill="none"
+																	strokeWidth={1}
+																	className="ms-1"
+																	viewBox='0 0 36 36'
+																/>
+															}
+
+
+
+															
+															</div>
 															<div className="ccard-image-wrapper">
 																<div className="ccard-image">
 				    												<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
