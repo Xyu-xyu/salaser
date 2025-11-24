@@ -30,6 +30,13 @@ class JobStore {
 		Completed: [],
 	};
 
+	taskView: Record<string, boolean> = {
+		Loaded: true,
+		Cutting: true,
+		Pending: true,
+		Completed: true,
+	};
+
 	constructor() {
 		makeAutoObservable(this, {});
 	}
@@ -151,6 +158,10 @@ class JobStore {
 			this[key] = value;
 			console.log(key, value)
 		}
+	}
+
+	setTaskView ( option:string,val:boolean) {
+		this.taskView[option] = val
 	}
 
 	async deleteJob() {
@@ -286,7 +297,7 @@ class JobStore {
 	  
 		console.warn(`Job with id ${id} not found`);
 		return false;
-	  }
+	}
 }
 
 const jobStore = new JobStore();

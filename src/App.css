@@ -314,8 +314,17 @@ body {
   margin: 5px;
 }
 
+#TaskViewSwitcher div:not(.list-group-item), 
 #PlanViewSwitcher div:not(.list-group-item) {
   margin: 0px;
+}
+
+#TaskViewSwitcher input {
+  margin-left: -21px;
+} 
+
+#TaskViewSwitcher label  {
+  margin-left: 5px;
 }
 
 #FunctionBar button,

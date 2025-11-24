@@ -11,7 +11,7 @@ import CustomIcon from '../icons/customIcon';
 const CanBan: React.FC = observer(() => {
 	const { t } = useTranslation();
 	const statuses: string[] = ['Loaded', 'Cutting', 'Pending', 'Completed'];
-	const { mockCards, selectedId } = jobStore;
+	const { mockCards, selectedId, taskView } = jobStore;
 	const { presets } = macrosStore;
 	const setList = (status: string) => (newList: any) => {
 		jobStore.setCardOrder(status, newList);
@@ -31,7 +31,7 @@ const CanBan: React.FC = observer(() => {
 			{statuses.map((status) => {
 				const cards = mockCards[status] ?? [];
 
-				return (
+				return ( taskView[status] &&
 					<div key={status} className="kanbanColumn" id={status}>
 						<div className="columnHeader">
 							<h6 className="m-0 p-0">{t(status)}</h6>
