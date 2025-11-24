@@ -76,7 +76,7 @@ const LoginPage = () => {
 			style={{
 				bottom:"0px",
 				right:"0px",
-				background: "url('/images/222082.gif",
+				background: "url('/images/11.png",
 				width: "100vw",
 				height: "500vh",
 				mixBlendMode: "luminosity",
@@ -84,7 +84,7 @@ const LoginPage = () => {
 			}}		
 			 >
 			</div>
-			<div className="position-absolute" style={{right:"0", top:"0"}}>
+			<div id="LoginButton" className="position-absolute" style={{right:"0", top:"0"}}>
 				<LanguageButton />
 			</div>
 		</>

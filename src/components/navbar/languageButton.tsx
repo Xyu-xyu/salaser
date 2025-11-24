@@ -18,7 +18,7 @@ const LanguageButton: React.FC = observer(() => {
 
 
 	return (
-		<div className="ms-2">
+		<div className="ms-2" id="LanguageButton">
 			<button
 				className={`navbar_button me-1 ${show ? "violet_button" : "white_button"}`}
 				onClick={showModal}

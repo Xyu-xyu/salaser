@@ -1,6 +1,7 @@
 // icons.ts или прямо в компоненте
 const customIcons = {
 	"finnish":"M5 4v24h2v-8h20V4zm2 2h3v3h3V6h3v3h3V6h3v3h3v3h-3v3h3v3h-3v-3h-3v3h-3v-3h-3v3h-3v-3H7v-3h3V9H7zm3 6v3h3v-3zm3 0h3V9h-3zm3 0v3h3v-3zm3 0h3V9h-3z",
+	"LaserLoaded":"M30 24 19 20 8 24 19 28 30 24M27 13 27 19 30 16 27 19 24 16",
 	"LaserComplete": "M30 24 19 20 8 24 19 28 30 24M25 16 27 19 30 12",
 	"LaserIcon":"M8 24H16M15 9 V18L19 23  23 18 V17 L15 17M23 9V18L19 23 19 24 30 24",
 	"LaserInCut":"M16 21 L8 24 L19 28 L30 24 L22 21 M15 9V18L19 23 23 18V17L15 17M23 9V18L19 23 ",
