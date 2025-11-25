@@ -18,12 +18,14 @@ export const StartButton = observer(() => {
 			method: "GET",
 		});
 		if (!resp.ok) {
-			throw new Error(`Ошибка: ${resp.statusText}`)
+			return false
+			//throw new Error(`Ошибка: ${resp.statusText}`)
 		} else {
 			const data = await resp.json();
 			// загружамемв настройки  макроссторе текущий пресет
 			macrosStore.setCutSettings(data.preset);
-			macrosStore.sentSettingsToLaser(data.preset)
+			let res = macrosStore.sentSettingsToLaser(data.preset)
+			return res;
 		}
 	}
 
@@ -38,7 +40,7 @@ export const StartButton = observer(() => {
 			});
 
 			if (resp.ok) {
-				//console.log("✅ Uploaded");
+				console.log("✅ Uploaded");
 			} else {
 
 				showToast({
@@ -182,11 +184,22 @@ export const StartButton = observer(() => {
 		}
 
 		if (typeof preset === 'number') {
-			await getPresetAndSenTolaser(preset)
-			await sentFileTolaser(id)
-			await execute()
+			const result = await getPresetAndSenTolaser(preset);
+			if (result === Boolean(result)) {
+				await sentFileTolaser(id);
+				await execute();				
+				if (typeof id === 'string') {
+					await updateIsCutting(id);
+				}
+			} else {		
+				showToast({
+					type: 'error',
+					message: "Error in sending preset to laser!",
+					position: 'bottom-right',
+					autoClose: 2500
+				});
+			}
 			if (typeof id === 'string')	await updateIsCutting (id);
-
 		}
 	};
 

@@ -298,6 +298,18 @@ class JobStore {
 		console.warn(`Job with id ${id} not found`);
 		return false;
 	}
+
+	getJobById (id:string) {
+		for (const statusKey of Object.keys(this.mockCards) as (keyof typeof this.mockCards)[]) {
+			const jobsArray = this.mockCards[statusKey];
+		
+			const job = jobsArray.find(job => job.id === id);
+			if (job) {			 		 
+			  return job;
+			}
+		}
+		return false;
+	}
 }
 
 const jobStore = new JobStore();

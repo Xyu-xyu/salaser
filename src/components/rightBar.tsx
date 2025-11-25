@@ -9,6 +9,7 @@ import AddPlanButton from "./navbar/addPlanButton";
 import jobStore from "../store/jobStore";
 import macrosStore from "../store/macrosStore";
 import CustomIcon from "../icons/customIcon";
+import { DetailsButton } from "./detailsButton";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
@@ -55,7 +56,7 @@ const RightBar = observer(() => {
 							<AddPlanButton />
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="fluent:tab-new-24-filled"
@@ -91,7 +92,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="fluent:group-24-regular"
@@ -111,7 +112,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100" onClick={() => laserStore.setVal('rightMode', 'parameter')}>
+								<button className="w-100" /*onClick={() => laserStore.setVal('rightMode', 'parameter')}*/ disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="tabler:chart-dots-3"
@@ -144,22 +145,11 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="fluent:clipboard-more-20-regular"
-											width="24"
-											height="24"
-											style={{ color: "black" }}
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Details")}</div>
-									</div>
-								</button>
+								<DetailsButton item={'selected'} />
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="bytesize:edit"
@@ -192,7 +182,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="fa7-solid:list-check"
@@ -209,7 +199,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="bytesize:edit"
@@ -263,7 +253,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="solar:restart-bold"
@@ -284,24 +274,11 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="tabler:chart-dots-3"
-											width="24"
-											height="24"
-											color="black"
-											fill="black"
-											strokeWidth={1}
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Details")}</div>
-									</div>
-								</button>
+								<DetailsButton item={'is_cutting'} />
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="carbon:view"
@@ -310,6 +287,7 @@ const RightBar = observer(() => {
 											color="black"
 											fill="black"
 											viewBox="0 0 32 32"
+											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("View")}</div>
 									</div>
@@ -317,13 +295,14 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100">
+								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="flowbite:clipboard-list-outline"
 											width="24"
 											height="24"
-											color="black"											
+											color="black"
+											className="ms-1"											
 										/>
 										<div className="flex-grow-1 text-center">{t("Key")}</div>
 									</div>

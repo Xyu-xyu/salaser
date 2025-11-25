@@ -315,5 +315,6 @@ const en: Record<string, string> = {
 	"Некоторые задания не были добавлены": "Некоторые задания не были добавлены",
 	"Все задания успешно добавлены": "Все задания успешно добавлены",
 	"Tasks": "Tasks",
+	"No selected jobs": "No selected jobs",
 }
 export default en;

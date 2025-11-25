@@ -779,9 +779,11 @@ class MacrosStore {
 
             } catch (err: any) {
                 showToast({ type: "error", message: err.message });
+                return false
             }
         } else {
             showToast({ type: "error", message: 'invalid something...' });
+            return false
         }   
     }
 

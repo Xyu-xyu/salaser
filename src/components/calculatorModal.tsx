@@ -141,7 +141,12 @@ const CalculatorModal: React.FC<CalculatorModalProps> = ({
 		>
 			<div className='d-flex align-items-center mb-2'>
 				<div className='me-1'>
-					<CustomIcon icon="bytesize:edit" width="18" height="18" style={{ color: "black" }} />
+					<CustomIcon icon="bytesize:edit" 
+						width="20"
+						height="20"
+						color="black"
+						viewBox="0 0 32 32"
+						strokeWidth={2} />
 				</div>
 				<div>
 					<h6 className='m-0 p-0'>{t(label)}</h6>
