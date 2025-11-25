@@ -10,6 +10,7 @@ import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import { showToast } from "./toast";
 import constants from "../store/constants";
 import macrosStore from "../store/macrosStore";
+import DetailsButtonImg from "./detailsButtonImg"
 
 
 interface DetailsButtonProps {
@@ -180,9 +181,11 @@ export const DetailsButton = observer(({ item }: DetailsButtonProps) => {
 
 									</div>
 
-									<div className="detailsImage">
+							{/* 		<div className="detailsImage">
 										<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
-									</div>
+									</div> */}
+
+									<DetailsButtonImg id={card.id}/>
 
 									<div className="m-4">
 										<div className="cardTime">
@@ -227,13 +230,11 @@ export const DetailsButton = observer(({ item }: DetailsButtonProps) => {
 														))}
 													</DropdownButton>
 												</Dropdown>
-											</div>
-											
+											</div>											
 									</div>
 								</div>
 							)
-						})
-						}
+						})}
 					</div>
 				</div>
 			</Modal>

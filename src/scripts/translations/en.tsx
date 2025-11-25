@@ -316,5 +316,6 @@ const en: Record<string, string> = {
 	"Все задания успешно добавлены": "Все задания успешно добавлены",
 	"Tasks": "Tasks",
 	"No selected jobs": "No selected jobs",
+	"Error in sending preset to laser!": "Error in sending preset to laser!",
 }
 export default en;

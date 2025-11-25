@@ -311,5 +311,6 @@ const zh: Record<string, string> = {
 	"Все задания успешно добавлены": "Все задания успешно добавлены",
 	"Tasks": "任务",
 	"No selected jobs": "没有选择的职位",
+	"Error in sending preset to laser!": "将预设发送到激光时出错！",
 }
 export default zh;

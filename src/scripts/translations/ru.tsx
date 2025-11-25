@@ -313,5 +313,6 @@ const ru: Record<string, string> = {
 	"Все задания успешно добавлены": "Все задания успешно добавлены",
 	"Tasks": "Задачи",
 	"No selected jobs": "Нет выбранных вакансий",
+	"Error in sending preset to laser!": "Ошибка отправки пресета на лазер!",
 }
 export default ru;
