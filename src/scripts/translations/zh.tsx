@@ -312,5 +312,7 @@ const zh: Record<string, string> = {
 	"Tasks": "任务",
 	"No selected jobs": "没有选择的职位",
 	"Error in sending preset to laser!": "将预设发送到激光时出错！",
+	"Start": "开始",
+	"Do you want to start laser cut process ?": "您想开始激光切割工艺吗？",
 }
 export default zh;

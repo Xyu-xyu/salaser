@@ -317,5 +317,7 @@ const en: Record<string, string> = {
 	"Tasks": "Tasks",
 	"No selected jobs": "No selected jobs",
 	"Error in sending preset to laser!": "Error in sending preset to laser!",
+	"Start": "Start",
+	"Do you want to start laser cut process ?": "Do you want to start laser cut process ?",
 }
 export default en;

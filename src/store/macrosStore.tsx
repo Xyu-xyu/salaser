@@ -773,6 +773,7 @@ class MacrosStore {
                 if (data.success) {
                     //this.cut_settings = newSettings;
                     showToast({ type: "success", message: "Settings updated" });
+                    return true;
                 } else {
                     throw new Error(data.exception || "Update error");
                 }

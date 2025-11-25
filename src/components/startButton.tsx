@@ -13,21 +13,33 @@ export const StartButton = observer(() => {
 	const { loadResult } = laserStore
 	const { mockCards } = jobStore
 
-	const getPresetAndSenTolaser = async (preset: number | boolean) => {
-		const resp = await fetch(`${constants.SERVER_URL}/db/get_preset?id=${preset}`, {
-			method: "GET",
-		});
-		if (!resp.ok) {
-			return false
-			//throw new Error(`Ошибка: ${resp.statusText}`)
-		} else {
+	const getPresetAndSenTolaser = async (preset: number | boolean): Promise<boolean> => {
+		try {
+			const resp = await fetch(`${constants.SERVER_URL}/db/get_preset?id=${preset}`, {
+				method: "GET",
+			});
+
+			if (!resp.ok) {
+				console.error("Failed to fetch preset:", resp.status, resp.statusText);
+				return false;
+			}
+
 			const data = await resp.json();
-			// загружамемв настройки  макроссторе текущий пресет
+
+			if (!data?.preset) {
+				console.error("Preset data is empty");
+				return false;
+			}
+
 			macrosStore.setCutSettings(data.preset);
-			let res = macrosStore.sentSettingsToLaser(data.preset)
-			return res;
+			const sendResult = await macrosStore.sentSettingsToLaser(data.preset);
+			return Boolean(sendResult)
+
+		} catch (err) {
+			console.error("Error in getPresetAndSenTolaser:", err);
+			return false;
 		}
-	}
+	};
 
 	const sentFileTolaser = async (id: string | boolean) => {
 
@@ -35,7 +47,7 @@ export const StartButton = observer(() => {
 		try {
 			let resp = await fetch(`${constants.SERVER_URL}/api/gcore/0/upload_from_id`, {
 				method: 'POST',
-				headers: { /*'Content-Type': 'application/json' */},
+				headers: { /*'Content-Type': 'application/json' */ },
 				body: JSON.stringify({ 'id': id })
 			});
 
@@ -146,7 +158,7 @@ export const StartButton = observer(() => {
 		jobStore.updateJobById(id, 'is_cutting', 1)
 	}
 
-	const handleClick = async () => {
+	const startLaser = async () => {
 
 		if (!mockCards.hasOwnProperty("Cutting") ||
 			!mockCards["Cutting"].length
@@ -184,24 +196,37 @@ export const StartButton = observer(() => {
 		}
 
 		if (typeof preset === 'number') {
-			const result = await getPresetAndSenTolaser(preset);
-			if (result === Boolean(result)) {
-				await sentFileTolaser(id);
-				await execute();				
-				if (typeof id === 'string') {
-					await updateIsCutting(id);
-				}
-			} else {		
+			const success = await getPresetAndSenTolaser(preset);
+			if (!success) {
 				showToast({
 					type: 'error',
 					message: "Error in sending preset to laser!",
 					position: 'bottom-right',
 					autoClose: 2500
 				});
+				return;
 			}
-			if (typeof id === 'string')	await updateIsCutting (id);
+		}
+		await sentFileTolaser(id);
+		await execute();
+
+		if (typeof id === 'string') {
+			await updateIsCutting(id);
 		}
 	};
+
+	const handleClick  =()=>{
+		const def = {
+			show:true,
+			modalBody: 'Do you want to start laser cut process ?',
+			confirmText: 'Start',
+			cancelText:'Cancel',
+			func: startLaser,
+			args:['']
+		}
+		macrosStore.setModalProps (def)		
+	}
+
 
 	return (
 		<>

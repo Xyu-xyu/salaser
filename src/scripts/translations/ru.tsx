@@ -314,5 +314,7 @@ const ru: Record<string, string> = {
 	"Tasks": "Задачи",
 	"No selected jobs": "Нет выбранных вакансий",
 	"Error in sending preset to laser!": "Ошибка отправки пресета на лазер!",
+	"Start": "Начать",
+	"Do you want to start laser cut process ?": "Вы хотите начать процесс лазерной резки?",
 }
 export default ru;
