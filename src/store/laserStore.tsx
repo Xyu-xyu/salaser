@@ -16,6 +16,7 @@ class LaserStore {
 	leftMode: string = "plan" //functions parameter, plan
 	planViewType: string ="CanBan"
 	knobMode: boolean = false
+	cutSeg:number = 0
 	tasks:string[]  = [];
 	loading: boolean = false;
 	error: string | null = null;
@@ -26,7 +27,8 @@ class LaserStore {
 	paramsLimit: ParamLimit[] = [
 		{ name: 'X', measure: 'mm', val: 0 },
 		{ name: 'Y', measure: 'mm', val: 0 },
-		{ name: 'Z', measure: 'mm', val: 0 }
+		{ name: 'Z', measure: 'mm', val: 0 },
+		{ name: 'exec_line', measure: 'num', val: 0 },
 	];
 	isLogined:boolean = false;
 
@@ -90,36 +92,42 @@ class LaserStore {
 	}
 
 	initSocket() {
-        if (laserStore.socket) return; // уже подключен — ничего не делаем
+		if (laserStore.socket) return; // уже подключен — ничего не делаем
 
 		//let lastUpdate = 0;
 
-        this.socket = io(constants.SERVER_URL, {
-            path: "/socket.io",
-            transports: ["websocket"],
-        });
+		this.socket = io(constants.SERVER_URL, {
+			path: "/socket.io",
+			transports: ["websocket"],
+		});
 
-        this.socket.on("connect", () => {
-            console.log("✅ Connected to backend");
-        });
+		this.socket.on("connect", () => {
+			console.log("✅ Connected to backend");
+		});
 
-        this.socket.on("disconnect", () => {
-            console.log("❌ Disconnected from backend");
-        });
+		this.socket.on("disconnect", () => {
+			console.log("❌ Disconnected from backend");
+		});
 
-        this.socket.on("machine_data", (data: any) => {
+		this.socket.on("machine_data", (data: any) => {
 			//const now = Date.now();
 			//if (lastUpdate) {
-				//const diff = now - lastUpdate;
-				//console.log(`⏱ Время между сообщениями: ${diff} мс`);
+			//const diff = now - lastUpdate;
+			//console.log(`⏱ Время между сообщениями: ${diff} мс`);
 			//}
-		
+
 			//lastUpdate = now;
-            runInAction(() => {
-			    this.paramsLimit = data; // обновляем observable-свойство
-            });
-        });
-    }
+			runInAction(() => {
+				this.paramsLimit = data;
+				const execLineValue =
+					data.find((item: any) => item?.name === 'exec_line')?.val ?? 0;
+
+				if (execLineValue > 0) {
+					this.setVal('cutSeg', execLineValue);
+				}
+			});
+		});
+	}
 
     /** Отключение сокета и очистка */
     closeSocket() {

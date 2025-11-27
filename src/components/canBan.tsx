@@ -99,11 +99,11 @@ const CanBan: React.FC = observer(() => {
 
 										return (
 											<div key={card.id}
-												className={`${card.id === selectedId ? "selected" : ""} ${card.is_cutting === 1 ? " is_cutting kanbanCard" : "kanbanCard"}`}
+												className={`${card.id === selectedId ? " selected " : ""} ${card.is_cutting === 1 ? " is_cutting kanbanCard " : " kanbanCard "}`}
 												data-id={card.id}
 												data-status={status}
 												style={{ touchAction: 'none' }}
-												onMouseDown={() => { handleMouseDown(card.id) }}
+												onPointerDown={() => { handleMouseDown(card.id) }}
 
 											>
 												<div className='d-flex justify-content-between align-items-center'>

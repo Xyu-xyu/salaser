@@ -10,12 +10,14 @@ const LeftBar = observer(() => {
 		<>
 			<div id="LeftBar">
 				<div className="d-flex flex-column">
-					<div className="mt-2 mx-2">
+					<div className="mt-2 mx-2"					
+						onClick={()=> {
+							laserStore.setVal ('rightMode', 'plan')
+							laserStore.setVal ('leftMode', 'plan')
+						}}
+					>
 						<button
-							onClick={()=> {
-								laserStore.setVal ('rightMode', 'plan')
-								laserStore.setVal ('leftMode', 'plan')
-							}} 
+						 
 							className={`${leftMode === 'plan' ? "viotet_button" : "grey_button"} navbar_button w-100`}>
 							<div className="d-flex align-items-center justify-content-center">
 							<CustomIcon icon="hugeicons:carousel-horizontal-02"
@@ -27,12 +29,13 @@ const LeftBar = observer(() => {
 							</div>
 						</button>
 					</div>
-					<div className="mx-2 mt-1">
-						<button 
-							onClick={()=> {
-								laserStore.setVal ('rightMode', 'parameter')
-								laserStore.setVal ('leftMode', 'sheet')
-							}} 
+					<div className="mx-2 mt-1"
+						onClick={()=> {
+							laserStore.setVal ('rightMode', 'parameter')
+							laserStore.setVal ('leftMode', 'sheet')
+						}} 
+					>
+						<button 							
 							className={`${leftMode !== 'plan' ? "viotet_button" :"grey_button"} navbar_button w-100`}>
 							<div className="d-flex align-items-center justify-content-center">
 								<CustomIcon 

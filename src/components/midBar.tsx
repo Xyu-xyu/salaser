@@ -94,7 +94,7 @@ const MidBar = observer(() => {
 
 							{/* Параметры с лимитами */}
 							<div className="d-flex mx-2 flex-wrap">
-								{paramsLimit.map((item: ParamItem, i: number) => (
+								{paramsLimit.filter(a => a.name !== 'exec_line').map((item: ParamItem, i: number) => (
 									<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
 										<div className="currentPlanMeasureWpapper">
 											<div className="currentPlanMeasure">

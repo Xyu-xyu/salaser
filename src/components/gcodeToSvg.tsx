@@ -26,7 +26,7 @@ interface PathItem {
 
 const GCodeToSvg = observer(() => {
 
-	const { loadResult } = laserStore
+	const { loadResult, cutSeg } = laserStore
 	const { isVertical } = macrosStore
 	const containerRef = useRef<HTMLDivElement | null>(null);
  	const panZoomRef = useRef<any>(null);
@@ -34,7 +34,6 @@ const GCodeToSvg = observer(() => {
 	const data = JSON.parse(loadResult)
 	const width = (isVertical ? Number(data.result.jobinfo.attr?.dimy) : Number(data.result.jobinfo.attr?.dimx) )|| (isVertical? 1500 : 3000);
 	const height = (isVertical ? Number(data.result.jobinfo.attr?.dimx) : Number(data.result.jobinfo.attr?.dimy) ) || (isVertical? 3000 : 1500);
-	const [cutSeg, setCutSeg] = useState(0);
 	const [paths, setPaths] = useState<PathItem[]>([]);//useState([]);
 	const [labels, setLabels] = useState<ReactNode[]>([]); // Храним готовые метки
 	let groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы
@@ -55,8 +54,7 @@ const GCodeToSvg = observer(() => {
 	}, [listing]);
 
 	useEffect(() => {
-		setCutSeg(0)
-		setLabels([])
+ 		setLabels([])
 		update()
 	}, [loadResult])
 
@@ -449,24 +447,6 @@ const GCodeToSvg = observer(() => {
 		let cmdsReverted:any = [];
 		let path:any = [];
    
-		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
-		const rotatePoint = (
-			x: number,
-			y: number,
-			cx: number,
-			cy: number,
-			angleDeg: number
-		): [number, number] => {
-			const theta = (angleDeg * Math.PI) / 180; // переводим угол в радианы
-			const dx = x - cx;
-			const dy = y - cy;
-
-			const xRot = cx + dx * Math.cos(theta) - dy * Math.sin(theta);
-			const yRot = cy + dx * Math.sin(theta) + dy * Math.cos(theta);
-
-			return [xRot, yRot];
-		};
-
 		for (let i = 0; i < cutSeg; i++) {
 			const c = cmds[cutSeg - i-1];
 			const g = c.g;
@@ -613,29 +593,7 @@ const GCodeToSvg = observer(() => {
 							/>
 						</div>
 					</button>
-				</div>
-				<div className="d-flex flex-column">
-					<input
-						type="range"
-						className="w-full cursor-pointer accent-orange-500"
-						min={0}
-						max={listing.trim().split(/\n+/).length}
-						step={1}
-						value={cutSeg}
-						onChange={(e) => setCutSeg(Number(e.target.value))}
-					/>
-
-					{/* Поле ввода */}
-					<input
-						type="number"
-						className="w-full p-2 border rounded-md"
-						min={0}
-						step={1}
-						value={cutSeg}
-						onChange={(e) => setCutSeg(Number(e.target.value))}
-					/>
-				</div>
-
+				</div>			
 			</div>
 			<div className="d-flex flex-column position-absolute mx-2 mt-2 p-2"
 				style={{ right: '0px', border: "1px solid var(--grey-nav)", borderRadius: "5px", backgroundColor: "#fff" }}

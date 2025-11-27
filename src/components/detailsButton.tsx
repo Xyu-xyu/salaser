@@ -23,6 +23,8 @@ export const DetailsButton = observer(({ item }: DetailsButtonProps) => {
 	const { presets } = macrosStore
 	const { t } = useTranslation()
 	const [show, setShow] = useState(false);
+	const handleClose = () => setShow(false);
+	const job = jobStore.getJobById(selectedId)
 
 	const showModal = () => {
 		if (job) {
@@ -37,8 +39,7 @@ export const DetailsButton = observer(({ item }: DetailsButtonProps) => {
 		}
 	};
 
-	const handleClose = () => setShow(false);
-	const job = jobStore.getJobById(selectedId)
+
 
 	const handleMaterialChange = (preset: number) => {
 		jobStore.updateJobsInDB('preset', selectedId, preset)
