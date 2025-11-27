@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useState } from "react";
 import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import { showToast } from "./toast";
-import constants from "../store/constants";
+//import constants from "../store/constants";
 import macrosStore from "../store/macrosStore";
 import DetailsButtonImg from "./detailsButtonImg"
 

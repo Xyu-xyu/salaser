@@ -211,12 +211,11 @@ const GCodeToSvg = observer(() => {
 		const parseGcodeLine = utils.makeGcodeParser();
 		const lines = listing.trim().split(/\n+/);
 		const cmds = lines.map(parseGcodeLine);
-		//console.log (cmds)
 
 		let cx = 0, cy = 0;
-		let laserOn = false;
+		//let laserOn = false;
 		let partOpen = false
-		console.log (laserOn)
+		//console.log(laserOn)
 		//let pendingBreakCircle = null;
 		let res = []; // массив путей
 
@@ -299,15 +298,15 @@ const GCodeToSvg = observer(() => {
 
 				if (c.m === 4) {
 					// console.log('laser on')
-					laserOn = true;
+					//laserOn = true;
 					res[res.length - 1].className += " laserOff "
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
-					res[res.length - 1].path = start(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), c, height);
+					res[res.length - 1].path = start(cx + (c.base && c.base.X || 0), cy + (c.base && c.base.Y || 0), c, height);
 				}
 
 				if (c.m === 5) {
 					// console.log('laser off')
-					laserOn = false;
+					//laserOn = false;
 					res[res.length - 1].className += " laserOn "
 					res.push({ path: '', n: [Infinity, -Infinity], className: '' })
 					res[res.length - 1].path = start(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), c, height);
@@ -450,6 +449,143 @@ const GCodeToSvg = observer(() => {
 		});
 		return newLabels;
 	};
+
+	const generateCutSeg = () => {
+		const parseGcodeLine = utils.makeGcodeParser();
+		const lines = listing.trim().split(/\n+/);
+		const cmds = lines.map(parseGcodeLine);
+		let cmdsReverted:any = [];
+		let path:any = [];
+   
+		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
+		const rotatePoint = (
+			x: number,
+			y: number,
+			cx: number,
+			cy: number,
+			angleDeg: number
+		): [number, number] => {
+			const theta = (angleDeg * Math.PI) / 180; // переводим угол в радианы
+			const dx = x - cx;
+			const dy = y - cy;
+
+			const xRot = cx + dx * Math.cos(theta) - dy * Math.sin(theta);
+			const yRot = cy + dx * Math.sin(theta) + dy * Math.cos(theta);
+
+			return [xRot, yRot];
+		};
+
+		// Линия с учётом поворота и инверсии Y
+		const line = (x2: number, y2: number, c: any, height: number) => {
+			const [rx2, ry2] = rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
+			return `L${rx2} ${height - ry2}`;
+		};
+
+		const start = (x1: number, y1: number, c: any, height: number) => {
+			const [rx2, ry2] = rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
+			return `M${rx2} ${height - ry2}`;
+		};
+
+
+		// Арка с поворотом
+		const arcPath = (
+			ex: number,
+			ey: number,
+			r: number,
+			large: number,
+			sweep: number,
+			c: any,
+			height: number
+		) => {
+			const [rxEnd, ryEnd] = rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
+			return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
+		};
+
+		for (let i = 0; i < cutSeg; i++) {
+			const c = cmds[cutSeg - i-1];
+			const g = c.g;
+			if (typeof g === "number" && (g === 0 || g === 1)) {
+				cmdsReverted.push(c)
+			} else if (typeof g === "number" && (g === 2 || g === 3)) {
+				cmdsReverted.push(c)
+			}  else if (typeof g === "number" && g === 29) {
+				cmdsReverted.push(c)
+			}
+
+			cmdsReverted = [...new Set(cmdsReverted)]
+			if (cmdsReverted.length === 2) {
+				cmdsReverted.reverse()
+				break
+			}
+		}
+
+		console.log('cmdsReverte: ')
+		console.log(cmdsReverted)
+		let cx = 0, cy = 0; // Текущие координаты
+
+		for (let i = 0; i < cmdsReverted.length; i++) {
+
+			const c = cmdsReverted[i];
+			if (typeof c.g !== 'number' || !c.params) continue;
+
+			const g = c.g;
+			const { X, Y, I, J } = c.params; // Параметры команды
+
+			if ( typeof g === "number" && (g === 0 || g === 1)) {
+				
+				const tx = (X !== undefined) ? (X) : cx;
+				const ty = (Y !== undefined) ? (Y) : cy;
+				if (path.length) {
+					path.push( line(tx + (c.base && c.base.X || 0), ty + (c.base && c.base.Y || 0), c, height))
+				} else {
+					path.push(start(tx + (c.base && c.base.X || 0), ty + (c.base && c.base.Y || 0), c, height));
+				}				
+				cx = tx; cy = ty;
+				
+			} else if ( typeof g === "number" && (g === 2 || g === 3)) {
+
+				const tx = (X !== undefined) ? (X) : cx;
+				const ty = (Y !== undefined) ? (Y) : cy;
+				const ci = (I !== undefined) ? (I) : 0;
+				const cj = (J !== undefined) ? (J) : 0;
+				const dxs = cx - (cx + ci);
+				const dys = cy - (cy + cj);
+				const dxe = tx - (cx + ci);
+				const dye = ty - (cy + cj);
+				let r = Math.round((Math.hypot(tx - ci, ty - cj)) * 1000) / 1000;
+				const a1 = Math.atan2(dys, dxs);
+				const a2 = Math.atan2(dye, dxe);
+				let d = utils.normalizeAngle(a2 - a1);
+				const ccw = (g === 3);
+				if (ccw && d < 0) d += 2 * Math.PI;
+				if (!ccw && d > 0) d -= 2 * Math.PI;
+				const large = 0;
+				const sweep = ccw ? 1 : 0;
+				if (path.length){
+			    	path.push( arcPath(tx + (c.base && c.base.X || 0), ty + (c.base && c.base.Y || 0), r, large, sweep, c, height));
+				} else {
+					path.push (start(tx + (c.base && c.base.X || 0), ty + (c.base && c.base.Y || 0), c, height));
+				}
+				cx = tx; cy = ty;
+			} else if ( typeof g === "number" && g === 29) {
+				path.push(`M0 ${height}`)
+			}
+			 
+		}
+
+		console.log ("THE RESULT " + path)
+		const pathElement = (
+			<path
+				d={path.join(' ')}
+				key={111}
+				className={"currentCut1"}
+			/>
+		);
+
+		return pathElement
+
+	}
+  
 
 	const [showLabels, setShowLabel] = useState(true);
 	const [showInners, setShowInners] = useState(true);
@@ -618,7 +754,7 @@ const GCodeToSvg = observer(() => {
 													className +
 													(
 														n[0] <= cutSeg && cutSeg <= n[1]
-															? " currentCut "
+															? "  "
 															: n[0] < cutSeg
 																? " cutted "
 																: " uncutted "
@@ -667,6 +803,7 @@ const GCodeToSvg = observer(() => {
 
 									return [...groupedResult, ...outsidePaths];
 								})()}
+								{generateCutSeg()}
 								{labels}
 							</g>
 						</g>
