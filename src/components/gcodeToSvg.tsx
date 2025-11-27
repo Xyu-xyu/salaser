@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, ReactNode } from "react";
+import { useEffect, useRef, useState, ReactNode, useMemo } from "react";
 import svgPanZoom from "svg-pan-zoom";
 import constants from "../store/constants";
 import { observer } from "mobx-react-lite";
@@ -18,14 +18,11 @@ interface CustomEventsHandler {
 	destroy: () => void;
 }
 
-
-
 interface PathItem {
 	path: string;
 	className: string;
 	n: number[];
 }
-
 
 const GCodeToSvg = observer(() => {
 
@@ -46,6 +43,16 @@ const GCodeToSvg = observer(() => {
 	useEffect(() => {
 		update()
 	}, [])
+
+	const cmds = useMemo(() => {
+		if (!listing.trim()) return [];	
+		const parseGcodeLine = utils.makeGcodeParser();
+		const lines = listing.trim().split(/\n+/);
+		return lines
+		  .map(line => line.trim())
+		  .filter(line => line && !line.startsWith(';')) // опционально: фильтр комментариев
+		  .map(parseGcodeLine);
+	}, [listing]);
 
 	useEffect(() => {
 		setCutSeg(0)
@@ -206,70 +213,59 @@ const GCodeToSvg = observer(() => {
 		dir === "+" ? panZoomRef.current.zoomIn() : panZoomRef.current.zoomOut();
 	};
 
+	// Линия с учётом поворота и инверсии Y
+	const line = (x2: number, y2: number, c: any, height: number) => {
+		const [rx2, ry2] = rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
+		return `L${rx2} ${height - ry2}`;
+	};
+
+	const start = (x1: number, y1: number, c: any, height: number) => {
+		const [rx2, ry2] = rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
+		return `M${rx2} ${height - ry2}`;
+	};
+
+	// Крест с поворотом
+	const cross = (x: number, y: number, size: number, c: any, height: number) => {
+		const [rx, ry] = rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
+		const yInv = height - ry;
+		return `M${rx - size},${yInv - size}L${rx + size},${yInv + size}M${rx - size},${yInv + size}L${rx + size},${yInv - size}`;
+	};
+
+	// Арка с поворотом
+	const arcPath = (
+		ex: number,
+		ey: number,
+		r: number,
+		large: number,
+		sweep: number,
+		c: any,
+		height: number
+	) => {
+		const [rxEnd, ryEnd] = rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
+		return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
+	};
+
+ 	const rotatePoint = (
+		x: number,
+		y: number,
+		cx: number,
+		cy: number,
+		angleDeg: number
+	): [number, number] => {
+		const theta = (angleDeg * Math.PI) / 180; // переводим угол в радианы
+		const dx = x - cx;
+		const dy = y - cy;
+
+		const xRot = cx + dx * Math.cos(theta) - dy * Math.sin(theta);
+		const yRot = cy + dx * Math.sin(theta) + dy * Math.cos(theta);
+
+		return [xRot, yRot];
+		};
+
 	const getPath = () => {
-		//console.log(' getPath ')
-		const parseGcodeLine = utils.makeGcodeParser();
-		const lines = listing.trim().split(/\n+/);
-		const cmds = lines.map(parseGcodeLine);
-
 		let cx = 0, cy = 0;
-		//let laserOn = false;
-		let partOpen = false
-		//console.log(laserOn)
-		//let pendingBreakCircle = null;
-		let res = []; // массив путей
-
-		// Функция поворота точки вокруг центра (c.base.X, c.base.Y) на угол c.base.C
-		const rotatePoint = (
-			x: number,
-			y: number,
-			cx: number,
-			cy: number,
-			angleDeg: number
-		): [number, number] => {
-			const theta = (angleDeg * Math.PI) / 180; // переводим угол в радианы
-			const dx = x - cx;
-			const dy = y - cy;
-
-			const xRot = cx + dx * Math.cos(theta) - dy * Math.sin(theta);
-			const yRot = cy + dx * Math.sin(theta) + dy * Math.cos(theta);
-
-			return [xRot, yRot];
-		};
-
-		// Линия с учётом поворота и инверсии Y
-		const line = (x2: number, y2: number, c: any, height: number) => {
-			const [rx2, ry2] = rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
-			return `L${rx2} ${height - ry2}`;
-		};
-
-		const start = (x1: number, y1: number, c: any, height: number) => {
-			const [rx2, ry2] = rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
-			return `M${rx2} ${height - ry2}`;
-		};
-
-		// Крест с поворотом
-		const cross = (x: number, y: number, size: number, c: any, height: number) => {
-			const [rx, ry] = rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
-			const yInv = height - ry;
-			return `M${rx - size},${yInv - size}L${rx + size},${yInv + size}M${rx - size},${yInv + size}L${rx + size},${yInv - size}`;
-		};
-
-		// Арка с поворотом
-		const arcPath = (
-			ex: number,
-			ey: number,
-			r: number,
-			large: number,
-			sweep: number,
-			c: any,
-			height: number
-		) => {
-			const [rxEnd, ryEnd] = rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
-			return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
-		};
-
-		//console.log(cmds)
+ 		let partOpen = false
+ 		let res = []; // массив путей
 
 		for (const c of cmds) {
 			if (c?.comment?.includes('Part code')) {
@@ -402,8 +398,6 @@ const GCodeToSvg = observer(() => {
 
 			}
 		}
-
-		// console.log(res)
 		return res;
 	};
 
@@ -451,9 +445,7 @@ const GCodeToSvg = observer(() => {
 	};
 
 	const generateCutSeg = () => {
-		const parseGcodeLine = utils.makeGcodeParser();
-		const lines = listing.trim().split(/\n+/);
-		const cmds = lines.map(parseGcodeLine);
+		if(!cmds.length) return;		
 		let cmdsReverted:any = [];
 		let path:any = [];
    
@@ -473,32 +465,6 @@ const GCodeToSvg = observer(() => {
 			const yRot = cy + dx * Math.sin(theta) + dy * Math.cos(theta);
 
 			return [xRot, yRot];
-		};
-
-		// Линия с учётом поворота и инверсии Y
-		const line = (x2: number, y2: number, c: any, height: number) => {
-			const [rx2, ry2] = rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
-			return `L${rx2} ${height - ry2}`;
-		};
-
-		const start = (x1: number, y1: number, c: any, height: number) => {
-			const [rx2, ry2] = rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
-			return `M${rx2} ${height - ry2}`;
-		};
-
-
-		// Арка с поворотом
-		const arcPath = (
-			ex: number,
-			ey: number,
-			r: number,
-			large: number,
-			sweep: number,
-			c: any,
-			height: number
-		) => {
-			const [rxEnd, ryEnd] = rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
-			return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
 		};
 
 		for (let i = 0; i < cutSeg; i++) {
@@ -585,12 +551,9 @@ const GCodeToSvg = observer(() => {
 		return pathElement
 
 	}
-  
 
-	const [showLabels, setShowLabel] = useState(true);
+  	const [showLabels, setShowLabel] = useState(true);
 	const [showInners, setShowInners] = useState(true);
-
-
 
 	return (
 		<div
@@ -815,4 +778,4 @@ const GCodeToSvg = observer(() => {
 	);
 });
 
-export default GCodeToSvg;
+export default GCodeToSvg
