@@ -22,30 +22,9 @@ interface ParamItem {
 	measure: string;
 }
 
-/* interface JobInfoAttr {
-	thickness: string;
-	id: number;
-	preset: number;
-	status: number;
-	name: string;
-	dimX: number;
-	dimY: number;
-	materialLabel: string;
-	quantity: number;
-	created_at: string;
-	updated_at: string;
-	loadResult: string;
-} */
-
 const MidBar = observer(() => {
-	let params = [
-		{ name: 'N2', measure: 'bar', val: 4.8 },
-		{ name: 'Nd', measure: 'mm', val: 12.7 },
-		{ name: 'f', measure: 'kHz', val: 88.7 },
-	]
 
 	const { t } = useTranslation();
-
 	useEffect(() => {
 		jobStore.loadJobs()
 	}, [])
@@ -99,7 +78,7 @@ const MidBar = observer(() => {
 
 							{/* Параметры с лимитами */}
 							<div className="d-flex mx-2 flex-wrap">
-								{paramsLimit.filter(a =>  ["Z", "X","Y"].indexOf( a.name ) !=-1 ).map((item: ParamItem, i: number) => (
+								{paramsLimit.filter(a =>  ["Z","X","Y"].indexOf( a.name ) !=-1 ).map((item: ParamItem, i: number) => (
 									<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
 										<div className="currentPlanMeasureWpapper">
 											<div className="currentPlanMeasure">
@@ -130,7 +109,7 @@ const MidBar = observer(() => {
 
 							{/* Параметры без лимитов */}
 							<div className="d-flex mx-2 flex-wrap">
-								{params.map((item, i) => (
+								{paramsLimit.filter(a =>  ["N2", "Nd", "f"].indexOf( a.name ) !=-1 ).map((item, i) => (
 									<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
 										<div className="currentPlanMeasureWpapper">
 											<div className="currentPlanMeasure">
