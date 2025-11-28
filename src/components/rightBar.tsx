@@ -10,6 +10,7 @@ import jobStore from "../store/jobStore";
 import macrosStore from "../store/macrosStore";
 import CustomIcon from "../icons/customIcon";
 import { DetailsButton } from "./detailsButton";
+import NewPlanButton from "./navbar/newPlanButton";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
@@ -52,27 +53,8 @@ const RightBar = observer(() => {
 							<div className="mt-2">
 								<h5>{t("Plans")}</h5>
 							</div>
-
 							<AddPlanButton />
-
-							<div>
-								<button className="w-100" disabled>
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="fluent:tab-new-24-filled"
-											width="24"
-											height="24"
-											color="black"
-											viewBox="0 0 24 24"
-											strokeWidth={0}
-											className="ms-1"
-											fill="black"
-										/>
-										<div className="flex-grow-1 text-center">{t("New")}</div>
-									</div>
-								</button>
-							</div>
-
+							<NewPlanButton />
 							<div>
 								<button className="w-100"
 									onMouseDown={ deleteJob }

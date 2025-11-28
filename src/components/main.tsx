@@ -127,6 +127,28 @@ const Main = observer(() => {
 					>
 						<ServiceBar />
 					</motion.div>
+					{/* PlanEditorr */}
+					<motion.div
+						key="planEditor"
+						initial={false}
+						animate={{
+							opacity: centralBarMode === "planEditor" ? 1 : 0,
+							x: centralBarMode === "planEditor" ? 0 : 30,
+							pointerEvents: centralBarMode === "planEditor" ? "auto" : "none",
+						}}
+						transition={{ duration: 0.25, ease: "easeInOut" }}
+						style={{
+							position: "absolute",
+							inset: 0,
+							width: "100%",
+							height: "100%",
+							backgroundColor: "var(--mainBg)"							
+						}}
+					>
+						<div>
+							<h1>planEditor</h1>
+						</div>
+					</motion.div>
 				</div>
 
 			</div>

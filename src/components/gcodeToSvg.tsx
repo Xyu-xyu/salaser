@@ -465,8 +465,8 @@ const GCodeToSvg = observer(() => {
 			}
 		}
 
-		console.log('cmdsReverte: ')
-		console.log(cmdsReverted)
+		//console.log('cmdsReverte: ')
+		//console.log(cmdsReverted)
 		let cx = 0, cy = 0; // Текущие координаты
 
 		for (let i = 0; i < cmdsReverted.length; i++) {
@@ -519,7 +519,7 @@ const GCodeToSvg = observer(() => {
 			 
 		}
 
-		console.log ("THE RESULT " + path)
+		//console.log ("THE RESULT " + path)
 		const pathElement = (
 			<path
 				d={path.join(' ')}
