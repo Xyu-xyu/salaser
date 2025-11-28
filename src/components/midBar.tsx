@@ -66,6 +66,11 @@ const MidBar = observer(() => {
 	if (laserStore.loading) return <div>Загрузка...</div>;
 	if (laserStore.error) return <div>Ошибка: {laserStore.error}</div>;
 
+	const detectLimit =(param:string, limit:string )=>{
+		const selector = 'limit'+ param + limit
+		const limitVal = paramsLimit.filter(a => a.name === selector)[0]['val']
+		return limitVal;	
+	}
 
 	return (
 
@@ -94,7 +99,7 @@ const MidBar = observer(() => {
 
 							{/* Параметры с лимитами */}
 							<div className="d-flex mx-2 flex-wrap">
-								{paramsLimit.filter(a => a.name !== 'exec_line').map((item: ParamItem, i: number) => (
+								{paramsLimit.filter(a =>  ["Z", "X","Y"].indexOf( a.name ) !=-1 ).map((item: ParamItem, i: number) => (
 									<div className="currentPlanMeasureWpapperWpapper d-flex" key={i}>
 										<div className="currentPlanMeasureWpapper">
 											<div className="currentPlanMeasure">
@@ -110,11 +115,11 @@ const MidBar = observer(() => {
 										<div className="currentPlanLimits my-2 ms-2">
 											<div className="d-flex flex-column">
 												<div className="d-flex align-items-center mb-1">
-													<div className={item.val > 500 ? "led-green-medium" : "led-gray-medium"}></div>
+													<div className={ detectLimit (item.name, 'minus') === 0 ? "led-green-medium" : "led-gray-medium"}></div>
 													<div className="limitText">Limit-</div>
 												</div>
 												<div className="d-flex align-items-center">
-													<div className={item.val < 500 ? "led-green-medium" : "led-gray-medium"}></div>
+													<div className={ detectLimit (item.name, 'plus') === 0 ? "led-green-medium" : "led-gray-medium"}></div>
 													<div className="limitText">Limit+</div>
 												</div>
 											</div>
