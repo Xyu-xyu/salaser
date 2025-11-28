@@ -24,12 +24,7 @@ class LaserStore {
 	loadResult:string= `{"success": true, "result": {"jobinfo": {}, "status": "IDLE", "mode": "NCP", "workarea": [3100, 2600]}}`
 	centralBarMode:string = 'plans'
 	socket: Socket | null = null;
-	paramsLimit: ParamLimit[] = [
-		{ name: 'X', measure: 'mm', val: 0 },
-		{ name: 'Y', measure: 'mm', val: 0 },
-		{ name: 'Z', measure: 'mm', val: 0 },
-		{ name: 'exec_line', measure: 'num', val: 0 },
-	];
+	paramsLimit: ParamLimit[] = [];
 	isLogined:boolean = false;
 
 	constructor() {

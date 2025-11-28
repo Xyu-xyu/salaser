@@ -46,6 +46,7 @@ const MidBar = observer(() => {
 	if (laserStore.error) return <div>Ошибка: {laserStore.error}</div>;
 
 	const detectLimit =(param:string, limit:string )=>{
+		if (!paramsLimit) return 0;
 		const selector = 'limit'+ param + limit
 		const limitVal = paramsLimit.filter(a => a.name === selector)[0]['val']
 		return limitVal;	
