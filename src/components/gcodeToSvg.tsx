@@ -33,9 +33,9 @@ const GCodeToSvg = observer(() => {
 	const [listing, setListing] = useState("");
 	const data = JSON.parse(loadResult)
 
-	console.log (data)
+	/* console.log (data)
 	console.log (loadResult)
-	console.log ("STOP MACHINE")
+	console.log ("STOP MACHINE") */
 	let width:number= 500 
 	let height:number = 500
 

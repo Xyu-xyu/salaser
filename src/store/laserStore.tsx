@@ -22,7 +22,7 @@ class LaserStore {
 	error: string | null = null;
 	private intervalId: ReturnType<typeof setInterval> | null = null;
 	loadResult:string= `{"status":"PARSED","mode":"NCP","workarea":[700,700],"async_busy":false,"async_result":1,"async_lines":1293,"async_message":"OK: 1293 lines","jobinfo":{"attr":{"dimx":"700","dimy":"700","label":"Mild_Steel","thickness":"10.0","jobcode":"Test"},"messages":[],"load_result":true,"parts_count":8,"estimation_s":232.7,"parts":[{"partcode":"28___10__1","debit":1},{"partcode":"550_01_00_013___10__1","debit":1},{"partcode":"114___10__2","debit":6},{"partcode":"33___10__1","debit":1},{"partcode":"13___10__4","debit":1},{"partcode":"22___10__1","debit":1},{"partcode":"108___10__1","debit":1},{"partcode":"007___10__2","debit":1}]}}`
-	centralBarMode:string = 'plans'
+	centralBarMode:string = 'planEditor'
 	socket: Socket | null = null;
 	paramsLimit: ParamLimit[] = [];
 	isLogined:boolean = false;

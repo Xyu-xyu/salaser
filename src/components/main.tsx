@@ -13,6 +13,7 @@ import macrosStore from "../store/macrosStore";
 import { useEffect } from "react";
 import ServiceBar from "./serviceBar";
 import { AnimatePresence, motion } from "framer-motion";
+import SvgWrapper from "./editor/svgWrapper";
 
 
 const Main = observer(() => {
@@ -147,6 +148,7 @@ const Main = observer(() => {
 					>
 						<div>
 							<h1>planEditor</h1>
+							<SvgWrapper />
 						</div>
 					</motion.div>
 				</div>
