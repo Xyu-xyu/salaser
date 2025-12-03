@@ -737,6 +737,8 @@ class Utils {
             y: (evt.clientY + CTM.e)/ CTM.d
         }; 
     }
+
+	 
  
 	getValueFromString(str, targetChar, num = true) {
 		// Create a regular expression pattern to match the target character and its value

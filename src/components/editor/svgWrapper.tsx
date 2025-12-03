@@ -34,7 +34,7 @@ const SvgWrapper = observer(() => {
 	const wrapperSVG = useRef<HTMLDivElement>(null);
 
 	// Touch gesture state
-	const evCache = useRef<Touch[]>([]);
+	const evCache = useRef<any[]>([]);
 	const prevDiff = useRef<number>(-1);
 
 	// Mouse wheel zoom
@@ -73,6 +73,7 @@ const SvgWrapper = observer(() => {
 
 	// Touch zoom (pinch)
 	const touchZoom = (curDiff: number, prevDiff: number) => {
+		console.log("TouchZOOM")
 		const svg = document.getElementById('svg') as unknown as SVGSVGElement;
 		if (!svg) return;
 
@@ -112,87 +113,119 @@ const SvgWrapper = observer(() => {
 	};
 
 	// Touch handlers
-	const handleTouchStart = (event: React.TouchEvent) => {
+	const TouchStart = (event: React.TouchEvent) => {
+		console.log("TouchStart");
+		//const nativeTouches = event.nativeEvent.touches;
 
 		if (editorStore.mode === 'drag' || true) {
-			startDrag(event.touches[0] as unknown as MouseEvent);
+			if (evCache.current.length > 0) {
+				TouchStartDrag(event.touches[0]  as Touch); // Pass the real Touch object
+			}
 		} else {
 			//evCache.current = Array.from(event.touches);
 			//prevDiff.current = -1;
 		}
 	};
+ 
+	const TouchStartDrag = (touch: Touch) => {
+		console.log("TouchStartDrag");
+		console.log("TouchStartDrag");
+		inMoveRef.current = 1;
+		const off = util.getMousePosition(touch);
+		console.log( off , groupMatrix);
 
-	const handleTouchMove = (event: React.TouchEvent) => {
-		
-		//event.preventDefault();
-		console.log (evCache.current.length)
+		const transforms = groupMatrix;
+		svgStore.setOffset({
+			x: off.x - transforms.e,
+			y: off.y - transforms.f,
+		}); 
 
-		//if (editorStore.mode === 'drag' || editorStore.mode === 'dragging' || pointInMove) {
+	}; 
 
-		if (evCache.current.length === 1) {
-			drag(event.touches[0] as unknown as MouseEvent, true);
-		} else if (editorStore.inletMode === 'inletInMoving') {
-			// drag(event.touches[0] as unknown as MouseEvent, true);
-		} else {
-			evCache.current = Array.from(event.touches);
 
-			if (evCache.current.length === 2) {
-				const curDiff = getDistance(evCache.current[0], evCache.current[1]);
-				if (prevDiff.current > 0) {
-					touchZoom(curDiff, prevDiff.current);
-				}
-				prevDiff.current = curDiff;
+
+	const TouchDrag = (event: React.TouchEvent) => {
+		const nativeTouches = event.nativeEvent.touches;
+		//console.log ( evCache.current.length)
+		if (evCache.current.length === 1 && inMoveRef.current ) {
+			//console.log("TouchDrag");
+			const touch = evCache.current[0];
+			const clientX = touch.clientX;
+			const clientY = touch.clientY;
+			const coords = util.convertScreenCoordsToSvgCoords(clientX, clientY);
+
+			coordsStore.setCoords({
+				x: Math.round(coords.x * 100) / 100,
+				y: Math.round(coords.y * 100) / 100,
+				width: 500,
+				height: 500,
+			});
+
+			// Update matrix transformation logic
+			const coord = util.getMousePosition(touch);
+			const newE = coord.x - offset.x;
+			const newF = coord.y - offset.y;
+
+			svgStore.setGroupMatrix({
+				a: groupMatrix.a,
+				b: groupMatrix.b,
+				c: groupMatrix.c,
+				d: groupMatrix.d,
+				e: newE,
+				f: newF,
+			});
+
+			const attr = calculateRectAttributes();
+			svgStore.setRectParams(attr);
+			editorStore.setMode('dragging');
+		}
+		evCache.current = Array.from(event.touches);
+
+		if (nativeTouches.length === 2) {
+			const curDiff = getDistance(nativeTouches[0], nativeTouches[1]);
+			if (prevDiff.current > 0) {
+				touchZoom(curDiff, prevDiff.current);
 			}
+			prevDiff.current = curDiff;
 		}
 	};
 
 	const handleTouchEnd = (event: React.TouchEvent) => {
-		/*    if (editorStore.mode === 'dragging' || pointInMove) {
-			 endDrag(event as unknown as MouseEvent);
-		   } */
+		if (editorStore.mode === 'dragging' || pointInMove) {
+			endDrag();
+		}
 
-		// Remove ended touches
 		for (const touch of event.changedTouches) {
 			const index = evCache.current.findIndex(t => t.identifier === touch.identifier);
 			if (index > -1) evCache.current.splice(index, 1);
 		}
 
-		if (evCache.current.length < 2) {
+		if (evCache.current.length === 0) {
 			prevDiff.current = -1;
 		}
 	};
 
-	const startDrag = (e: MouseEvent | Touch) => {
+	const MouseStartDrag = (e: React.MouseEvent) => {
 		inMoveRef.current = 1;
+		const off = util.getMousePosition(e);
+		const transforms = groupMatrix;
+		svgStore.setOffset({
+			x: off.x - transforms.e,
+			y: off.y - transforms.f,
+		});
 
-		/*     if ('button' in e && e.button === 2) {
-			  const selectedEdge = util.selectEdge(e);
-			  svgStore.setSelectedEdge(selectedEdge);
-			  return;
-			} */
-
-		if (
-			('buttons' in e && (e.buttons === 4 || editorStore.mode === 'drag')) ||
-			('touches' in e && editorStore.mode === 'drag') || true
-		) {
-			const off = util.getMousePosition(e);
-			const transforms = groupMatrix;
-			svgStore.setOffset({
-				x: off.x - transforms.e,
-				y: off.y - transforms.f,
-			});
-		}
 	};
 
-	const drag = (e: MouseEvent | Touch, force = false) => {
-		const coords = util.convertScreenCoordsToSvgCoords(
-			('clientX' in e ? e.clientX : e.touches[0].clientX),
-			('clientY' in e ? e.clientY : e.touches[0].clientY)
-		);
+	const MouseDrag = (e: React.MouseEvent, force = false) => {
 
+		const clientX = e.clientX;
+		const clientY = e.clientY;
+		const coords = util.convertScreenCoordsToSvgCoords(clientX, clientY);
 		coordsStore.setCoords({
 			x: Math.round(coords.x * 100) / 100,
 			y: Math.round(coords.y * 100) / 100,
+			width: 500,
+			height: 500
 		});
 
 		const isDragging =
@@ -233,11 +266,13 @@ const SvgWrapper = observer(() => {
 	};
 
 	const leave = () => {
-		coordsStore.setCoords({ x: 0, y: 0 });
+		coordsStore.setCoords({ x: 0, y: 0, width: 500, height: 500 });
 	};
 
 	const calculateRectAttributes = () => {
-		const combinedMatrix = util.multiplyMatrices(groupMatrix, matrix);
+		const groupMatrix1 = new DOMMatrix([groupMatrix.a, groupMatrix.b, groupMatrix.c, groupMatrix.d, groupMatrix.e, groupMatrix.f]);
+		const localMatrix = new DOMMatrix([matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f]);
+		const combinedMatrix = util.multiplyMatrices(groupMatrix1, localMatrix);
 		const scaleX = combinedMatrix.a;
 		const scaleY = combinedMatrix.d;
 
@@ -400,12 +435,12 @@ const SvgWrapper = observer(() => {
 							ref={wrapperSVG}
 							className={wrapperClass}
 							onWheel={handleMouseWheel}
-							onMouseDown={startDrag}
-							onMouseMove={drag}
+							onMouseDown={MouseStartDrag}
+							onMouseMove={MouseDrag}
+							onTouchMove={TouchDrag}
 							onMouseUp={endDrag}
 							onMouseLeave={leave}
-							onTouchStart={handleTouchStart}
-							onTouchMove={handleTouchMove}
+							onTouchStart={TouchStart}
 							onTouchEnd={handleTouchEnd}
 							onTouchCancel={handleTouchEnd}
 							onContextMenu={(e) => e.preventDefault()}

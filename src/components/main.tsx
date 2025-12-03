@@ -147,7 +147,6 @@ const Main = observer(() => {
 						}}
 					>
 						<div>
-							<h1>planEditor</h1>
 							<SvgWrapper />
 						</div>
 					</motion.div>

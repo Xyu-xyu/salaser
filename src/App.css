@@ -1773,3 +1773,15 @@ height: fit-content;}
   0%, 100% { stroke-opacity: 1; }
   50% { stroke-opacity: 0.5; }
 }
+
+#wrapper_svg {
+  overflow: hidden;
+  border: 0.2px solid var(--paleColor);
+  border-top: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%!important;
+  box-shadow: -1px -4px 20px 5px var(--transColor);
+  background-color: var(--darkBg);
+}
