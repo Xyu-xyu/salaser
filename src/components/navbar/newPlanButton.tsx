@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
-import { Dropdown, DropdownButton, Modal, Form, Button } from "react-bootstrap";
+import { Dropdown, DropdownButton, Modal, Form  } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import macrosStore from "../../store/macrosStore";
 import CustomIcon from "../../icons/customIcon";
@@ -12,10 +12,10 @@ const NewPlanButton = observer(() => {
 	const { presets } = macrosStore;
 
 	// Форма
-	const [name, setName] = useState("");
-	const [width, setWidth] = useState("");
-	const [height, setHeight] = useState("");
-	const [quantity, setQuantity] = useState("");
+	const [name, setName] = useState("new_plan");
+	const [width, setWidth] = useState("900");
+	const [height, setHeight] = useState("600");
+	const [quantity, setQuantity] = useState("1");
 	const [selectedPreset, setSelectedPreset] = useState<any>(null);
 
 	// Ошибки валидации
@@ -127,7 +127,7 @@ const NewPlanButton = observer(() => {
 				centered
 				size="lg"
 			>
-				<Modal.Header closeButton>
+				<Modal.Header>
 					<Modal.Title>{t("New sheet")}</Modal.Title>
 				</Modal.Header>
 
@@ -149,7 +149,7 @@ const NewPlanButton = observer(() => {
 						</Form.Group>
 
 						<div className="row">
-							<div className="col-md-6">
+							<div className="col-md-4">
 								<Form.Group className="mb-3">
 									<Form.Label>{t("Width (mm)")} *</Form.Label>
 									<Form.Control
@@ -166,7 +166,7 @@ const NewPlanButton = observer(() => {
 								</Form.Group>
 							</div>
 
-							<div className="col-md-6">
+							<div className="col-md-4">
 								<Form.Group className="mb-3">
 									<Form.Label>{t("Height (mm)")} *</Form.Label>
 									<Form.Control
@@ -182,22 +182,25 @@ const NewPlanButton = observer(() => {
 									</Form.Control.Feedback>
 								</Form.Group>
 							</div>
-						</div>
 
-						<Form.Group className="mb-3">
-							<Form.Label>{t("Quantity")} *</Form.Label>
-							<Form.Control
-								type="number"
-								value={quantity}
-								onChange={(e) => setQuantity(e.target.value)}
-								isInvalid={!!errors.quantity}
-								min="1"
-								step="1"
-							/>
-							<Form.Control.Feedback type="invalid">
-								{errors.quantity}
-							</Form.Control.Feedback>
-						</Form.Group>
+							<div className="col-md-4">
+								<Form.Group className="mb-3">
+									<Form.Label>{t("Quantity")} *</Form.Label>
+									<Form.Control
+										type="number"
+										value={quantity}
+										onChange={(e) => setQuantity(e.target.value)}
+										isInvalid={!!errors.quantity}
+										min="1"
+										step="1"
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.quantity}
+									</Form.Control.Feedback>
+								</Form.Group>
+
+							</div>
+						</div>
 
 						<Form.Group className="mb-3">
 							<Form.Label>{t("Material / Preset")} *</Form.Label>
@@ -230,22 +233,39 @@ const NewPlanButton = observer(() => {
 				</Modal.Body>
 
 				<Modal.Footer>
-					<Button variant="secondary" onClick={handleClose}>
-						{t("Cancel")}
-					</Button>
-					<Button
-						variant="primary"
-						onClick={handleSubmit}
-						className="d-flex align-items-center gap-2"
+
+					<button
+						className="violet_button text-white p-1 br-5"
+						type="button"
+						onClick={handleClose}
 					>
-						<CustomIcon
+						<div className="d-flex align-items-center p-2">
+							<CustomIcon
+							icon="ic:round-cancel"
+							width="24"
+							height="24"
+							color="white"
+						/>
+						{t("Cancel")}
+						</div>
+					</button>
+
+			
+					<button
+						className="violet_button text-white p-1 br-5"
+						type="button"
+						onClick={handleSubmit}
+					>
+						<div className="d-flex align-items-center p-2">
+							<CustomIcon
 							icon="line-md:square-to-confirm-square-transition"
 							width="24"
 							height="24"
 							color="white"
 						/>
 						{t("Create")}
-					</Button>
+						</div>
+					</button>
 				</Modal.Footer>
 			</Modal>
 		</div>

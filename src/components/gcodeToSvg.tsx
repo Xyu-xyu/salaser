@@ -32,8 +32,24 @@ const GCodeToSvg = observer(() => {
  	const panZoomRef = useRef<any>(null);
 	const [listing, setListing] = useState("");
 	const data = JSON.parse(loadResult)
-	const width = (isVertical ? Number(data.result.jobinfo.attr?.dimy) : Number(data.result.jobinfo.attr?.dimx) )|| (isVertical? 1500 : 3000);
-	const height = (isVertical ? Number(data.result.jobinfo.attr?.dimx) : Number(data.result.jobinfo.attr?.dimy) ) || (isVertical? 3000 : 1500);
+
+	console.log (data)
+	console.log (loadResult)
+	console.log ("STOP MACHINE")
+	let width:number= 500 
+	let height:number = 500
+
+	try {
+
+		width = (isVertical ? Number(data.result.jobinfo.attr?.dimy) : Number(data.result.jobinfo.attr?.dimx) )|| (isVertical? 1500 : 3000);
+		height =(isVertical ? Number(data.result.jobinfo.attr?.dimx) : Number(data.result.jobinfo.attr?.dimy) ) || (isVertical? 3000 : 1500);
+		
+	} catch (e) {
+		
+		console.log ("ЕБАТЬ")		
+
+	}
+	
 	const [paths, setPaths] = useState<PathItem[]>([]);//useState([]);
 	const [labels, setLabels] = useState<ReactNode[]>([]); // Храним готовые метки
 	let groupRefs = useRef<SVGGElement[]>([]); // Рефы на группы

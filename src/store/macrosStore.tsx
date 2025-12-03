@@ -810,11 +810,21 @@ class MacrosStore {
     }
 
     get selectedModulationMacro() {
-        return this.technology.macros[this.selectedMacros].cutting.modulationMacro;
+        try {
+            return this.technology.macros[this.selectedMacros].cutting.modulationMacro     
+        } catch (e) {
+            console.log ("Catch in get selectedModulationMacro")
+            return 0         
+        }
     }
 
     get selectedPiercingMacro() {
-        return this.technology.macros[this.selectedMacros].piercingMacro;
+        try {
+            return this.technology.macros[this.selectedMacros].piercingMacro 
+        } catch (e) {
+            console.log ("Catch in get selectedPiercingMacro")
+            return 0         
+        }
     }
 
     get isVertical() {

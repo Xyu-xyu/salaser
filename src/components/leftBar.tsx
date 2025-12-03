@@ -12,6 +12,7 @@ const LeftBar = observer(() => {
 				<div className="d-flex flex-column">
 					<div className="mt-2 mx-2"					
 						onClick={()=> {
+							console.log ("clack")
 							laserStore.setVal ('rightMode', 'plan')
 							laserStore.setVal ('leftMode', 'plan')
 						}}
@@ -31,6 +32,7 @@ const LeftBar = observer(() => {
 					</div>
 					<div className="mx-2 mt-1"
 						onClick={()=> {
+							console.log ("click")
 							laserStore.setVal ('rightMode', 'parameter')
 							laserStore.setVal ('leftMode', 'sheet')
 						}} 
