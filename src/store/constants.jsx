@@ -40,7 +40,127 @@ const constants = {
 	`G1 y95.38`, 
 	`(<laser_off>)`, 
 	`(</Contour part_id="4" contour_id="0" c_contour_id="0" >)`, 
-	`(</Part id="4" part_id="4">)`]
+	`(</Part id="4" part_id="4">)`],
+	fontSize:11.88,
+	kerning:1,
+	defaultInletIntend: 1,
+	defaultInletLength: 5,
+	defaultStringInterval:18,
+	defaultJointSize: 0.2,
+    contourTypes:['engraving', 'inner', 'outer'],
+    operatingModes:['macro0', 'macro1','macro2', 'macro3', 'macro4', 'macro5', ],
+    piercingModes: {'normal':0, 'without_time':-1, 'pulse':1},
+    panelPostions:	{
+		logPopup: {
+			mini: true,
+			style: {
+				top: 40,
+				left: 12,
+				width: 350,
+				height: 300,
+			}
+		},
+		toolsPopup: {
+			mini: false,
+			style: {
+				top: 40,
+				left: 300,
+				width: 125,
+				height: 380,
+			}
+		},
+		contourModesPopup: {
+			mini: true,
+			style: {
+				top: 80,
+				left: 12,
+				width: 350,
+				height: 300,
+			}
+		},
+		contourPopup: {
+			mini: true,
+			style: {
+				top: 120,
+				left: 12,
+				width: 350,
+				height: 600,
+			}
+		},
+		partPopup: {
+			mini: true,
+			style: {
+				top: 160,
+				left: 12,
+				width: 350,
+				height: 300,
+			}
+		},
+		outletPopup: {
+			mini: true,
+			style: {
+				top: 200,
+				left: 12,
+				width: 350,
+				height: 360,
+			}
+		},
+		inletPopup: {
+			mini: true,
+			style: {
+				top: 240,
+				left: 12,
+				width: 350,
+				height: 400,
+			}
+		},
+		pointPopup: {
+			mini: true,
+			style: {
+				top: 200,
+				left: 500,
+				width: 400,
+				height: 120,
+			}
+		},
+		edgePopup: {
+			mini: true,
+			style: {
+				top: 100,
+				left: 500,
+				width: 350,
+				height: 120,
+			}
+		},
+		textPopup: {
+			mini: true,
+			style: {
+				top: 280,
+				left: 12,
+				width: 350,
+				height: 120,
+			}
+		},
+		jointPopup: {
+			mini: true,
+			style: {
+				top: 320,
+				left: 12,
+				width: 350,
+				height: 120,
+			}
+		},
+		cutPopup: {
+			mini: true,
+			style: {
+				top: 360,
+				left: 12,
+				width: 350,
+				height: 120,
+			}
+		},
+    },
+	
 
 }
 

@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import macrosStore from "../../store/macrosStore";
 import CustomIcon from "../../icons/customIcon";
 import laserStore from "../../store/laserStore";
+import editorStore from "../../store/editorStore";
+
 
 const NewPlanButton = observer(() => {
 	const { t } = useTranslation();
@@ -74,16 +76,16 @@ const NewPlanButton = observer(() => {
 		if (!validate()) return;
 
 		// Здесь можно сохранить данные или передать в store
-		console.log({
+		let res = {
 			name: name.trim(),
 			width: parseFloat(width),
 			height: parseFloat(height),
 			quantity: parseInt(quantity, 10),
 			presetId: selectedPreset.id,
 			presetName: selectedPreset.name
-		});
+		};
 
-		// Переключаем режим
+		editorStore.setVal ('newSheet',res)
 		laserStore.setVal("centralBarMode", "planEditor");
 		handleClose();
 	};

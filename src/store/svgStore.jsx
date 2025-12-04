@@ -540,10 +540,6 @@ class SvgStore {
 		Object.assign(this.offset, val)
 	}
 
-	setRectParams (val) {
-		Object.assign(this.rectParams,val)
-	}
-
 	setGridState(val) {
 		Object.assign(this.gridState, val);
 	}
@@ -581,7 +577,14 @@ class SvgStore {
 		}
 	
 		current[lastKey] = newValue;
-	  }
+	}
+
+
+	fitToPage() {
+		console.log("FIT TO PAGE");
+	}
+	
+		
 }
 
 const svgStore = new SvgStore();

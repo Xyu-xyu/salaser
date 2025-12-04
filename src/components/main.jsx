@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import ServiceBar from "./serviceBar";
 import { AnimatePresence, motion } from "framer-motion";
 import SvgWrapper from "./editor/svgWrapper";
+import Panels from "./editor/panels/panels";
 
 
 const Main = observer(() => {
@@ -148,6 +149,7 @@ const Main = observer(() => {
 					>
 						<div>
 							<SvgWrapper />
+							<Panels />
 						</div>
 					</motion.div>
 				</div>

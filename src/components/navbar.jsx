@@ -10,6 +10,7 @@ import LanguageButton from "./navbar/languageButton";
 import { StartButton } from "./startButton";
 import CustomIcon from "../icons/customIcon";
 import jobStore from '../store/jobStore';
+import svgStore from '../store/svgStore';
 
 const NavBar = observer(() => {
 
@@ -133,7 +134,7 @@ const NavBar = observer(() => {
 
 				<FavoritesButton />
 				<div className="ms-2">
-					<button className="white_button navbar_button">
+					<button className="white_button navbar_button" onClick={ svgStore.fitToPage }>
 						<div className="d-flex align-items-center justify-content-center">
 							<CustomIcon icon="fluent:question-circle-12-regular"
 								width="36"

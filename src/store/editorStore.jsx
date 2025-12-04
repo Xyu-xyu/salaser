@@ -1,4 +1,3 @@
-// store/editorStore.ts
 import { makeAutoObservable } from "mobx";
 
 /* type EditorMode =
@@ -16,6 +15,14 @@ import { makeAutoObservable } from "mobx";
 class EditorStore {
   mode = "resize";
   inletMode = "";
+  newSheet = {
+      name: "undefined.ncp",
+			width: 600,
+			height: 500,
+			quantity: 1,
+			presetId: 0,
+			presetName: "any_preset"
+  }
 
   constructor() {
     makeAutoObservable(this);
@@ -28,6 +35,13 @@ class EditorStore {
   setInletMode = (newMode )=> {
     this.inletMode = newMode;
   };
+
+  setVal (key, value) {
+    console.log ("Set VAL in EDITOR store" + value)
+		if (key in this) {
+			this[key] = value;
+		}
+	}
 }
 
 // Singleton instance (most common pattern)

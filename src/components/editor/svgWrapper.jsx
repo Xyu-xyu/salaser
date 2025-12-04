@@ -27,6 +27,8 @@ const SvgWrapper = observer(() => {
 		selectedText,
 		pointInMove,
 	} = svgStore;
+	const { newSheet } = editorStore
+
 
 	const { a, b, c, d, e, f } = matrix;
 	const [wrapperClass, setWrapperClass] = useState('');
@@ -66,9 +68,7 @@ const SvgWrapper = observer(() => {
 			e: comboMatrix.e,
 			f: comboMatrix.f,
 		});
-
-		const attr = calculateRectAttributes();
-		svgStore.setRectParams(attr);
+	
 	};
 
 	// Touch zoom (pinch)
@@ -101,9 +101,6 @@ const SvgWrapper = observer(() => {
 			e: comboMatrix.e,
 			f: comboMatrix.f,
 		});
-
-		const attr = calculateRectAttributes();
-		svgStore.setRectParams(attr);
 	};
 
 	const getDistance = (t1, t2)=> {
@@ -172,9 +169,6 @@ const SvgWrapper = observer(() => {
 				e: newE,
 				f: newF,
 			});
-
-			const attr = calculateRectAttributes();
-			svgStore.setRectParams(attr);
 			editorStore.setMode('dragging');
 		}
 		evCache.current = Array.from(event.touches);
@@ -245,8 +239,6 @@ const SvgWrapper = observer(() => {
 				f: newF,
 			});
 
-			const attr = calculateRectAttributes();
-			svgStore.setRectParams(attr);
 			editorStore.setMode('dragging');
 		}
 	};
@@ -282,70 +274,12 @@ const SvgWrapper = observer(() => {
 		return { x, y, width, height };
 	};
 
-	const fitToPage = () => {
-		if (!coordsStore.fittedPosition) {
-			svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
-			svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
-			svgStore.setRectParams({ x: 0, y: 0, width: 0, height: 0 });
-
-			const groupEl = document.querySelector('#group');
-			const wrapperEl = wrapperSVG.current;
-			if (!groupEl || !wrapperEl) return;
-
-			const box = groupEl.getBoundingClientRect();
-			const wBox = wrapperEl.getBoundingClientRect();
-
-			const scaleW = wBox.width / box.width;
-			const scaleH = wBox.height / box.height;
-			const scale = Math.min(scaleW, scaleH);
-
-			const centerX = wBox.x + wBox.width / 2;
-			const centerY = wBox.y + wBox.height / 2;
-			const svgCenter = util.convertScreenCoordsToSvgCoords(centerX, centerY);
-
-			const outerBox = document.querySelector('#contours')?.getBoundingClientRect();
-			const outerCenter = outerBox
-				? util.convertScreenCoordsToSvgCoords(
-					outerBox.x + outerBox.width / 2,
-					outerBox.y + outerBox.height / 2
-				)
-				: svgCenter;
-
-			const xdif = outerCenter.x - svgCenter.x;
-			const ydif = outerCenter.y - svgCenter.y;
-
-			const matrixN = {
-				a: scale,
-				b: 0,
-				c: 0,
-				d: scale,
-				e: svgCenter.x - svgCenter.x * scale - xdif,
-				f: svgCenter.y - svgCenter.y * scale - ydif,
-			};
-
-			if (Object.values(matrixN).every(v => Number.isFinite(v))) {
-				svgStore.setGroupMatrix(matrixN);
-			}
-
-			coordsStore.setNeedToFit(false);
-			coordsStore.setFittedPosition({
-				matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
-				groupMatrix: matrixN,
-				rectParams: calculateRectAttributes(),
-			});
-		} else {
-			svgStore.setMatrix(coordsStore.fittedPosition.matrix);
-			svgStore.setGroupMatrix(coordsStore.fittedPosition.groupMatrix);
-			svgStore.setRectParams(coordsStore.fittedPosition.rectParams);
-			coordsStore.setNeedToFit(false);
-		}
-	};
-
+	
+	
 	useEffect(() => {
 		const timeoutId = setTimeout(() => {
-			fitToPage();
+			svgStore.fitToPage();
 			coordsStore.setPreloader(false);
-			svgStore.setRectParams(calculateRectAttributes());
 		}, 500);
 
 		const handleKeyDown = (e) => {
@@ -373,7 +307,7 @@ const SvgWrapper = observer(() => {
 	// Fit when requested
 	useEffect(() => {
 		if (coordsStore.needToFit) {
-			fitToPage();
+			svgStore.fitToPage();
 		}
 	}, [coordsStore.needToFit]);
 
