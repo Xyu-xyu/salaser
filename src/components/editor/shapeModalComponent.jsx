@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-//import '@fortawesome/fontawesome-free/css/all.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { observer } from 'mobx-react-lite';  
 import { addToLog } from './../../scripts/addToLog';
@@ -9,6 +8,7 @@ import svgStore from './../../store/svgStore';
 import Util from './../../scripts/util';
 import SVGPathCommander from 'svg-path-commander';
 import { useTranslation } from 'react-i18next';
+import CustomIcon from '../../icons/customIcon';
 
 
 const ShapeModalComponent =observer(()=> {
@@ -65,7 +65,14 @@ const ShapeModalComponent =observer(()=> {
 				<div
 					className="text-white btn_shapes btn_tool"
 				>
-					{/* <i className="fa-solid fa-shapes"></i> */}
+					<CustomIcon
+							icon="fa-shapes"
+							width="20"
+							height="20"
+							fill='black'
+							strokeWidth={0}
+							viewBox='0 0 512 512'
+						/>	
 				</div>
 			</Button>
 
