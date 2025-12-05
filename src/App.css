@@ -1929,3 +1929,273 @@ height: fit-content;}
   align-items: center;
   justify-content: center;
 }
+
+
+
+
+.operating_mode__wrappper,
+.piercing_mode__wrappper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+}
+
+.piercing_mode {
+    width: 10px;
+    height: 10px;
+    border: 0.1px solid black; 
+    border-radius: 50%;
+}
+
+.operating_mode {
+    width: 50px;
+    height: 3px;
+}
+
+.piercing_mode.normal,
+.piercing_mode.cutting {
+    background-color: red;
+    border-color: red;
+    fill: red;
+}
+
+.operating_mode.cutting {
+    background-color: red;
+}
+
+g.macro0 {
+    stroke: red;
+    stroke-width: var(--widthUsual);
+}
+g.outlet {
+    stroke: limegreen;
+}
+
+g.outlet.unfinished  {
+    stroke: url(#grid);
+}
+
+.piercing_mode.pulse{
+    background-color: pink;
+    border-color: pink;
+    fill:pink;
+} 
+
+g.macro1{
+    stroke: pink;
+    stroke-width: var(--widthUsual);
+} 
+
+.operating_mode.pulse{
+    background-color: pink;
+} 
+
+.piercing_mode.without_time {
+    background-color: yellow;
+    border-color: yellow;
+    fill:yellow;
+}
+
+.operating_mode.engraving{
+    background-color: lawngreen;
+}
+
+g.macro2 {
+    stroke: lawngreen;
+    stroke-width: var(--widthUsual);
+}
+
+
+.operating_mode.macro3{
+    background-color: blue;
+}
+
+g.macro3{   
+    stroke-width: var(--widthUsual);
+    stroke: blue;
+}
+
+.operating_mode.macro4{
+    background-color: yellow;
+}
+
+g.macro4{
+    stroke: yellow;
+    stroke-width: var(--widthUsual);
+}
+
+.operating_mode.macro5{
+    border-top: 2px whitesmoke dashed;
+}
+
+g.macro5{
+    stroke: whitesmoke;
+    stroke-width: var(--widthUsual);
+    stroke-dasharray: 2px, 2px;
+}
+
+#operatingContourModeSelect,
+#operatingInletSelect,
+#operatingSelect,
+#piercingSelect{
+    height: 30px;
+    padding: 0 0 0 10px;
+    text-align: center;
+}
+
+g.macro0,
+g.macro1,
+g.macro2,
+g.macro3, 
+g.macro4,
+g.macro4,
+g.macro5 {
+    fill:url(#grid);
+    stroke-width: var(--widthUsual);
+    marker-start: url(#dotRed);
+    marker-end: url(#dotRed);
+    marker-mid: url(#dotRed); 
+} 
+
+g.macro5 {
+    stroke-width: var(--widthThick);
+} 
+
+g.inlet {
+    marker-end: none;
+    marker-mid: none;
+    stroke-width: var(--widthInlet);
+}
+
+g.inlet.pulse-1 {
+  marker-start: none;
+}
+
+g.inlet.pulse0 {
+  marker-start: url(#dotRed);
+
+}
+
+g.inlet.pulse1 {
+  marker-start: url(#dotPink);
+ 
+}
+
+g.inlet.pulse2 {
+  marker-start: url(#dotYellow);
+}
+
+g.macro2 {
+    fill:transparent;
+  /*   stroke-width:0.4; */
+}
+
+g.outer {
+    fill:aqua;
+    fill:#fd7e14;
+    opacity:0.7;
+    filter: brightness(1.1);
+}
+
+g.outlet,
+g.inlet {
+    fill:transparent;
+}
+
+#inlet_viewer__wrapper{
+    justify-content: center;
+    display: flex;
+    align-items: center; 
+   /*  height: 150px;
+    width: 150px; */
+}
+
+/* input.popup_input {
+    width:150px !important;
+}
+ */
+
+g.macro0.closed0, 
+g.macro1.closed0, 
+g.macro3.closed0, 
+g.macro4.closed0, 
+g.macro4.closed0, 
+g.macro5.closed0 {
+/*     fill:transparent;
+ */    stroke-width: var(--widthThin);;
+}
+
+
+#logger_wrapper {
+  border: #9b9da2 1px solid;
+  height: 550px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+#logger {
+  width:100%;
+  margin: 0.5em;
+} 
+
+#logPopup .window-top {
+  position: sticky;
+  top: 0px;
+}
+
+.custom_devide {
+  height: 1px;
+  width: 100%;
+  border-top: 1px solid #9b9da2;
+}
+
+.btn-log-restore.active {
+  background-color: #02feff !important;
+}
+
+/*       **          */
+.containerPoint {
+  position: relative;
+  width: var(--edge);
+  height: var(--edge);
+  border: 2px solid var(--color);
+}
+
+.contourPoint {
+  position: absolute;
+  width: var(--pEdge);
+  height: var(--pEdge);
+  background-color: var(--color);
+}  
+
+.topX {
+  left: var(--tEdge);
+}    
+
+.topY {
+top: var(--tEdge);
+}
+
+.botX {
+ left: var(--bEdge);
+
+}
+
+.botY{
+top:var(--bEdge);
+} 
+
+.midX {
+left:var(--hEdge);
+}
+ 
+.midY{
+top:var(--hEdge);
+}
+
+.contourPoint.active{
+  background-color: orangered ;
+}
+/*         конец          */

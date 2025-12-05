@@ -9,7 +9,50 @@ class SvgStore {
 	laserShow =  {};
 	highLighted= false;
 	svgParams = { width: 0, height: 0 };
-	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
+	//svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
+	svgData = {
+		"width": 255,
+		"height": 399,
+		"positions": [
+			{
+				"part_id": 1,
+				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": 0, "f": 0 }
+			}
+		],
+		"part_code": [
+			{
+				"id": 1,
+				"uuid": "n2-d0170e56-3c47-411e-84de-813bb41a7245",
+				"name": "12___10__2",
+				"code": [
+					{
+						"cid": 1,
+						"class": "contour outer macro0 closed1",
+						"path": "M15 199.5 V254.358 A9.999969 9.999969 0 0 1 12.071 261.429 L2.929 270.571 A9.999969 9.999969 0 0 0 0 277.642 V389 A9.999993 9.999993 0 0 0 10 399 H54.555 A10.000573 10.000573 0 0 0 62.955 394.426 L65.619 390.302 A10.000073 10.000073 0 0 1 74.019 385.729 H180.981 A10.000073 10.000073 0 0 1 189.381 390.302 L192.045 394.426 A10.000573 10.000573 0 0 0 200.445 399 H245 A9.999993 9.999993 0 0 0 255 389 V277.642 A9.999969 9.999969 0 0 0 252.071 270.571 L242.929 261.429 A9.999969 9.999969 0 0 1 240 254.358 V144.642 A9.999969 9.999969 0 0 1 242.929 137.571 L252.071 128.429 A9.999969 9.999969 0 0 0 255 121.358 V10 A9.999993 9.999993 0 0 0 245 0 H200.445 A10.000573 10.000573 0 0 0 192.045 4.574 L189.381 8.698 A10.000073 10.000073 0 0 1 180.981 13.271 H74.019 A10.000073 10.000073 0 0 1 65.619 8.698 L62.955 4.574 A10.000573 10.000573 0 0 0 54.555 0 H10 A9.999993 9.999993 0 0 0 0 10 V121.358 A9.999969 9.999969 0 0 0 2.929 128.429 L12.071 137.571 A9.999969 9.999969 0 0 1 15 144.642 V199.5 ",
+						"stroke": "red",
+						"strokeWidth": 0.2
+					},
+					{
+						"cid": 2,
+						"class": "inlet outer macro1 pulse0",
+						"path": "M7 199.5 L12.333333 197.614382 A2 2 0 0 1 15 199.5 ",
+						"stroke": "red",
+						"strokeWidth": 0.2
+					},
+					{
+						"cid": 2,
+						"class": "contour inner macro0 closed1",
+						"path": "M100.025 283.243 V241.243 A9.999993 9.999993 0 0 1 110.025 231.243 H144.482 A9.999993 9.999993 0 0 1 154.482 241.243 V325.243 A9.999993 9.999993 0 0 1 144.482 335.243 H110.025 A9.999993 9.999993 0 0 1 100.025 325.243 V283.243",
+						"stroke": "red",
+						"strokeWidth": 0.2
+					}
+
+				]
+			}
+			
+		]
+	}
+	
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
 	safeMode = {mode: false, intend: 10/*CONSTANTS.defaultInletIntend*/}
 	copiedCid = false
@@ -62,59 +105,59 @@ class SvgStore {
     }
 
 	get selectedText () {
-		const text = this.svgData.code.find(element => element.class.includes('selectedText')  && element.class.includes('contour'));
+	/* 	const text = this.svgData.code.find(element => element.class.includes('selectedText')  && element.class.includes('contour'));
 		if (!text) {
 			return null;
 		}
-		return text
+		return text */
 	}
 
 	get selectedInletPath () {
-		let cid = this.selected.cid
+	/* 	let cid = this.selected.cid
 		if (typeof cid === 'number') {
 			return this.getElementByCidAndClass(cid, 'inlet', 'path')	|| ''
 		}	
-		return ''
+		return '' */
 	}
 
 	get selectedOutletPath () {
-		let cid = this.selected.cid
+		/* let cid = this.selected.cid
 		if (typeof cid === 'number') {
 			return this.getElementByCidAndClass(cid, 'outlet', 'path')	|| ''
 		}	
-		return ''
+		return '' */
 	}
 
 	get selectedCid () {
-		const selected = this.getSelectedElement();
+	/* 	const selected = this.getSelectedElement();
 		if (selected) {
 			if (selected.hasOwnProperty('cid')){
 				return selected.cid
 			}
 		}
-		return -1;
+		return -1; */
 	}
 
 	get selectedPath () {
-		const selected = this.getSelectedElement();
+	/* 	const selected = this.getSelectedElement();
 		if (selected) {
 			if (selected.hasOwnProperty('path')){
 				return selected.path
 			}
 		}
-		return '';
+		return ''; */
 	}
 
 	get selected () {
-		const selected = this.getSelectedElement();
+	/* 	const selected = this.getSelectedElement();
 		if (selected) {
 			return selected;		 
 		}
-		return '';
+		return ''; */
 	}
 
 	get tecnology () {
-		let allClasses =''
+	/* 	let allClasses =''
 		this.svgData['code'].forEach(element => {
 			allClasses+=' '
 			allClasses+=element.class
@@ -122,18 +165,18 @@ class SvgStore {
    		});
 		let allTec = [...new Set (allClasses.split(/\s{1,}/gm))]
 		//console.log("printStore:", toJS(allTec));
-	    return allTec
+	    return allTec */
 	}
 
 	get selectedPiercingType () {
-		const selected = this.getSelectedElement();
+		/* const selected = this.getSelectedElement();
 		if (selected) {
 			const inletClass = this.getElementByCidAndClass (selected.cid, 'inlet', 'class')
 			if (inletClass){
 				return Part.detectPiercingType(inletClass);
 			}
 		}
-		return '';
+		return ''; */
 	}
 
 	get selectedInletModeType () {
@@ -331,7 +374,7 @@ class SvgStore {
 	}
 
 	clearSvgData() {
-		this.svgData = { width: 0, height: 0, code: [] , params:{}}; // Очищаем данные SVG
+		this.svgData = { width: 0, height: 0, code: [] , params:{}, positions:[/* id + matrix*/]}; // Очищаем данные SVG
 	}
 
 	addElement (element) {

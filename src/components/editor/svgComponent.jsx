@@ -1,6 +1,4 @@
-
-
-//import SimpleReturnComponent from './simpleReturnComponent'
+import SimpleReturnComponent from './simpleReturnComponent'
 //import Selector from './selector.js'
 //import SelectedPointOnEdge from './selectedPointOnEdge.js';
 //import SelectedPointOnPath from './selectedPointOnPath.js';
@@ -115,7 +113,7 @@ const SvgComponent = observer (() => {
                                 strokeWidth="0"
                             ></rect>
                             <>
-                            {/*  < SimpleReturnComponent /> */}
+                            < SimpleReturnComponent />
                             </>
                        </g>
                       {/*  <Selector />
