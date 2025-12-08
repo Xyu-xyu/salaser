@@ -29,6 +29,7 @@
     "socket.io-client": "^4.8.1",
     "svg-pan-zoom": "^3.6.2",
     "svg-path-commander": "^2.1.11",
+    "svgpath": "^2.6.0",
     "swiper": "^11.2.6"
   },
   "devDependencies": {
