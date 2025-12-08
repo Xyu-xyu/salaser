@@ -5,248 +5,209 @@ import editorStore from './../../store/editorStore.jsx';
 import svgStore from './../../store/svgStore.jsx';
 import util from './../../scripts/util.jsx';
 import SvgComponent from './svgComponent.jsx';
-//import SvgComponent from './svg';
-//import Part from '../../scripts/part.jsx';
-//import SvgComponent from './svgComponent.jsx';
-//import Part from '../scripts/part.js';
-//import inlet from './../scripts/inlet.js'
-//import { addToLog } from '../scripts/addToLog.js';
-//import jointStore from './stores/jointStore.js';
-//import logStore from './stores/logStore.js';
-//import log from '../scripts/log.js'
-
 
 const SvgWrapper = observer(() => {
-	const {
-		matrix,
-		groupMatrix,
-		offset,
-		//rectParams,
-		gridState,
-		selectedText,
-		pointInMove,
-	} = svgStore;
+	const { matrix, groupMatrix } = svgStore;
 
+	const inMoveRef = useRef(false);                    // теперь boolean
+	const startOffset = useRef({ x: 0, y: 0 });
 
-	const { a, b, c, d, e, f } = matrix;
+	// Touch state
+	const evCache = useRef([]);                         // массив Touch
+	const prevDiff = useRef(-1);                        // расстояние между пальцами
+
 	const [wrapperClass, setWrapperClass] = useState('');
-	const inMoveRef = useRef(0);
-	const wrapperSVG = useRef(null);
 
-	// Touch gesture state
-	const evCache = useRef([]);
-	const prevDiff = useRef(-1);
-
-	// Mouse wheel zoom
-	const handleMouseWheel = (event) => {
-		//event.preventDefault();
-		const svg = document.getElementById('svg')
-		if (!svg) return;
-
-		const groupSvg = document.getElementById('group');
-		const group = groupSvg.transform.baseVal.consolidate()?.matrix;
-
-		if (!group) return;
-
-		const coords = util.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
-		const scale = 1.0 + (-event.deltaY * 0.001);
-
-		let gTransform = svg.createSVGMatrix();
-		gTransform = gTransform.translate(coords.x, coords.y);
-		gTransform = gTransform.scale(scale);
-		gTransform = gTransform.translate(-coords.x, -coords.y);
-
-		const comboMatrix = util.multiplyMatrices(group, gTransform);
-
-		svgStore.setMatrix({
-			a: comboMatrix.a,
-			b: comboMatrix.b,
-			c: comboMatrix.c,
-			d: comboMatrix.d,
-			e: comboMatrix.e,
-			f: comboMatrix.f,
-		});
-	
-	};
-
-	// Touch zoom (pinch)
-	const touchZoom = (curDiff, prevDiff) => {
-		console.log("TouchZOOM")
+	// =============== WHEEL ZOOM ===============
+	const handleMouseWheel = (e) => {
+		e.preventDefault();
 		const svg = document.getElementById('svg');
 		if (!svg) return;
 
-		const groupSvg = document.getElementById('group');
-		const group = groupSvg.transform.baseVal.consolidate()?.matrix;
-		if (!group) return;
+		const groupEl = document.getElementById('group');
+		const current = groupEl.transform.baseVal.consolidate()?.matrix;
+		if (!current) return;
 
-		const scale = curDiff / prevDiff;
-		const x = (evCache.current[0].clientX + evCache.current[1].clientX) / 2;
-		const y = (evCache.current[0].clientY + evCache.current[1].clientY) / 2;
-		const coords = util.convertScreenCoordsToSvgCoords(x, y);
+		const point = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+		const scale = e.deltaY > 0 ? 0.9 : 1.1;
 
-		let gTransform = svg.createSVGMatrix();
-		gTransform = gTransform.translate(coords.x, coords.y);
-		gTransform = gTransform.scale(scale);
-		gTransform = gTransform.translate(-coords.x, -coords.y);
+		let t = svg.createSVGMatrix()
+			.translate(point.x, point.y)
+			.scale(scale)
+			.translate(-point.x, -point.y);
 
-		const comboMatrix = util.multiplyMatrices(group, gTransform);
+		const newMatrix = current.multiply(t);
 
 		svgStore.setMatrix({
-			a: comboMatrix.a,
-			b: comboMatrix.b,
-			c: comboMatrix.c,
-			d: comboMatrix.d,
-			e: comboMatrix.e,
-			f: comboMatrix.f,
+			a: newMatrix.a, b: newMatrix.b,
+			c: newMatrix.c, d: newMatrix.d,
+			e: newMatrix.e, f: newMatrix.f,
 		});
 	};
 
-	const getDistance = (t1, t2)=> {
+	// =============== PINCH ZOOM ===============
+	const touchZoom = (scale, centerX, centerY) => {
+		const svg = document.getElementById('svg');
+		if (!svg) return;
+
+		const groupEl = document.getElementById('group');
+		const current = groupEl.transform.baseVal.consolidate()?.matrix;
+		if (!current) return;
+
+		const point = util.convertScreenCoordsToSvgCoords(centerX, centerY);
+
+		let t = svg.createSVGMatrix()
+			.translate(point.x, point.y)
+			.scale(scale)
+			.translate(-point.x, -point.y);
+
+		const newMatrix = current.multiply(t);
+
+		svgStore.setMatrix({
+			a: newMatrix.a, b: newMatrix.b,
+			c: newMatrix.c, d: newMatrix.d,
+			e: newMatrix.e, f: newMatrix.f,
+		});
+	};
+
+	const getDistance = (t1, t2) => {
 		const dx = t1.clientX - t2.clientX;
 		const dy = t1.clientY - t2.clientY;
 		return Math.hypot(dx, dy);
 	};
 
-	// Touch handlers
-	const TouchStart = (event) => {
-		console.log("TouchStart");
-		//const nativeTouches = event.nativeEvent.touches;
+	// =============== TOUCH HANDLERS ===============
+	const TouchStart = (e) => {
+		const touches = e.touches;
+		evCache.current = Array.from(touches);
 
-		if (editorStore.mode === 'drag' || true) {
-			if (evCache.current.length > 0) {
-				TouchStartDrag(event.touches[0]); // Pass the real Touch object
-			}
-		} else {
-			//evCache.current = Array.from(event.touches);
-			//prevDiff.current = -1;
+		if (inMoveRef.current) return;
+
+		if (touches.length === 1) {
+			inMoveRef.current = true;
+			const touch = touches[0];
+			const pos = util.getMousePosition(touch);
+
+			startOffset.current = {
+				x: pos.x - groupMatrix.e,
+				y: pos.y - groupMatrix.f,
+			};
 		}
+		// если сразу 2 пальца — ничего не делаем, ждём TouchDrag
 	};
- 
-	const TouchStartDrag = (touch) => {
-		console.log("TouchStartDrag");
-		inMoveRef.current = 1;
-		const off = util.getMousePosition(touch);
-		console.log( off , groupMatrix);
 
-		const transforms = groupMatrix;
-		svgStore.setOffset({
-			x: off.x - transforms.e,
-			y: off.y - transforms.f,
-		}); 
+	const TouchDrag = (e) => {
+		e.preventDefault(); // обязательно!
 
-	}; 
+		const touches = e.touches;
+		evCache.current = Array.from(touches);
 
-	const TouchDrag = (event) => {
-		const nativeTouches = event.nativeEvent.touches;
-		//console.log ( evCache.current.length)
-		if (evCache.current.length === 1 && inMoveRef.current ) {
-			//console.log("TouchDrag");
-			const touch = evCache.current[0];
-			const clientX = touch.clientX;
-			const clientY = touch.clientY;
-			const coords = util.convertScreenCoordsToSvgCoords(clientX, clientY);
+		// 1 палец → pan
+		if (touches.length === 1 && inMoveRef.current) {
+			const touch = touches[0];
 
+			// Курсор
+			const svgCoord = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
 			coordsStore.setCoords({
-				x: Math.round(coords.x * 100) / 100,
-				y: Math.round(coords.y * 100) / 100,
+				x: Math.round(svgCoord.x * 100) / 100,
+				y: Math.round(svgCoord.y * 100) / 100,
 				width: 500,
 				height: 500,
 			});
 
-			// Update matrix transformation logic
-			const coord = util.getMousePosition(touch);
-			const newE = coord.x - offset.x;
-			const newF = coord.y - offset.y;
+			// Драг
+			const pos = util.getMousePosition(touch);
+			const newE = pos.x - startOffset.current.x;
+			const newF = pos.y - startOffset.current.y;
 
 			svgStore.setGroupMatrix({
-				a: groupMatrix.a,
-				b: groupMatrix.b,
-				c: groupMatrix.c,
-				d: groupMatrix.d,
-				e: newE,
-				f: newF,
+				a: groupMatrix.a, b: groupMatrix.b,
+				c: groupMatrix.c, d: groupMatrix.d,
+				e: newE, f: newF,
 			});
+
 			editorStore.setMode('dragging');
 		}
-		evCache.current = Array.from(event.touches);
 
-		if (nativeTouches.length === 2) {
-			const curDiff = getDistance(nativeTouches[0], nativeTouches[1]);
+		// 2 пальца → zoom
+		else if (touches.length === 2) {
+			inMoveRef.current = true;
+
+			const t1 = touches[0];
+			const t2 = touches[1];
+			const curDiff = getDistance(t1, t2);
+
 			if (prevDiff.current > 0) {
-				touchZoom(curDiff, prevDiff.current);
+				const scale = curDiff / prevDiff.current;
+				const centerX = (t1.clientX + t2.clientX) / 2;
+				const centerY = (t1.clientY + t2.clientY) / 2;
+
+				touchZoom(scale, centerX, centerY);
 			}
+
 			prevDiff.current = curDiff;
 		}
 	};
 
-	const handleTouchEnd = (event) => {
-		if (editorStore.mode === 'dragging' || pointInMove) {
-			endDrag();
+	const handleTouchEnd = (e) => {
+		// Удаляем ушедшие пальцы
+		for (let i = 0; i < e.changedTouches.length; i++) {
+			const idx = evCache.current.findIndex(t => t.identifier === e.changedTouches[i].identifier);
+			if (idx >= 0) evCache.current.splice(idx, 1);
 		}
 
-		for (const touch of event.changedTouches) {
-			const index = evCache.current.findIndex(t => t.identifier === touch.identifier);
-			if (index > -1) evCache.current.splice(index, 1);
-		}
-
-		if (evCache.current.length === 0) {
+		// Если пальцев не осталось
+		if (e.touches.length === 0) {
+			if (inMoveRef.current) {
+				endDrag();
+			}
+			inMoveRef.current = false;
 			prevDiff.current = -1;
+			evCache.current = [];
 		}
+		// Если остался один — драг продолжится в следующем TouchDrag
 	};
 
+	// =============== MOUSE DRAG ===============
 	const MouseStartDrag = (e) => {
-		inMoveRef.current = 1;
-		const off = util.getMousePosition(e);
-		const transforms = groupMatrix;
-		svgStore.setOffset({
-			x: off.x - transforms.e,
-			y: off.y - transforms.f,
-		});
+		if (e.button !== 0) return; // только левая кнопка
+		inMoveRef.current = true;
 
+		const pos = util.getMousePosition(e);
+		startOffset.current = {
+			x: pos.x - groupMatrix.e,
+			y: pos.y - groupMatrix.f,
+		};
+
+		editorStore.setMode('drag');
 	};
 
-	const MouseDrag = (e, force = false) => {
+	const MouseDrag = (e) => {
+		if (!inMoveRef.current) return;
 
-		const clientX = e.clientX;
-		const clientY = e.clientY;
-		const coords = util.convertScreenCoordsToSvgCoords(clientX, clientY);
+		const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
 		coordsStore.setCoords({
-			x: Math.round(coords.x * 100) / 100,
-			y: Math.round(coords.y * 100) / 100,
+			x: Math.round(svgCoord.x * 100) / 100,
+			y: Math.round(svgCoord.y * 100) / 100,
 			width: 500,
-			height: 500
+			height: 500,
 		});
 
-		const isDragging =
-			('buttons' in e && (e.buttons === 4 || e.buttons === 1)) ||
-			force ||
-			editorStore.mode === 'dragging';
+		const pos = util.getMousePosition(e);
+		const newE = pos.x - startOffset.current.x;
+		const newF = pos.y - startOffset.current.y;
 
-		if (isDragging && inMoveRef.current) {
-			const coord = util.getMousePosition(e);
-			const newE = coord.x - offset.x;
-			const newF = coord.y - offset.y;
+		svgStore.setGroupMatrix({
+			a: groupMatrix.a, b: groupMatrix.b,
+			c: groupMatrix.c, d: groupMatrix.d,
+			e: newE, f: newF,
+		});
 
-			svgStore.setGroupMatrix({
-				a: groupMatrix.a,
-				b: groupMatrix.b,
-				c: groupMatrix.c,
-				d: groupMatrix.d,
-				e: newE,
-				f: newF,
-			});
-
-			editorStore.setMode('dragging');
-		}
+		editorStore.setMode('dragging');
 	};
 
 	const endDrag = () => {
-		inMoveRef.current = 0;
-
-		if (pointInMove) {
-			// util.setGuidesPositionForPoint(e);
-		}
-
+		inMoveRef.current = false;
 		if (editorStore.mode === 'dragging') {
 			editorStore.setMode('resize');
 		}
@@ -256,73 +217,21 @@ const SvgWrapper = observer(() => {
 		coordsStore.setCoords({ x: 0, y: 0, width: 500, height: 500 });
 	};
 
-	
-	
+	// =============== EFFECTS ===============
 	useEffect(() => {
-		const timeoutId = setTimeout(() => {
+		const timer = setTimeout(() => {
 			svgStore.fitToPage();
 			coordsStore.setPreloader(false);
 		}, 500);
-
-		const handleKeyDown = (e) => {
-			if (selectedText) return;
-
-			if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'z' || e.key === 'Я')) {
-				e.preventDefault();
-				// Undo
-			} else if (e.ctrlKey && (e.key.toLowerCase() === 'z' || e.key === 'Я')) {
-				e.preventDefault();
-				// Redo
-			} else if (e.key === 'Delete') {
-				e.preventDefault();
-				// Delete selected
-			}
-		};
-
-		window.addEventListener('keydown', handleKeyDown);
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown);
-			clearTimeout(timeoutId);
-		};
+		return () => clearTimeout(timer);
 	}, []);
 
-	// Fit when requested
 	useEffect(() => {
 		if (coordsStore.needToFit) {
 			svgStore.fitToPage();
 		}
 	}, [coordsStore.needToFit]);
 
-	// Grid visibility based on zoom
-	useEffect(() => {
-		// xsGrid
-		if (matrix.a < 0.25) {
-			svgStore.setVal("gridState", ["xsGrid", "visibility"], "hidden");
-			svgStore.setVal("gridState", ["smallGrid", "fill"], "var(--gridColorFill)");
-		} else {
-			svgStore.setVal("gridState", ["xsGrid", "visibility"], "visible");
-			svgStore.setVal("gridState", ["smallGrid", "fill"], "none");
-		}
-	
-		// smallGrid
-		if (matrix.a < 0.125) {
-			svgStore.setVal("gridState", ["smallGrid", "visibility"], "hidden");
-			svgStore.setVal("gridState", ["grid", "fill"], "var(--gridColorFill)");
-		} else {
-			svgStore.setVal("gridState", ["smallGrid", "visibility"], "visible");
-			svgStore.setVal("gridState", ["grid", "fill"], "none");
-		}
-	
-		// grid
-		if (matrix.a > 85) {
-			svgStore.setVal("gridState", ["grid", "visibility"], "hidden");
-		} else {
-			svgStore.setVal("gridState", ["grid", "visibility"], "visible");
-		}
-	}, [matrix.a, a, b, c, d, e, f]);
-	
-
-	// Cursor class based on mode
 	useEffect(() => {
 		const mode = editorStore.mode;
 		const classes = {
@@ -335,9 +244,32 @@ const SvgWrapper = observer(() => {
 			addJoint: 'cursorAddJoint',
 			removeJoint: 'cursorRemoveJoint',
 		};
-
 		setWrapperClass(classes[mode] || 'cursorArrow');
 	}, [editorStore.mode]);
+
+	// Grid visibility (оставил как было, но можно упростить)
+	useEffect(() => {
+		const zoom = matrix.a;
+		if (zoom < 0.25) {
+			svgStore.setVal("gridState", ["xsGrid", "visibility"], "hidden");
+			svgStore.setVal("gridState", ["smallGrid", "fill"], "var(--gridColorFill)");
+		} else {
+			svgStore.setVal("gridState", ["xsGrid", "visibility"], "visible");
+			svgStore.setVal("gridState", ["smallGrid", "fill"], "none");
+		}
+		if (zoom < 0.125) {
+			svgStore.setVal("gridState", ["smallGrid", "visibility"], "hidden");
+			svgStore.setVal("gridState", ["grid", "fill"], "var(--gridColorFill)");
+		} else {
+			svgStore.setVal("gridState", ["smallGrid", "visibility"], "visible");
+			svgStore.setVal("gridState", ["grid", "fill"], "none");
+		}
+		if (zoom > 85) {
+			svgStore.setVal("gridState", ["grid", "visibility"], "hidden");
+		} else {
+			svgStore.setVal("gridState", ["grid", "visibility"], "visible");
+		}
+	}, [matrix.a]);
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
@@ -346,19 +278,21 @@ const SvgWrapper = observer(() => {
 					<div className="d-flex" id="editor_main_wrapper">
 						<div
 							id="wrapper_svg"
-							ref={wrapperSVG}
 							className={wrapperClass}
+							style={{ touchAction: 'none' }} // обязательно!
+							
 							onWheel={handleMouseWheel}
 							onMouseDown={MouseStartDrag}
 							onMouseMove={MouseDrag}
-							onTouchMove={TouchDrag}
 							onMouseUp={endDrag}
 							onMouseLeave={leave}
+
 							onTouchStart={TouchStart}
+							onTouchMove={TouchDrag}
 							onTouchEnd={handleTouchEnd}
 							onTouchCancel={handleTouchEnd}
-							onContextMenu={(e) => e.preventDefault()}
-							style={{ touchAction: 'none' }} // Critical for pinch/zoom
+
+							onContextMenu={e => e.preventDefault()}
 						>
 							<SvgComponent />
 						</div>

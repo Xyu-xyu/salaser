@@ -18,15 +18,15 @@ const SimpleReturnComponent = observer(() => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const svg = await Part.getPartCode(handle, partNumber); // Получаем данные
-			const newSvgData = {
+			//const svg = await Part.getPartCode(handle, partNumber); // Получаем данные
+/* 			const newSvgData = {
 				width: svg.width,
 				height: svg.height,
 				code: svg.code,
 				params: svg.params,
 				positions: []
-			};
-			svgStore.setSvgData(newSvgData);
+			}; */
+			//svgStore.setSvgData(newSvgData); 
 			//jointStore.loadJoints (svg.joints)			
 		};
 		fetchData();
