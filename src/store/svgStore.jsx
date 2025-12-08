@@ -8,14 +8,18 @@ class SvgStore {
 	tooltips = false;
 	laserShow =  {};
 	highLighted= false;
-	svgParams = { width: 0, height: 0 };
 	//svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	svgData = {
-		"width": 255,
-		"height": 399,
+		"name": "undefined.ncp",
+		"width": 500,
+		"height": 500,
+		"quantity": 1,
+		"presetId": 0,
+		"presetName": "any_preset",
 		"positions": [
 			{
 				"part_id": 1,
+				"part_code_id": 1,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": 0, "f": 0 }
 			}
 		],
@@ -180,34 +184,34 @@ class SvgStore {
 	}
 
 	get selectedInletModeType () {
-		const selected = this.getSelectedElement();
+		/* const selected = this.getSelectedElement();
 		if (selected) {
 			const inletClass = this.getElementByCidAndClass (selected.cid, 'inlet', 'class')
 			if (inletClass) {
 				return Part.detectContourModeType(inletClass);
 			}	
 		}
-		return '';
+		return ''; */
 	}
 
 	get selectedContourModeType () {
-		const selected = this.getSelectedElement('class');
+		/* const selected = this.getSelectedElement('class');
 		if (selected) {
 			return Part.detectContourModeType(selected);
 		}
-		return '';
+		return ''; */
 	}
 
 	get selectedType() {
-		const selected = this.getSelectedElement('class');
+		/* const selected = this.getSelectedElement('class');
 		if (selected) {
 			return Part.detectContourType(selected);
 		}
-		return '';
+		return ''; */
 	}
 
 	get selectedEdgePath() {
-		let val = this.selectedEdge || '';
+		/* let val = this.selectedEdge || '';
 		if (val && this.selectedEdge) {
 			let contour = this.getElementByCidAndClass(this.selectedEdge.cid, 'contour', 'path');
 			if (!contour) return '';
@@ -227,7 +231,7 @@ class SvgStore {
 			return `M${prevX} ${prevY} ${segment.join(' ')}`;
 		} else {
 			return '';
-		}
+		} */
 	}
 
 	setTooltips (val) {
@@ -271,7 +275,7 @@ class SvgStore {
 	}
 
 	setNewOuter() {
-		if (typeof this.selectedCid === 'number' && this.selectedCid !==-1 ) {
+		/* if (typeof this.selectedCid === 'number' && this.selectedCid !==-1 ) {
 			if (this.getSelectedElement().class.includes('outer')) return;
 			this.svgData.code.forEach(element => {
 				if (element.class.includes("outer")) {
@@ -295,7 +299,7 @@ class SvgStore {
 	
 				return bc - ac;
 			});
-		}
+		} */
 	}
 	
 	setGuidesMode (val) {
@@ -323,7 +327,7 @@ class SvgStore {
     }
 
 	setSelectedPointOnEdge (val) {
-		this.selectedPointOnEdge = val
+		/* this.selectedPointOnEdge = val
 		if (svgStore.boundsList && val) {
 			let res = Util.checkGuides( val.point )
 
@@ -351,11 +355,11 @@ class SvgStore {
 				let val = { x1: 0, y1: 0, x2:0, y2: 0, angle: 0 };
 				this.updateAGuide(val)			
 			}
-		}
+		} */
 	}
 
 	setSelectedPointOnPath (val) {
-		this.selectedPointOnPath=val
+		//this.selectedPointOnPath=val
 	}
 
 	setsafeMode (mode) {
@@ -546,6 +550,7 @@ class SvgStore {
 		  !excludes.some(e => element.class.includes(e))
 		);
 	}
+
 	deleteSelected () {
 		let selected = this.getSelectedElement()	
 		let cidSelected = selected.cid		
@@ -587,9 +592,7 @@ class SvgStore {
 		Object.assign(this.gridState, val);
 	}
 
-	setSvgParams(val) {
-        Object.assign(this.svgParams, val);
-    } 
+ 
 
 	setHighLighted(val) {
         this.highLighted = val;

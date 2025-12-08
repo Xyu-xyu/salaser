@@ -220,6 +220,7 @@ const ToolsPanel = observer(() => {
 								height="24"
 								color="black"
 								fill="none"
+								strokeWidth={2}
   							/>
 					</button>
 					<button disabled
@@ -263,7 +264,8 @@ const ToolsPanel = observer(() => {
 							width="24"
 							height="24"
 							fill='black'
-							strokeWidth={0}
+							strokeWidth={1}							
+							color='black'
 						/>
 
 					</button>

@@ -4,7 +4,7 @@ import SimpleReturnComponent from './simpleReturnComponent'
 //import SelectedPointOnPath from './selectedPointOnPath.js';
 //import SelectedEdge from './selectedEdge.js';
 //import Guides from './guides.js'
-import editorStore from '../../store/editorStore';
+//import editorStore from '../../store/editorStore';
 import svgStore from './../../store/svgStore';
 import { observer } from 'mobx-react-lite';
 //import Joints from './joints.js';
@@ -19,12 +19,11 @@ const SvgComponent = observer (() => {
         groupMatrix,
         rectParams,
         gridState,
-        svgParams,
+        svgData,
 
     } = svgStore
 
-    const { newSheet } = editorStore
-    
+   
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${groupMatrix.a} ${groupMatrix.b} ${groupMatrix.c} ${groupMatrix.d} ${groupMatrix.e} ${groupMatrix.f}`;
 
@@ -32,7 +31,7 @@ const SvgComponent = observer (() => {
         <svg
             id="svg"
             baseProfile="full"
-            viewBox={`0.00 0.00 ${newSheet.width} ${ newSheet.height }`}
+            viewBox={`0.00 0.00 ${svgData.width} ${ svgData.height }`}
             style={{ overflow: 'hidden', border: '1px solid var(--color)' }}
             version="1.1"
             stroke='var(--color)'
@@ -104,8 +103,8 @@ const SvgComponent = observer (() => {
                         <g id="contours">
                             <rect
                                 id="dimensionalGrid"
-                                height={ newSheet.height }
-                                width={ newSheet.width }
+                                height={ svgData.height }
+                                width={ svgData.width }
 								x={0 /*rectParams.x*/}
                                 y={0 /*rectParams.y*/}
                                 fill="url(#grid)"

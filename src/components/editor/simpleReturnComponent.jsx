@@ -84,7 +84,7 @@ const SimpleReturnComponent = observer(() => {
 			{svgStore.svgData.positions.map((pos, posIndex) => {
 				// находим part_code по part_id
 				const part = svgStore.svgData.part_code.find(
-					p => p.id === pos.part_id
+					p => p.id === pos.part_code_id
 				);
 
 				if (!part) return null;

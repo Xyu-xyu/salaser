@@ -15,14 +15,6 @@ import { makeAutoObservable } from "mobx";
 class EditorStore {
   mode = "resize";
   inletMode = "";
-  newSheet = {
-      name: "undefined.ncp",
-			width: 600,
-			height: 500,
-			quantity: 1,
-			presetId: 0,
-			presetName: "any_preset"
-  }
 
   constructor() {
     makeAutoObservable(this);

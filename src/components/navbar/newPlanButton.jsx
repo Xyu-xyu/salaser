@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import macrosStore from "../../store/macrosStore";
 import CustomIcon from "../../icons/customIcon";
 import laserStore from "../../store/laserStore";
-import editorStore from "../../store/editorStore";
+import svgStore from "../../store/svgStore";
 
 
 const NewPlanButton = observer(() => {
@@ -85,7 +85,10 @@ const NewPlanButton = observer(() => {
 			presetName: selectedPreset.name
 		};
 
-		editorStore.setVal ('newSheet',res)
+		for (let key in res) {
+			console.log (key, res[key])
+			svgStore.setVal ('svgData', key, res[key])
+		}	
 		laserStore.setVal("centralBarMode", "planEditor");
 		handleClose();
 	};

@@ -20,15 +20,6 @@ class Part {
         width: window.screen.width,
         height:window.screen.height
     };
-
-    static setSvgParams(newParams) {
-        this.#params = { ...this.#params, ...newParams };
-    }
-
-    static getSvgParams(param=false) {
-        if (!param) return this.#params
-        return this.#params[param];
-    }
       
     static normalizeIntends () {
         /*     let int = {x:Infinity,y:Infinity}
@@ -97,7 +88,7 @@ class Part {
             if (line.includes('(<Part id="')) {
                 Part.width = +util.getAttributeValue(line, 'originx')
                 Part.height = +util.getAttributeValue(line, 'originy')
-				Part.setSvgParams({width: Part.width, height: Part.height})                                
+				//Part.setSvgParams({width: Part.width, height: Part.height})                                
             } else if (line.includes('(<Inlet')) {
                 let x = util.getValueFromString(line, 'x')
                 let y = util.getValueFromString(line, 'y')

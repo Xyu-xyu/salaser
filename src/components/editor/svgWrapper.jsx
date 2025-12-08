@@ -23,11 +23,9 @@ const SvgWrapper = observer(() => {
 		offset,
 		//rectParams,
 		gridState,
-		svgParams,
 		selectedText,
 		pointInMove,
 	} = svgStore;
-	const { newSheet } = editorStore
 
 
 	const { a, b, c, d, e, f } = matrix;
@@ -266,8 +264,8 @@ const SvgWrapper = observer(() => {
 		const scaleX = combinedMatrix.a;
 		const scaleY = combinedMatrix.d;
 
-		const width = svgParams.width / scaleX;
-		const height = svgParams.height / scaleY;
+		const width = svgData.width / scaleX;
+		const height = svgData.height / scaleY;
 		const x = -combinedMatrix.e / scaleX;
 		const y = -combinedMatrix.f / scaleY;
 
