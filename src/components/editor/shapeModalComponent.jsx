@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { observer } from 'mobx-react-lite';  
 import { addToLog } from './../../scripts/addToLog';
 import svgStore from './../../store/svgStore';
-import Util from './../../scripts/util';
+import util from './../../scripts/util';
 import SVGPathCommander from 'svg-path-commander';
 import { useTranslation } from 'react-i18next';
 import CustomIcon from '../../icons/customIcon';
@@ -40,8 +40,10 @@ const ShapeModalComponent =observer(()=> {
         let iniY = myPathBBox.height
         let scaleX = partWidth/iniX
         let scaleY = partHeight/iniY
-		let translateX = 0
-		let translateY = 0
+		var transformed = util.applyTransform(d, scaleX, scaleY, 0, 0, {angle: 0, x:0, y:0})
+ 
+		let translateX = partXPosition - myPathBBox.cx*scaleX
+		let translateY = partYPosition - myPathBBox.cy*scaleY
 
 		if (partCenterXPosition) {
 			translateX = svgStore.svgData.width*0.5-myPathBBox.cx*scaleX
@@ -52,11 +54,33 @@ const ShapeModalComponent =observer(()=> {
 		}
 
         if (!d || !d.length) return;
-        var transformed = Util.applyTransform(d, scaleX, scaleY, translateX, translateY, {angle: 0, x:0, y:0})
-		console.log (transformed)
-		
-		svgStore.addElementPath( transformed, '', '') 
-		addToLog ('Contour added')
+        
+		let uuid = util.uuid()
+
+		svgStore.addForm (
+			{
+				"id": uuid,
+				"uuid": uuid,
+				"name": "12___10__2",
+				"code": [
+					{
+						"cid": 1,
+						"class": "contour outer macro0 closed1",
+						"path": transformed,
+						"stroke": "red",
+						"strokeWidth": 0.2
+					},]
+			}
+		)
+
+
+		svgStore.addPosition (
+			{
+				"part_id": 1,
+				"part_code_id": uuid,
+				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": translateX, "f": translateY}
+			}
+		)
 	}
 
 	return (

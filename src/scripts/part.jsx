@@ -62,7 +62,7 @@ class Part {
             return Part.ncpToSvg ()
         } */
 
-		Part.ncpToSvg ()
+		//Part.ncpToSvg ()
     }
 
     static add(create=false) {

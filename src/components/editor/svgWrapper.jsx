@@ -124,7 +124,6 @@ const SvgWrapper = observer(() => {
  
 	const TouchStartDrag = (touch) => {
 		console.log("TouchStartDrag");
-		console.log("TouchStartDrag");
 		inMoveRef.current = 1;
 		const off = util.getMousePosition(touch);
 		console.log( off , groupMatrix);
@@ -255,21 +254,6 @@ const SvgWrapper = observer(() => {
 
 	const leave = () => {
 		coordsStore.setCoords({ x: 0, y: 0, width: 500, height: 500 });
-	};
-
-	const calculateRectAttributes = () => {
-		const groupMatrix1 = new DOMMatrix([groupMatrix.a, groupMatrix.b, groupMatrix.c, groupMatrix.d, groupMatrix.e, groupMatrix.f]);
-		const localMatrix = new DOMMatrix([matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f]);
-		const combinedMatrix = util.multiplyMatrices(groupMatrix1, localMatrix);
-		const scaleX = combinedMatrix.a;
-		const scaleY = combinedMatrix.d;
-
-		const width = svgData.width / scaleX;
-		const height = svgData.height / scaleY;
-		const x = -combinedMatrix.e / scaleX;
-		const y = -combinedMatrix.f / scaleY;
-
-		return { x, y, width, height };
 	};
 
 	

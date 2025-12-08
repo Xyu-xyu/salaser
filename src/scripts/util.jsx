@@ -3,6 +3,7 @@ import cutting_settings_schema from '../store/cut_settings_schema';
 import macrosStore from '../store/macrosStore';
 import validator from "@rjsf/validator-ajv8";
 import { getDefaultFormState } from "@rjsf/utils";
+import svgPath from 'svgpath';
 
 
 class Utils {
@@ -564,11 +565,11 @@ class Utils {
     };
 
 
-	static normPath (path) {
+	normPath (path) {
 		return SVGPathCommander.normalizePath(path)
 	}
 
-	static radian(ux, uy, vx, vy) {
+	radian(ux, uy, vx, vy) {
 		var dot = ux * vx + uy * vy;
 		var mod = Math.sqrt((ux * ux + uy * uy) * (vx * vx + vy * vy));
 		var rad = Math.acos(dot / mod);
@@ -578,11 +579,11 @@ class Utils {
 		return rad;
 	}
 
-	static degreeToRadian(deg) {
+	degreeToRadian(deg) {
 		return deg * (Math.PI / 180);
 	}
 
-	static 	getBisectorPoint(x, y, x1, y1, x2, y2, l) {
+		getBisectorPoint(x, y, x1, y1, x2, y2, l) {
 		// вычисляем точку на биисектрисе для поиска координать скругдления
 		// Вычисляем векторы A и B
 		let vectorA = { x: x1 - x, y: y1 - y };
@@ -612,7 +613,7 @@ class Utils {
 		};
 	}
 
-/* 	static isPathClosed(normalizedPath) {
+/* 	isPathClosed(normalizedPath) {
 		normalizedPath = SVGPathCommander.normalizePath(normalizedPath); 
 		if (!normalizedPath || normalizedPath.length < 2) return false;
 		const first = normalizedPath[0]; 
@@ -621,11 +622,11 @@ class Utils {
 		return first[1] === last[last.length - 2] && first[2] === last[last.length - 1];
 	} */
 	
-	static radianToDegree(rad) {
+	radianToDegree(rad) {
 		return rad * (180 / Math.PI);
 	}
 
-	static distance(arg1, arg2, arg3 = null, arg4 = null) {
+	distance(arg1, arg2, arg3 = null, arg4 = null) {
         let x1, y1, x2, y2;
 
         if (arg2 !== null && arg3 === null && arg4 === null) {
@@ -649,7 +650,7 @@ class Utils {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-	static convertScreenCoordsToSvgCoords(x, y) {
+	convertScreenCoordsToSvgCoords(x, y) {
 		var svg = document.getElementById("svg")
 		var group = document.getElementById("group");
 		var pt = svg.createSVGPoint();  // An SVGPoint SVG DOM object
@@ -695,7 +696,7 @@ class Utils {
 		}
 	}
 
-	static getAttributeValue(inputString, attributeName) {
+	getAttributeValue(inputString, attributeName) {
 		const pattern = new RegExp(`${attributeName}="([^"]+)"`, 'i');
 		const match = inputString.match(pattern);
 
@@ -706,7 +707,7 @@ class Utils {
 		}
 	}
 
-	static round(i, pow = 6, format = false) {
+	round(i, pow = 6, format = false) {
 		if (!format) {
 			return (Math.round(Number(i) * 10 ** pow)) / 10 ** pow
 		} else {
@@ -720,11 +721,11 @@ class Utils {
 		}
 	}
 
-	static getJoint (x,y) {
+	getJoint (x,y) {
 		return `M${x} ${y} l2 2 -4 -4 2 2 2 -2 -4 4`
 	}
 
-	static uuid() {
+	uuid() {
 		let d = new Date().getTime();
 		if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
 			d += performance.now(); // Add high-precision timestamp if available
@@ -738,7 +739,7 @@ class Utils {
 		});
 	}
 
-	static getLargeArcFlag(currentX, currentY, x, y, i, j, is_ccw) {
+	getLargeArcFlag(currentX, currentY, x, y, i, j, is_ccw) {
 		const cp = {
 			x: currentX + i,
 			y: currentY + j
@@ -772,7 +773,7 @@ class Utils {
 		return (eang * 180) / Math.PI - (sang * 180) / Math.PI <= 180 ? 0 : 1;
 	}
 
-	static transformContour (path, id, val, params, t=false) {
+	transformContour (path, id, val, params, t=false) {
         let {x, y, width, height, angle, proportion} = params
 		if (!t) {
             t = {
@@ -824,7 +825,7 @@ class Utils {
         
     }
 
-    static applyTransform(path, scaleX, scaleY, translateX, translateY, rotate={angle: 0, x:0, y:0}, update = true, element =false, updatePanels=true) {
+    applyTransform(path, scaleX, scaleY, translateX, translateY, rotate={angle: 0, x:0, y:0}, update = true, element =false, updatePanels=true) {
         var transformed = svgPath(path)
             .scale(scaleX, scaleY)
             .translate(translateX, translateY)
@@ -834,7 +835,7 @@ class Utils {
 		return transformed
     }
 
-	static 	pathToPolyline(path, segments = 1) {
+		pathToPolyline(path, segments = 1) {
 /* 		let points = [] 
 		let contourPath = SVGPathCommander.normalizePath(path);
 		let PX, PY, SX, SY;
@@ -907,7 +908,7 @@ class Utils {
  		return points.join(";"); */
 	}
 
-	static intersects(edge1, edge, asSegment=true) {
+	intersects(edge1, edge, asSegment=true) {
 		const a = edge1[0];
 		const b = edge1[1];
 		const e = edge[0];
@@ -941,7 +942,7 @@ class Utils {
 		return point;
 	}
 
-	static getPerpendicularCoordinates(arcParams, length) {
+	getPerpendicularCoordinates(arcParams, length) {
 		const { clockwise, cx, cy, deltaAngle, endAngle, phi, rx, ry, startAngle } = arcParams;
 	
 		// Calculate coordinates of the point on the ellipse at startAngle
@@ -975,7 +976,7 @@ class Utils {
 		};
 	}
 
-	static getPerpendicularCoordinatesToPoint (arcParams, point, length) {
+	getPerpendicularCoordinatesToPoint (arcParams, point, length) {
 		const { cx, cy, rx, ry, phi } = arcParams;
 		const { x, y } = point; // Точка на дуге
 	
@@ -1010,7 +1011,7 @@ class Utils {
 		};
 	}
 	
-	static arraysAreEqual(arr1, arr2) {
+	arraysAreEqual(arr1, arr2) {
 		if (arr1.length !== arr2.length) {
 		   return false;
 	   }
@@ -1022,7 +1023,7 @@ class Utils {
 		return true;
    }
 
-	static svgArcToCenterParam(x1, y1, rx, ry, degree, fA, fS, x2, y2, centers=false) {
+	svgArcToCenterParam(x1, y1, rx, ry, degree, fA, fS, x2, y2, centers=false) {
 		var cx, cy, startAngle, deltaAngle, endAngle, outputObj;
 		var PIx2 = Math.PI * 2.0;
 		var phi = degree * Math.PI / 180;
@@ -1119,7 +1120,7 @@ class Utils {
 		return outputObj;
 	}
 
-	static calculateAngleVector(x, y, x1, y1, x2, y2) {
+	calculateAngleVector(x, y, x1, y1, x2, y2) {
 		// Calculate vectors
 		const vector1 = { x: x1 - x, y: y1 - y };
 		const vector2 = { x: x2 - x, y: y2 - y };
@@ -1151,7 +1152,7 @@ class Utils {
 		return angleDeg;
 	}
 
-	static findPointWithSameDirection(x, y, x1, y1, L) {
+	findPointWithSameDirection(x, y, x1, y1, L) {
 		// Вычисляем вектор направления отрезка
 		let directionVector = { x: x1 - x, y: y1 - y };
 	
@@ -1168,7 +1169,7 @@ class Utils {
 		return { x: pointX, y: pointY };
 	}
 
-	static angleBetweenPoints (x1, y1, x2, y2) {
+	angleBetweenPoints (x1, y1, x2, y2) {
 		const delta_x = x2 - x1;
 		const delta_y = y2 - y1;
 		const angle_AB = Math.atan2(delta_y, delta_x);
@@ -1177,7 +1178,7 @@ class Utils {
 		return angle_degrees_AB
 	}
 
-	static findTangentPoints(circleCenterX, circleCenterY, radius, pointX, pointY) {
+	findTangentPoints(circleCenterX, circleCenterY, radius, pointX, pointY) {
 		// Расчет расстояния между центром окружности и точкой
 		var distance = Math.sqrt(Math.pow(pointX - circleCenterX, 2) + Math.pow(pointY - circleCenterY, 2));
 		
@@ -1202,7 +1203,7 @@ class Utils {
 		return [{x: tangentPoint1X, y: tangentPoint1Y}, {x: tangentPoint2X, y: tangentPoint2Y}];
 	}
 
-	static arcLength (svgArc) {
+	arcLength (svgArc) {
 
 		let radius, x1, y1, x2, y2, flag1, flag2, flag3;
 		let pathArc  = SVGPathCommander.normalizePath (svgArc)
@@ -1236,7 +1237,7 @@ class Utils {
 		return +arcLength;
 	}
 
-	static rotatePoint(MX, MY, LX, LY, oldAxis, newAxis) {
+	rotatePoint(MX, MY, LX, LY, oldAxis, newAxis) {
 		// Step 1: Find the difference between the new and old axes
 		const angleDifference = newAxis - oldAxis;
 	
@@ -1255,7 +1256,7 @@ class Utils {
 		return { x:newX, y:newY };
 	}
 
-	static 	getNewEndPoint(MX, MY, LX, LY, newLength) {
+		getNewEndPoint(MX, MY, LX, LY, newLength) {
 		// Step 1: Calculate the vector of the line segment
 		const dx = LX - MX;
 		const dy = LY - MY;
@@ -1271,7 +1272,7 @@ class Utils {
 		return { x: newEndPointX, y: newEndPointY };
 	}
 
-	static 	calculateEndPoint(centerX, centerY, radius, startX, startY, arcLength, flag3) {
+		calculateEndPoint(centerX, centerY, radius, startX, startY, arcLength, flag3) {
 		// Step 1: Calculate the initial angle of the arc
 		let endX, endY;
 		const startAngle = Math.atan2(startY - centerY, startX - centerX);
@@ -1298,7 +1299,7 @@ class Utils {
 		return { x: endX, y: endY };
 	}	
 
-	static angleBetwenContourAndInlet ( path, contourPath, inlet=true) {
+	angleBetwenContourAndInlet ( path, contourPath, inlet=true) {
 		let  A, MX, MY, LX, LY,  PX, PY;
 		if(inlet){
 			if (path.length) {
@@ -1391,7 +1392,7 @@ class Utils {
 		}
 	}
 
-	static findPerpendicularPoints(x, y, x1, y1, L) {
+	findPerpendicularPoints(x, y, x1, y1, L) {
 		//return [point1, point2];
 		let dx = x1 - x
 		let dy = y1 - y
@@ -1407,7 +1408,7 @@ class Utils {
 		return [{ x: x + nx * L, y: y + ny * L }, { x: x - nx * L, y: y - ny * L }]
 	}
 
-	static transformCoordinates(input) {
+	transformCoordinates(input) {
 		const values = input.split(';')
 		const transformed = [];
 		for (let i = 0; i < values.length; i++) {
@@ -1417,7 +1418,7 @@ class Utils {
 		return [transformed];
 	}
 
-	static pointInSvgPath(path, x, y) {
+	pointInSvgPath(path, x, y) {
 		//console.log(arguments)
 		let polyline = this.pathToPolyline(path)
 		let polygon = this.transformCoordinates(polyline)
@@ -1425,7 +1426,7 @@ class Utils {
 		return pointIn
 	}
 
-	static findNearestPointOnSegment(x, y, x1, y1, x2, y2) {
+	findNearestPointOnSegment(x, y, x1, y1, x2, y2) {
 		const dx = x2 - x1;
 		const dy = y2 - y1;
 		const dx1 = x - x1;
@@ -1457,7 +1458,7 @@ class Utils {
 		return { x: nearestX, y: nearestY };
 	}
 
-	static findNearestPointOnEllipse(x, y, xc, yc, rx, ry, xAxisRotation) {
+	findNearestPointOnEllipse(x, y, xc, yc, rx, ry, xAxisRotation) {
 		// Вращение точки (x, y) в обратную сторону на xAxisRotation
 		const radians = (Math.PI / 180) * xAxisRotation; // Угол вращения в радианах
 		const cosAngle = Math.cos(radians);
@@ -1489,11 +1490,11 @@ class Utils {
 		return { x: finalX, y: finalY };
 	}
 
-	static normalizedAngle (startAngle)	{
+	normalizedAngle (startAngle)	{
 		return (startAngle < 0 ? startAngle + 2 * Math.PI : startAngle) % (2 * Math.PI);
     }
 
-	static findNearestPointOnPath(pathString, point) {
+	findNearestPointOnPath(pathString, point) {
 		const pathCommands = SVGPathCommander.normalizePath (pathString)
         let nearestPoint  = {}
 		let nearestPointOnCommand ={}
@@ -1607,7 +1608,7 @@ class Utils {
  		return nearestPoint
 	}
 
-	static parsePointsString(pointsArray, openPolygon=false, ind=0, int=2) {
+	parsePointsString(pointsArray, openPolygon=false, ind=0, int=2) {
 		var scale = 100;
 		let intend = ind > 0 ? int*=-1 : int;
 
@@ -1642,7 +1643,7 @@ class Utils {
 		}
 	}
 
-	static findParallelLine(x, y, x1, y1, x3, y3, L) {
+	findParallelLine(x, y, x1, y1, x3, y3, L) {
 		// Находим угловой коэффициент прямой через точки (x, y) и (x1, y1)
 		let slope;
 		if (x1 !== x) {
@@ -1679,7 +1680,7 @@ class Utils {
 		];
 	}
 
-	static findNearesPoint(event) {
+	findNearesPoint(event) {
 
         let coord = this.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
         let minDistance = Infinity
@@ -1728,7 +1729,7 @@ class Utils {
 		return searchResult  
     }
 
-	static addPointToPath =()=>{
+	addPointToPath =()=>{
 					
 		let updPath = SVGPathCommander.normalizePath (svgStore.selectedPointOnPath.path)
 		let targetCommand = svgStore.selectedPointOnPath.command;
@@ -1775,7 +1776,7 @@ class Utils {
 		return updPath.toString().replaceAll(',', ' ')	
 	}
 
-	static deletePoint () {
+	deletePoint () {
 		let searchResult = svgStore.selectedPointOnEdge	
 		let updPath = searchResult.path;
 		let commandIndex = searchResult.segIndex
@@ -1807,7 +1808,7 @@ class Utils {
 		return newPathData; 
    	}
 
-	static createFilletArc({nextSeg, point, prevSeg, cid, currentSeg, path}=svgStore.selectedPointOnEdge) {
+	createFilletArc({nextSeg, point, prevSeg, cid, currentSeg, path}=svgStore.selectedPointOnEdge) {
         if (!nextSeg || !point || !prevSeg || !currentSeg || !cid || !path) return
         const nextX = nextSeg[nextSeg.length-2];
         const nextY = nextSeg[nextSeg.length-1];
@@ -1896,7 +1897,7 @@ class Utils {
         return  updPath.toString().replaceAll(',', ' ')
     }
 
-	static pointMoving (e=false, coord=false) {
+	pointMoving (e=false, coord=false) {
 		if (!coord) coord = this.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);   
 		let searchResult = svgStore.selectedPointOnEdge
 		let updPath = searchResult.path
@@ -1961,7 +1962,7 @@ class Utils {
 		}
 	}
 
-	static createBoundsList () {
+	createBoundsList () {
 		let xcoords = new Set()
 		let ycoords = new Set()
 		let angles = new Set([0,45,135,315,30,60,120,150,210,240,270])
@@ -2001,7 +2002,7 @@ class Utils {
 	}
 
 
-	static checkGuides(coord) {
+	checkGuides(coord) {
 		//console.log ('checking guides')
 		if (svgStore.boundsList) {
 			let threshold = 1
@@ -2076,7 +2077,7 @@ class Utils {
 		}
 	}
 
-	static setGuidesPositionForPoint (e) {
+	setGuidesPositionForPoint (e) {
 	
 			const { aGuide, xGuide, yGuide, selectedPointOnEdge } = svgStore;
 			let x = selectedPointOnEdge.point.x;
@@ -2134,7 +2135,7 @@ class Utils {
 		svgStore.setPointInMove(false)
 	}
 
-	static selectEdge (event) {
+	selectEdge (event) {
         let coord = this.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
         let minDistance = Infinity
         let edgeSearchResult ={}
@@ -2160,7 +2161,7 @@ class Utils {
         return edgeSearchResult;
     }
 
-	static fakeBox (paths) {
+	fakeBox (paths) {
         var fakePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
         fakePath.setAttribute("d", paths);
         fakePath.setAttribute("id", 'fakePath');
@@ -2175,7 +2176,7 @@ class Utils {
         return stringBox
     }
 
-	static 	calculatePathPercentageOptimized(cid, x, y, step = 1) {
+		calculatePathPercentageOptimized(cid, x, y, step = 1) {
 		let closestLength = 0;
 		let minDistance = Infinity;
 		var fakePath = document.querySelector(`.contour[data-cid="${cid}"] path`);

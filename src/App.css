@@ -1785,6 +1785,11 @@ height: fit-content;}
   background-color: var(--darkBg);
 }
 
+.btn-shape-selected svg path,
+.btn-figure-selected svg path{
+  fill:aqua;
+  fill: #0d6efd;
+}
 
 
 /* DRAGGABLE WINDOWS  START */

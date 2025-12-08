@@ -1,7 +1,6 @@
 import { makeAutoObservable, computed } from "mobx";
 import { toJS } from "mobx";
 import Part from "./../scripts/part";
-//import CONSTANTS from "../../constants/constants";
 import Util from "./../scripts/util";
 
 class SvgStore {
@@ -17,11 +16,11 @@ class SvgStore {
 		"presetId": 0,
 		"presetName": "any_preset",
 		"positions": [
-			{
+			/*{
 				"part_id": 1,
 				"part_code_id": 1,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": 0, "f": 0 }
-			}
+			}*/
 		],
 		"part_code": [
 			{
@@ -592,8 +591,6 @@ class SvgStore {
 		Object.assign(this.gridState, val);
 	}
 
- 
-
 	setHighLighted(val) {
         this.highLighted = val;
     } 
@@ -625,11 +622,18 @@ class SvgStore {
 		current[lastKey] = newValue;
 	}
 
-
 	fitToPage() {
 		console.log("FIT TO PAGE");
 	}
+
+	addPosition ( position) {
+		this.svgData.positions.push( position )
+	}
 	
+	addForm ( form ) {
+		form.part_id = svgStore.svgData.part_code.length+1
+		this.svgData.part_code.push ( form )
+	}
 		
 }
 
