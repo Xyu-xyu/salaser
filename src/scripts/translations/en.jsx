@@ -342,6 +342,7 @@ const en = {
     "Add contour from shapes": "Add contour from shapes",
     "Position center": "Position center",
     "In the center": "In the center",
-    "Add contour": "Add contour"
+    "Add contour": "Add contour",
+    "Ooops, something is in cut 12301.ncp": "Ooops, something is in cut 12301.ncp"
 }
 export default en;

@@ -330,6 +330,7 @@ const zh = {
     "No material info": "无材料信息",
     "Object of type Response is not JSON serializable": "Response 类型的对象不可 JSON 序列化",
     "Position center": "位置中心",
-    "In the center": "在中心"
+    "In the center": "在中心",
+    "Ooops, something is in cut 12301.ncp": "哎呀，剪切 12301.ncp 中有东西"
 }
 export default zh;

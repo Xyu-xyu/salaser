@@ -8,7 +8,7 @@ import SvgComponent from './svgComponent.jsx';
 
 const SvgWrapper = observer(() => {
 	const { matrix, groupMatrix } = svgStore;
-
+	const wrapperRef = useRef(null);
 	const inMoveRef = useRef(false);                    // теперь boolean
 	const startOffset = useRef({ x: 0, y: 0 });
 
@@ -219,11 +219,34 @@ const SvgWrapper = observer(() => {
 
 	// =============== EFFECTS ===============
 	useEffect(() => {
-		const timer = setTimeout(() => {
+		/* const timer = setTimeout(() => {
 			svgStore.fitToPage();
-			coordsStore.setPreloader(false);
+			//coordsStore.setPreloader(false);
+			//		fitToPage();
 		}, 500);
-		return () => clearTimeout(timer);
+		return () => clearTimeout(timer);  */
+
+
+
+		const wrapper = wrapperRef.current;
+		if (!wrapper) return;
+
+		const handleTouchMove = (e) => {
+			TouchDrag(e);
+		};
+
+		const handleWheel = (e) => {
+			e.preventDefault(); // теперь можно!
+			handleMouseWheel(e);
+		};
+
+		wrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
+		wrapper.addEventListener('wheel', handleWheel, { passive: false });
+
+		return () => {
+			wrapper.removeEventListener('touchmove', handleTouchMove);
+			wrapper.removeEventListener('wheel', handleWheel);
+		};
 	}, []);
 
 	useEffect(() => {
@@ -271,27 +294,31 @@ const SvgWrapper = observer(() => {
 		}
 	}, [matrix.a]);
 
+	//svgStore.js или внутри компонента
+	//const fitToPage = () => {
+	//}
+
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
 			<div className="row align-items-center h-100">
 				<div className="w-100 h-100">
 					<div className="d-flex" id="editor_main_wrapper">
 						<div
+							ref={wrapperRef}
 							id="wrapper_svg"
 							className={wrapperClass}
 							style={{ touchAction: 'none' }} // обязательно!
 							
-							onWheel={handleMouseWheel}
+							//onWheel={handleMouseWheel}
 							onMouseDown={MouseStartDrag}
 							onMouseMove={MouseDrag}
 							onMouseUp={endDrag}
 							onMouseLeave={leave}
 
+							//onTouchMove={TouchDrag}
 							onTouchStart={TouchStart}
-							onTouchMove={TouchDrag}
 							onTouchEnd={handleTouchEnd}
 							onTouchCancel={handleTouchEnd}
-
 							onContextMenu={e => e.preventDefault()}
 						>
 							<SvgComponent />

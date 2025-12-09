@@ -105,8 +105,8 @@ const SvgComponent = observer (() => {
                                 id="dimensionalGrid"
                                 height={ svgData.height }
                                 width={ svgData.width }
-								x={0 /*rectParams.x*/}
-                                y={0 /*rectParams.y*/}
+								x={0}
+                                y={0}
                                 fill="url(#grid)"
                                 stroke='var(--color)'
                                 strokeWidth="0"

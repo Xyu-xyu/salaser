@@ -335,6 +335,7 @@ const ru = {
     "Object of type Response is not JSON serializable": "Объект типа Response не является сериализуемым в формате JSON.",
     "Position center": "Позиция центра",
     "Add contour from shapes": "Добавить контур из фигур",
-    "In the center": "В центре"
+    "In the center": "В центре",
+    "Ooops, something is in cut 12301.ncp": "Ой, что-то вырезано 12301.ncp"
 }
 export default ru;
