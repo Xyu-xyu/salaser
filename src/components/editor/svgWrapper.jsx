@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
+import { runInAction } from 'mobx';
 import coordsStore from './../../store/coordStore.jsx';
 import editorStore from './../../store/editorStore.jsx';
 import svgStore from './../../store/svgStore.jsx';
@@ -8,9 +9,18 @@ import SvgComponent from './svgComponent.jsx';
 
 const SvgWrapper = observer(() => {
 	const { matrix, groupMatrix } = svgStore;
+	const { mode } = editorStore;
 	const wrapperRef = useRef(null);
-	const inMoveRef = useRef(false);                    // теперь boolean
+	const inMoveRef = useRef(false);                   
 	const startOffset = useRef({ x: 0, y: 0 });
+
+	const dragState = useRef({
+		isDragging: false,
+		startX: 0,
+		startY: 0,
+		// Сохраняем начальные смещения всех выделенных деталей
+		initialMatrices: new Map(), // part_id → { e, f }
+	});
 
 	// Touch state
 	const evCache = useRef([]);                         // массив Touch
@@ -170,40 +180,79 @@ const SvgWrapper = observer(() => {
 
 	// =============== MOUSE DRAG ===============
 	const MouseStartDrag = (e) => {
-		if (e.button !== 0) return; // только левая кнопка
-		inMoveRef.current = true;
+		/*console.log ( 'MouseStartDrag' + e.button)
+		console.log ("Mouse is moving")
+		console.log ("editor.mode " + mode )
+		console.log ("inMoveRef.current  "+ inMoveRef.current)
+		console.log ("button   "+ e.button)*/
+		const selectedParts = svgStore.svgData.positions.filter(p => p.selected);
 
-		const pos = util.getMousePosition(e);
-		startOffset.current = {
-			x: pos.x - groupMatrix.e,
-			y: pos.y - groupMatrix.f,
-		};
+		if (e.button === 1) {// mid button
+			inMoveRef.current = true;
+			const pos = util.getMousePosition(e);
+			startOffset.current = {
+				x: pos.x - groupMatrix.e,
+				y: pos.y - groupMatrix.f,
+			};
+			editorStore.setMode('drag');
+		} else if (e.button === 0 && mode === "dragging") {
+			console.log ("starr moving form")
+			dragState.current.isDragging = true;
+			dragState.current.startX = e.clientX;
+			dragState.current.startY = e.clientY;
 
-		editorStore.setMode('drag');
+			// Сохраняем начальные позиции всех выделенных деталей
+			dragState.current.initialMatrices.clear();
+			selectedParts.forEach(part => {
+				dragState.current.initialMatrices.set(part.part_id, {
+					e: part.positions.e,
+					f: part.positions.f,
+				});
+			});
+
+		}; 		
 	};
 
 	const MouseDrag = (e) => {
-		if (!inMoveRef.current) return;
+		
+		if (e.button === 0 && inMoveRef.current) {
+			const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+			coordsStore.setCoords({
+				x: Math.round(svgCoord.x * 100) / 100,
+				y: Math.round(svgCoord.y * 100) / 100,
+				width: 500,
+				height: 500,
+			});
 
-		const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
-		coordsStore.setCoords({
-			x: Math.round(svgCoord.x * 100) / 100,
-			y: Math.round(svgCoord.y * 100) / 100,
-			width: 500,
-			height: 500,
-		});
+			const pos = util.getMousePosition(e);
+			const newE = pos.x - startOffset.current.x;
+			const newF = pos.y - startOffset.current.y;
 
-		const pos = util.getMousePosition(e);
-		const newE = pos.x - startOffset.current.x;
-		const newF = pos.y - startOffset.current.y;
+			svgStore.setGroupMatrix({
+				a: groupMatrix.a, b: groupMatrix.b,
+				c: groupMatrix.c, d: groupMatrix.d,
+				e: newE, f: newF,
+			});
 
-		svgStore.setGroupMatrix({
-			a: groupMatrix.a, b: groupMatrix.b,
-			c: groupMatrix.c, d: groupMatrix.d,
-			e: newE, f: newF,
-		});
+			//editorStore.setMode('dragging');
+		}	else if	(  mode === 'dragging')  {
+			console.log ("MouseDrag form" )
+			const dx = e.clientX - dragState.current.startX;
+			const dy = e.clientY - dragState.current.startY;
 
-		editorStore.setMode('dragging');
+			// Применяем смещение ко всем выделенным деталям
+			runInAction(() => {
+				svgStore.svgData.positions.forEach(part => {
+					if (part.selected) {
+						const initial = dragState.current.initialMatrices.get(part.part_id);
+						if (initial) {
+							part.positions.e = initial.e + dx;
+							part.positions.f = initial.f + dy;
+						}
+					}
+				});
+			});
+		}
 	};
 
 	const endDrag = () => {
@@ -211,10 +260,15 @@ const SvgWrapper = observer(() => {
 		if (editorStore.mode === 'dragging') {
 			editorStore.setMode('resize');
 		}
+		if (dragState.current.isDragging) {
+			dragState.current.isDragging = false;
+			dragState.current.initialMatrices.clear();
+			editorStore.setMode('resize');
+		}
 	};
 
 	const leave = () => {
-		coordsStore.setCoords({ x: 0, y: 0, width: 500, height: 500 });
+		endDrag()
 	};
 
 	// =============== EFFECTS ===============
@@ -294,9 +348,7 @@ const SvgWrapper = observer(() => {
 		}
 	}, [matrix.a]);
 
-	//svgStore.js или внутри компонента
-	//const fitToPage = () => {
-	//}
+
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">

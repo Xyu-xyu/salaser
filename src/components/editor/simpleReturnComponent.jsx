@@ -33,10 +33,11 @@ const SimpleReturnComponent = observer(() => {
 
 	}, []);
 
-	const setSelected = (e) => {
-		//console.log ("Button number   "+e.button)
+	const setSelected = (e, part_id) => {
+		console.log ( part_id )
+		svgStore.selectOnly ( part_id )
 		if (e.button === 0 && editorStore.mode === 'resize') {
-			let cid = Number(e.currentTarget.getAttribute('data-cid'));
+			/*let cid = Number(e.currentTarget.getAttribute('data-cid'));
 			if (typeof cid === 'number') {
 				if (cid !== selectedCid) {
 					svgStore.setContourSelected(cid)
@@ -49,12 +50,12 @@ const SimpleReturnComponent = observer(() => {
 						//console.log ('setSelected and start in mode  ' + editorStore.inlrtMode)						
 					}
 				}
-			}
+			}*/
 		} else if (e.button === 0 && editorStore.mode === 'text') {
 
 			//console.log ('пиу пиу')
 
-			if (e.currentTarget.classList.contains('skeletonText')) {
+			/*if (e.currentTarget.classList.contains('skeletonText')) {
 				let cid = Number(e.currentTarget.getAttribute('data-cid'));
 				if (typeof cid === 'number') {
 					svgStore.setTextFocus(false)
@@ -69,7 +70,7 @@ const SimpleReturnComponent = observer(() => {
 				let coords = { x: e.clientX, y: e.clientY }
 				svgStore.addTextElement(coords)
 				svgStore.setTextFocus(true)
-			}
+			}*/
 		}
 	}
 
@@ -101,10 +102,11 @@ const SimpleReturnComponent = observer(() => {
 							<g
 								key={element.cid}
 								data-cid={element.cid}
-								className={element.class}
-								onMouseDown={setSelected}
-								onMouseUp={detectCanMove}
-								fill={element.class.includes("inner") ? "url(#grid)" : "red"}
+								className={element.class +`${pos.selected ? " selected " : " " }` }
+								onMouseDown={ (e) =>setSelected(e, pos.part_id)}
+								onMouseMove={ () => editorStore.setMode ('dragging')}
+								onMouseUp={ editorStore.setMode ('resize')}
+								fill={ element.class.includes("inner") ? "url(#grid)" :"red"}
 							>
 								<path d={element.path} />
 							</g>

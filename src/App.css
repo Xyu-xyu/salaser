@@ -2097,10 +2097,15 @@ g.macro2 {
 }
 
 g.outer {
-    fill:aqua;
     fill:#fd7e14;
     opacity:0.7;
     filter: brightness(1.1);
+}
+
+g.outer.selected {
+  fill:aqua;
+   opacity:0.7;
+  filter: brightness(1.1);
 }
 
 g.outlet,
@@ -2204,3 +2209,4 @@ top:var(--hEdge);
   background-color: orangered ;
 }
 /*         конец          */
+

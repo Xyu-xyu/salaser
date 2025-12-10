@@ -1,4 +1,4 @@
-import { makeAutoObservable, computed } from "mobx";
+import { makeAutoObservable, computed, runInAction } from "mobx";
 import { toJS } from "mobx";
 import Part from "./../scripts/part";
 import Util from "./../scripts/util";
@@ -23,7 +23,7 @@ class SvgStore {
 			}*/
 		],
 		"part_code": [
-			{
+			/*{
 				"id": 1,
 				"uuid": "n2-d0170e56-3c47-411e-84de-813bb41a7245",
 				"name": "12___10__2",
@@ -51,7 +51,7 @@ class SvgStore {
 					}
 
 				]
-			}
+			}*/
 			
 		]
 	}
@@ -105,6 +105,17 @@ class SvgStore {
 			inners: computed,
 
         });
+    }
+
+	get nextPartId() {
+        const positions = this.svgData.positions;
+        if (!positions || positions.length === 0) {
+            return 1;
+        }
+
+        // Находим максимальный part_id
+        const maxId = Math.max(...positions.map(p => p.part_id || 0));
+        return maxId + 1;
     }
 
 	get selectedText () {
@@ -634,6 +645,14 @@ class SvgStore {
 		form.part_id = svgStore.svgData.part_code.length+1
 		this.svgData.part_code.push ( form )
 	}
+
+	selectOnly = (partId) => {
+		runInAction(() => {
+			this.svgData.positions.forEach(pos => {
+				pos.selected = pos.part_id === partId;
+			});
+		});
+	};
 		
 }
 

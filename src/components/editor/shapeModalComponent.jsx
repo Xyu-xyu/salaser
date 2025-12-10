@@ -19,8 +19,8 @@ const ShapeModalComponent =observer(()=> {
 	const [selected, setSelected] = useState(0)
 	const [partXPosition,setPartXPosition ] = useState(0)
 	const [partYPosition,setPartYPosition ] = useState(0)
-	const [partWidth,setPartWidth ] = useState(50)
-	const [partHeight,setPartHeight ] = useState(50)
+	const [partWidth,setPartWidth ] = useState(150)
+	const [partHeight,setPartHeight ] = useState(150)
 	const [partCenterXPosition, setPartCenterXPosition] = useState(true)
 	const [partCenterYPosition, setPartCenterYPosition] = useState(true)
 
@@ -56,6 +56,7 @@ const ShapeModalComponent =observer(()=> {
         if (!d || !d.length) return;
         
 		let uuid = util.uuid()
+		let id = svgStore.nextPartId
 
 		svgStore.addForm (
 			{
@@ -76,8 +77,9 @@ const ShapeModalComponent =observer(()=> {
 
 		svgStore.addPosition (
 			{
-				"part_id": 1,
+				"part_id": id,
 				"part_code_id": uuid,
+				"selected":false,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": translateX, "f": translateY}
 			}
 		)
