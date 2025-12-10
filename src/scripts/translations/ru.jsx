@@ -343,6 +343,7 @@ const ru = {
     "amount": "кол-во",
     "action": "действие",
     "Part": "Деталь",
-    "Do you want to delete all parts of this type?": "Вы хотите удалить все детали этого типа?"
+    "Do you want to delete all parts of this type?": "Вы хотите удалить все детали этого типа?",
+    "Parts on sheet": "Детали на листе"
 }
 export default ru;

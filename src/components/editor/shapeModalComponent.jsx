@@ -55,10 +55,10 @@ const ShapeModalComponent =observer(()=> {
 
         if (!d || !d.length) return;
         
-		let uuid = util.uuid()
-		let id = svgStore.nextPartId
+		//let uuid = util.uuid()
+		//let id = svgStore.nextPartId
 
-		svgStore.addForm (
+/* 		svgStore.addForm (
 			{
 				"id": uuid,
 				"uuid": uuid,
@@ -82,7 +82,70 @@ const ShapeModalComponent =observer(()=> {
 				"selected":false,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": translateX, "f": translateY}
 			}
-		)
+		) */
+
+		const findExistingFormByCode = (codeArray) => {
+			return svgStore.svgData.part_code.length && svgStore.svgData.part_code.find(form => {
+			  if (!form.code || form.code.length !== codeArray.length) return false;
+		  
+			  return form.code.every((existingContour, i) => {
+				const newContour = codeArray[i];
+				return existingContour.path === newContour.path &&        // главное — путь
+					   existingContour.class === newContour.class &&      // можно добавить, если важно
+					   existingContour.cid === newContour.cid;            // опционально
+			  });
+			});
+		  };
+		  
+		  // === ТВОЙ КОД С ПРОВЕРКОЙ ===
+		  
+		  // 1. Сначала ищем — вдруг такая форма уже есть
+		  let existingForm = findExistingFormByCode([
+			{
+			  cid: 1,
+			  class: "contour outer macro0 closed1",
+			  path: transformed,
+			  stroke: "red",
+			  strokeWidth: 0.2
+			}
+		  ]);
+		  
+		  let uuid;
+		  
+		  if (existingForm) {
+			// Форма уже существует — используем её uuid!
+			uuid = existingForm.uuid;
+			console.log("Форма уже существует, используем uuid:", uuid);
+		  } else {
+			// Создаём новую форму с новым uuid
+			uuid = util.uuid();
+			const id = svgStore.nextPartId;
+		  
+			svgStore.addForm({
+			  id: uuid,
+			  uuid: uuid,
+			  name: "12___10__2", // можно тоже генерить по code, если хочешь
+			  code: [
+				{
+				  cid: 1,
+				  class: "contour outer macro0 closed1",
+				  path: transformed,
+				  stroke: "red",
+				  strokeWidth: 0.2
+				}
+			  ]
+			});
+		  
+			console.log("Создана новая форма с uuid:", uuid);
+		  }
+		  
+		  // В любом случае — добавляем позицию с правильным part_code_id
+		  svgStore.addPosition({
+			part_id: svgStore.nextPartId, // или как у тебя правильно
+			part_code_id: uuid,           // вот здесь критично — правильный uuid!
+			selected: false,
+			positions: { a: 1, b: 0, c: 0, d: 1, e: translateX, f: translateY }
+		  });
 	}
 
 	return (

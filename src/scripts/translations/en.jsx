@@ -351,6 +351,7 @@ const en = {
     "part_code": "part code",
     "amount": "amount",
     "Part": "Part",
-    "Do you want to delete all parts of this type?": "Do you want to delete all parts of this type?"
+    "Do you want to delete all parts of this type?": "Do you want to delete all parts of this type?",
+    "Parts on sheet": "Parts on sheet"
 }
 export default en;

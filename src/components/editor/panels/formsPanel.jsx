@@ -94,16 +94,16 @@ const FormsPanel = observer(() => {
 
 									return (
 										<tr key={index}>
-											<td className="header" scope="col">
+											<td className="header align-middle" scope="col">
 												{Number(index + 1)}
 											</td>
-											<td className="header longText longText5" scope="col">
+											<td className="header longText longText5 align-middle" scope="col">
 												Part_{Number(index + 1)}
 											</td>
-											<td className="header longText" scope="col">
+											<td className="header longText align-middle" scope="col">
 												{a.uuid}
 											</td>
-											<td className="header" scope="col">
+											<td className="header align-middle" scope="col">
 												{
 													svgStore.svgData.positions.filter(pos => pos.part_code_id === a.uuid).length
 												}
@@ -125,43 +125,63 @@ const FormsPanel = observer(() => {
 												</svg>
 											</td>
 											<td className="header" scope="col">
-												<div className='d-flex'>
-													<button
-														className={`white_button navbar_button small_button40 me-2`} 
-														onPointerDown={ () => {add ( a.uuid, 0, 0)}}>
-														<div className="d-flex align-items-center justify-content-center">
-															<CustomIcon icon="plus"
+												<div className='d-flex align-items-center justify-content-center'>												
+													<div className='d-flex'>
+														<button
+															className={`white_button navbar_button small_button40 me-2`} 
+															onPointerDown={ () => {add ( a.uuid, 0, 0)}}>
+															<div className="d-flex align-items-center justify-content-center">
+																<CustomIcon icon="plus"
+																	width="24"
+																	height="24"
+																	fill='var(--violet)'
+																	color="none"
+																	viewBox="0 0 24 24"
+																/>
+															</div>
+														</button>
+														<button
+															className={`white_button navbar_button small_button40 me-2`} 
+															onPointerDown={() => { deleteAll (a.uuid)}}>
+															<div className="d-flex align-items-center justify-content-center">
+															<CustomIcon
+																icon="ic:twotone-delete-outline"
 																width="24"
 																height="24"
 																fill='var(--violet)'
-																color="none"
-																viewBox="0 0 24 24"
+																strokeWidth={0}
 															/>
-														</div>
-													</button>
-													<button
-														className={`white_button navbar_button small_button40`} 
-														onPointerDown={() => { deleteAll (a.uuid)}}>
-														<div className="d-flex align-items-center justify-content-center">
-														<CustomIcon
-															icon="ic:twotone-delete-outline"
-															width="24"
-															height="24"
-															fill='var(--violet)'
-															strokeWidth={0}
-														/>
-														</div>
-													</button>
+															</div>
+														</button>
+														<button
+															className={`white_button navbar_button small_button40 me-2`} 
+															onPointerDown={() => {}}>
+															<div className="d-flex align-items-center justify-content-center">
+															<CustomIcon 
+																icon="bytesize:edit"
+																width="24"
+																height="24"
+																color="var(--violet)"
+																viewBox="0 0 32 32"
+																strokeWidth={2}
+															/>
+															</div>
+														</button>
+													</div>
 												</div>
 											</td>
 										</tr>
 									)
 								})
 							}
+							<tr>
+								<td colSpan={3}>{t("Parts on sheet")}: </td>
+								<td>{ svgStore.svgData.positions.length }</td>
+								<td></td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
-
 			</div>
 		),
 	}

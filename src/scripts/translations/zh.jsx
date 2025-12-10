@@ -338,6 +338,7 @@ const zh = {
     "action": "action",
     "amount": "amount",
     "Part": "部分",
-    "Do you want to delete all parts of this type?": "您想删除该类型的所有部分吗？"
+    "Do you want to delete all parts of this type?": "您想删除该类型的所有部分吗？",
+    "Parts on sheet": "板材上的零件"
 }
 export default zh;
