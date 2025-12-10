@@ -653,6 +653,23 @@ class SvgStore {
 			});
 		});
 	};
+
+	deselect = (id = false) => {
+		runInAction(() => {
+			if (id === false || id === null || id === undefined) {
+				// Снимаем выделение со ВСЕХ деталей
+				this.svgData.positions.forEach(part => {
+					part.selected = false;
+				});
+			} else {
+				// Снимаем выделение только с конкретной детали
+				const part = this.svgData.positions.find(p => p.part_id === id);
+				if (part) {
+					part.selected = false;
+				}
+			}
+		});
+	};
 		
 }
 

@@ -105,11 +105,8 @@ const SvgWrapper = observer(() => {
 			}
 
 		} else if (editorStore.mode === "dragging") {
-			console.log ("1111")
 			const selected = svgStore.svgData.positions.filter(p => p.selected);
 			if (selected.length === 0) return;
-
-			// Ключевое: сохраняем позицию мыши в координатах SVG!
 			const touch = e.touches[0]
 			const startSvg = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
 
@@ -135,7 +132,7 @@ const SvgWrapper = observer(() => {
 		//e.preventDefault(); // обязательно!
 		const touches = e.touches;
 		evCache.current = Array.from(touches);
-		console.log ("TouchStart mode: " + editorStore.mode)
+		///console.log ("TouchStart mode: " + editorStore.mode)
 		
 
 		if (editorStore.mode === "resize") {
@@ -144,13 +141,13 @@ const SvgWrapper = observer(() => {
 
 				const touch = touches[0];
 				// Курсор
-				const svgCoord = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
+				/* const svgCoord = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
 				coordsStore.setCoords({
 					x: Math.round(svgCoord.x * 100) / 100,
 					y: Math.round(svgCoord.y * 100) / 100,
 					width: 500,
 					height: 500,
-				});
+				}); */
 
 				// Драг
 				const pos = util.getMousePosition(touch);
@@ -182,21 +179,19 @@ const SvgWrapper = observer(() => {
 			}
 		} else if (editorStore.mode === "dragging") {
 
-			console.log ("22222")
 			const touch = e.touches[0]
-			const svgCoord = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
+			/* const svgCoord = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
 			coordsStore.setCoords({
 				x: Math.round(svgCoord.x * 100) / 100,
 				y: Math.round(svgCoord.y * 100) / 100,
 				width: 500,
 				height: 500,
-			});
+			}); */
 
 			if (!dragState.current.isDragging) return;
 
 			// Текущая позиция мыши в координатах SVG
 			const currentSvg = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
-
 			const dx = currentSvg.x - dragState.current.startSvgX;
 			const dy = currentSvg.y - dragState.current.startSvgY;
 
@@ -218,25 +213,21 @@ const SvgWrapper = observer(() => {
 
 	const handleTouchEnd = (e) => {
 		// Удаляем ушедшие пальцы
-		console.log ("33333")
-
-		for (let i = 0; i < e.changedTouches.length; i++) {
+ 		for (let i = 0; i < e.changedTouches.length; i++) {
 			const idx = evCache.current.findIndex(t => t.identifier === e.changedTouches[i].identifier);
 			if (idx >= 0) evCache.current.splice(idx, 1);
 		}
 
 		// Если пальцев не осталось
-		if (e.touches.length === 0 || true) {
-			if (inMoveRef.current || true) {
+		if (/*e.touches.length === 0 ||*/ true) {
+			if (/*inMoveRef.current ||*/ true) {
 				endDrag();
 			} 
 			inMoveRef.current = false;
 			prevDiff.current = -1;
 			evCache.current = [];
 		}
-
 		editorStore.setMode('resize');
-
 	};
 
 	// =============== MOUSE DRAG ===============
@@ -276,13 +267,13 @@ const SvgWrapper = observer(() => {
 	const MouseDrag = (e) => {
 
 		if (e.button === 0 && inMoveRef.current) {
-			const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+			/* const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
 			coordsStore.setCoords({
 				x: Math.round(svgCoord.x * 100) / 100,
 				y: Math.round(svgCoord.y * 100) / 100,
 				width: 500,
 				height: 500,
-			});
+			}); */
 
 			const pos = util.getMousePosition(e);
 			const newE = pos.x - startOffset.current.x;
@@ -295,14 +286,14 @@ const SvgWrapper = observer(() => {
 			});
 
 		} else if (editorStore.mode === 'dragging') {
-			console.log("MouseDrag form")
-			const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+			//console.log("MouseDrag form")
+/* 			const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
 			coordsStore.setCoords({
 				x: Math.round(svgCoord.x * 100) / 100,
 				y: Math.round(svgCoord.y * 100) / 100,
 				width: 500,
 				height: 500,
-			});
+			}); */
 
 			if (!dragState.current.isDragging) return;
 
@@ -328,9 +319,10 @@ const SvgWrapper = observer(() => {
 
 	const endDrag = () => {
 		inMoveRef.current = false;
-		console.log ("END DRAG")
+		//console.log ("END DRAG")
 		if (editorStore.mode === 'dragging') {
 			editorStore.setMode('resize');
+			svgStore.deselect()
 		}
 		if (dragState.current.isDragging) {
 			dragState.current.isDragging = false;
@@ -351,8 +343,6 @@ const SvgWrapper = observer(() => {
 			//		fitToPage();
 		}, 500);
 		return () => clearTimeout(timer);  */
-
-
 
 		const wrapper = wrapperRef.current;
 		if (!wrapper) return;
@@ -419,7 +409,6 @@ const SvgWrapper = observer(() => {
 			svgStore.setVal("gridState", ["grid", "visibility"], "visible");
 		}
 	}, [matrix.a]);
-
 
 
 	return (
