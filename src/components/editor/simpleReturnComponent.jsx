@@ -105,7 +105,11 @@ const SimpleReturnComponent = observer(() => {
 								className={element.class +`${pos.selected ? " selected " : " " }` }
 								onMouseDown={ (e) =>setSelected(e, pos.part_id)}
 								onMouseMove={ () => editorStore.setMode ('dragging')}
-								onMouseUp={ editorStore.setMode ('resize')}
+								//onMouseUp={ editorStore.setMode ('resize')}
+								onTouchStart={ (e) =>{
+									setSelected(e, pos.part_id)
+									editorStore.setMode ('dragging')
+								}}
 								fill={ element.class.includes("inner") ? "url(#grid)" :"red"}
 							>
 								<path d={element.path} />

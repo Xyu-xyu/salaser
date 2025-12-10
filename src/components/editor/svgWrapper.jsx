@@ -9,16 +9,14 @@ import SvgComponent from './svgComponent.jsx';
 
 const SvgWrapper = observer(() => {
 	const { matrix, groupMatrix } = svgStore;
-	const { mode } = editorStore;
-	const wrapperRef = useRef(null);
-	const inMoveRef = useRef(false);                   
+ 	const wrapperRef = useRef(null);
+	const inMoveRef = useRef(false);
 	const startOffset = useRef({ x: 0, y: 0 });
 
 	const dragState = useRef({
 		isDragging: false,
 		startX: 0,
 		startY: 0,
-		// Сохраняем начальные смещения всех выделенных деталей
 		initialMatrices: new Map(), // part_id → { e, f }
 	});
 
@@ -88,35 +86,104 @@ const SvgWrapper = observer(() => {
 
 	// =============== TOUCH HANDLERS ===============
 	const TouchStart = (e) => {
-		const touches = e.touches;
-		evCache.current = Array.from(touches);
 
-		if (inMoveRef.current) return;
+		if (editorStore.mode === "resize") {
 
-		if (touches.length === 1) {
-			inMoveRef.current = true;
-			const touch = touches[0];
-			const pos = util.getMousePosition(touch);
+			const touches = e.touches;
+			evCache.current = Array.from(touches);
 
-			startOffset.current = {
-				x: pos.x - groupMatrix.e,
-				y: pos.y - groupMatrix.f,
+			if (inMoveRef.current) return;
+			if (touches.length === 1) {
+				inMoveRef.current = true;
+				const touch = touches[0];
+				const pos = util.getMousePosition(touch);
+
+				startOffset.current = {
+					x: pos.x - groupMatrix.e,
+					y: pos.y - groupMatrix.f,
+				};
+			}
+
+		} else if (editorStore.mode === "dragging") {
+			console.log ("1111")
+			const selected = svgStore.svgData.positions.filter(p => p.selected);
+			if (selected.length === 0) return;
+
+			// Ключевое: сохраняем позицию мыши в координатах SVG!
+			const touch = e.touches[0]
+			const startSvg = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
+
+			dragState.current = {
+				isDragging: true,
+				startSvgX: startSvg.x,
+				startSvgY: startSvg.y,
+				initialMatrices: new Map(
+					selected.map(part => [
+						part.part_id,
+						{ e: part.positions.e, f: part.positions.f }
+					])
+				)
 			};
+			e.stopPropagation();
+			e.preventDefault()			
+
 		}
-		// если сразу 2 пальца — ничего не делаем, ждём TouchDrag
+
 	};
 
 	const TouchDrag = (e) => {
-		e.preventDefault(); // обязательно!
-
+		//e.preventDefault(); // обязательно!
 		const touches = e.touches;
 		evCache.current = Array.from(touches);
+		console.log ("TouchStart mode: " + editorStore.mode)
+		
 
-		// 1 палец → pan
-		if (touches.length === 1 && inMoveRef.current) {
-			const touch = touches[0];
+		if (editorStore.mode === "resize") {
 
-			// Курсор
+			if (touches.length === 1 && inMoveRef.current) {
+
+				const touch = touches[0];
+				// Курсор
+				const svgCoord = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
+				coordsStore.setCoords({
+					x: Math.round(svgCoord.x * 100) / 100,
+					y: Math.round(svgCoord.y * 100) / 100,
+					width: 500,
+					height: 500,
+				});
+
+				// Драг
+				const pos = util.getMousePosition(touch);
+				const newE = pos.x - startOffset.current.x;
+				const newF = pos.y - startOffset.current.y;
+
+				svgStore.setGroupMatrix({
+					a: groupMatrix.a, b: groupMatrix.b,
+					c: groupMatrix.c, d: groupMatrix.d,
+					e: newE, f: newF,
+				});
+
+			}	else if (touches.length === 2) {
+
+				inMoveRef.current = true;
+				const t1 = touches[0];
+				const t2 = touches[1];
+				const curDiff = getDistance(t1, t2);
+
+				if (prevDiff.current > 0) {
+					const scale = curDiff / prevDiff.current;
+					const centerX = (t1.clientX + t2.clientX) / 2;
+					const centerY = (t1.clientY + t2.clientY) / 2;
+
+					touchZoom(scale, centerX, centerY);
+				}
+
+				prevDiff.current = curDiff;
+			}
+		} else if (editorStore.mode === "dragging") {
+
+			console.log ("22222")
+			const touch = e.touches[0]
 			const svgCoord = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
 			coordsStore.setCoords({
 				x: Math.round(svgCoord.x * 100) / 100,
@@ -125,67 +192,56 @@ const SvgWrapper = observer(() => {
 				height: 500,
 			});
 
-			// Драг
-			const pos = util.getMousePosition(touch);
-			const newE = pos.x - startOffset.current.x;
-			const newF = pos.y - startOffset.current.y;
+			if (!dragState.current.isDragging) return;
 
-			svgStore.setGroupMatrix({
-				a: groupMatrix.a, b: groupMatrix.b,
-				c: groupMatrix.c, d: groupMatrix.d,
-				e: newE, f: newF,
+			// Текущая позиция мыши в координатах SVG
+			const currentSvg = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
+
+			const dx = currentSvg.x - dragState.current.startSvgX;
+			const dy = currentSvg.y - dragState.current.startSvgY;
+
+			runInAction(() => {
+				svgStore.svgData.positions.forEach(part => {
+					if (part.selected) {
+						const initial = dragState.current.initialMatrices.get(part.part_id);
+						if (initial) {
+							part.positions.e = initial.e + dx;
+							part.positions.f = initial.f + dy;
+						}
+					}
+				});
 			});
 
-			editorStore.setMode('dragging');
 		}
 
-		// 2 пальца → zoom
-		else if (touches.length === 2) {
-			inMoveRef.current = true;
-
-			const t1 = touches[0];
-			const t2 = touches[1];
-			const curDiff = getDistance(t1, t2);
-
-			if (prevDiff.current > 0) {
-				const scale = curDiff / prevDiff.current;
-				const centerX = (t1.clientX + t2.clientX) / 2;
-				const centerY = (t1.clientY + t2.clientY) / 2;
-
-				touchZoom(scale, centerX, centerY);
-			}
-
-			prevDiff.current = curDiff;
-		}
-	};
+	}
 
 	const handleTouchEnd = (e) => {
 		// Удаляем ушедшие пальцы
+		console.log ("33333")
+
 		for (let i = 0; i < e.changedTouches.length; i++) {
 			const idx = evCache.current.findIndex(t => t.identifier === e.changedTouches[i].identifier);
 			if (idx >= 0) evCache.current.splice(idx, 1);
 		}
 
 		// Если пальцев не осталось
-		if (e.touches.length === 0) {
-			if (inMoveRef.current) {
+		if (e.touches.length === 0 || true) {
+			if (inMoveRef.current || true) {
 				endDrag();
-			}
+			} 
 			inMoveRef.current = false;
 			prevDiff.current = -1;
 			evCache.current = [];
 		}
-		// Если остался один — драг продолжится в следующем TouchDrag
+
+		editorStore.setMode('resize');
+
 	};
 
 	// =============== MOUSE DRAG ===============
 	const MouseStartDrag = (e) => {
-		/*console.log ( 'MouseStartDrag' + e.button)
-		console.log ("Mouse is moving")
-		console.log ("editor.mode " + mode )
-		console.log ("inMoveRef.current  "+ inMoveRef.current)
-		console.log ("button   "+ e.button)*/
- 
+
 		if (e.button === 1) {// mid button
 			inMoveRef.current = true;
 			const pos = util.getMousePosition(e);
@@ -193,11 +249,10 @@ const SvgWrapper = observer(() => {
 				x: pos.x - groupMatrix.e,
 				y: pos.y - groupMatrix.f,
 			};
-			editorStore.setMode('drag');
-		} else if (e.button === 0 && mode === "dragging") {
-			console.log ("starr moving form")
+			//editorStore.setMode('drag');
+		} else if (e.button === 0 && editorStore.mode === "dragging") {
 			const selected = svgStore.svgData.positions.filter(p => p.selected);
-    		if (selected.length === 0) return;
+			if (selected.length === 0) return;
 
 			// Ключевое: сохраняем позицию мыши в координатах SVG!
 			const startSvg = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
@@ -213,15 +268,13 @@ const SvgWrapper = observer(() => {
 					])
 				)
 			};
-
-			editorStore.setMode('dragging');
 			e.stopPropagation();
 		};
-			
+
 	};
 
 	const MouseDrag = (e) => {
-		
+
 		if (e.button === 0 && inMoveRef.current) {
 			const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
 			coordsStore.setCoords({
@@ -241,9 +294,8 @@ const SvgWrapper = observer(() => {
 				e: newE, f: newF,
 			});
 
-			//editorStore.setMode('dragging');
-		}	else if	(  mode === 'dragging')  {
-			console.log ("MouseDrag form" )
+		} else if (editorStore.mode === 'dragging') {
+			console.log("MouseDrag form")
 			const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
 			coordsStore.setCoords({
 				x: Math.round(svgCoord.x * 100) / 100,
@@ -251,15 +303,15 @@ const SvgWrapper = observer(() => {
 				width: 500,
 				height: 500,
 			});
-		
+
 			if (!dragState.current.isDragging) return;
-		
+
 			// Текущая позиция мыши в координатах SVG
 			const currentSvg = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
-		
+
 			const dx = currentSvg.x - dragState.current.startSvgX;
 			const dy = currentSvg.y - dragState.current.startSvgY;
-		
+
 			runInAction(() => {
 				svgStore.svgData.positions.forEach(part => {
 					if (part.selected) {
@@ -270,12 +322,13 @@ const SvgWrapper = observer(() => {
 						}
 					}
 				});
-			});			 
+			});
 		}
 	};
 
 	const endDrag = () => {
 		inMoveRef.current = false;
+		console.log ("END DRAG")
 		if (editorStore.mode === 'dragging') {
 			editorStore.setMode('resize');
 		}
@@ -379,7 +432,7 @@ const SvgWrapper = observer(() => {
 							id="wrapper_svg"
 							className={wrapperClass}
 							style={{ touchAction: 'none' }} // обязательно!
-							
+
 							//onWheel={handleMouseWheel}
 							onMouseDown={MouseStartDrag}
 							onMouseMove={MouseDrag}

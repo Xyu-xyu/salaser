@@ -21,6 +21,7 @@ class EditorStore {
   }
 
   setMode = (newMode )=> {
+    console.log ("WE SET NEW MODE :" + newMode)
     this.mode = newMode;
   };
 
