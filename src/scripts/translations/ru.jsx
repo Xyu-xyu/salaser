@@ -336,6 +336,13 @@ const ru = {
     "Position center": "Позиция центра",
     "Add contour from shapes": "Добавить контур из фигур",
     "In the center": "В центре",
-    "Ooops, something is in cut 12301.ncp": "Ой, что-то вырезано 12301.ncp"
+    "Ooops, something is in cut 12301.ncp": "Ой, что-то вырезано 12301.ncp",
+    "Contour": "Контур",
+    "pic": "картинка",
+    "part_code": "код детали",
+    "amount": "кол-во",
+    "action": "действие",
+    "Part": "Деталь",
+    "Do you want to delete all parts of this type?": "Вы хотите удалить все детали этого типа?"
 }
 export default ru;

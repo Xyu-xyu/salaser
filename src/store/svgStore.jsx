@@ -638,7 +638,7 @@ class SvgStore {
 	}
 
 	addPosition ( position) {
-		this.svgData.positions.push( position )
+		this.svgData.positions = [...this.svgData.positions, position]
 	}
 	
 	addForm ( form ) {
@@ -668,6 +668,19 @@ class SvgStore {
 					part.selected = false;
 				}
 			}
+		});
+	};
+
+	deleteAll = (uuid) => {
+		if (!uuid) {
+			console.warn('deleteAll: uuid не передан');
+			return;
+		}
+	
+		runInAction(() => {
+			svgStore.svgData.positions = svgStore.svgData.positions.filter(
+				(part) => part.part_code_id !== uuid
+			);
 		});
 	};
 		

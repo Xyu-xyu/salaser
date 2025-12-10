@@ -27,7 +27,7 @@
   --grey-button: rgb(249, 223, 226);
   --grey-button-bottom: rgb(231, 231, 233);
   --grey-nav: rgb(223, 223, 226 );
-  --color: #ffffff;        
+  --color: black;        
   --transColor:none;
   --gridColorStroke:#FFFFFF;;
   --knobMainText: rgba(0, 0, 0, 0.8);
@@ -1808,7 +1808,6 @@ height: fit-content;}
 .window-content table tr td {
  color: var(--color);
  height: calc(100% - 45px);;
- font-family: 'Agency FB Cyrillic';  
  border-right:0.2px solid var(--paleColor);
  border-left:0.2px solid var(--paleColor);
  background-color: var(--mainBg) !important;
@@ -2210,3 +2209,25 @@ top:var(--hEdge);
 }
 /*         конец          */
 
+#partListContainer tr td.longText{
+  max-width: 6rem !important; /* Максимальная ширина ячейки */
+  white-space: nowrap !important; /* Текст не переносится на новую строку */
+  overflow: hidden !important; /* Скрывает текст, который выходит за границы ячейки */
+  text-overflow: ellipsis !important; /* Добавляет многоточие в конец обрезанного текста */
+}
+
+#partListContainer tr td.longText5 {
+  max-width: 5rem !important; /* Максимальная ширина ячейки */ 
+}
+
+.header {
+  position: sticky;
+  top: 0;
+}
+
+.containerTable {
+  width: 100%;
+  height: 900px;
+  overflow-x:hidden;
+  overflow-y:auto ;
+}

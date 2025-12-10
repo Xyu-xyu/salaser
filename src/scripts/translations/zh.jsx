@@ -331,6 +331,13 @@ const zh = {
     "Object of type Response is not JSON serializable": "Response 类型的对象不可 JSON 序列化",
     "Position center": "位置中心",
     "In the center": "在中心",
-    "Ooops, something is in cut 12301.ncp": "哎呀，剪切 12301.ncp 中有东西"
+    "Ooops, something is in cut 12301.ncp": "哎呀，剪切 12301.ncp 中有东西",
+    "Contour": "轮廓",
+    "part_code": "零件代码",
+    "pic": "图片",
+    "action": "action",
+    "amount": "amount",
+    "Part": "部分",
+    "Do you want to delete all parts of this type?": "您想删除该类型的所有部分吗？"
 }
 export default zh;

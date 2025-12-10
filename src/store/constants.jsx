@@ -159,6 +159,15 @@ const constants = {
 				height: 120,
 			}
 		},
+		formsPopup: {
+			mini: true,
+			style: {
+				top: 360,
+				left: 12,
+				width: 350,
+				height: 120,
+			}
+		},
     },
 	
 

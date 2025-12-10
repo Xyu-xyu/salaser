@@ -343,6 +343,14 @@ const en = {
     "Position center": "Position center",
     "In the center": "In the center",
     "Add contour": "Add contour",
-    "Ooops, something is in cut 12301.ncp": "Ooops, something is in cut 12301.ncp"
+    "Ooops, something is in cut 12301.ncp": "Ooops, something is in cut 12301.ncp",
+    "Contour": "Contour",
+    "id": "id",
+    "action": "action",
+    "pic": "pic",
+    "part_code": "part code",
+    "amount": "amount",
+    "Part": "Part",
+    "Do you want to delete all parts of this type?": "Do you want to delete all parts of this type?"
 }
 export default en;

@@ -353,7 +353,7 @@ class Utils {
 		}
 	}
 
-	getLargeArcFlag(currentX, currentY, x, y, i, j, is_ccw) {
+/* 	getLargeArcFlag(currentX, currentY, x, y, i, j, is_ccw) {
 		const cp = {
 			x: currentX + i,
 			y: currentY + j
@@ -386,7 +386,7 @@ class Utils {
 		}
 		return (eang * 180) / Math.PI - (sang * 180) / Math.PI <= 180 ? 0 : 1;
 	}
-
+ */
  	convertScreenCoordsToSvgCoords(x, y) {
 		var svg = document.getElementById("svg")
 		var group = document.getElementById("group");
@@ -650,7 +650,7 @@ class Utils {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-	convertScreenCoordsToSvgCoords(x, y) {
+/* 	convertScreenCoordsToSvgCoords(x, y) {
 		var svg = document.getElementById("svg")
 		var group = document.getElementById("group");
 		var pt = svg.createSVGPoint();  // An SVGPoint SVG DOM object
@@ -663,7 +663,7 @@ class Utils {
 		} catch (e) {
 			return false
 		}
-	}
+	} */
 	 
 	getMousePosition = (evt) => {
 		var svg = document.getElementById("svg")
@@ -707,7 +707,7 @@ class Utils {
 		}
 	}
 
-	round(i, pow = 6, format = false) {
+/* 	round(i, pow = 6, format = false) {
 		if (!format) {
 			return (Math.round(Number(i) * 10 ** pow)) / 10 ** pow
 		} else {
@@ -719,7 +719,7 @@ class Utils {
 				return (d + '.'+'0'.repeat(pow))
 			}
 		}
-	}
+	} */
 
 	getJoint (x,y) {
 		return `M${x} ${y} l2 2 -4 -4 2 2 2 -2 -4 4`

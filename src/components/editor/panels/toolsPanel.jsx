@@ -1,6 +1,4 @@
-import { Icon } from '@iconify/react';
 import Panel from './panel.jsx';
-//import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import svgStore from "./../../../store/svgStore.jsx";
 import editorStore from "./../../../store/editorStore.jsx";;

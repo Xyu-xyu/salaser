@@ -17,7 +17,6 @@ const SvgComponent = observer (() => {
     const {
         matrix,  
         groupMatrix,
-        rectParams,
         gridState,
         svgData,
 
@@ -32,7 +31,7 @@ const SvgComponent = observer (() => {
             id="svg"
             baseProfile="full"
             viewBox={`0.00 0.00 ${svgData.width} ${ svgData.height }`}
-            style={{ overflow: 'hidden', border: '1px solid var(--color)' }}
+            style={{ overflow: 'hidden' }}
             version="1.1"
             stroke='var(--color)'
             strokeWidth="0.2"
