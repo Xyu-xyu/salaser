@@ -185,8 +185,7 @@ const SvgWrapper = observer(() => {
 		console.log ("editor.mode " + mode )
 		console.log ("inMoveRef.current  "+ inMoveRef.current)
 		console.log ("button   "+ e.button)*/
-		const selectedParts = svgStore.svgData.positions.filter(p => p.selected);
-
+ 
 		if (e.button === 1) {// mid button
 			inMoveRef.current = true;
 			const pos = util.getMousePosition(e);
@@ -197,20 +196,28 @@ const SvgWrapper = observer(() => {
 			editorStore.setMode('drag');
 		} else if (e.button === 0 && mode === "dragging") {
 			console.log ("starr moving form")
-			dragState.current.isDragging = true;
-			dragState.current.startX = e.clientX;
-			dragState.current.startY = e.clientY;
+			const selected = svgStore.svgData.positions.filter(p => p.selected);
+    		if (selected.length === 0) return;
 
-			// Сохраняем начальные позиции всех выделенных деталей
-			dragState.current.initialMatrices.clear();
-			selectedParts.forEach(part => {
-				dragState.current.initialMatrices.set(part.part_id, {
-					e: part.positions.e,
-					f: part.positions.f,
-				});
-			});
+			// Ключевое: сохраняем позицию мыши в координатах SVG!
+			const startSvg = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
 
-		}; 		
+			dragState.current = {
+				isDragging: true,
+				startSvgX: startSvg.x,
+				startSvgY: startSvg.y,
+				initialMatrices: new Map(
+					selected.map(part => [
+						part.part_id,
+						{ e: part.positions.e, f: part.positions.f }
+					])
+				)
+			};
+
+			editorStore.setMode('dragging');
+			e.stopPropagation();
+		};
+			
 	};
 
 	const MouseDrag = (e) => {
@@ -237,10 +244,22 @@ const SvgWrapper = observer(() => {
 			//editorStore.setMode('dragging');
 		}	else if	(  mode === 'dragging')  {
 			console.log ("MouseDrag form" )
-			const dx = e.clientX - dragState.current.startX;
-			const dy = e.clientY - dragState.current.startY;
-
-			// Применяем смещение ко всем выделенным деталям
+			const svgCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+			coordsStore.setCoords({
+				x: Math.round(svgCoord.x * 100) / 100,
+				y: Math.round(svgCoord.y * 100) / 100,
+				width: 500,
+				height: 500,
+			});
+		
+			if (!dragState.current.isDragging) return;
+		
+			// Текущая позиция мыши в координатах SVG
+			const currentSvg = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+		
+			const dx = currentSvg.x - dragState.current.startSvgX;
+			const dy = currentSvg.y - dragState.current.startSvgY;
+		
 			runInAction(() => {
 				svgStore.svgData.positions.forEach(part => {
 					if (part.selected) {
@@ -251,7 +270,7 @@ const SvgWrapper = observer(() => {
 						}
 					}
 				});
-			});
+			});			 
 		}
 	};
 
