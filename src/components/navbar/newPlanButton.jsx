@@ -82,7 +82,9 @@ const NewPlanButton = observer(() => {
 			height: parseFloat(height),
 			quantity: parseInt(quantity, 10),
 			presetId: selectedPreset.id,
-			presetName: selectedPreset.name
+			presetName: selectedPreset.name,
+			part_code: [],
+			positions:[]
 		};
 
 		for (let key in res) {
@@ -90,6 +92,7 @@ const NewPlanButton = observer(() => {
 			svgStore.setVal ('svgData', key, res[key])
 		}	
 		laserStore.setVal("centralBarMode", "planEditor");
+		svgStore.c
 		handleClose();
 	};
 

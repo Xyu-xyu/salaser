@@ -1,4 +1,6 @@
 import { makeAutoObservable,  runInAction } from "mobx";
+import SVGPathCommander from 'svg-path-commander';
+
   
 class SvgStore {
 	tooltips = false;
@@ -120,7 +122,7 @@ class SvgStore {
 		this.tooltips = val
 	}
 
-		setVal(objectKey, pathOrKey, newValue) {
+	setVal(objectKey, pathOrKey, newValue) {
 		const target = this[objectKey];
 		if (!target) throw new Error(`Object ${objectKey} not found in store`);
 	
@@ -153,7 +155,27 @@ class SvgStore {
 	
 	addForm ( form ) {
 		form.part_id = svgStore.svgData.part_code.length+1
+		form.papams={
+			"code": "",
+			"uuid": ""
+		}
+		const box = this.findBox ( form.code)
+		form.width = 0
+		form.height = 0
+		if ( box) {
+			form.width = box.width
+			form.height = box.height
+		}
+
+		console.log ( form )
+
 		this.svgData.part_code.push ( form )
+	}
+
+	findBox (code) {
+		let commonPath =''
+		code.map (a => commonPath+= a.path)
+		return SVGPathCommander.getPathBBox( commonPath )
 	}
 
 	selectOnly = (partId) => {
@@ -211,11 +233,15 @@ class SvgStore {
 				}	
 				const x = part.positions.e;
 				const y = part.positions.f;
+				const formId = part.part_code_id
+				const form = this.svgData.part_code.filter (f =>  formId === f.uuid)
+				const widthF = form[0].width
+				const heightF = form[0].height
 	
 				// Условие: центр детали за пределами холста
 				const isOut =
-					x < 0 ||
-					y < 0 ||
+					x + widthF < 0 ||
+					y + heightF < 0 ||
 					x > width ||
 					y > height;
 	

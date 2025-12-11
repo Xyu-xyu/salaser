@@ -3,25 +3,14 @@ import { observer } from 'mobx-react-lite';
 import svgStore from "../../../store/svgStore.jsx";
 import macrosStore from "../../../store/macrosStore.jsx";
 import laserStore from "../../../store/laserStore.jsx";
-import util from '../../../scripts/util.jsx';
 import CustomIcon from '../../../icons/customIcon.jsx';
 import { useTranslation } from 'react-i18next';
-import SVGPathCommander from 'svg-path-commander';
+import partStore from "../../../store/partStore.jsx"
 
 
 const FormsPanel = observer(() => {
 
 	const { t } = useTranslation()
-	const getViewBox = (code) => {
-		const box = SVGPathCommander.getPathBBox(code[0].path);
-		if (box) {
-			let w = util.round(box.width, 3)
-			let h = util.round(box.height, 3)
-			return `0 0 ${box.width} ${box.height}`
-		}
-		return `0 0 100 100`
-	}
-
 	const add = (uuid, x, y)=> {
 		let id = svgStore.nextPartId
 		svgStore.addPosition (
@@ -110,7 +99,7 @@ const FormsPanel = observer(() => {
 												}
 											</td>
 											<td className="header" scope="col">
-												<svg viewBox={getViewBox(a.code)} xmlns="http://www.w3.org/2000/svg" width='40' height='40'>
+												<svg viewBox={`0 0 ${a.width} ${a.height}`} xmlns="http://www.w3.org/2000/svg" width='40' height='40'>
 													{a.code.map((element) => (
 														<g
 															key={element.cid}
@@ -156,7 +145,11 @@ const FormsPanel = observer(() => {
 														</button>
 														<button
 															className={`white_button navbar_button small_button40 me-2`} 
-															onPointerDown={()=> laserStore.setVal("centralBarMode", "partEditor")}>
+															onPointerDown={()=>{
+																laserStore.setVal("centralBarMode", "partEditor")
+																partStore.setSvgData( a );		
+																}
+															}>
 															<div className="d-flex align-items-center justify-content-center">
 															<CustomIcon 
 																icon="bytesize:edit"

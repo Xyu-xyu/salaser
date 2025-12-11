@@ -11,9 +11,9 @@ const PartSimpleReturnComponent = observer(() => {
  	const pollingTimeoutRef = useRef(null);
 	const {	selectedCid } = partStore;	
 
-	useEffect(()=>{
+/* 	useEffect(()=>{
 		partStore.setSvgData( constants.svg );		
-	}, []);
+	}, []); */
 
 	const setSelectedTouch = (e) => {
 		if ( editorStore.mode === 'resize') {
