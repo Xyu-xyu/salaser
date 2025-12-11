@@ -20,6 +20,11 @@ class Part {
         width: window.screen.width,
         height:window.screen.height
     };
+
+    static getSvgParams(param=false) {
+        if (!param) return this.#params
+        return this.#params[param];
+    }
       
     static normalizeIntends () {
         /*     let int = {x:Infinity,y:Infinity}

@@ -2,6 +2,7 @@ import Panel from './panel.jsx';
 import { observer } from 'mobx-react-lite';
 import svgStore from "../../../store/svgStore.jsx";
 import macrosStore from "../../../store/macrosStore.jsx";
+import laserStore from "../../../store/laserStore.jsx";
 import util from '../../../scripts/util.jsx';
 import CustomIcon from '../../../icons/customIcon.jsx';
 import { useTranslation } from 'react-i18next';
@@ -155,7 +156,7 @@ const FormsPanel = observer(() => {
 														</button>
 														<button
 															className={`white_button navbar_button small_button40 me-2`} 
-															onPointerDown={() => {}}>
+															onPointerDown={()=> laserStore.setVal("centralBarMode", "partEditor")}>
 															<div className="d-flex align-items-center justify-content-center">
 															<CustomIcon 
 																icon="bytesize:edit"

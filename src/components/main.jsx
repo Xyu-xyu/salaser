@@ -14,6 +14,8 @@ import { useEffect } from "react";
 import ServiceBar from "./serviceBar";
 import { AnimatePresence, motion } from "framer-motion";
 import SvgWrapper from "./editor/svgWrapper";
+import PartSvgWrapper from "./editor/partSvgWrapper";
+import PartPanels from "./editor/panels/partPanels";
 import Panels from "./editor/panels/panels";
 
 
@@ -147,13 +149,35 @@ const Main = observer(() => {
 							backgroundColor: "var(--mainBg)"							
 						}}
 					>
+						<div>	
+							{centralBarMode === "planEditor" && <SvgWrapper />}
+							{centralBarMode === "planEditor" && <Panels />}
+						</div>
+					</motion.div>
+					{/* PartEditor */}
+					<motion.div
+						key="partEditor"
+						initial={false}
+						animate={{
+							opacity: centralBarMode === "partEditor" ? 1 : 0,
+							x: centralBarMode === "partEditor" ? 0 : 30,
+							pointerEvents: centralBarMode === "partEditor" ? "auto" : "none",
+						}}
+						transition={{ duration: 0.25, ease: "easeInOut" }}
+						style={{
+							position: "absolute",
+							inset: 0,
+							width: "100%",
+							height: "100%",
+							backgroundColor: "aqua"													
+						}}
+					>
 						<div>
-							<SvgWrapper />
-							<Panels />
+							{centralBarMode === "partEditor" && <PartPanels />}
+							{centralBarMode === "partEditor" && <PartSvgWrapper />}
 						</div>
 					</motion.div>
 				</div>
-
 			</div>
 
 
