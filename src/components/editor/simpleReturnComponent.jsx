@@ -104,7 +104,10 @@ const SimpleReturnComponent = observer(() => {
 								data-cid={element.cid}
 								className={element.class +`${pos.selected ? " selected " : " " }` }
 								onMouseDown={ (e) =>setSelected(e, pos.part_id)}
-								onMouseMove={ () => editorStore.setMode ('dragging')}
+								onMouseMove={ () => {
+										if (editorStore.mode  !== 'dragging') editorStore.setMode ('dragging');
+									}
+								}
 								//onMouseUp={ editorStore.setMode ('resize')}
 								onTouchStart={ (e) =>{
 									setSelected(e, pos.part_id)

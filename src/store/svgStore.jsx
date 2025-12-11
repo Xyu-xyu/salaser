@@ -683,6 +683,37 @@ class SvgStore {
 			);
 		});
 	};
+
+	deleteOutParts = () => {
+		const { width, height } = this.svgData;
+	
+		// Если холст не задан — выходим
+		if (!width || !height) {
+			console.warn('deleteOutParts: размеры холста не заданы');
+			return;
+		}
+	
+		runInAction(() => {
+			this.svgData.positions = this.svgData.positions.filter(part => {
+				// Проверяем только выделенные
+				if (!part.selected) {
+					return true; // оставляем
+				}	
+				const x = part.positions.e;
+				const y = part.positions.f;
+	
+				// Условие: центр детали за пределами холста
+				const isOut =
+					x < 0 ||
+					y < 0 ||
+					x > width ||
+					y > height;
+	
+				// Если за пределами — удаляем (filter возвращает false)
+				return !isOut;
+			});
+		});
+	};
 		
 }
 

@@ -28,7 +28,7 @@ const SvgWrapper = observer(() => {
 
 	// =============== WHEEL ZOOM ===============
 	const handleMouseWheel = (e) => {
-		e.preventDefault();
+		//e.preventDefault();
 		const svg = document.getElementById('svg');
 		if (!svg) return;
 
@@ -122,7 +122,7 @@ const SvgWrapper = observer(() => {
 				)
 			};
 			e.stopPropagation();
-			e.preventDefault()			
+			//e.preventDefault()			
 
 		}
 
@@ -322,7 +322,7 @@ const SvgWrapper = observer(() => {
 		//console.log ("END DRAG")
 		if (editorStore.mode === 'dragging') {
 			editorStore.setMode('resize');
-			svgStore.deselect()
+			svgStore.deleteOutParts()
 		}
 		if (dragState.current.isDragging) {
 			dragState.current.isDragging = false;

@@ -159,8 +159,8 @@ const FormsPanel = observer(() => {
 															<div className="d-flex align-items-center justify-content-center">
 															<CustomIcon 
 																icon="bytesize:edit"
-																width="24"
-																height="24"
+																width="20"
+																height="20"
 																color="var(--violet)"
 																viewBox="0 0 32 32"
 																strokeWidth={2}

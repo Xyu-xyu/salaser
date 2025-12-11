@@ -19,11 +19,11 @@ const ToolsPanel = observer(() => {
 
 	const setMode = (mode) => {
 		editorStore.setMode(mode)
-		svgStore.setSelectedPointOnEdge(false)
+		/* svgStore.setSelectedPointOnEdge(false)
 		svgStore.setSelectedPointOnPath(false)
 		svgStore.setContourSelected(false)
 		svgStore.setSelectedEdge(false)
-		svgStore.setTextFocus(false)
+		svgStore.setTextFocus(false) */
 	}
 
 	const copyContour = () => {
@@ -93,10 +93,14 @@ const ToolsPanel = observer(() => {
 			),
 			content: (
 				<div className="d-flex align-items-center btn_block flex-wrap">
-					<button disabled
+					<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
-						onMouseDown={() => setMode('resize')}
+						onMouseDown={() => {
+								setMode('resize')
+								svgStore.deselect ()
+							}
+						}
 					>
 
 						<CustomIcon
