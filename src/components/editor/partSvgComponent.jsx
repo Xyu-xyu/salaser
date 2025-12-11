@@ -11,6 +11,7 @@ import { observer } from 'mobx-react-lite';
 //import Joints from './joints.js';
 ///import HighLighted from './highlighted.js';
 //import LaserShow from './laserShow.js';
+import PartSimpleReturnComponent from "./partSimpleReturnComponent"
 
 
 const PartSvgComponent = observer (() => {
@@ -110,12 +111,11 @@ const PartSvgComponent = observer (() => {
                                 x={rectParams.x}
                                 y={rectParams.y}
                                 fill="url(#grid)"
-                                transform-origin="50% 50%"
                                 stroke='var(--color)'
                                 strokeWidth="0"
                             ></rect>
                             <>
-                           {/*   < SimpleReturnComponent /> */}
+                                <PartSimpleReturnComponent /> 
                             </>
                        </g>
                    {/*     <Selector />
