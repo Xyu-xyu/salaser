@@ -7,7 +7,7 @@ import Util from "./../scripts/util";
 import CONSTANTS from "./constants";
 
 
-class SvgStore {
+class PartStore {
 	tooltips = false;
 	laserShow =  {};
 	highLighted= false;
@@ -472,7 +472,7 @@ class SvgStore {
 	}
 
 	setContourSelected(cid) {
-		//console.log('setContourSelected ' + cid)
+		console.log('setContourSelected ' + cid)
  		this.svgData.code.forEach((el, i, arr)=>{
 			if(el.hasOwnProperty('selected')) {
 				this.updateElementValue (el.cid, 'contour', 'selected', false)		
@@ -564,5 +564,5 @@ class SvgStore {
 	}
 }
 
-const svgStore = new SvgStore();
-export default svgStore;
+const partStore = new PartStore();
+export default partStore;

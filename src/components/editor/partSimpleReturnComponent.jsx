@@ -4,18 +4,14 @@ import editorStore from "../../store/editorStore.jsx";
 import Part from "../../scripts/part.jsx";
 import React, { useEffect, useRef } from 'react';
 import jointStore from "../../store/jointStore.jsx";
- import constants from "../../store/constants.jsx";
+import constants from "../../store/constants.jsx";
 
 const PartSimpleReturnComponent = observer(() => {
 
- 	const pollingTimeoutRef = useRef(null);
 	const {	selectedCid } = partStore;	
 
-/* 	useEffect(()=>{
-		partStore.setSvgData( constants.svg );		
-	}, []); */
-
 	const setSelectedTouch = (e) => {
+		console.log ("setSelectedTouch")
 		if ( editorStore.mode === 'resize') {
 			let cid = Number(e.currentTarget.getAttribute('data-cid'));
 			if (typeof cid === 'number') {
@@ -35,11 +31,12 @@ const PartSimpleReturnComponent = observer(() => {
 	}
 
 	const setSelected = (e) => {
-		//console.log ("Button number   "+e.button)
+		console.log ("Button number setSelected"+e.button)
 		if (e.button === 0 && editorStore.mode === 'resize') {
 			let cid = Number(e.currentTarget.getAttribute('data-cid'));
 			if (typeof cid === 'number') {
 				if (cid !== selectedCid) {
+					console.log ("ПИК ПИК ПИК "+ cid)
 					partStore.setContourSelected(cid)
 				} else {
 					//console.log (e)
@@ -76,18 +73,6 @@ const PartSimpleReturnComponent = observer(() => {
 			editorStore.setInletMode('move')
 		} 
 	} 
-
-	const primaryPolling = () => {
-		
-
-	};
-	
-	const setPrimaryPollingTimeout = () => {
-		/* clearTimeout(pollingTimeoutRef.current);
-		pollingTimeoutRef.current = setTimeout(() => {
-			primaryPolling();
-		}, 2000); */
-	};
 
 	return (
 		<>

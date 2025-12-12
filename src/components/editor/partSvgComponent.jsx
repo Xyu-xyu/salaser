@@ -12,6 +12,7 @@ import { observer } from 'mobx-react-lite';
 ///import HighLighted from './highlighted.js';
 //import LaserShow from './laserShow.js';
 import PartSimpleReturnComponent from "./partSimpleReturnComponent"
+import PartSelector from './partSelector';
 
 
 const PartSvgComponent = observer (() => {
@@ -118,8 +119,9 @@ const PartSvgComponent = observer (() => {
                                 <PartSimpleReturnComponent /> 
                             </>
                        </g>
-                   {/*     <Selector />
-                       <Guides />
+                   {     
+                       <PartSelector />
+                      /* <Guides />
                        <SelectedPointOnEdge/>
                        <Joints />
                        <SelectedPointOnPath/>

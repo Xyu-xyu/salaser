@@ -106,7 +106,8 @@ const ShapeModalComponent = observer(() => {
 				class: "contour outer macro0 closed1",
 				path: transformed,
 				stroke: "red",
-				strokeWidth: 0.2
+				strokeWidth: 0.2,
+				selected:false
 			},
 			{
 				cid: 1,
@@ -114,6 +115,7 @@ const ShapeModalComponent = observer(() => {
 				path: "",
 				stroke: 'red',
 				strokeWidth: 0.2,
+				selected:false
 			},
 			{
 				cid: 1,
@@ -121,6 +123,7 @@ const ShapeModalComponent = observer(() => {
 				path: "",
 				stroke: 'lime',
 				strokeWidth: 0.2,
+				selected:false
 			}
 		]
 
