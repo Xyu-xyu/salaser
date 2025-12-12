@@ -1,6 +1,6 @@
 import Panel from './panel.jsx';
 import { observer } from 'mobx-react-lite';
-import svgStore from "./../../../store/svgStore.jsx";
+import partStore from "./../../../store/partStore.jsx";
 import editorStore from "./../../../store/editorStore.jsx";;
 import inlet from './../../../scripts/inlet.jsx'
 import ShapeModalComponent from './../shapeModalComponent.jsx';
@@ -11,32 +11,32 @@ import CustomIcon from './../../../icons/customIcon.jsx';
 
 const ToolsPanel = observer(() => {
 	const deleteContour = () => {
-		if (svgStore.getSelectedElement()) {
-			svgStore.deleteSelected()
+		if (partStore.getSelectedElement()) {
+			partStore.deleteSelected()
 			addToLog('Contour deleted')
 		}
 	}
 
 	const setMode = (mode) => {
 		editorStore.setMode(mode)
-		/* svgStore.setSelectedPointOnEdge(false)
-		svgStore.setSelectedPointOnPath(false)
-		svgStore.setContourSelected(false)
-		svgStore.setSelectedEdge(false)
-		svgStore.setTextFocus(false) */
+		partStore.setSelectedPointOnEdge(false)
+		partStore.setSelectedPointOnPath(false)
+		partStore.setContourSelected(false)
+		partStore.setSelectedEdge(false)
+		partStore.setTextFocus(false) 
 	}
 
 	const copyContour = () => {
-		console.log(svgStore.selectedCid)
-		if (typeof svgStore.selectedCid === 'number') {
-			svgStore.setCopiedCid(svgStore.selectedCid)
+		console.log(partStore.selectedCid)
+		if (typeof partStore.selectedCid === 'number') {
+			partStore.setCopiedCid(partStore.selectedCid)
 		}
 	}
 
 	const pasteContour = () => {
-		if (typeof svgStore.copiedCid !== 'number') return;
-		svgStore.addElementWithCid(svgStore.copiedCid)
-		svgStore.setCopiedCid(false)
+		if (typeof partStore.copiedCid !== 'number') return;
+		partStore.addElementWithCid(partStore.copiedCid)
+		partStore.setCopiedCid(false)
 		addToLog("Contour pasted")
 	}
 
@@ -47,8 +47,8 @@ const ToolsPanel = observer(() => {
 	const addPointToPath = () => {
 		let newPathData = util.addPointToPath()
 		if (newPathData) {
-			svgStore.updateElementValue(svgStore.selectedPointOnPath.cid, 'contour', 'path', newPathData)
-			svgStore.setSelectedPointOnPath(false)
+			partStore.updateElementValue(partStore.selectedPointOnPath.cid, 'contour', 'path', newPathData)
+			partStore.setSelectedPointOnPath(false)
 			addToLog('Added new point to path')
 		}
 	}
@@ -56,8 +56,8 @@ const ToolsPanel = observer(() => {
 	const deletePoint = () => {
 		let newPathData = util.deletePoint()
 		if (newPathData) {
-			svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData)
-			svgStore.setSelectedPointOnEdge(false)
+			partStore.updateElementValue(partStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData)
+			partStore.setSelectedPointOnEdge(false)
 			addToLog('Point deleted from path')
 		} else {
 			console.log('No cut signor!')
@@ -67,8 +67,8 @@ const ToolsPanel = observer(() => {
 	const roundEdge = () => {
 		let newPathData = util.createFilletArc()
 		if (newPathData) {
-			svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData)
-			svgStore.setSelectedPointOnEdge(false)
+			partStore.updateElementValue(partStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData)
+			partStore.setSelectedPointOnEdge(false)
 			addToLog('Edge rounded')
 		} else {
 			console.log('No cut signor!')
@@ -98,7 +98,7 @@ const ToolsPanel = observer(() => {
 						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
 						onMouseDown={() => {
 								setMode('resize')
-								svgStore.deselect ()
+								partStore.deselect ()
 							}
 						}
 					>
@@ -129,7 +129,7 @@ const ToolsPanel = observer(() => {
 						/>
 					</button>
 
-					{svgStore.selectedPointOnPath ?
+					{partStore.selectedPointOnPath ?
 						<button disabled
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
@@ -178,7 +178,7 @@ const ToolsPanel = observer(() => {
 							viewBox='0 0 500 500'
 						/>
 					</button>
-					{ svgStore.selectedPointOnEdge ? 
+					{ partStore.selectedPointOnEdge ? 
 
 <button disabled
 							type="button"
@@ -274,7 +274,7 @@ const ToolsPanel = observer(() => {
 					<button disabled
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
-						onClick={() => svgStore.setNewOuter()}
+						onClick={() => partStore.setNewOuter()}
 					>
 
 						<CustomIcon

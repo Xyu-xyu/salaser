@@ -1,16 +1,14 @@
-import SimpleReturnComponent from './simpleReturnComponent'
-//import Selector from './selector.js'
-//import SelectedPointOnEdge from './selectedPointOnEdge.js';
-//import SelectedPointOnPath from './selectedPointOnPath.js';
-//import SelectedEdge from './selectedEdge.js';
-//import Guides from './guides.js'
+import SelectedPointOnEdge from './selectedPointOnEdge';
+import SelectedPointOnPath from './selectedPointOnPath';
+import SelectedEdge from './selectedEdge';
+import Guides from './guides'
 //import editorStore from '../../store/editorStore';
 import partStore from '../../store/partStore';
 import svgStore from '../../store/svgStore';
 import { observer } from 'mobx-react-lite';
-//import Joints from './joints.js';
-///import HighLighted from './highlighted.js';
-//import LaserShow from './laserShow.js';
+import Joints from './joints';
+import HighLighted from './highlighted'
+import LaserShow from './laserShow';
 import PartSimpleReturnComponent from "./partSimpleReturnComponent"
 import PartSelector from './partSelector';
 
@@ -119,15 +117,15 @@ const PartSvgComponent = observer (() => {
                                 <PartSimpleReturnComponent /> 
                             </>
                        </g>
-                   {     
+                        
                        <PartSelector />
-                      /* <Guides />
+                       <Guides />
                        <SelectedPointOnEdge/>
                        <Joints />
                        <SelectedPointOnPath/>
                        <SelectedEdge/>
                        <HighLighted />
-                       <LaserShow /> */}
+                       <LaserShow /> 
                     </g>
                 </g>
             </g>
