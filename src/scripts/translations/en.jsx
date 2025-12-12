@@ -352,6 +352,24 @@ const en = {
     "amount": "amount",
     "Part": "Part",
     "Do you want to delete all parts of this type?": "Do you want to delete all parts of this type?",
-    "Parts on sheet": "Parts on sheet"
+    "Parts on sheet": "Parts on sheet",
+    "Type": "Type",
+    "Piercing": "Piercing",
+    "Select Piercing Type": "Select Piercing Type",
+    "normal": "normal",
+    "without time": "without time",
+    "pulse": "pulse",
+    "Inlet": "Inlet",
+    "Select Inlet Mode": "Select Inlet Mode",
+    "cutting": "cutting",
+    "engraving": "engraving",
+    "cutless": "cutless",
+    "Select Contour Mode": "Select Contour Mode",
+    "Transformations": "Transformations",
+    "outer&inner": "outer&inner",
+    "Align": "Align",
+    "Rounding": "Rounding",
+    "Rounding radius": "Rounding radius",
+    "Angle": "Angle"
 }
 export default en;

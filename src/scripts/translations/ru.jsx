@@ -344,6 +344,20 @@ const ru = {
     "action": "действие",
     "Part": "Деталь",
     "Do you want to delete all parts of this type?": "Вы хотите удалить все детали этого типа?",
-    "Parts on sheet": "Детали на листе"
+    "Parts on sheet": "Детали на листе",
+    "normal": "нормальный",
+    "pulse": "пульс",
+    "engraving": "гравировка",
+    "Select Inlet Mode": "Выберите режим врезки",
+    "Align": "Выровнять",
+    "Piercing": "Пирсинг",
+    "outer&inner": "внешний и внутренний",
+    "cutting": "резка",
+    "without time": "без времени",
+    "Rounding radius": "Радиус скругления",
+    "cutless": "без резки",
+    "Transformations": "Преобразования",
+    "Rounding": "Округление",
+    "Angle": "Угол"
 }
 export default ru;

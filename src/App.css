@@ -16,6 +16,16 @@
 }
 
 :root {
+  --edge:32px;
+  --pEdge:8px;
+  --hEdge: 10px;
+  --tEdge: -6px;
+  --bEdge: 26px;
+  --sizeSortedPlanItemY:50px;    
+  --sizeSortedPlanItemX:100px;    
+  --textAreaFontSize:36pt;
+  --sizePlanX:50;   
+  --sizePlanY:50; 
   --red: rgb(255, 51, 40);
   --green: rgb(42, 199, 94);
   --blue: rgb(71, 209, 204);
@@ -2231,3 +2241,64 @@ top:var(--hEdge);
   overflow-x:hidden;
   overflow-y:auto ;
 }
+
+
+.popup .table>:not(caption)>*>* {
+    padding: 5px!important;
+}
+
+.table .editable {
+    background: #45d0e280!important;
+    width: 50px;
+}
+
+.containerPoint {
+  position: relative;
+  width: var(--edge);
+  height: var(--edge);
+  border: 2px solid var(--color);
+}
+
+.contourPoint {
+  position: absolute;
+  width: var(--pEdge);
+  height: var(--pEdge);
+  background-color: var(--color);
+}  
+
+.topX {
+  left: var(--tEdge);
+}    
+
+.topY {
+top: var(--tEdge);
+}
+
+.botX {
+ left: var(--bEdge);
+
+}
+
+.botY{
+top:var(--bEdge);
+} 
+
+.midX {
+left:var(--hEdge);
+}
+ 
+.midY{
+top:var(--hEdge);
+}
+
+.contourPoint.active{
+  background-color: orangered ;
+}
+/*         конец          */
+
+.table .editable {
+  background: rgba(69, 208, 226, .5) !important;
+  width: 50px;
+ /*  height: 2rem; */
+}
+

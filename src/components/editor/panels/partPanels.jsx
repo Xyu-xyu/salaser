@@ -1,13 +1,14 @@
 import React from 'react';
 import ToolsPanel from './toolsPanel.jsx'
-import FormsPanel from './formsPanel.jsx'
+import ContourPanel from './contourPanel.jsx';
 
 
 const PartPanels = () => {
 
 	return (
 		<>
-			<ToolsPanel />	
+			<ToolsPanel />
+			<ContourPanel />	
 		</>
 	);
 };

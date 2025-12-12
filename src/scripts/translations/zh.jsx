@@ -339,6 +339,20 @@ const zh = {
     "amount": "amount",
     "Part": "部分",
     "Do you want to delete all parts of this type?": "您想删除该类型的所有部分吗？",
-    "Parts on sheet": "板材上的零件"
+    "Parts on sheet": "板材上的零件",
+    "normal": "普通的",
+    "pulse": "脉冲",
+    "Select Contour Mode": "选择轮廓模式",
+    "outer&inner": "外层&内层",
+    "Select Inlet Mode": "选择进样模式",
+    "cutting": "切割",
+    "Align": "对齐",
+    "engraving": "雕刻",
+    "Rounding radius": "倒圆半径",
+    "without time": "没有时间",
+    "cutless": "免切割的",
+    "Transformations": "转换",
+    "Rounding": "四舍五入",
+    "Angle": "角度"
 }
 export default zh;
