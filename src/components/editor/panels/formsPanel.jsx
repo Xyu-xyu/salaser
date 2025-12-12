@@ -100,9 +100,9 @@ const FormsPanel = observer(() => {
 											</td>
 											<td className="header" scope="col">
 												<svg viewBox={`0 0 ${a.width} ${a.height}`} xmlns="http://www.w3.org/2000/svg" width='40' height='40'>
-													{a.code.map((element) => (
+													{a.code.map((element, i) => (
 														<g
-															key={element.cid}
+															key={"fp"+element.cid+"_"+i}
 															data-cid={element.cid}
 															onMouseDown={(e) => { }}
 															onMouseMove={(e) => { }}
@@ -157,7 +157,7 @@ const FormsPanel = observer(() => {
 																height="20"
 																color="var(--violet)"
 																viewBox="0 0 32 32"
-																strokeWidth={2}
+																strokeWidth={3}
 															/>
 															</div>
 														</button>

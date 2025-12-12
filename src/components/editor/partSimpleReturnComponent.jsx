@@ -83,17 +83,17 @@ const PartSimpleReturnComponent = observer(() => {
 	};
 	
 	const setPrimaryPollingTimeout = () => {
-		clearTimeout(pollingTimeoutRef.current);
+		/* clearTimeout(pollingTimeoutRef.current);
 		pollingTimeoutRef.current = setTimeout(() => {
 			primaryPolling();
-		}, 2000);
+		}, 2000); */
 	};
 
 	return (
 		<>
 			{partStore.svgData['code'].map((element, i) => (
 				<g
-					key={i}
+					key={"psr"+i+ element.cid}
 					data-cid={element.cid}
 					className={element.class}
 					onMouseDown={setSelected}

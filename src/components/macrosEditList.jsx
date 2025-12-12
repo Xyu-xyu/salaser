@@ -2,17 +2,13 @@ import { ListGroup, Form } from 'react-bootstrap';
 import { observer } from 'mobx-react-lite';
 import macrosStore from '../store/macrosStore';
 
-interface MacrosEditListInt {
-	param;
-	keyParam;
-}
   
-const MacrosEditList<MacrosEditListInt> = observer(({ param, keyParam }) => {
+const MacrosEditList = observer(({ param, keyParam }) => {
 
 	const { macrosProperties } = macrosStore
 	let val = macrosStore.getTecnologyValue(param, keyParam)
 	
-	let property = macrosProperties.cutting.properties[param as keyof typeof macrosProperties.cutting.properties];
+	let property = macrosProperties.cutting.properties[param];
 	const { title } = property;	
 	const setSelectedOption =(val) =>{
  		macrosStore.setValString ( param, val, keyParam)
@@ -27,7 +23,7 @@ const MacrosEditList<MacrosEditListInt> = observer(({ param, keyParam }) => {
  */}			
 				<ListGroup>
 					{property.enum.map((option="") => (
-						<ListGroup.Item key={option}>
+						<ListGroup.Item key={"list_3"+option}>
 							<Form.Check
 								type="radio"
 								id={`radio-${option}-${title}-${keyParam}`}

@@ -2,8 +2,8 @@ import { observer } from "mobx-react-lite";
 import svgStore from "./../../store/svgStore.jsx";
 import editorStore from "./../../store/editorStore.jsx";
 import Part from "./../../scripts/part.jsx";
-import React, { useEffect } from 'react';
-import jointStore from "./../../store/jointStore.jsx";
+import React, { useEffect, useId } from 'react';
+
 
 const SimpleReturnComponent = observer(() => {
 
@@ -19,13 +19,13 @@ const SimpleReturnComponent = observer(() => {
 	useEffect(() => {
 		const fetchData = async () => {
 			//const svg = await Part.getPartCode(handle, partNumber); // Получаем данные
-/* 			const newSvgData = {
-				width: svg.width,
-				height: svg.height,
-				code: svg.code,
-				params: svg.params,
-				positions: []
-			}; */
+			/* 			const newSvgData = {
+							width: svg.width,
+							height: svg.height,
+							code: svg.code,
+							params: svg.params,
+							positions: []
+						}; */
 			//svgStore.setSvgData(newSvgData); 
 			//jointStore.loadJoints (svg.joints)			
 		};
@@ -34,8 +34,8 @@ const SimpleReturnComponent = observer(() => {
 	}, []);
 
 	const setSelected = (e, part_id) => {
-		console.log ( part_id )
-		svgStore.selectOnly ( part_id )
+		console.log(part_id)
+		svgStore.selectOnly(part_id)
 		if (e.button === 0 && editorStore.mode === 'resize') {
 			/*let cid = Number(e.currentTarget.getAttribute('data-cid'));
 			if (typeof cid === 'number') {
@@ -80,6 +80,8 @@ const SimpleReturnComponent = observer(() => {
 		}
 	}
 
+	<g id="form1_0" data-part-id="1" transform="matrix(1 0 0 1 175 175)"><g id="path101_0_1_0" data-cid="101" class="contour outer macro0 closed1 " fill="red"><path d="M150 75A75 75 0 0 0 0 75 75 75 0 0 0 75 150 75 75 0 0 0 150 75"></path></g><g id="path101_1_1_0" data-cid="101" class="inlet inner macro0 closed1 " fill="url(#grid)"><path d=""></path></g><g id="path101_2_1_0" data-cid="101" class="outlet inner macro0 closed1 " fill="url(#grid)"><path d=""></path></g></g>
+
 	return (
 		<>
 			{svgStore.svgData.positions.map((pos, posIndex) => {
@@ -89,31 +91,32 @@ const SimpleReturnComponent = observer(() => {
 				);
 
 				if (!part) return null;
-
 				const { a, b, c, d, e, f } = pos.positions;
 
 				return (
 					<g
-						key={posIndex}
+						id={"form" + pos.part_id + "_" + posIndex}
+						key={"form" + pos.part_id + "_" + posIndex}
 						data-part-id={pos.part_id}
 						transform={`matrix(${a} ${b} ${c} ${d} ${e} ${f})`}
 					>
-						{part.code.map((element) => (
+						{part.code.map((element, index) => (
 							<g
-								key={element.cid}
-								data-cid={element.cid}
-								className={element.class +`${pos.selected ? " selected " : " " }` }
-								onMouseDown={ (e) =>setSelected(e, pos.part_id)}
-								onMouseMove={ () => {
-										if (editorStore.mode  !== 'dragging') editorStore.setMode ('dragging');
-									}
+								key={"path" + "_" + index + "_" + pos.part_id + "_" + posIndex}
+								id={"path" +  "_" + index + "_" + pos.part_id + "_" + posIndex}
+								/*data-cid={element.cid}*/
+								className={element.class + `${pos.selected ? " selected " : " "}`}
+								onMouseDown={(e) => setSelected(e, pos.part_id)}
+								onMouseMove={() => {
+									if (editorStore.mode !== 'dragging') editorStore.setMode('dragging');
+								}
 								}
 								//onMouseUp={ editorStore.setMode ('resize')}
-								onTouchStart={ (e) =>{
+								onTouchStart={(e) => {
 									setSelected(e, pos.part_id)
-									editorStore.setMode ('dragging')
+									editorStore.setMode('dragging')
 								}}
-								fill={ element.class.includes("inner") ? "url(#grid)" :"red"}
+								fill={element.class.includes("inner") ? "url(#grid)" : "red"}
 							>
 								<path d={element.path} />
 							</g>

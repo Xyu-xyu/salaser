@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { observer } from 'mobx-react-lite';  
+import { observer } from 'mobx-react-lite';
 import { addToLog } from './../../scripts/addToLog';
 import svgStore from './../../store/svgStore';
 import util from './../../scripts/util';
@@ -11,173 +11,178 @@ import { useTranslation } from 'react-i18next';
 import CustomIcon from '../../icons/customIcon';
 
 
-const ShapeModalComponent =observer(()=> {
+const ShapeModalComponent = observer(() => {
 	const { t } = useTranslation();
 	const [show, setShow] = useState(false);
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
 	const [selected, setSelected] = useState(0)
-	const [partXPosition,setPartXPosition ] = useState(0)
-	const [partYPosition,setPartYPosition ] = useState(0)
-	const [partWidth,setPartWidth ] = useState(150)
-	const [partHeight,setPartHeight ] = useState(150)
+	const [partXPosition, setPartXPosition] = useState(0)
+	const [partYPosition, setPartYPosition] = useState(0)
+	const [partWidth, setPartWidth] = useState(150)
+	const [partHeight, setPartHeight] = useState(150)
 	const [partCenterXPosition, setPartCenterXPosition] = useState(true)
 	const [partCenterYPosition, setPartCenterYPosition] = useState(true)
 
 	let shapes = [
 		"M10 5 A5 5 0 0 0 0 5 A5 5 0 0 0 5 10 A5 5 0 0 0 10 5",
 		"M5 0 H10 V10 H0 L0 0 L5 0",
-		"M5 0 L10 8.66 L0 8.66 L5 0" , 
+		"M5 0 L10 8.66 L0 8.66 L5 0",
 		"M4.86 9.27 L 1.78 9.27 L 0 3.54 L 4.86 0 L 9.72 3.54 L 7.94 9.27 L 4.86 9.27",
-		"M9.41 5 9.41 7.5 5.08 10 .75 7.5.75 2.5 5.08 0 9.41 2.5 9.41 5",	
+		"M9.41 5 9.41 7.5 5.08 10 .75 7.5.75 2.5 5.08 0 9.41 2.5 9.41 5",
 	]
 
-	const addContour =()=>{
+	const addContour = () => {
 		let d = shapes[selected]
-        const myPathBBox = SVGPathCommander.getPathBBox(d)
+		const myPathBBox = SVGPathCommander.getPathBBox(d)
 
-        let iniX = myPathBBox.width
-        let iniY = myPathBBox.height
-        let scaleX = partWidth/iniX
-        let scaleY = partHeight/iniY
-		var transformed = util.applyTransform(d, scaleX, scaleY, 0, 0, {angle: 0, x:0, y:0})
- 
-		let translateX = partXPosition - myPathBBox.cx*scaleX
-		let translateY = partYPosition - myPathBBox.cy*scaleY
+		let iniX = myPathBBox.width
+		let iniY = myPathBBox.height
+		let scaleX = partWidth / iniX
+		let scaleY = partHeight / iniY
+		var transformed = util.applyTransform(d, scaleX, scaleY, 0, 0, { angle: 0, x: 0, y: 0 })
+
+		let translateX = partXPosition - myPathBBox.cx * scaleX
+		let translateY = partYPosition - myPathBBox.cy * scaleY
 
 		if (partCenterXPosition) {
-			translateX = svgStore.svgData.width*0.5-myPathBBox.cx*scaleX
+			translateX = svgStore.svgData.width * 0.5 - myPathBBox.cx * scaleX
 		}
 
 		if (partCenterYPosition) {
-			translateY = svgStore.svgData.height*0.5-myPathBBox.cy*scaleY
+			translateY = svgStore.svgData.height * 0.5 - myPathBBox.cy * scaleY
 		}
 
-        if (!d || !d.length) return;
-        
+		if (!d || !d.length) return;
+
 		//let uuid = util.uuid()
 		//let id = svgStore.nextPartId
 
-/* 		svgStore.addForm (
-			{
-				"id": uuid,
-				"uuid": uuid,
-				"name": "12___10__2",
-				"code": [
+		/* 		svgStore.addForm (
 					{
-						"cid": 1,
-						"class": "contour outer macro0 closed1",
-						"path": transformed,
-						"stroke": "red",
-						"strokeWidth": 0.2
-					},]
-			}
-		)
-
-
-		svgStore.addPosition (
-			{
-				"part_id": id,
-				"part_code_id": uuid,
-				"selected":false,
-				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": translateX, "f": translateY}
-			}
-		) */
+						"id": uuid,
+						"uuid": uuid,
+						"name": "12___10__2",
+						"code": [
+							{
+								"cid": 1,
+								"class": "contour outer macro0 closed1",
+								"path": transformed,
+								"stroke": "red",
+								"strokeWidth": 0.2
+							},]
+					}
+				)
+		
+		
+				svgStore.addPosition (
+					{
+						"part_id": id,
+						"part_code_id": uuid,
+						"selected":false,
+						"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": translateX, "f": translateY}
+					}
+				) */
 
 		const findExistingFormByCode = (codeArray) => {
 			return svgStore.svgData.part_code.length && svgStore.svgData.part_code.find(form => {
-			  if (!form.code || form.code.length !== codeArray.length) return false;
-		  
-			  return form.code.every((existingContour, i) => {
-				const newContour = codeArray[i];
-				return existingContour.path === newContour.path &&        // главное — путь
-					   existingContour.class === newContour.class &&      // можно добавить, если важно
-					   existingContour.cid === newContour.cid;            // опционально
-			  });
+				if (!form.code || form.code.length !== codeArray.length) return false;
+
+				return form.code.every((existingContour, i) => {
+					const newContour = codeArray[i];
+					return existingContour.path === newContour.path &&        // главное — путь
+						existingContour.class === newContour.class &&      // можно добавить, если важно
+						existingContour.cid === newContour.cid;            // опционально
+				});
 			});
-		  };
-		  
-		  // === ТВОЙ КОД С ПРОВЕРКОЙ ===
-		  
-		  // 1. Сначала ищем — вдруг такая форма уже есть
-		  let existingForm = findExistingFormByCode([
+		};
+
+		// === ТВОЙ КОД С ПРОВЕРКОЙ ===
+		let uuid = util.uuid();
+		const id = svgStore.nextPartId;
+		let newForm = [
 			{
-			  cid: 1,
-			  class: "contour outer macro0 closed1",
-			  path: transformed,
-			  stroke: "red",
-			  strokeWidth: 0.2
+				cid: 1,
+				class: "contour outer macro0 closed1",
+				path: transformed,
+				stroke: "red",
+				strokeWidth: 0.2
+			},
+			{
+				cid: 1,
+				class: "inlet inner macro0 closed1",
+				path: "",
+				stroke: 'red',
+				strokeWidth: 0.2,
+			},
+			{
+				cid: 1,
+				class: "outlet inner macro0 closed1",
+				path: "",
+				stroke: 'lime',
+				strokeWidth: 0.2,
 			}
-		  ]);
-		  
-		  let uuid;
-		  
-		  if (existingForm) {
+		]
+
+		// 1. Сначала ищем — вдруг такая форма уже есть
+		let existingForm = findExistingFormByCode(newForm);
+
+
+		if (existingForm) {
 			// Форма уже существует — используем её uuid!
 			uuid = existingForm.uuid;
 			console.log("Форма уже существует, используем uuid:", uuid);
-		  } else {
+		} else {
 			// Создаём новую форму с новым uuid
-			uuid = util.uuid();
-			const id = svgStore.nextPartId;
-		  
 			svgStore.addForm({
-			  id: uuid,
-			  uuid: uuid,
-			  name: "12___10__2", // можно тоже генерить по code, если хочешь
-			  code: [
-				{
-				  cid: 1,
-				  class: "contour outer macro0 closed1",
-				  path: transformed,
-				  stroke: "red",
-				  strokeWidth: 0.2
-				}
-			  ]
+				id: uuid,
+				uuid: uuid,
+				name: "12___10__2", // можно тоже генерить по code, если хочешь
+				code: newForm
 			});
-		  
 			console.log("Создана новая форма с uuid:", uuid);
-		  }
-		  
-		  // В любом случае — добавляем позицию с правильным part_code_id
-		  svgStore.addPosition({
-			part_id: svgStore.nextPartId, // или как у тебя правильно
-			part_code_id: uuid,           // вот здесь критично — правильный uuid!
-			selected: false,
-			positions: { a: 1, b: 0, c: 0, d: 1, e: translateX, f: translateY }
-		  });
-	}
+		}
+
+
+	// В любом случае — добавляем позицию с правильным part_code_id
+	svgStore.addPosition({
+		part_id: svgStore.nextPartId, // или как у тебя правильно
+		part_code_id: uuid,           // вот здесь критично — правильный uuid!
+		selected: false,
+		positions: { a: 1, b: 0, c: 0, d: 1, e: translateX, f: translateY }
+	});
+}
 
 	return (
-		<>
-			<Button variant="" onClick={handleShow} className='mt-1 ms-2'>
-				<div
-					className="text-white btn_shapes btn_tool"
-				>
-					<CustomIcon
-							icon="fa-shapes"
-							width="20"
-							height="20"
-							fill='black'
-							strokeWidth={0}
-							viewBox='0 0 512 512'
-						/>	
-				</div>
-			</Button>
+	<>
+		<Button variant="" onClick={handleShow} className='mt-1 ms-2'>
+			<div
+				className="text-white btn_shapes btn_tool"
+			>
+				<CustomIcon
+					icon="fa-shapes"
+					width="20"
+					height="20"
+					fill='black'
+					strokeWidth={0}
+					viewBox='0 0 512 512'
+				/>
+			</div>
+		</Button>
 
-			<Modal variant="" show={show} onHide={handleClose}>
-				<Modal.Header closeButton className="custom_modal">
-					<Modal.Title>{t('Add contour from shapes')}</Modal.Title>
-				</Modal.Header>
-				<Modal.Body className="custom_modal">
-					<div className="modal-body">
-						<div className="d-flex align-items-center justify-content-center">						
+		<Modal variant="" show={show} onHide={handleClose}>
+			<Modal.Header closeButton className="custom_modal">
+				<Modal.Title>{t('Add contour from shapes')}</Modal.Title>
+			</Modal.Header>
+			<Modal.Body className="custom_modal">
+				<div className="modal-body">
+					<div className="d-flex align-items-center justify-content-center">
 						{
 							shapes.map((shape, i) => (
-								<button 
-									key={i} 
-									className={"btn btn-shape-select m-2 d-flex align-items-center justify-content-center "+ (i === selected ? "btn-shape-selected" :"")}
-									onMouseDown={ ()=>{ setSelected(i)}}
+								<button
+									key={"sh"+i}
+									className={"btn btn-shape-select m-2 d-flex align-items-center justify-content-center " + (i === selected ? "btn-shape-selected" : "")}
+									onMouseDown={() => { setSelected(i) }}
 								>
 									<div className='d-flex align-items-center justify-content-center shape-select-wrapper'>
 										<svg
@@ -192,148 +197,148 @@ const ShapeModalComponent =observer(()=> {
 								</button>
 							))
 						}
-						</div>
-						<div className="d-flex align-items-center justify-content-center mt-4">
-							<table>
-								<tbody>
-									<tr>
-										<td>
-											<div>{t('Position center')} X</div>
-										</td>
-										<td>
-											<div className="">
-												<input
-													className="mx-2"
-													id="newPartPositionX"
-													type="number"
-													min={0}
-													max={1500}
-													step={1}
-													value={partXPosition}
-													onChange={(e) => {
-														let value = Number(e.target.value); 
-														if (!isNaN(value)) {
-														  if (value < 0) value = 0; 
-														  if (value > 1500) value = 1500; // Максимум 1500
-														  setPartXPosition(value);
-														}
-													  }}																										
-												/>
-												mm
-												<input
-													className="mx-2"
-													id="newPartPositionXCenter"
-													type="checkbox"
-													checked={ partCenterXPosition }
-													onChange={()=>setPartCenterXPosition ( !Boolean(partCenterXPosition))}
-												/>
-												{t('In the center')} X
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<div>{t('Position center')} Y</div>
-										</td>
-										<td>
-											<div className="">
-												<input
-													className="mx-2"
-													id="newPartPositionY"
-													type="number"
-													min={0}
-													max={2500}
-													step={1}
-													value={partYPosition}
-													onChange={(e) => {
-														let value = Number(e.target.value); 
-														if (!isNaN(value)) {
-														  if (value < 0) value = 0; 
-														  if (value > 1500) value = 1500; // Максимум 1500
-														  setPartYPosition(value);
-														}
-													}}												
-												/>
-												mm
-												<input
-													className="mx-2"
-													id="newPartPositionYCenter"
-													type="checkbox"
-													checked={ partCenterYPosition }
-													onChange={()=> setPartCenterYPosition ( !Boolean(partCenterYPosition))}
-												/>
-												{t('In the center')} Y
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<div>{t('Width')}</div>
-										</td>
-										<td>
+					</div>
+					<div className="d-flex align-items-center justify-content-center mt-4">
+						<table>
+							<tbody>
+								<tr>
+									<td>
+										<div>{t('Position center')} X</div>
+									</td>
+									<td>
+										<div className="">
 											<input
 												className="mx-2"
-												id="newPartShapesX"
+												id="newPartPositionX"
 												type="number"
-												min={1}
+												min={0}
 												max={1500}
 												step={1}
-												value={partWidth}
+												value={partXPosition}
 												onChange={(e) => {
-													let value = Number(e.target.value); 
+													let value = Number(e.target.value);
 													if (!isNaN(value)) {
-													  if (value < 1) value = 1; 
-													  if (value > 1500) value = 1500; // Максимум 1500
-													  setPartWidth(value);
+														if (value < 0) value = 0;
+														if (value > 1500) value = 1500; // Максимум 1500
+														setPartXPosition(value);
 													}
 												}}
 											/>
 											mm
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<div>{t('Height')}</div>
-										</td>
-										<td>
 											<input
 												className="mx-2"
-												id="newPartShapesY"
+												id="newPartPositionXCenter"
+												type="checkbox"
+												checked={partCenterXPosition}
+												onChange={() => setPartCenterXPosition(!Boolean(partCenterXPosition))}
+											/>
+											{t('In the center')} X
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>{t('Position center')} Y</div>
+									</td>
+									<td>
+										<div className="">
+											<input
+												className="mx-2"
+												id="newPartPositionY"
 												type="number"
-												min={1}
+												min={0}
 												max={2500}
 												step={1}
-												value={partHeight}
+												value={partYPosition}
 												onChange={(e) => {
-													let value = Number(e.target.value); 
+													let value = Number(e.target.value);
 													if (!isNaN(value)) {
-													  if (value < 1) value = 1; 
-													  if (value > 1500) value = 1500; // Максимум 1500
-													  setPartHeight(value);
+														if (value < 0) value = 0;
+														if (value > 1500) value = 1500; // Максимум 1500
+														setPartYPosition(value);
 													}
 												}}
 											/>
 											mm
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
+											<input
+												className="mx-2"
+												id="newPartPositionYCenter"
+												type="checkbox"
+												checked={partCenterYPosition}
+												onChange={() => setPartCenterYPosition(!Boolean(partCenterYPosition))}
+											/>
+											{t('In the center')} Y
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>{t('Width')}</div>
+									</td>
+									<td>
+										<input
+											className="mx-2"
+											id="newPartShapesX"
+											type="number"
+											min={1}
+											max={1500}
+											step={1}
+											value={partWidth}
+											onChange={(e) => {
+												let value = Number(e.target.value);
+												if (!isNaN(value)) {
+													if (value < 1) value = 1;
+													if (value > 1500) value = 1500; // Максимум 1500
+													setPartWidth(value);
+												}
+											}}
+										/>
+										mm
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>{t('Height')}</div>
+									</td>
+									<td>
+										<input
+											className="mx-2"
+											id="newPartShapesY"
+											type="number"
+											min={1}
+											max={2500}
+											step={1}
+											value={partHeight}
+											onChange={(e) => {
+												let value = Number(e.target.value);
+												if (!isNaN(value)) {
+													if (value < 1) value = 1;
+													if (value > 1500) value = 1500; // Максимум 1500
+													setPartHeight(value);
+												}
+											}}
+										/>
+										mm
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
-				</Modal.Body>
-				<Modal.Footer className="custom_modal">
-					<Button variant="secondary" onClick={handleClose}>
-						{t('Close')}
-					</Button>
-					<Button variant="primary" 
-						onClick={ handleClose }
-						onMouseDown={ addContour }>
-						{t('Add contour')}
-					</Button>
-				</Modal.Footer>
-			</Modal>
-		</>
-	);
+				</div>
+			</Modal.Body>
+			<Modal.Footer className="custom_modal">
+				<Button variant="secondary" onClick={handleClose}>
+					{t('Close')}
+				</Button>
+				<Button variant="primary"
+					onClick={handleClose}
+					onMouseDown={addContour}>
+					{t('Add contour')}
+				</Button>
+			</Modal.Footer>
+		</Modal>
+	</>
+);
 })
 
 export default ShapeModalComponent;
