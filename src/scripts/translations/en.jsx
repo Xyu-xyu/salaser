@@ -384,7 +384,6 @@ const en = {
     "l": "l",
     "a": "a",
     "Show danger": "Show danger",
-    "Inlet":"Inlet",
-    "Straight":"Straight",
+    "Outlet": "Outlet"
 }
 export default en;

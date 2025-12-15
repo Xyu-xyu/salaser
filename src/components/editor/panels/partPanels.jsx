@@ -2,6 +2,7 @@ import React from 'react';
 import ToolsPanel from './toolsPanel.jsx'
 import ContourPanel from './contourPanel.jsx';
 import InletPanel from './inletPanel.jsx';
+import OutletPanel from './outletPanel.jsx';
 
 
 const PartPanels = () => {
@@ -11,6 +12,7 @@ const PartPanels = () => {
 			<ToolsPanel />
 			<ContourPanel />
 			<InletPanel />	
+			<OutletPanel />
 		</>
 	);
 };

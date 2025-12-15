@@ -369,7 +369,8 @@ const ru = {
     "l": "л",
     "a": "а",
     "Show danger": "Показать опасность",
-    "Inlet":"Врезка",
-    "Straight":"Контур",
+    "Inlet": "Врезка",
+    "Straight": "Контур",
+    "Outlet": "Выход"
 }
 export default ru;

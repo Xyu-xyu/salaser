@@ -1,18 +1,19 @@
-import { Icon } from '@iconify/react';
-import Panel from './panel.js';
-import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
-import svgStore from "../stores/svgStore.js";
+import partStore from "./../../../store/partStore.jsx";
+//import editorStore from "./../../../store/editorStore.jsx";
 import { useEffect, useState } from 'react';
-import Hook from './../../img/Hook.jpg';
-import Direct from './../../img/Direct.jpg';
-import Straight from './../../img/Straight.jpg';
-import Tangent from './../../img/Tangent.jpg';
+import Hook from './../../../../public/images//Hook.jpg';
+import Direct from './../../../../public/images/Direct.jpg';
+import Straight from './../../../../public/images/Straight.jpg';
+import Tangent from './../../../../public/images//Tangent.jpg';
 import SVGPathCommander from 'svg-path-commander';
-import inlet from '../../scripts/inlet.js';
-import util from '../../utils/util.js';
-import { addToLog } from './../../scripts/addToLog.js';
+import util from './../../../scripts/util.jsx';
+import inlet from './../../../scripts/inlet.jsx'
+import Panel from './panel.jsx';
+//import CONSTANTS from './../../../store/constants.jsx';
+import { addToLog } from './../../../scripts/addToLog.jsx';
 import { useTranslation } from 'react-i18next';
+import CustomIcon from './../../../icons/customIcon.jsx';
 
 
 const OutletPanel = observer(() => {
@@ -21,7 +22,7 @@ const OutletPanel = observer(() => {
 		selectedCid,
 		selectedPath,
 		selectedOutletPath
-	} = svgStore;
+	} = partStore;
 
 	const [type, setType] = useState(Straight)
 	const [mode, setMode] = useState(null)
@@ -60,7 +61,7 @@ const OutletPanel = observer(() => {
 	useEffect(()=>{
 		let resp;
 		if (DirectA && selectedOutletPath) {
-			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+			let classes = partStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 			let contourType = classes.includes('inner') ? 'inner' : 'outer'
 			resp = inlet.outletDirectA (DirectA, selectedOutletPath, selectedPath, contourType)
 			if ( resp ) {
@@ -133,7 +134,7 @@ const OutletPanel = observer(() => {
 	const setNewOutlet = (newType) =>{
 		console.log(newType)
 		if (type === newType) return;
-		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+		let classes = partStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
 		let resp = inlet.setOutletType (newType, false, 'set', selectedPath, selectedOutletPath, contourType)
 		if ( resp ) {
@@ -149,13 +150,13 @@ const OutletPanel = observer(() => {
 	const setOutletForAll = () =>{
 		console.log ('setoutletForAll')
 		let mode = inlet.detectInletType ( selectedOutletPath )
-		let outlets = svgStore.getFiltered("outlet")
+		let outlets = partStore.getFiltered("outlet")
 		if (mode) {
 			for (let i in  outlets ) {
 				let element = outlets[i]
 				let contourType = element.class.includes('inner') ? 'inner' : 'outer'	
 				let outletPath = element.path
-				let contour = svgStore.getElementByCidAndClass ( element.cid, 'contour')
+				let contour = partStore.getElementByCidAndClass ( element.cid, 'contour')
 
 				let resp = inlet.setOutletType (mode, false, 'set', contour.path, outletPath, contourType)
 				if (resp ) {
@@ -266,38 +267,22 @@ const OutletPanel = observer(() => {
 	const panelInfo = [
 		  {
 			id: 'outletPopup',
-			fa: (<><Icon icon="ion:exit-outline" width="24" height="24" style={{color: 'white'}} className='me-2' /><div>{t('Outlet')}</div></>),
+			fa: (<>
+			<CustomIcon
+					icon="outlet"
+					width="24"
+					height="24"
+					color="black"
+					fill="none"
+					strokeWidth={50}
+					viewBox='0 0 512 512'
+					className={'m-2'}
+				/>
+			<div>{t('Outlet')}</div></>),
 			content:  (
 				<div className="d-flex flex-column">
 					<table className="table mb-0">
 						<tbody>
-{/* 							<tr>
-								<td colSpan={3}>
-									<div className="d-flex align-items-center ms-4 justify-content-around">
-										<div className="d-flex align-items-center">
-											<div>
-												<i className="fa-solid fa-arrows-left-right-to-line" />
-											</div>
-											<input
-												className="mx-2"
-												id="outletIntend"
-												type="number"
-												placeholder={2}
-												min={1}
-												max={5}
-												step={1}
-												defaultValue={2}
-											/>
-											<div>{t('mm')}</div>
-										</div>
-										<div className="ms-2">
-											<button className="btn btn-sm btn-primary btn_ShowDangerOutlets">
-												Show danger outlets
-											</button>
-										</div>
-									</div>
-								</td>
-							</tr> */}
 							<tr>
 								<td colSpan={3} className='d-flex justify-content-around'>
 									<div className="d-flex">
@@ -333,71 +318,74 @@ const OutletPanel = observer(() => {
 						<tbody>
 							<tr>
 								<td className="w-50">
-									<div className="form-check text-left ms-4">
-										<input
-											className="form-check-input mt-0 mt-0 inputOutletType"
-											type="radio"
-											name="outletType"
-											id="outletTypeStraight"
-											disabled={mode !== 'set'}
-											checked={type === 'Straight'}
-											//onMouseDown={()=>{ setNewOutlet('Straight')}}
-											onChange={()=>{ setNewOutlet('Straight')}}
-										/>
-										<label className="form-check-label mx-1" htmlFor="outletTypeStraight">
-											<div>
-											{t('Straight')}
-											</div>
-										</label>
-									</div>
-									<div className="form-check text-left ms-4">
-										<input
-											className="form-check-input mt-0 inputOutletType"
-											type="radio"
-											name="outletType"
-											id="outletTypeDirect"
-											disabled={mode !== 'set'}
-											checked={type === 'Direct'}
-											//onMouseDown={()=>{ setNewOutlet('Direct')}}
-											onChange={()=>{ setNewOutlet('Direct')}}
+									<div className='d-flex flex-column align-items-baseline justify-content-between h-100 mt-2'
+										style={{marginLeft :"30px"}}>
+										<div className="form-check text-left m-0 p-0">
+											<input
+												className="form-check-input mt-0 mt-0 inputOutletType"
+												type="radio"
+												name="outletType"
+												id="outletTypeStraight"
+												disabled={mode !== 'set'}
+												checked={type === 'Straight'}
+												//onMouseDown={()=>{ setNewOutlet('Straight')}}
+												onChange={()=>{ setNewOutlet('Straight')}}
+											/>
+											<label className="form-check-label mx-1" htmlFor="outletTypeStraight">
+												<div>
+												{t('Straight')}
+												</div>
+											</label>
+										</div>
+										<div className="form-check text-left m-0 p-0">
+											<input
+												className="form-check-input mt-0 inputOutletType"
+												type="radio"
+												name="outletType"
+												id="outletTypeDirect"
+												disabled={mode !== 'set'}
+												checked={type === 'Direct'}
+												//onMouseDown={()=>{ setNewOutlet('Direct')}}
+												onChange={()=>{ setNewOutlet('Direct')}}
 
-										/>
-										<label className="form-check-label mx-1" htmlFor="outletTypeDirect">
-											<div>{t('Direct')}</div>
-										</label>
-									</div>
-									<div className="form-check text-left ms-4">
-										<input
-											className="form-check-input mt-0 inputOutletType"
-											type="radio"
-											name="outletType"
-											id="outletTypeHook"
-											disabled={mode !== 'set'}
-											checked={type === 'Hook'}
-											//onMouseDown={()=>{ setNewOutlet('Hook')}}
-											onChange={()=>{ setNewOutlet('Hook')}}
+											/>
+											<label className="form-check-label mx-1" htmlFor="outletTypeDirect">
+												<div>{t('Direct')}</div>
+											</label>
+										</div>
+										<div className="form-check text-left m-0 p-0">
+											<input
+												className="form-check-input mt-0 inputOutletType"
+												type="radio"
+												name="outletType"
+												id="outletTypeHook"
+												disabled={mode !== 'set'}
+												checked={type === 'Hook'}
+												//onMouseDown={()=>{ setNewOutlet('Hook')}}
+												onChange={()=>{ setNewOutlet('Hook')}}
 
-										/>
-										<label className="form-check-label mx-1" htmlFor="outletTypeHook">
-											<div>{t('Hook')}</div>
-										</label>
-									</div>
-									<div className="form-check text-left ms-4">
-										<input
-											className="form-check-input mt-0 inputOutletType"
-											type="radio"
-											name="outletType"
-											id="outletTypeTangent"
-											disabled={mode !== 'set'}
-											checked={type === 'Tangent'}
-											//onMouseDown={()=>{ setNewOutlet('Tangent')}}
-											onChange={()=>{ setNewOutlet('Tangent')}}
+											/>
+											<label className="form-check-label mx-1" htmlFor="outletTypeHook">
+												<div>{t('Hook')}</div>
+											</label>
+										</div>
+										<div className="form-check text-left m-0 p-0">
+											<input
+												className="form-check-input mt-0 inputOutletType"
+												type="radio"
+												name="outletType"
+												id="outletTypeTangent"
+												disabled={mode !== 'set'}
+												checked={type === 'Tangent'}
+												//onMouseDown={()=>{ setNewOutlet('Tangent')}}
+												onChange={()=>{ setNewOutlet('Tangent')}}
 
-										/>
+											/>
 
-										<label className="form-check-label mx-1" htmlFor="outletTypeTangent">
-											<div>{t('Tangent')}</div>
-										</label>
+											<label className="form-check-label mx-1" htmlFor="outletTypeTangent">
+												<div>{t('Tangent')}</div>
+											</label>
+										</div>
 									</div>
 								</td>
 								<td colSpan={2}>

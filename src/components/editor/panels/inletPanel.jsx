@@ -389,69 +389,69 @@ const InletPanel = observer(() => {
 						<tbody>
 							<tr>
 								<td className="w-50">
-								<div className='d-flex flex-column align-items-baseline justify-content-between h-100 mt-2'
-									style={{marginLeft :"18px"}}>	
-									<div className="form-check text-left m-0 p-0">
-										<input
-											className="form-check-input mt-0 mt-0 inputInletType"
-											type="radio"
-											name="inletType"
-											id="inletTypeStraight"
-											disabled={mode !== 'set'}
-											checked={type === 'Straight'}
-											//onMouseDown={()=>{ setNewInlet('Straight')}}
-											onChange={() => { setNewInlet('Straight') }}
+									<div className='d-flex flex-column align-items-baseline justify-content-between h-100 mt-2'
+										style={{marginLeft :"18px"}}>	
+										<div className="form-check text-left m-0 p-0">
+											<input
+												className="form-check-input mt-0 mt-0 inputInletType"
+												type="radio"
+												name="inletType"
+												id="inletTypeStraight"
+												disabled={mode !== 'set'}
+												checked={type === 'Straight'}
+												//onMouseDown={()=>{ setNewInlet('Straight')}}
+												onChange={() => { setNewInlet('Straight') }}
 
-										/>
-										<label className="form-check-label mx-1" htmlFor="inletTypeStraight">
-											<div>{t('Straight')}</div>
-										</label>
-									</div>
-									<div className="form-check text-left m-0 p-0">
-										<input
-											className="form-check-input mt-0 inputInletType"
-											type="radio"
-											name="inletType"
-											id="inletTypeDirect"
-											disabled={mode !== 'set'}
-											checked={type === 'Direct'}
-											//onMouseDown={()=>{ setNewInlet('Direct')}}
-											onChange={() => { setNewInlet('Direct') }}
-										/>
-										<label className="form-check-label mx-1" htmlFor="inletTypeDirect">
-											<div>{t('Direct')}</div>
-										</label>
-									</div>
-									<div className="form-check text-left m-0 p-0 ">
-										<input
-											className="form-check-input mt-0 inputInletType"
-											type="radio"
-											name="inletType"
-											id="inletTypeHook"
-											disabled={mode !== 'set'}
-											checked={type === 'Hook'}
-											//onMouseDown={()=>{ setNewInlet('Hook')}}
-											onChange={() => { setNewInlet('Hook') }}
+											/>
+											<label className="form-check-label mx-1" htmlFor="inletTypeStraight">
+												<div>{t('Straight')}</div>
+											</label>
+										</div>
+										<div className="form-check text-left m-0 p-0">
+											<input
+												className="form-check-input mt-0 inputInletType"
+												type="radio"
+												name="inletType"
+												id="inletTypeDirect"
+												disabled={mode !== 'set'}
+												checked={type === 'Direct'}
+												//onMouseDown={()=>{ setNewInlet('Direct')}}
+												onChange={() => { setNewInlet('Direct') }}
+											/>
+											<label className="form-check-label mx-1" htmlFor="inletTypeDirect">
+												<div>{t('Direct')}</div>
+											</label>
+										</div>
+										<div className="form-check text-left m-0 p-0 ">
+											<input
+												className="form-check-input mt-0 inputInletType"
+												type="radio"
+												name="inletType"
+												id="inletTypeHook"
+												disabled={mode !== 'set'}
+												checked={type === 'Hook'}
+												//onMouseDown={()=>{ setNewInlet('Hook')}}
+												onChange={() => { setNewInlet('Hook') }}
 
-										/>
-										<label className="form-check-label mx-1" htmlFor="inletTypeHook">
-											<div>{t('Hook')}</div>
-										</label>
-									</div>
-									<div className="form-check text-left m-0 p-0">
-										<input
-											className="form-check-input mt-0 inputInletType"
-											type="radio"
-											name="inletType"
-											id="inletTypeTangent"
-											disabled={mode !== 'set'}
-											checked={type === 'Tangent'}
-											//onMouseDown={()=>{ setNewInlet('Tangent')}}
-											onChange={() => { setNewInlet('Tangent') }}
-										/>
-										<label className="form-check-label mx-1" htmlFor="inletTypeTangent">
-											<div>{t('Tangent')}</div>
-										</label>
+											/>
+											<label className="form-check-label mx-1" htmlFor="inletTypeHook">
+												<div>{t('Hook')}</div>
+											</label>
+										</div>
+										<div className="form-check text-left m-0 p-0">
+											<input
+												className="form-check-input mt-0 inputInletType"
+												type="radio"
+												name="inletType"
+												id="inletTypeTangent"
+												disabled={mode !== 'set'}
+												checked={type === 'Tangent'}
+												//onMouseDown={()=>{ setNewInlet('Tangent')}}
+												onChange={() => { setNewInlet('Tangent') }}
+											/>
+											<label className="form-check-label mx-1" htmlFor="inletTypeTangent">
+												<div>{t('Tangent')}</div>
+											</label>
 									</div>
 
 								</div>	

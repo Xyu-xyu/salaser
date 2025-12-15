@@ -363,7 +363,8 @@ const zh = {
     "l": "我",
     "a": "一个",
     "Show danger": "表现出危险",
-    "Inlet":"Inlet",
-    "Straight":"Straight",
+    "Inlet": "Inlet",
+    "Straight": "Straight",
+    "Outlet": "出路"
 }
 export default zh;
