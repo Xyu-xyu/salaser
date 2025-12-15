@@ -1872,7 +1872,6 @@ height: fit-content;}
  max-width: 1200px;
  position: absolute;
  overflow: hidden;
- /*   zoom:0.8; */  
  box-shadow: 3px 3px 9px 0px var(--transColor);
  transform-origin: 0% 0%;
  transform: scale(0.8);

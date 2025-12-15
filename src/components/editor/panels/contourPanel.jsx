@@ -1,4 +1,3 @@
-import { Icon } from '@iconify/react';
 import Panel from './panel.jsx';
 import { observer } from 'mobx-react-lite';
 import partStore from "./../../../store/partStore.jsx";

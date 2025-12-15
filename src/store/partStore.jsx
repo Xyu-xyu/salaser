@@ -284,7 +284,7 @@ class PartStore {
 
 	setSelectedPointOnEdge (val) {
 		this.selectedPointOnEdge = val
-		if (svgStore.boundsList && val) {
+		if (partStore.boundsList && val) {
 			let res = Util.checkGuides( val.point )
 
 			//console.log ( res )

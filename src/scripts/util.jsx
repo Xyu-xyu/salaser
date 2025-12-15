@@ -4,7 +4,11 @@ import macrosStore from '../store/macrosStore';
 import validator from "@rjsf/validator-ajv8";
 import { getDefaultFormState } from "@rjsf/utils";
 import svgPath from 'svgpath';
-
+import SVGPathCommander from 'svg-path-commander';
+import arc from './arc'
+import inside from 'point-in-polygon-hao'
+import ClipperLib from 'clipper-lib'
+import inlet from './inlet';
 
 class Utils {
 	// Метод для преобразования полярных координат в декартовы
@@ -836,7 +840,7 @@ class Utils {
     }
 
 		pathToPolyline(path, segments = 1) {
-/* 		let points = [] 
+ 		let points = [] 
 		let contourPath = SVGPathCommander.normalizePath(path);
 		let PX, PY, SX, SY;
 
@@ -905,7 +909,7 @@ class Utils {
 
 		})
 		//console.log ('Points:    '+ points)
- 		return points.join(";"); */
+ 		return points.join(";"); 
 	}
 
 	intersects(edge1, edge, asSegment=true) {
@@ -1419,7 +1423,7 @@ class Utils {
 	}
 
 	pointInSvgPath(path, x, y) {
-		//console.log(arguments)
+		console.log(arguments)
 		let polyline = this.pathToPolyline(path)
 		let polygon = this.transformCoordinates(polyline)
 		let pointIn = inside([x, y], polygon)

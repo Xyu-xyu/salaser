@@ -370,6 +370,21 @@ const en = {
     "Align": "Align",
     "Rounding": "Rounding",
     "Rounding radius": "Rounding radius",
-    "Angle": "Angle"
+    "Angle": "Angle",
+    "Prevent danger inlets and outlets": "Prevent danger inlets and outlets",
+    "Show danger inlets outlets": "Show danger inlets outlets",
+    "Move": "Move",
+    "Straight": "Straight",
+    "Hook": "Hook",
+    "Direct": "Direct",
+    "Tangent": "Tangent",
+    "Apply for all": "Apply for all",
+    "r": "r",
+    "d": "d",
+    "l": "l",
+    "a": "a",
+    "Show danger": "Show danger",
+    "Inlet":"Inlet",
+    "Straight":"Straight",
 }
 export default en;

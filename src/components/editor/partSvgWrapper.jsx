@@ -4,7 +4,7 @@ import coordsStore from '../../store/coordStore.jsx';
 import editorStore from '../../store/editorStore.jsx';
 import partStore from '../../store/partStore.jsx';
 import jointStore from '../../store/jointStore.jsx';
-
+import inlet from '../../scripts/inlet.jsx';
 import util from '../../scripts/util.jsx';
 import PartSvgComponent from './partSvgComponent.jsx';
 import Part from "./../../scripts/part.jsx";

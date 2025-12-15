@@ -358,6 +358,18 @@ const ru = {
     "cutless": "без резки",
     "Transformations": "Преобразования",
     "Rounding": "Округление",
-    "Angle": "Угол"
+    "Angle": "Угол",
+    "Move": "Двигать",
+    "Apply for all": "Применить для всех",
+    "Direct": "Прямой",
+    "Prevent danger inlets and outlets": "Предотвратите опасные входы и выходы",
+    "Tangent": "Касательная",
+    "Hook": "Крюк",
+    "d": "d",
+    "l": "л",
+    "a": "а",
+    "Show danger": "Показать опасность",
+    "Inlet":"Врезка",
+    "Straight":"Контур",
 }
 export default ru;

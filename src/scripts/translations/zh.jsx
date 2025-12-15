@@ -353,6 +353,17 @@ const zh = {
     "cutless": "免切割的",
     "Transformations": "转换",
     "Rounding": "四舍五入",
-    "Angle": "角度"
+    "Angle": "角度",
+    "Move": "移动",
+    "Apply for all": "申请全部",
+    "Direct": "直接的",
+    "Prevent danger inlets and outlets": "防止危险入口和出口",
+    "Tangent": "切线",
+    "d": "d",
+    "l": "我",
+    "a": "一个",
+    "Show danger": "表现出危险",
+    "Inlet":"Inlet",
+    "Straight":"Straight",
 }
 export default zh;

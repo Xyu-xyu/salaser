@@ -2102,7 +2102,7 @@ class Inlet {
         let reversePath =  SVGPathCommander.reversePath( selectedPath ).join(' ').replaceAll(',', ' ')
         let res = inlet.getNewInletOutlet( selectedCid, 'contour', 'path', reversePath)
         inlet.applyNewPaths( res )
-        addToLog('Contour reversed')
+        //addToLog('Contour reversed')
     }
 
     applyNewPaths (paths) {
@@ -2146,7 +2146,7 @@ class Inlet {
                 if ( paths.hasOwnProperty('contour')) partStore.updateElementValue ( cid, 'contour', 'path', contour );
                 if ( paths.hasOwnProperty('outlet')) partStore.updateElementValue ( cid, 'outlet', 'path', outlet );
                 if ( paths.hasOwnProperty('inlet')) partStore.updateElementValue ( cid, 'inlet', 'path', inlet );
-                if ( paths.hasOwnProperty('log')) addToLog(log)
+                if ( paths.hasOwnProperty('log')) //addToLog(log)
                 return true
             } else {
                 return false;
@@ -2156,7 +2156,7 @@ class Inlet {
             if ( paths.hasOwnProperty('contour')) partStore.updateElementValue ( cid, 'contour', 'path', contour );
             if ( paths.hasOwnProperty('outlet')) partStore.updateElementValue ( cid, 'outlet', 'path', outlet );
 		    if ( paths.hasOwnProperty('inlet')) partStore.updateElementValue ( cid, 'inlet', 'path', inlet );
-            if ( paths.hasOwnProperty('log')) addToLog(log)
+            if ( paths.hasOwnProperty('log')) //addToLog(log)
             return true
         }
     }   
