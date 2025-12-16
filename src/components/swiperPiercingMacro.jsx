@@ -123,32 +123,30 @@ const swiperPiercingMacro = observer(() => {
 												<div className="d-flex align-items-center justify-content-center">
 													<CustomIcon
 														icon="charm:square-tick"
-														width="48"
-														height="48"
+														width="36"
+														height="36"
 														strokeWidth={1}
 														color='white'
 														viewBox='0 0 16 16' />
 													<div className="mx-2 d-flex align-items-center">
-														<p className="text-white mb-0 font25">{t('Set')}</p>
+														<p className="text-white mb-0 font22">{t('Set')}</p>
 													</div>
 												</div>
 											</button>}
 
 											<button className="carousel_btn violet_button mx-2" 
 												onClick={ (e)=> cloneThis(e)}>
-												<div
-													className="d-flex align-items-center justify-content-center mx-2"
-													
-												>
+												<div className="d-flex align-items-center justify-content-center mx-2">
 
-													<CustomIcon icon="fa-regular:clone"
-														width="36"
-														height="48"
+													<CustomIcon 
+														icon="fa-regular:clone"
+														width="24"
+														height="36"
 														color= 'white'
 														fill = 'white'
 														viewBox='0 0 512 512' />
 													<div className="mx-2 d-flex align-items-center">
-														<p className="text-white mb-0 font25">{t('Copy')}</p>
+														<p className="text-white mb-0 font22">{t('Copy')}</p>
 													</div>
 												</div>
 											</button>
@@ -160,13 +158,13 @@ const swiperPiercingMacro = observer(() => {
 													>
 													<CustomIcon
 														icon="ic:twotone-delete-outline"
-														width="48"
-														height="48"
+														width="36"
+														height="36"
 														fill='white'
 														strokeWidth={0}/>
 
 													<div className="mx-2 d-flex align-items-center">
-														<p className="text-white mb-0 font25">{t('Delete')}</p>
+														<p className="text-white mb-0 font22">{t('Delete')}</p>
 													</div>
 												</div>
 											</button>

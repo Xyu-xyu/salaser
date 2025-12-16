@@ -143,7 +143,7 @@ const swiperModulationMacro = observer(() => {
 													color='white'
 													viewBox='0 0 16 16' />
 												<div className="mx-2 d-flex align-items-center">
-													<p className="text-white mb-0 font25">{ t('Set') }</p>
+													<p className="text-white mb-0 font22">{ t('Set') }</p>
 												</div>
 											</div>
 										</button>}
@@ -159,7 +159,7 @@ const swiperModulationMacro = observer(() => {
 													strokeWidth={0}
 												/>
 												<div className="mx-2 d-flex align-items-center">
-													<p className="text-white mb-0 font25">{ t('Delete') }</p>
+													<p className="text-white mb-0 font22">{ t('Delete') }</p>
 												</div>
 											</div>
 										</button>
@@ -177,7 +177,7 @@ const swiperModulationMacro = observer(() => {
 													viewBox='0 0 512 512'
 												/>
 												<div className="mx-2 d-flex align-items-center">
-													<p className="text-white mb-0 font25">{ t('Copy') }</p>
+													<p className="text-white mb-0 font22">{ t('Copy') }</p>
 												</div>
 											</div>
 										</button>

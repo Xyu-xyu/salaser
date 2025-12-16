@@ -31,15 +31,15 @@ const NavigationModalinStages = observer(() => {
 						) : (
 							<CustomIcon
 								icon="hugeicons:carousel-horizontal-02"
-								width="48"
-								height="48"
+								width="36"
+								height="36"
 								color='white'
 								strokeWidth={1.5}
 
 							/>
 						)}
 						<div className="mx-2 d-flex align-items-center">
-							<p className="text-white mb-0 font25">{!carouselModeInPiercing ? t('View all') : t('Edit')  }</p>
+							<p className="text-white mb-0 font22">{!carouselModeInPiercing ? t('View all') : t('Edit')  }</p>
 						</div>
 					</div>
 				</button>

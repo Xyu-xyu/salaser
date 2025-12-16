@@ -47,20 +47,20 @@ const NavigationModal = observer(() => {
 						{carouselMode ? (
 							<CustomIcon
 								icon="material-symbols:rectangle-outline-rounded"
-								width="48"
-								height="48"
+								width="36"
+								height="36"
 								style={{ color: 'white' }}
 							/>
 						) : (
 							<CustomIcon
 								icon="hugeicons:carousel-horizontal-02"
-								width="48"
-								height="48"
+								width="36"
+								height="36"
 								style={{ color: 'white' }}
 							/>
 						)}
 						<div className="mx-2 d-flex align-items-center">
-							<p className="text-white mb-0 font25">{ t('View') }</p>
+							<p className="text-white mb-0 font22">{ t('View') }</p>
 						</div>
 					</div>
 				</button>
@@ -74,11 +74,11 @@ const NavigationModal = observer(() => {
 							<CustomIcon
 								icon="fa-regular:clone"
 								width="36"
-								height="48"
+								height="36"
 								style={{ color: 'white' }}
 							/>
 							<div className="mx-2 d-flex align-items-center">
-								<p className="text-white mb-0 font25">{ t('Copy') }</p>
+								<p className="text-white mb-0 font22">{ t('Copy') }</p>
 							</div>
 						</div>
 					</button>
@@ -92,12 +92,12 @@ const NavigationModal = observer(() => {
 						>
 							<CustomIcon
 								icon="ic:twotone-delete-outline"
-								width="48"
-								height="48"
+								width="36"
+								height="36"
 								style={{ color: 'white' }}
 							/>
 							<div className="mx-2 d-flex align-items-center">
-								<p className="text-white mb-0 font25">{ t('Delete') }</p>
+								<p className="text-white mb-0 font22">{ t('Delete') }</p>
 							</div>
 						</div>
 					</button>
