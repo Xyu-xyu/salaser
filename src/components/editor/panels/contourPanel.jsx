@@ -124,8 +124,8 @@ const ContourPanel = observer(() => {
 
 		const box = SVGPathCommander.getPathBBox(path);
 		if (box) {
-			let w = util.round(box.width, 3)
-			let h = util.round(box.height, 3)
+			let w = util.round(box.width, 2)
+			let h = util.round(box.height, 2)
 			setWH({ w, h })
 
 		}
@@ -146,7 +146,7 @@ const ContourPanel = observer(() => {
 			y = box.y2
 		}
 
-		if (activeCooord) setActiveCoord({ x: util.round(x, 3), y: util.round(y, 3) })
+		if (activeCooord) setActiveCoord({ x: util.round(x, 2), y: util.round(y, 2) })
 	}
 
 	const captureInput = (event) => {
@@ -383,7 +383,7 @@ const ContourPanel = observer(() => {
 				<table className="table mb-0">
 					<thead className="table-dark">
 						<tr>
-							<th colSpan={4}>{t('Transformations')}</th>
+							<th colSpan={5}>{t('Transformations')}</th>
 						</tr>
 					</thead>
 					<tbody>

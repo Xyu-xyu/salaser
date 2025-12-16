@@ -3,6 +3,7 @@ import SVGPathCommander from 'svg-path-commander';
 import arc from './arc.jsx';
 import CONSTANTS from './../store/constants.jsx';
 import partStore from './../store/partStore.jsx';
+//import editorStore from './../store/editorStore.jsx';
 import { addToLog } from './../scripts/addToLog';
 
 
@@ -931,6 +932,7 @@ class Inlet {
             var midPoint;
             var pointOn, pointIn, perpendicular, direction;
             var fakePath, fakePoint
+            let x1, y1;
 
             const commandType = nearestSegment[0]
             //console.log ( 'commandType ' +commandType )

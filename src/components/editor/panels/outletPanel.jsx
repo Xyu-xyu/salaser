@@ -319,7 +319,7 @@ const OutletPanel = observer(() => {
 							<tr>
 								<td className="w-50">
 									<div className='d-flex flex-column align-items-baseline justify-content-between h-100 mt-2'
-										style={{marginLeft :"30px"}}>
+										style={{marginLeft :"18px"}}>
 										<div className="form-check text-left m-0 p-0">
 											<input
 												className="form-check-input mt-0 mt-0 inputOutletType"
