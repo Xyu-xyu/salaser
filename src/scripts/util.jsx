@@ -207,7 +207,7 @@ class Utils {
 		return {
 			x1: isVertical ? 17 : -10,
 			x2: isVertical ? 83 : 110,
-			x4: isVertical ? 5 : -56,
+			x4: isVertical ? 5 : -50,
 			y1: isVertical ? 105 : 80,
 			y2: 80,
 			y3: isVertical ? -15 : 15,

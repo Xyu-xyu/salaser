@@ -55,6 +55,8 @@ const ContourPanel = observer(() => {
 				partStore.addElement(inlet)
 				partStore.addElement(outlet)
 			}*/
+
+			partStore.updateElementValue(selected.cid, 'outlet', 'class', "outlet inner closed1 "+newMode)
 			partStore.updateElementValue(selected.cid, 'contour', 'class', newClass)
 			//addToLog('Contour type changed')
 		}

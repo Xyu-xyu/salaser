@@ -2027,13 +2027,12 @@ g.macro2 {
 
 
 .operating_mode.macro3{
-    background-color: blue;
+    background-color: green;
 }
 g.macro3{   
     stroke-width: var(--widthUsual);
-    stroke: blue;
+    stroke: green;
 }
-
 
 
 .operating_mode.macro4{
@@ -2045,38 +2044,31 @@ g.macro4{
 }
 
 .operating_mode.macro5{
-    border-top: 2px cyan;
+  background: 2px cyan;
 }
 g.macro5{
     stroke: cyan;
     stroke-width: var(--widthUsual);
-    stroke-dasharray: 2px, 2px;
-}
+/*     stroke-dasharray: 2px, 2px;
+ */}
 
 
 .operating_mode.macro6{
-  border-top: 2px blue;
+  background-color: blue;
 }
-g.macro6{
-  stroke: blue;
+g.macro6{   
   stroke-width: var(--widthUsual);
-  stroke-dasharray: 2px, 2px;
+  stroke: blue;
 }
 
 
 .operating_mode.macro7{
-  border-top: 2px var(--violet);
+  background-color: var(--violet);
 }
-
-g.macro7{
-  stroke: var(--violet);
+g.macro7{   
   stroke-width: var(--widthUsual);
-  stroke-dasharray: 2px, 2px;
+  stroke: var(--violet);
 }
-
-
-
-
 
 #operatingContourModeSelect,
 #operatingInletSelect,

@@ -90,23 +90,6 @@ class SvgStore {
         return maxId + 1;
     }
 
-	
-	get tecnology () {
-		try {
-			let allClasses =''
-			this.svgData.part_code[0].code.forEach(element => {
-			   allClasses+=' '
-			   allClasses+=element.class
-			   allClasses+=' '
-			  });
-		   let allTec = [...new Set (allClasses.split(/\s{1,}/gm))]
-		   return allTec 
-			
-		} catch (error) {
-			return []			
-		}	
-	}
-	
 	setMatrix  (val) {
 		Object.assign(this.matrix, val)
 	}

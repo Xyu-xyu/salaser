@@ -48,7 +48,7 @@ const constants = {
 	defaultStringInterval:18,
 	defaultJointSize: 0.2,
     contourTypes:['engraving', 'inner', 'outer'],
-    operatingModes:['macro0', 'macro1','macro2', 'macro3', 'macro4', 'macro5', ],
+    operatingModes:['macro0', 'macro1','macro2', 'macro3', 'macro4', 'macro5','macro6', 'macro7' ],
     piercingModes: {'normal':0, 'without_time':-1, 'pulse':1},
     panelPostions:	{
 		logPopup: {
