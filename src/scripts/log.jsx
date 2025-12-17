@@ -1,3 +1,8 @@
+import logStore from "../store/logStore";
+import jointStore from "../store/jointStore";
+import partStore from "../store/partStore";
+
+
 function openDatabase() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open('parteditor', 1);
@@ -99,7 +104,6 @@ class Log {
         });
     }
     
-
     // Очистка базы данных
     clearBase() {
         if (!this.db) {
@@ -128,6 +132,33 @@ class Log {
             this.save(data);
         }, 30000); // Сохранение каждые 30 секунд
     }
+
+    async restorePoint () {
+		try {			
+			//console.log('Restore from', tpoint);
+			let tpoint = logStore.currentTimeStamp
+			if (!tpoint) return
+			const data = await log.load(tpoint);	
+ 			//console.log('Loaded data:', data);
+			if (!data) return
+			let parsed = JSON.parse(data.svg)
+			let joints = JSON.parse(data.joints)
+			if (parsed ) {
+				const newSvgData = {
+					width: parsed.width,
+					height: parsed.height,
+					code: parsed.code,
+					params: parsed.params,
+				  };
+				partStore.setSvgData(newSvgData)
+				jointStore.setData(joints)
+			}		
+			logStore.makeNoteActive(tpoint)	
+			
+		} catch (error) {
+			console.error('Error during restore:', error);
+		}
+	}
 }
 
 const log = new Log();

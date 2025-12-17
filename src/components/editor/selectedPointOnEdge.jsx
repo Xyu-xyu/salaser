@@ -14,7 +14,7 @@ const SelectedPointOnEdge = observer(() => {
 	}
 
 	const onMouseUp =()=>{
-		//addToLog("Contour was changed")
+		addToLog("Contour was changed")
 		partStore.setBoundsList(false)
 	}
 

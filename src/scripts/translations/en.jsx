@@ -410,6 +410,14 @@ const en = {
     "Paste copied contour": "Paste copied contour",
     "Revert contour path": "Revert contour path",
     "Remove joint": "Remove joint",
-    "Select contour": "Select contour"
+    "Select contour": "Select contour",
+    "History": "History",
+    "Ready to work": "Ready to work",
+    "Restore": "Restore",
+    "Contour type changed": "Contour type changed",
+    "Text was changed": "Text was changed",
+    "Contour changed by selector": "Contour changed by selector",
+    "Set inlet type": "Set inlet type",
+    "Inlet type changed": "Inlet type changed"
 }
 export default en;

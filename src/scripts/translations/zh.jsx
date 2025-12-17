@@ -388,6 +388,14 @@ const zh = {
     "Set new outer contour": "设置新的外轮廓",
     "Paste copied contour": "粘贴复制的轮廓",
     "Select contour": "选择轮廓",
-    "Letter spacing": "字母间距"
+    "Letter spacing": "字母间距",
+    "History": "历史",
+    "Restore": "恢复",
+    "Ready to work": "准备工作",
+    "Contour type changed": "轮廓类型已更改",
+    "Text was changed": "文字已更改",
+    "Contour changed by selector": "轮廓被选择器改变",
+    "Set inlet type": "设置入口类型",
+    "Inlet type changed": "入口类型已更改"
 }
 export default zh;

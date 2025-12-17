@@ -58,7 +58,7 @@ const ContourPanel = observer(() => {
 
 			partStore.updateElementValue(selected.cid, 'outlet', 'class', "outlet inner closed1 "+newMode)
 			partStore.updateElementValue(selected.cid, 'contour', 'class', newClass)
-			//addToLog('Contour type changed')
+			addToLog('Contour type changed')
 		}
 	}
 
@@ -70,7 +70,7 @@ const ContourPanel = observer(() => {
 			let inlet = partStore.getElementByCidAndClass(selected.cid, 'inlet')
 			let newClass = inlet.class.replace(/macro\d/gm, '') + ' ' + newMode
 			partStore.updateElementValue(selected.cid, 'inlet', 'class', newClass)
-			//addToLog('Inlet type changed')
+			addToLog('Inlet type changed')
 
 		}
 	}
@@ -83,7 +83,7 @@ const ContourPanel = observer(() => {
 			let inlet = partStore.getElementByCidAndClass(selected.cid, 'inlet')
 			let newClass = inlet.class.replace(/pulse-1/gm, '').replace(/pulse\d/gm, '') + ' ' + newMode
 			partStore.updateElementValue(selected.cid, 'inlet', 'class', newClass)
-			//addToLog('Piercing type changed')
+			addToLog('Piercing type changed')
 		}
 
 	}

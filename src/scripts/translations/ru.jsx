@@ -396,6 +396,14 @@ const ru = {
     "Paste copied contour": "Вставить скопированный контур",
     "Select contour": "Выбрать контур",
     "Resize mode": "Режим изменения размера",
-    "Select point mode": "Выбор точечного режима"
+    "Select point mode": "Выбор точечного режима",
+    "History": "История",
+    "Restore": "Восстановить",
+    "Ready to work": "Готов к работе",
+    "Contour type changed": "Тип контура изменен",
+    "Text was changed": "Текст был изменен",
+    "Contour changed by selector": "Контур изменен селектором",
+    "Set inlet type": "Установить тип входа",
+    "Inlet type changed": "Тип впуска изменен"
 }
 export default ru;

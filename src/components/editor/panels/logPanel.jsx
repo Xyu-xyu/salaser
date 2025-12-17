@@ -1,14 +1,13 @@
-import { Icon } from '@iconify/react';
-import Panel from './panel.js';
-import '@fortawesome/fontawesome-free/css/all.css'
-import { observer } from 'mobx-react-lite';  
-import logStore from '../stores/logStore.js'; 
-import svgStore from "../stores/svgStore.js";
-import jointStore from "../stores/jointStore.js";
-import { useEffect, useState } from 'react';
-import log from './../../scripts/log.js'
+import logStore from './../../../store/logStore'; 
+import partStore from "./../../../store/partStore";
+//import jointStore from "../stores/jointStore.js";
+import { useEffect  } from 'react';
+import log from './../../../scripts/log.jsx'
 import { useTranslation } from 'react-i18next';
-import { addToLog } from '../../scripts/addToLog.js';
+import { observer } from 'mobx-react-lite';
+import Panel from './panel.jsx';
+import { addToLog } from './../../../scripts/addToLog.jsx';
+import CustomIcon from './../../../icons/customIcon.jsx';
 
 
 const LogPanel = observer(() => {
@@ -39,7 +38,7 @@ const LogPanel = observer(() => {
 			const data = await log.load(tpoint);	
  			console.log('Loaded data:', data);
 			let parsed = JSON.parse(data.svg)
-			let joints = JSON.parse(data.joints)
+			//let joints = JSON.parse(data.joints)
 			if (parsed ) {
 				const newSvgData = {
 					width: parsed.width,
@@ -47,8 +46,8 @@ const LogPanel = observer(() => {
 					code: parsed.code,
 					params: parsed.params,
 				  };
-				svgStore.setSvgData(newSvgData)
-				jointStore.setData(joints)
+				partStore.setSvgData(newSvgData)
+				//jointStore.setData(joints)
 			}		
 			logStore.makeNoteActive(tpoint)	
 			
@@ -60,7 +59,18 @@ const LogPanel = observer(() => {
 	const panelInfo = [
 		  {
 			id: 'logPopup',
-			fa: (<><Icon icon="vaadin:time-backward" width="24" height="24"  style={{color: 'white'}} className='me-2' /><div>{t('History')}</div></>),
+			fa: (<>
+			<CustomIcon
+					icon="history"
+					width="24"
+					height="24"
+					color="black"
+					fill="black"
+					strokeWidth={0}
+					viewBox='0 0 16 16'
+					className={'m-2'}
+				/>
+			<div>{t('History')}</div></>),
 			content: (
 				<div id="logger_wrapper">
 				  <div id="logger">
@@ -73,7 +83,7 @@ const LogPanel = observer(() => {
 										<h6>{time(element.time)}</h6>
 									</div>
 									<div className="ms-2">
-										<h6 className="text-white">{t(element.action)}</h6>
+										<h6 className="">{t(element.action)}</h6>
 									</div>
 								</div>
 								<div className="me-4">
@@ -96,7 +106,7 @@ const LogPanel = observer(() => {
 return (
 	<>
 		{panelInfo.map((element, index) => (
-			<Panel key={'panel' + index+3} element={element} index={3} />
+			<Panel key={'panel' + index+3} element={element} />
 		))}
 	</>
 	);

@@ -28,7 +28,7 @@ const TecnologyPanel =  observer(() => {
 					<div>{t('Operating modes')}</div>
 				</>),
 	 		content: (
-			  <div className="window-content">
+			  <div className="">
 				<div className="d-flex">
 				  <table className="table">
 					<tbody>

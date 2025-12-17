@@ -251,6 +251,7 @@ const TextPanel = observer(() => {
 					strokeWidth={1}							
 					color='black'
 					className={'m-2'}
+					viewBox='0 0 20 20'
 				/>
 				<div>{t('Text')}</div>
 			</>),

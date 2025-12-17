@@ -5,6 +5,7 @@ import InletPanel from './inletPanel.jsx';
 import OutletPanel from './outletPanel.jsx';
 import TecnologyPanel from './tecnologyPanel.jsx';
 import TextPanel from './textPanel.jsx';
+import LogPanel from './logPanel.jsx';
 
 
 const PartPanels = () => {
@@ -17,6 +18,7 @@ const PartPanels = () => {
 			<OutletPanel />
 			<TecnologyPanel />
 			<TextPanel />
+			<LogPanel />
 		</>
 	);
 };

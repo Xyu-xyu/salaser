@@ -4,7 +4,7 @@ import editorStore from "./../../store/editorStore.jsx";
 import Util from "./../../scripts/util.jsx";
 import inlet from "./../../scripts/inlet.jsx";
 import { useEffect, useState } from "react";
-//import { addToLog } from './../scripts/addToLog.js';
+import { addToLog } from './../../scripts/addToLog.jsx';
 import SVGPathCommander from "svg-path-commander";
 
 const PartSelector = observer(() => {
@@ -291,7 +291,7 @@ const PartSelector = observer(() => {
 		document.removeEventListener('touchend', handleMouseUp);
 
 		setInmove(false)
-		//addToLog('Contour changed by selector')
+		addToLog('Contour changed by selector')
 	}
 
 	return (

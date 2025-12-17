@@ -2,7 +2,6 @@ import { makeAutoObservable } from "mobx";
 import CONSTANTS from "./constants";
 
 
-
 class PanelStore {
 
 	positions = CONSTANTS.panelPostions

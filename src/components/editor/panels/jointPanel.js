@@ -1,11 +1,9 @@
- import Panel from './panel.js';
+import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 import util from '../../utils/util.js';
-//import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
- //import { toJS } from "mobx";
 import CONSTANTS from '../../constants/constants.js';
 import { addToLog } from '../../scripts/addToLog.js';
 import jointStore from '../stores/jointStore.js';

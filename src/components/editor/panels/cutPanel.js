@@ -6,7 +6,6 @@ import util from '../../utils/util.js';
 //import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
 import CONSTANTS from '../../constants/constants.js';
-import { addToLog } from '../../scripts/addToLog.js';
 import jointStore from '../stores/jointStore.js';
 import svgStore from '../stores/svgStore.js';
 import { Icon } from '@iconify/react';

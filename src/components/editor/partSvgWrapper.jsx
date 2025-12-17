@@ -3,6 +3,8 @@ import { observer } from 'mobx-react-lite';
 import coordsStore from '../../store/coordStore.jsx';
 import editorStore from '../../store/editorStore.jsx';
 import partStore from '../../store/partStore.jsx';
+import logStore from '../../store/logStore.jsx';
+import log from "./../../scripts/log.jsx"
 import jointStore from '../../store/jointStore.jsx';
 import inlet from '../../scripts/inlet.jsx';
 import util from '../../scripts/util.jsx';
