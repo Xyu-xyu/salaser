@@ -21,8 +21,13 @@ class EditorStore {
   }
 
   setMode = (newMode )=> {
-    console.log ("WE SET NEW MODE :" + newMode)
-    this.mode = newMode;
+    if (newMode !== this.mode  ) {
+      console.log ("WAS " + this.mode +" WE SET NEW MODE :" + newMode)
+      this.mode = newMode
+      
+    } else {
+      console.log ("STILL OLDMODE :" + this.mode)
+    }
   };
 
   setInletMode = (newMode )=> {

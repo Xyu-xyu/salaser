@@ -1,12 +1,12 @@
 import React from 'react';
-import ToolsPanel from './toolsPanel.jsx'
+import SheetToolsPanel from './sheetToolsPanel.jsx'
 import FormsPanel from './formsPanel.jsx'
  
 
 const Panels = () => {
  	return (
 		<>
-			<ToolsPanel />	
+			<SheetToolsPanel />	
 			<FormsPanel />
  		</>
 	);

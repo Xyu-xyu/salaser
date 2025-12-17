@@ -71,6 +71,16 @@ const constants = {
 				zIndex:2
 			}
 		},
+		sheetToolsPopup: {
+			mini: false,
+			style: {
+				top: 40,
+				left: 300,
+				width: 125,
+				height: 380,
+				zIndex:2
+			}
+		},
 		contourModesPopup: {
 			mini: true,
 			style: {

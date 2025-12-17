@@ -1,15 +1,15 @@
 import Panel from './panel.jsx';
 import { observer } from 'mobx-react-lite';
-import partStore from "./../../../store/partStore.jsx";
-import editorStore from "./../../../store/editorStore.jsx";;
-import inlet from './../../../scripts/inlet.jsx'
-import ShapeModalComponent from './../shapeModalComponent.jsx';
-import { addToLog } from './../../../scripts/addToLog.jsx';
-import util from './../../../scripts/util.jsx';
-import CustomIcon from './../../../icons/customIcon.jsx';
+import partStore from "../../../store/partStore.jsx";
+import editorStore from "../../../store/editorStore.jsx";;
+import inlet from '../../../scripts/inlet.jsx'
+import ShapeModalComponent from '../shapeModalComponent.jsx';
+import { addToLog } from '../../../scripts/addToLog.jsx';
+import util from '../../../scripts/util.jsx';
+import CustomIcon from '../../../icons/customIcon.jsx';
 
 
-const ToolsPanel = observer(() => {
+const SheetToolsPanel = observer(() => {
 	const deleteContour = () => {
 		if (partStore.getSelectedElement()) {
 			partStore.deleteSelected()
@@ -77,7 +77,7 @@ const ToolsPanel = observer(() => {
 
 	const panelInfo = [
 		{
-			id: "toolsPopup",
+			id: "sheetToolsPopup",
 			fa: (
 				<CustomIcon
 					icon="wrench"
@@ -184,7 +184,7 @@ const ToolsPanel = observer(() => {
 					</button>
 					{ partStore.selectedPointOnEdge ? 
 
-<button disabled
+					<button disabled
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
 							onMouseDown={deletePoint}
@@ -317,7 +317,7 @@ const ToolsPanel = observer(() => {
 	);
 })
 
-export default ToolsPanel;
+export default SheetToolsPanel;
 
 
 
