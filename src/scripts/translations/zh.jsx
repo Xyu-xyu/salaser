@@ -344,7 +344,7 @@ const zh = {
     "pulse": "脉冲",
     "Select Contour Mode": "选择轮廓模式",
     "outer&inner": "外层&内层",
-    "Select Inlet Mode": "选择进样模式",
+    "Inlet Mode": "选择进样模式",
     "cutting": "切割",
     "Align": "对齐",
     "engraving": "雕刻",
@@ -365,6 +365,9 @@ const zh = {
     "Show danger": "表现出危险",
     "Inlet": "Inlet",
     "Straight": "Straight",
-    "Outlet": "出路"
+    "Outlet": "出路",
+    "Select Inlet Mode": "选择进样模式",
+    "Operating modes": "操作模式",
+    "Tags": "标签"
 }
 export default zh;

@@ -360,11 +360,11 @@ const en = {
     "without time": "without time",
     "pulse": "pulse",
     "Inlet": "Inlet",
-    "Select Inlet Mode": "Select Inlet Mode",
+    "Inlet Mode": "Inlet Mode",
     "cutting": "cutting",
     "engraving": "engraving",
     "cutless": "cutless",
-    "Select Contour Mode": "Select Contour Mode",
+    "Contour Mode": "Contour Mode",
     "Transformations": "Transformations",
     "outer&inner": "outer&inner",
     "Align": "Align",
@@ -384,6 +384,10 @@ const en = {
     "l": "l",
     "a": "a",
     "Show danger": "Show danger",
-    "Outlet": "Outlet"
+    "Outlet": "Outlet",
+    "Select Inlet Mode": "Select Inlet Mode",
+    "Select Contour Mode": "Select Contour Mode",
+    "Operating modes": "Operating modes",
+    "Tags": "Tags"
 }
 export default en;

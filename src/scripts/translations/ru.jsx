@@ -348,7 +348,7 @@ const ru = {
     "normal": "нормальный",
     "pulse": "пульс",
     "engraving": "гравировка",
-    "Select Inlet Mode": "Выберите режим врезки",
+    "Inlet Mode": "макрос врезки",
     "Align": "Выровнять",
     "Piercing": "Пирсинг",
     "outer&inner": "внешний и внутренний",
@@ -371,6 +371,9 @@ const ru = {
     "Show danger": "Показать опасность",
     "Inlet": "Врезка",
     "Straight": "Контур",
-    "Outlet": "Выход"
+    "Outlet": "Выход",
+    "Contour Mode": "макрос контура",
+    "Operating modes": "Режимы работы",
+    "Tags": "Теги"
 }
 export default ru;
