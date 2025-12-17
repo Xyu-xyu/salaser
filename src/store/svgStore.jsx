@@ -1,6 +1,6 @@
 import { makeAutoObservable,  runInAction } from "mobx";
 import SVGPathCommander from 'svg-path-commander';
-
+ 
   
 class SvgStore {
 	tooltips = false;
@@ -12,7 +12,7 @@ class SvgStore {
 		"width": 500,
 		"height": 500,
 		"quantity": 1,
-		"presetId": 0,
+		"presetId": 50,
 		"presetName": "any_preset",
 		"positions": [
 			/*{
@@ -92,15 +92,19 @@ class SvgStore {
 
 	
 	get tecnology () {
-	/* 	let allClasses =''
-		this.svgData['code'].forEach(element => {
-			allClasses+=' '
-			allClasses+=element.class
-			allClasses+=' '
-   		});
-		let allTec = [...new Set (allClasses.split(/\s{1,}/gm))]
-		//console.log("printStore:", toJS(allTec));
-	    return allTec */
+		try {
+			let allClasses =''
+			this.svgData.part_code[0].code.forEach(element => {
+			   allClasses+=' '
+			   allClasses+=element.class
+			   allClasses+=' '
+			  });
+		   let allTec = [...new Set (allClasses.split(/\s{1,}/gm))]
+		   return allTec 
+			
+		} catch (error) {
+			return []			
+		}	
 	}
 	
 	setMatrix  (val) {

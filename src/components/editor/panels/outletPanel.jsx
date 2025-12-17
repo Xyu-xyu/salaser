@@ -2,10 +2,10 @@ import { observer } from 'mobx-react-lite';
 import partStore from "./../../../store/partStore.jsx";
 //import editorStore from "./../../../store/editorStore.jsx";
 import { useEffect, useState } from 'react';
-import Hook from './../../../../public/images//Hook.jpg';
-import Direct from './../../../../public/images/Direct.jpg';
-import Straight from './../../../../public/images/Straight.jpg';
-import Tangent from './../../../../public/images//Tangent.jpg';
+import Hook from './../../../images//Hook.jpg';
+import Direct from './../../../images/Direct.jpg';
+import Straight from './../../../images/Straight.jpg';
+import Tangent from './../../../images//Tangent.jpg';
 import SVGPathCommander from 'svg-path-commander';
 import util from './../../../scripts/util.jsx';
 import inlet from './../../../scripts/inlet.jsx'
@@ -559,7 +559,7 @@ const OutletPanel = observer(() => {
 return (
 	<>
 		{panelInfo.map((element) => (
-			<Panel key={'panel' + 5} element={element} index={5} />
+			<Panel key={'panel' + 5} element={element}/>
 		))}
 	</>
 	);

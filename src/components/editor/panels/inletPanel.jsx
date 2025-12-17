@@ -2,10 +2,10 @@ import { observer } from 'mobx-react-lite';
 import partStore from "./../../../store/partStore.jsx";
 import editorStore from "./../../../store/editorStore.jsx";
 import { useEffect, useState } from 'react';
-import Hook from './../../../../public/images//Hook.jpg';
-import Direct from './../../../../public/images/Direct.jpg';
-import Straight from './../../../../public/images/Straight.jpg';
-import Tangent from './../../../../public/images//Tangent.jpg';
+import Hook from './../../../images/Hook.jpg';
+import Direct from './../../../images/Direct.jpg';
+import Straight from './../../../images/Straight.jpg';
+import Tangent from './../../../images//Tangent.jpg';
 import SVGPathCommander from 'svg-path-commander';
 import util from './../../../scripts/util.jsx';
 import inlet from './../../../scripts/inlet.jsx'
@@ -461,8 +461,7 @@ const InletPanel = observer(() => {
 										<img id="inlet_viewer__wrapper__img" src={
 											type === "Straight" ? Straight :
 												type === "Hook" ? Hook :
-													type === "Direct" ? Direct :
-														type === "Tangent" ? Tangent : ''
+													type === "Direct" ? Direct : Tangent
 										} alt="no img"
 										/>
 									</div>
@@ -627,7 +626,7 @@ const InletPanel = observer(() => {
 	return (
 		<>
 			{panelInfo.map((element, index) => (
-				<Panel key={'panel' + index +2} element={element} index={2} />
+				<Panel key={'panel' + index +2} element={element}/>
 				
 			))}
 		</>

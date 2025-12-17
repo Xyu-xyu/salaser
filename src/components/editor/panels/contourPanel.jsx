@@ -8,7 +8,8 @@ import inlet from './../../../scripts/inlet.jsx'
 import { addToLog } from './../../../scripts/addToLog.jsx';
 import { useTranslation } from 'react-i18next';
 import CustomIcon from './../../../icons/customIcon.jsx';
-
+import constants from '../../../store/constants.jsx';
+import svgStore from '../../../store/svgStore.jsx';
 
 
 const ContourPanel = observer(() => {
@@ -29,8 +30,8 @@ const ContourPanel = observer(() => {
 		let oldMode = selected.class.split(' ').filter(a => a.startsWith('macro')).join('')
 		if (selected) {
 			let newClass = selected.class.replace(/macro\d/gm, '') + ' ' + newMode
-			if (newMode === 'macro2') {
-				newClass += ' engraving'
+			/*if (newMode === 'macro2') {
+				newClass += 'macro2'
 				partStore.removeElementByCidAndClass(selectedCid, 'inlet')
 				partStore.removeElementByCidAndClass(selectedCid, 'outlet')
 			}
@@ -53,9 +54,9 @@ const ContourPanel = observer(() => {
 				};
 				partStore.addElement(inlet)
 				partStore.addElement(outlet)
-			}
+			}*/
 			partStore.updateElementValue(selected.cid, 'contour', 'class', newClass)
-			addToLog('Contour type changed')
+			//addToLog('Contour type changed')
 		}
 	}
 
@@ -67,7 +68,7 @@ const ContourPanel = observer(() => {
 			let inlet = partStore.getElementByCidAndClass(selected.cid, 'inlet')
 			let newClass = inlet.class.replace(/macro\d/gm, '') + ' ' + newMode
 			partStore.updateElementValue(selected.cid, 'inlet', 'class', newClass)
-			addToLog('Inlet type changed')
+			//addToLog('Inlet type changed')
 
 		}
 	}
@@ -80,7 +81,7 @@ const ContourPanel = observer(() => {
 			let inlet = partStore.getElementByCidAndClass(selected.cid, 'inlet')
 			let newClass = inlet.class.replace(/pulse-1/gm, '').replace(/pulse\d/gm, '') + ' ' + newMode
 			partStore.updateElementValue(selected.cid, 'inlet', 'class', newClass)
-			addToLog('Piercing type changed')
+			//addToLog('Piercing type changed')
 		}
 
 	}
@@ -89,18 +90,22 @@ const ContourPanel = observer(() => {
 	const [activeCooord, setActiveCoord] = useState({ x: 0, y: 0 })
 	const [wh, setWH] = useState({ w: 0, h: 0 })
 	const [angle, setAngle] = useState(0)
-	const cellRef = useRef(null); // Ссылка на ячейку таблицы
-
+	const cellRef = useRef(null); 
 
 	const contourPoint = (e) => {
 		let id = e.currentTarget.getAttribute('id')
 		setActive(id)
 	}
 
+	const [ macrosCount, setMacrosCount] = useState(0)
+	useEffect (() =>{
+		
+		getAndCountMacros()
+
+	},[])
 
 	useEffect(() => {
-		//console.log ('USING EFFECT')
-		updateState()
+ 		updateState()
 	}, [selected, selectedPath, activePoint])
 
 	const updateState = () => {
@@ -173,6 +178,24 @@ const ContourPanel = observer(() => {
 		selection.removeAllRanges(); // Убираем все выделения
 		selection.addRange(range); // Добавляем новый диапазон 
 	};
+
+	async function getAndCountMacros () {
+		let id = svgStore.svgData.presetId
+ 		const resp = await fetch(`${constants.SERVER_URL}/db/get_preset?id=${id}`, {
+			method: "GET",
+		});
+
+		if (!resp.ok) throw new Error(`Ошибка: ${resp.statusText}`);
+		const data = await resp.json();
+		try {
+
+			let count = data.preset.technology.macros.length
+			setMacrosCount( count )
+
+		} catch (error) {
+			console.log ("Error in getAndCountMacros")			
+		}
+	}
 
 	const onKeyDown = (e) => {
 		let id = e.currentTarget.getAttribute('id')
@@ -294,13 +317,14 @@ const ContourPanel = observer(() => {
 			content: (<div className="d-flex flex-column">
 				<table className="table mb-0">
 					<tbody>
-						<tr>
+						<tr className='d-none'>
 							<td colSpan={2} className="text-start ps-2">
 								{t('Type')}:
 							</td>
 							<td colSpan={2}><div id="info_type">{t(selectedType)}</div></td>
 						</tr>
-						<tr style={{ height: "1.5rem" }}>
+						{/* Пирсинг тайп определяется только макросом  */}
+						<tr style={{ height: "1.5rem" }} className='d-none'>
 							<td colSpan={2} className="text-start ps-2">
 								{t('Piercing')}:
 							</td>
@@ -321,6 +345,7 @@ const ContourPanel = observer(() => {
 								</select>
 							</td>
 						</tr>
+						{/* Пирсинг тайп определяется только макросом  */}
 						<tr style={{ height: "1.5rem" }}>
 							<td colSpan={2} className="text-start ps-2">
 								{t('Inlet')}:
@@ -338,20 +363,20 @@ const ContourPanel = observer(() => {
 									onChange={setSelectedInletModeType}
 								>
 									<option value={-1} disabled={selectedInletModeType}>
-										-- {t('Select Inlet Mode')} --
+										-- {t('Inlet Mode')} --
 									</option>
-									<option value={0} >{t('cutting')}</option>
-									<option value={1} >{t('pulse')}</option>
-									<option value={2} >{t('engraving')}</option>
-									<option value={3} >{t('macro')}3</option>
-									<option value={4} >{t('macro')}4</option>
-									<option value={5} >{t('cutless')}</option>
+									{
+										Array.from({ length: Number(macrosCount) }, (_, index) => (
+										<option key={index} value={index}>
+											macro{index}
+										</option>))
+									}
 								</select>
 							</td>
 						</tr>
 						<tr style={{ height: "1.5rem" }}>
 							<td colSpan={2} className="text-start ps-2">
-								Contour:
+								{t("Contour")}:
 							</td>
 							<td
 								colSpan={2}
@@ -367,14 +392,15 @@ const ContourPanel = observer(() => {
 									onChange={setSelectedContourModeType}
 								>
 									<option value={-1} disabled={selectedContourModeType}>
-										-- {t('Select Contour Mode')} --
+										-- {t('Contour Mode')} --
 									</option>
-									<option value={0} >{t('cutting')}</option>
-									<option value={1} >{t('pulse')}</option>
-									<option value={2} >{t('engraving')}</option>
-									<option value={3} >{t('macro')}3</option>
-									<option value={4} >{t('macro')}4</option>
-									<option value={5} >{t('cutless')}</option>
+									{
+										Array.from({ length: Number(macrosCount) }, (_, index) => (										
+										<option key={index} value={index}>
+											macro{index}
+										</option>
+										))
+									}
 								</select>
 							</td>
 						</tr>
@@ -685,7 +711,7 @@ const ContourPanel = observer(() => {
 	return (
 		<>
 			{panelInfo.map((element, index) => (
-				<Panel key={'panel' + index + 1} element={element} index={index + 1} />
+				<Panel key={'panel' + index + 1} element={element} />
 			))}
 		</>
 	);

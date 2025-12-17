@@ -2,11 +2,17 @@ import { makeAutoObservable } from "mobx";
 import CONSTANTS from "./constants";
 
 
+
 class PanelStore {
 
 	positions = CONSTANTS.panelPostions
+	maxZindex = 0
 	constructor() {
 		makeAutoObservable(this);
+	}
+
+	setMaxZindex (val) {
+		this.maxZindex = val
 	}
 
 	getInitialPositions() {

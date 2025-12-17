@@ -4,15 +4,13 @@ import panelStore from "./../../../store/panelStore";
 //import { toJS } from "mobx";
 
 
-const Panel = observer (({ element, index }) => {
+const Panel = observer (({ element }) => {
 	const id =element.id
 
 	useEffect(()=>{
 		panelStore.getInitialPositions()
 	},[])
-	
-	
-	const [zIndex, setZIndex] = useState(index+1);
+
 	const panelRef = useRef(null);
 	const startPos = useRef({ x: 0, y: 0 });
 	const startWidth = useRef(0);
@@ -21,7 +19,7 @@ const Panel = observer (({ element, index }) => {
 	const startX = useRef(0);
 	const move = useRef(0);
 
-	const toggleMinified = () => {
+ 	const toggleMinified = () => {
 		handleIncreaseZIndex()
 		let positions = {
 			style:{
@@ -139,19 +137,17 @@ const Panel = observer (({ element, index }) => {
 	};
 
 	const findHighestZIndex = () => {
-		let inx = [...Object.values(panelStore.positions).map(popup => popup.style.zIndex)]||[1]
+		let inx = [...Object.values(panelStore.positions).map(popup => popup.style.zIndex)]
 		let maxZIndex = Math.max( ...inx  );		
 		return maxZIndex+1;
 	};
 
 	const handleIncreaseZIndex = () => {
 		const currentMaxZIndex = findHighestZIndex();
-		setZIndex(currentMaxZIndex + 1);
-		console.log ('Set Z')
+		panelStore.setMaxZindex ( currentMaxZIndex )
 	};
 
 	const  savePanelPosition =(id)=>{
-		console.log("SavePositions")
 		let ppp = localStorage.getItem('ppp')
 		if (!ppp) {
             let ppp = {}
@@ -162,14 +158,13 @@ const Panel = observer (({ element, index }) => {
         }
 	}   
 
-
 	return (
 		<div
 			ref={panelRef}
 			id={element.id}
 			className={`window popup ${panelStore.positions[id].mini ? " mini h45" : ""}`}
 			style={{
-				zIndex: zIndex,
+				zIndex: `${panelStore.positions[id].style.zIndex}`,
 				top: `${panelStore.positions[id].style.top}px`,
 				left: `${panelStore.positions[id].style.left}px`,
 				width: `${panelStore.positions[id].style.width}px`,
