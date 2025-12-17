@@ -368,6 +368,26 @@ const zh = {
     "Outlet": "出路",
     "Select Inlet Mode": "选择进样模式",
     "Operating modes": "操作模式",
-    "Tags": "标签"
+    "Tags": "标签",
+    "Text": "文本",
+    "Transform outer with inner contours": "用内部轮廓变换外部轮廓",
+    "Select point mode": "选择点模式",
+    "Remove joint": "拆除接头",
+    "Play": "玩",
+    "Save proportions in transforming": "变换时保存比例",
+    "Resize mode": "调整大小模式",
+    "Add point": "添加点",
+    "Delete selected point": "删除选定点",
+    "Round edges at selected point": "选定点处的圆边",
+    "Revert contour path": "恢复轮廓路径",
+    "Font size": "字体大小",
+    "Copy contour": "复制轮廓",
+    "Select or create text": "选择或创建文本",
+    "Cut speed": "切割速度",
+    "Drag mode": "拖动模式",
+    "Set new outer contour": "设置新的外轮廓",
+    "Paste copied contour": "粘贴复制的轮廓",
+    "Select contour": "选择轮廓",
+    "Letter spacing": "字母间距"
 }
 export default zh;

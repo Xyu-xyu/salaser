@@ -4,6 +4,7 @@ import ContourPanel from './contourPanel.jsx';
 import InletPanel from './inletPanel.jsx';
 import OutletPanel from './outletPanel.jsx';
 import TecnologyPanel from './tecnologyPanel.jsx';
+import TextPanel from './textPanel.jsx';
 
 
 const PartPanels = () => {
@@ -15,6 +16,7 @@ const PartPanels = () => {
 			<InletPanel />	
 			<OutletPanel />
 			<TecnologyPanel />
+			<TextPanel />
 		</>
 	);
 };

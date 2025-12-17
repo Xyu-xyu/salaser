@@ -24,7 +24,7 @@ const NavBar = observer(() => {
 
 	return (
 		<div>
-			<div id="NavBar" className="w-100 mt-1">
+			<div id="NavBar" className="w-100 my-1">
 				<div className="ms-2">
 					<button 
 						className={`navbar_button me-1 ${centralBarMode === "plans" ? "violet_button" : "white_button"}` }

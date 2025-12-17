@@ -134,7 +134,7 @@ const ToolsPanel = observer(() => {
 					</button>
 
 					{partStore.selectedPointOnPath ?
-						<button disabled
+						<button 
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
 							onMouseDown={addPointToPath}>
@@ -148,7 +148,7 @@ const ToolsPanel = observer(() => {
 							/>
 						</button>
 						:
-						<button disabled
+						<button 
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
 							onMouseDown={() => setMode('addPoint')}							>
@@ -167,7 +167,7 @@ const ToolsPanel = observer(() => {
 						</button>
 					}
 
-					<button disabled
+					<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_copy btn_tool"
 						onMouseDown={copyContour}
@@ -184,7 +184,7 @@ const ToolsPanel = observer(() => {
 					</button>
 					{ partStore.selectedPointOnEdge ? 
 
-<button disabled
+<button 
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
 							onMouseDown={deletePoint}
@@ -199,7 +199,7 @@ const ToolsPanel = observer(() => {
 							/>
 						</button>
 						:
-						<button disabled
+						<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
 						onMouseDown={() => setMode('selectPoint')}
@@ -215,7 +215,7 @@ const ToolsPanel = observer(() => {
 							/>
 						</button>
 					}
-					<button disabled
+					<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
 						onMouseDown={roundEdge}
@@ -229,7 +229,7 @@ const ToolsPanel = observer(() => {
 								strokeWidth={2}
   							/>
 					</button>
-					<button disabled
+					<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_paste btn_tool"
 						onMouseDown={pasteContour}
@@ -244,7 +244,7 @@ const ToolsPanel = observer(() => {
 								viewBox='0 0 640 640'
 							/>
 					</button>
-					<button disabled
+					<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_reverse_path btn_tool"
 						onMouseDown={reverse}
@@ -260,7 +260,7 @@ const ToolsPanel = observer(() => {
 						/>
 					</button>
 					<ShapeModalComponent />
-					<button disabled
+					<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_text btn_tool"
 						onMouseDown={() => setMode('text')}
@@ -275,7 +275,7 @@ const ToolsPanel = observer(() => {
 						/>
 
 					</button>
-					<button disabled
+					<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
 						onClick={() => partStore.setNewOuter()}
@@ -291,7 +291,7 @@ const ToolsPanel = observer(() => {
 						/>
 					</button>
 
-					<button disabled
+					<button 
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_delete btn_tool" onMouseDown={deleteContour}
 					>
