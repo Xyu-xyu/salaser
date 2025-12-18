@@ -339,7 +339,7 @@ const TextPanel = observer(() => {
 											ref={textareaRef}
 											id="textarea"
 											rows={4}
-											cols={40}
+											cols={32}
 											onKeyUp={onKeyUp}
 										/>
 										<br />

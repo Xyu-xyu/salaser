@@ -1,6 +1,7 @@
 import { showToast } from '../components/toast';
 import cutting_settings_schema from '../store/cut_settings_schema';
 import macrosStore from '../store/macrosStore';
+import partStore from '../store/partStore';
 import validator from "@rjsf/validator-ajv8";
 import { getDefaultFormState } from "@rjsf/utils";
 import svgPath from 'svgpath';
@@ -1690,7 +1691,7 @@ class Utils {
         let minDistance = Infinity
         let searchResult ={}
         
-        let contours = svgStore.getFiltered('contour')
+        let contours = partStore.getFiltered('contour')
         contours.forEach((contour,i)=>{
 			
            	let cid= contour.cid
@@ -1735,9 +1736,9 @@ class Utils {
 
 	addPointToPath =()=>{
 					
-		let updPath = SVGPathCommander.normalizePath (svgStore.selectedPointOnPath.path)
-		let targetCommand = svgStore.selectedPointOnPath.command;
-		let newPoint = {x:svgStore.selectedPointOnPath.x,y:svgStore.selectedPointOnPath.y}
+		let updPath = SVGPathCommander.normalizePath (partStore.selectedPointOnPath.path)
+		let targetCommand = partStore.selectedPointOnPath.command;
+		let newPoint = {x:partStore.selectedPointOnPath.x,y:partStore.selectedPointOnPath.y}
 		let commandParts = targetCommand.split(' ');
 		let commandType = commandParts[0]; // Например, 'L'
 		let commandIndex = updPath.findIndex(cmd => cmd.join(' ') === targetCommand );
@@ -1781,7 +1782,7 @@ class Utils {
 	}
 
 	deletePoint () {
-		let searchResult = svgStore.selectedPointOnEdge	
+		let searchResult = partStore.selectedPointOnEdge	
 		let updPath = searchResult.path;
 		let commandIndex = searchResult.segIndex
 		let commandType = searchResult.currentSeg[0]; // Например, 'L'
@@ -1812,7 +1813,7 @@ class Utils {
 		return newPathData; 
    	}
 
-	createFilletArc({nextSeg, point, prevSeg, cid, currentSeg, path}=svgStore.selectedPointOnEdge) {
+	createFilletArc({nextSeg, point, prevSeg, cid, currentSeg, path}=partStore.selectedPointOnEdge) {
         if (!nextSeg || !point || !prevSeg || !currentSeg || !cid || !path) return
         const nextX = nextSeg[nextSeg.length-2];
         const nextY = nextSeg[nextSeg.length-1];
@@ -1837,7 +1838,7 @@ class Utils {
         let p2= this.findPointWithSameDirection( point.x, point.y, prevX, prevY, k2)
 
         let updPath = path
-		let classList = svgStore.getElementByCidAndClass(cid, 'contour', 'class')
+		let classList = partStore.getElementByCidAndClass(cid, 'contour', 'class')
         let contourType = classList.includes('inner') ? 'inner' :'outer'
         let clockwise =SVGPathCommander.getDrawDirection(path)
         var pointIn = this.pointInSvgPath(path , bisPoint.x, bisPoint.y)        
@@ -1896,14 +1897,14 @@ class Utils {
         // Возвращаем обе команды
         const arcanisation = { arcSeg, modifiedPrevSeg };
         //меняем путь
-        updPath.splice ( svgStore.selectedPointOnEdge.segIndex+1 ,0, arcanisation.arcSeg)
-        updPath[svgStore.selectedPointOnEdge.segIndex] = arcanisation.modifiedPrevSeg
+        updPath.splice ( partStore.selectedPointOnEdge.segIndex+1 ,0, arcanisation.arcSeg)
+        updPath[partStore.selectedPointOnEdge.segIndex] = arcanisation.modifiedPrevSeg
         return  updPath.toString().replaceAll(',', ' ')
     }
 
 	pointMoving (e=false, coord=false) {
 		if (!coord) coord = this.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);   
-		let searchResult = svgStore.selectedPointOnEdge
+		let searchResult = partStore.selectedPointOnEdge
 		let updPath = searchResult.path
 		let commandIndex = searchResult.segIndex
 		let commandType = searchResult.currentSeg[0];
@@ -1943,25 +1944,25 @@ class Utils {
 		
 		let newPathData = updPath.toString().replaceAll(',', ' ')
 		
-		if (svgStore.safeMode.mode) {
+		if (partStore.safeMode.mode) {
 			// TODO доделать проверку столкновения
 			// Дичь дикая что может наделать пользователь если править арки
 
-			let res = inlet.getNewInletOutlet( svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData, {angle: 0, x:0, y:0} )
+			let res = inlet.getNewInletOutlet( partStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData, {angle: 0, x:0, y:0} )
 			let success = inlet.applyNewPaths( res )	
 			if (success) {
 				//console.log (success+ '  updating POsitions')
-				svgStore.setSelectedPointOnEdge({
-					...svgStore.selectedPointOnEdge, 
+				partStore.setSelectedPointOnEdge({
+					...partStore.selectedPointOnEdge, 
 					point: { x: coord.x, y: coord.y }
 				});
 			}
 		} else {
-			svgStore.setSelectedPointOnEdge({
-				...svgStore.selectedPointOnEdge, 
+			partStore.setSelectedPointOnEdge({
+				...partStore.selectedPointOnEdge, 
 				point: { x: coord.x, y: coord.y }
 			});
-			let res = inlet.getNewInletOutlet( svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData, {angle: 0, x:0, y:0} )
+			let res = inlet.getNewInletOutlet( partStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData, {angle: 0, x:0, y:0} )
 			inlet.applyNewPaths( res )	
 		}
 	}
@@ -1971,7 +1972,7 @@ class Utils {
 		let ycoords = new Set()
 		let angles = new Set([0,45,135,315,30,60,120,150,210,240,270])
 		
-		let searchResult = svgStore.selectedPointOnEdge
+		let searchResult = partStore.selectedPointOnEdge
 		let updPath = searchResult.path
 		let commandIndex = searchResult.segIndex
 
@@ -2008,10 +2009,10 @@ class Utils {
 
 	checkGuides(coord) {
 		//console.log ('checking guides')
-		if (svgStore.boundsList) {
+		if (partStore.boundsList) {
 			let threshold = 1
 			let xx = false, yy = false, aa = false;
-			for (let x of svgStore.boundsList.x) {
+			for (let x of partStore.boundsList.x) {
 				if (Math.abs(x - coord.x) < threshold) {
 					//console.log ('show x guide on'+x)
 					xx = x
@@ -2019,7 +2020,7 @@ class Utils {
 				}
 			}
 
-			for (let y of svgStore.boundsList.y) {
+			for (let y of partStore.boundsList.y) {
 				if (Math.abs(y - coord.y) < threshold) {
 					//console.log ('show y guide on'+ y)
 					yy = y
@@ -2027,10 +2028,10 @@ class Utils {
 				}
 			}
 
-			//console.log ( toJS (svgStore.selectedPointOnEdge))
+			//console.log ( toJS (partStore.selectedPointOnEdge))
 
-			let nsg = svgStore.selectedPointOnEdge.nextSeg
-			let psg = svgStore.selectedPointOnEdge.prevSeg
+			let nsg = partStore.selectedPointOnEdge.nextSeg
+			let psg = partStore.selectedPointOnEdge.prevSeg
 
 			let psgX = psg[psg.length - 2]
 			let psgY = psg[psg.length - 1]
@@ -2039,7 +2040,7 @@ class Utils {
 			let ap = this.angleBetweenPoints(psgX, psgY, coord.x, coord.y)
 			let an = this.angleBetweenPoints(coord.x, coord.y, nsgX, nsgY,)
 
-			for (let a of svgStore.boundsList.angles) {
+			for (let a of partStore.boundsList.angles) {
 				if (a % 90 > 0) {
 					if (Math.abs((a - ap) % 180) < threshold) {
 						aa = { a: a, x: psgX, y: psgY }
@@ -2083,7 +2084,7 @@ class Utils {
 
 	setGuidesPositionForPoint (e) {
 	
-			const { aGuide, xGuide, yGuide, selectedPointOnEdge } = svgStore;
+			const { aGuide, xGuide, yGuide, selectedPointOnEdge } = partStore;
 			let x = selectedPointOnEdge.point.x;
 			let y = selectedPointOnEdge.point.y;
 			
@@ -2136,14 +2137,14 @@ class Utils {
 			let coord = { x, y };			
 			this.pointMoving(false, coord);			
 		}
-		svgStore.setPointInMove(false)
+		partStore.setPointInMove(false)
 	}
 
 	selectEdge (event) {
         let coord = this.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
         let minDistance = Infinity
         let edgeSearchResult ={}
-		let contours = svgStore.getFiltered('contour')
+		let contours = partStore.getFiltered('contour')
 
         contours.forEach((contour, index, arr) => {
 			let path = contour.path;

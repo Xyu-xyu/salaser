@@ -404,6 +404,10 @@ const ru = {
     "Text was changed": "Текст был изменен",
     "Contour changed by selector": "Контур изменен селектором",
     "Set inlet type": "Установить тип входа",
-    "Inlet type changed": "Тип впуска изменен"
+    "Inlet type changed": "Тип впуска изменен",
+    "Contour deleted": "Контур удален.",
+    "Point deleted from path": "Точка удалена из пути",
+    "Edge rounded": "Край закруглен",
+    "Added new point to path": "Добавлена ​​новая точка в путь"
 }
 export default ru;

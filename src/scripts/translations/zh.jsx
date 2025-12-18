@@ -396,6 +396,10 @@ const zh = {
     "Text was changed": "文字已更改",
     "Contour changed by selector": "轮廓被选择器改变",
     "Set inlet type": "设置入口类型",
-    "Inlet type changed": "入口类型已更改"
+    "Inlet type changed": "入口类型已更改",
+    "Contour deleted": "轮廓已删除",
+    "Point deleted from path": "从路径中删除的点",
+    "Edge rounded": "边缘圆角",
+    "Added new point to path": "添加新点到路径"
 }
 export default zh;

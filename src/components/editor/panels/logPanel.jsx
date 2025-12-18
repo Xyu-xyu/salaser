@@ -106,7 +106,7 @@ const LogPanel = observer(() => {
 return (
 	<>
 		{panelInfo.map((element, index) => (
-			<Panel key={'panel' + index+3} element={element} />
+			<Panel key={'panel'+3} element={element} />
 		))}
 	</>
 	);

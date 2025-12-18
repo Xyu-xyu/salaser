@@ -418,6 +418,10 @@ const en = {
     "Text was changed": "Text was changed",
     "Contour changed by selector": "Contour changed by selector",
     "Set inlet type": "Set inlet type",
-    "Inlet type changed": "Inlet type changed"
+    "Inlet type changed": "Inlet type changed",
+    "Contour deleted": "Contour deleted",
+    "Point deleted from path": "Point deleted from path",
+    "Edge rounded": "Edge rounded",
+    "Added new point to path": "Added new point to path"
 }
 export default en;
