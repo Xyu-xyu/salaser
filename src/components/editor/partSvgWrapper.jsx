@@ -10,6 +10,8 @@ import inlet from '../../scripts/inlet.jsx';
 import util from '../../scripts/util.jsx';
 import PartSvgComponent from './partSvgComponent.jsx';
 import Part from "./../../scripts/part.jsx";
+import { addToLog } from './../../scripts/addToLog.jsx';
+
 
 
 const PartSvgWrapper = observer(() => {

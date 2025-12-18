@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import partStore from "./../../../store/partStore.jsx";
 import editorStore from "./../../../store/editorStore.jsx";;
 import inlet from './../../../scripts/inlet.jsx'
-import ShapeModalComponent from './../shapeModalComponent.jsx';
+import ContourModalComponent from './../contourModalComponent.jsx';
 import { addToLog } from './../../../scripts/addToLog.jsx';
 import util from './../../../scripts/util.jsx';
 import CustomIcon from './../../../icons/customIcon.jsx';
@@ -23,7 +23,7 @@ const ToolsPanel = observer(() => {
 		partStore.setSelectedPointOnPath(false)
 		partStore.setContourSelected(false)
 		partStore.setSelectedEdge(false)
-		partStore.setTextFocus(false) 
+		partStore.setTextFocus(false)
 	}
 
 	const copyContour = () => {
@@ -93,13 +93,13 @@ const ToolsPanel = observer(() => {
 			),
 			content: (
 				<div className="d-flex align-items-center btn_block flex-wrap">
-					<button 
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
 						onMouseDown={() => {
-								setMode('resize')
-								//partStore.deselect ()
-							}
+							setMode('resize')
+							//partStore.deselect ()
+						}
 						}
 					>
 
@@ -113,14 +113,14 @@ const ToolsPanel = observer(() => {
 							viewBox='0 0 640 640'
 						/>
 					</button>
-					<button 
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_tool btn_drag_mode"
 						onMouseDown={() => {
 							setMode('drag')
 							//partStore.deselect ()
-						}							
-					}						
+						}
+						}
 					>
 						<CustomIcon
 							icon="hand"
@@ -134,7 +134,7 @@ const ToolsPanel = observer(() => {
 					</button>
 
 					{partStore.selectedPointOnPath ?
-						<button 
+						<button
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
 							onMouseDown={addPointToPath}>
@@ -148,7 +148,7 @@ const ToolsPanel = observer(() => {
 							/>
 						</button>
 						:
-						<button 
+						<button
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
 							onMouseDown={() => setMode('addPoint')}							>
@@ -162,12 +162,12 @@ const ToolsPanel = observer(() => {
 									strokeWidth={10}
 									viewBox='0 0 640 640'
 								/>
-								<div style={{ marginLeft: -4,marginTop: 11, color: "black" }}>+</div>
+								<div style={{ marginLeft: -4, marginTop: 11, color: "black" }}>+</div>
 							</div>
 						</button>
 					}
 
-					<button 
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_copy btn_tool"
 						onMouseDown={copyContour}
@@ -182,9 +182,9 @@ const ToolsPanel = observer(() => {
 							viewBox='0 0 500 500'
 						/>
 					</button>
-					{ partStore.selectedPointOnEdge ? 
+					{partStore.selectedPointOnEdge ?
 
-<button 
+						<button
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
 							onMouseDown={deletePoint}
@@ -195,16 +195,16 @@ const ToolsPanel = observer(() => {
 								height="24"
 								color="white"
 								fill="black"
-								strokeWidth={0.5}								
+								strokeWidth={0.5}
 							/>
 						</button>
 						:
-						<button 
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
-						onMouseDown={() => setMode('selectPoint')}
-					>
-						<CustomIcon
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+							onMouseDown={() => setMode('selectPoint')}
+						>
+							<CustomIcon
 								icon="fa-arrow-pointer"
 								width="24"
 								height="24"
@@ -215,36 +215,36 @@ const ToolsPanel = observer(() => {
 							/>
 						</button>
 					}
-					<button 
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
 						onMouseDown={roundEdge}
 					>
-							<CustomIcon
-								icon="arc"
-								width="24"
-								height="24"
-								color="black"
-								fill="none"
-								strokeWidth={2}
-  							/>
+						<CustomIcon
+							icon="arc"
+							width="24"
+							height="24"
+							color="black"
+							fill="none"
+							strokeWidth={2}
+						/>
 					</button>
-					<button 
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_paste btn_tool"
 						onMouseDown={pasteContour}
 					>
 						<CustomIcon
-								icon="fa-import"
-								width="24"
-								height="24"
-								color="black"
-								fill="black"
-								strokeWidth={0}
-								viewBox='0 0 640 640'
-							/>
+							icon="fa-import"
+							width="24"
+							height="24"
+							color="black"
+							fill="black"
+							strokeWidth={0}
+							viewBox='0 0 640 640'
+						/>
 					</button>
-					<button 
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_reverse_path btn_tool"
 						onMouseDown={reverse}
@@ -259,8 +259,8 @@ const ToolsPanel = observer(() => {
 							viewBox='0 0 1536 1536'
 						/>
 					</button>
-					<ShapeModalComponent />
-					<button 
+					<ContourModalComponent />
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_text btn_tool"
 						onMouseDown={() => setMode('text')}
@@ -270,12 +270,12 @@ const ToolsPanel = observer(() => {
 							width="24"
 							height="24"
 							fill='black'
-							strokeWidth={1}							
+							strokeWidth={1}
 							color='black'
 						/>
 
 					</button>
-					<button 
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
 						onClick={() => partStore.setNewOuter()}
@@ -291,7 +291,7 @@ const ToolsPanel = observer(() => {
 						/>
 					</button>
 
-					<button 
+					<button
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_delete btn_tool" onMouseDown={deleteContour}
 					>
@@ -311,7 +311,7 @@ const ToolsPanel = observer(() => {
 	return (
 		<>
 			{panelInfo.map((element, index) => (
-				<Panel key={'panel' + index + 8} element={element}/>
+				<Panel key={'panel' + index + 8} element={element} />
 			))}
 		</>
 	);

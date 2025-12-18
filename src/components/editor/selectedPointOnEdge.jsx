@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import partStore from './../../store/partStore';
 import Util from './../../scripts/util';
+import { addToLog } from './../../scripts/addToLog.jsx';
 
 
 const SelectedPointOnEdge = observer(() => {

@@ -3,16 +3,17 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { observer } from 'mobx-react-lite';
-import { addToLog } from './../../scripts/addToLog';
-import svgStore from './../../store/svgStore';
-import util from './../../scripts/util';
+import { addToLog } from '../../scripts/addToLog';
+import svgStore from '../../store/svgStore';
+import util from '../../scripts/util';
 import SVGPathCommander from 'svg-path-commander';
 import { useTranslation } from 'react-i18next';
 import CustomIcon from '../../icons/customIcon';
 import constants from '../../store/constants';
+import partStore from '../../store/partStore';
 
 
-const ShapeModalComponent = observer(() => {
+const contourModalComponent = observer(() => {
 	const { t } = useTranslation();
 	const [show, setShow] = useState(false);
 	const handleClose = () => setShow(false);
@@ -30,126 +31,15 @@ const ShapeModalComponent = observer(() => {
 	const addContour = () => {
 		let d = shapes[selected]
 		const myPathBBox = SVGPathCommander.getPathBBox(d)
-
 		let iniX = myPathBBox.width
 		let iniY = myPathBBox.height
 		let scaleX = partWidth / iniX
 		let scaleY = partHeight / iniY
 		var transformed = util.applyTransform(d, scaleX, scaleY, 0, 0, { angle: 0, x: 0, y: 0 })
-
-		let translateX = partXPosition - myPathBBox.cx * scaleX
-		let translateY = partYPosition - myPathBBox.cy * scaleY
-
-		if (partCenterXPosition) {
-			translateX = svgStore.svgData.width * 0.5 - myPathBBox.cx * scaleX
-		}
-
-		if (partCenterYPosition) {
-			translateY = svgStore.svgData.height * 0.5 - myPathBBox.cy * scaleY
-		}
-
 		if (!d || !d.length) return;
+		partStore.addElementPath ( transformed )		
+	}
 
-		//let uuid = util.uuid()
-		//let id = svgStore.nextPartId
-
-		/* 		svgStore.addForm (
-					{
-						"id": uuid,
-						"uuid": uuid,
-						"name": "12___10__2",
-						"code": [
-							{
-								"cid": 1,
-								"class": "contour outer macro0 closed1",
-								"path": transformed,
-								"stroke": "red",
-								"strokeWidth": 0.2
-							},]
-					}
-				)
-		
-		
-				svgStore.addPosition (
-					{
-						"part_id": id,
-						"part_code_id": uuid,
-						"selected":false,
-						"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": translateX, "f": translateY}
-					}
-				) */
-
-		const findExistingFormByCode = (codeArray) => {
-			return svgStore.svgData.part_code.length && svgStore.svgData.part_code.find(form => {
-				if (!form.code || form.code.length !== codeArray.length) return false;
-
-				return form.code.every((existingContour, i) => {
-					const newContour = codeArray[i];
-					return existingContour.path === newContour.path &&        // главное — путь
-						existingContour.class === newContour.class &&      // можно добавить, если важно
-						existingContour.cid === newContour.cid;            // опционально
-				});
-			});
-		};
-
-		// === ТВОЙ КОД С ПРОВЕРКОЙ ===
-		let uuid = util.uuid();
-		const id = svgStore.nextPartId;
-		let newForm = [
-			{
-				cid: 1,
-				class: "contour outer macro0 closed1",
-				path: transformed,
-				stroke: "red",
-				strokeWidth: 0.2,
-				selected:false
-			},
-			{
-				cid: 1,
-				class: "inlet inner macro0 closed1",
-				path: "",
-				stroke: 'red',
-				strokeWidth: 0.2,
-				selected:false
-			},
-			{
-				cid: 1,
-				class: "outlet inner macro0 closed1",
-				path: "",
-				stroke: 'lime',
-				strokeWidth: 0.2,
-				selected:false
-			}
-		]
-
-		// 1. Сначала ищем — вдруг такая форма уже есть
-		let existingForm = findExistingFormByCode(newForm);
-
-
-		if (existingForm) {
-			// Форма уже существует — используем её uuid!
-			uuid = existingForm.uuid;
-			console.log("Форма уже существует, используем uuid:", uuid);
-		} else {
-			// Создаём новую форму с новым uuid
-			svgStore.addForm({
-				id: uuid,
-				uuid: uuid,
-				name: "12___10__2", // можно тоже генерить по code, если хочешь
-				code: newForm
-			});
-			console.log("Создана новая форма с uuid:", uuid);
-		}
-
-
-	// В любом случае — добавляем позицию с правильным part_code_id
-	svgStore.addPosition({
-		part_id: svgStore.nextPartId, // или как у тебя правильно
-		part_code_id: uuid,           // вот здесь критично — правильный uuid!
-		selected: false,
-		positions: { a: 1, b: 0, c: 0, d: 1, e: translateX, f: translateY }
-	});
-}
 
 	return (
 	<>
@@ -339,4 +229,4 @@ const ShapeModalComponent = observer(() => {
 );
 })
 
-export default ShapeModalComponent;
+export default contourModalComponent;

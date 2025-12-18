@@ -84,7 +84,7 @@ const SheetToolsPanel = observer(() => {
 					width="20"
 					height="20"
 					color="black"
-					fill="black"
+					fill="limegreen"
 					strokeWidth={10}
 					className="m-2"
 					viewBox='0 0 512 512'
@@ -108,7 +108,7 @@ const SheetToolsPanel = observer(() => {
 							width="24"
 							height="24"
 							color="white"
-							fill="black"
+							fill="limegreen"
 							strokeWidth={10}
 							viewBox='0 0 640 640'
 						/>
@@ -127,7 +127,7 @@ const SheetToolsPanel = observer(() => {
 							width="24"
 							height="24"
 							color="black"
-							fill="black"
+							fill="limegreen"
 							strokeWidth={0.2}
 							viewBox='0 0 20 20'
 						/>
@@ -143,7 +143,7 @@ const SheetToolsPanel = observer(() => {
 								width="24"
 								height="24"
 								color="black"
-								fill="black"
+								fill="limegreen"
 								strokeWidth={.5}
 							/>
 						</button>
@@ -158,7 +158,7 @@ const SheetToolsPanel = observer(() => {
 									width="24"
 									height="24"
 									color="white"
-									fill="black"
+									fill="limegreen"
 									strokeWidth={10}
 									viewBox='0 0 640 640'
 								/>
@@ -177,7 +177,7 @@ const SheetToolsPanel = observer(() => {
 							width="24"
 							height="24"
 							color="black"
-							fill="black"
+							fill="limegreen"
 							strokeWidth={0}
 							viewBox='0 0 500 500'
 						/>
@@ -194,7 +194,7 @@ const SheetToolsPanel = observer(() => {
 								width="24"
 								height="24"
 								color="white"
-								fill="black"
+								fill="limegreen"
 								strokeWidth={0.5}								
 							/>
 						</button>
@@ -239,7 +239,7 @@ const SheetToolsPanel = observer(() => {
 								width="24"
 								height="24"
 								color="black"
-								fill="black"
+								fill="limegreen"
 								strokeWidth={0}
 								viewBox='0 0 640 640'
 							/>
@@ -254,7 +254,7 @@ const SheetToolsPanel = observer(() => {
 							icon="fa-rotate"
 							width="20"
 							height="20"
-							fill='black'
+							fill="limegreen"
 							strokeWidth={0}
 							viewBox='0 0 1536 1536'
 						/>
@@ -269,7 +269,7 @@ const SheetToolsPanel = observer(() => {
 							icon="text-size"
 							width="24"
 							height="24"
-							fill='black'
+							fill="limegreen"
 							strokeWidth={1}							
 							color='black'
 						/>
@@ -285,7 +285,7 @@ const SheetToolsPanel = observer(() => {
 							icon="settings-outline"
 							width="32"
 							height="32"
-							fill='black'
+							fill="limegreen"
 							strokeWidth={0}
 							viewBox='0 0 24 24'
 						/>
@@ -299,7 +299,7 @@ const SheetToolsPanel = observer(() => {
 							icon="ic:twotone-delete-outline"
 							width="24"
 							height="24"
-							fill='black'
+							fill="limegreen"
 							strokeWidth={0.2}
 						/>
 					</button>

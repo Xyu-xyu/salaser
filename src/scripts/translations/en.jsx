@@ -422,6 +422,18 @@ const en = {
     "Contour deleted": "Contour deleted",
     "Point deleted from path": "Point deleted from path",
     "Edge rounded": "Edge rounded",
-    "Added new point to path": "Added new point to path"
+    "Added new point to path": "Added new point to path",
+    "Contour reversed": "Contour reversed",
+    "Contour pasted": "Contour pasted",
+    "Contour was changed": "Contour was changed",
+    "Set inlet type Tangent for all": "Set inlet type Tangent for all",
+    "Set inlet type Hook for all": "Set inlet type Hook for all",
+    "Set inlet type Direct for all": "Set inlet type Direct for all",
+    "Set inlet type Straight for all": "Set inlet type Straight for all",
+    "Set outlet type Straight for all": "Set outlet type Straight for all",
+    "Set outlet type": "Set outlet type",
+    "Set outlet type Direct for all": "Set outlet type Direct for all",
+    "Set outlet type Hook for all": "Set outlet type Hook for all",
+    "Set outlet type Tangent for all": "Set outlet type Tangent for all"
 }
 export default en;

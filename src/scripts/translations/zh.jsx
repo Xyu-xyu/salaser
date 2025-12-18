@@ -400,6 +400,16 @@ const zh = {
     "Contour deleted": "轮廓已删除",
     "Point deleted from path": "从路径中删除的点",
     "Edge rounded": "边缘圆角",
-    "Added new point to path": "添加新点到路径"
+    "Added new point to path": "添加新点到路径",
+    "Contour reversed": "轮廓反转",
+    "Contour pasted": "轮廓粘贴",
+    "Contour was changed": "轮廓已改变",
+    "Set inlet type Tangent for all": "为所有设置入口类型 Tangent",
+    "Set inlet type Hook for all": "为所有设置入口类型 Hook",
+    "Set inlet type Direct for all": "为所有设置直接入口类型",
+    "Set inlet type Straight for all": "设置入口类型为直通",
+    "Set outlet type": "设置出口类型",
+    "Set outlet type Hook for all": "设置所有插座类型挂钩",
+    "Set outlet type Tangent for all": "为所有设置出口类型 Tangent"
 }
 export default zh;

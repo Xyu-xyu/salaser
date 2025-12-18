@@ -50,6 +50,12 @@ const constants = {
     contourTypes:['engraving', 'inner', 'outer'],
     operatingModes:['macro0', 'macro1','macro2', 'macro3', 'macro4', 'macro5','macro6', 'macro7' ],
     piercingModes: {'normal':0, 'without_time':-1, 'pulse':1},
+	shapes:[
+		"M10 5 A5 5 0 0 0 0 5 A5 5 0 0 0 5 10 A5 5 0 0 0 10 5",
+		"M5 0 H10 V10 H0 L0 0 L5 0",
+		"M5 8.66  L0 8.66 L5 0 L10 8.66 L5 8.66",
+		"M4.86 9.27 L 1.78 9.27 L 0 3.54 L 4.86 0 L 9.72 3.54 L 7.94 9.27 L 4.86 9.27",
+		"M9.41 5 9.41 7.5 5.08 10 .75 7.5.75 2.5 5.08 0 9.41 2.5 9.41 5"],
     panelPostions:	{
 		logPopup: {
 			mini: true,
