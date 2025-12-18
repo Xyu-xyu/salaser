@@ -438,6 +438,13 @@ const en = {
     "Contour added": "Contour added",
     "Point": "Point",
     "Apply": "Apply",
-    "Point position update": "Point position update"
+    "Point position update": "Point position update",
+    "Edge": "Edge",
+    "To line": "To line",
+    "Save points": "Save points",
+    "Save arc angle": "Save arc angle",
+    "Edge transform": "Edge transform",
+    "Length": "Length",
+    "To arc": "To arc"
 }
 export default en;

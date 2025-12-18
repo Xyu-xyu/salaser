@@ -1,12 +1,12 @@
-import Panel from './panel.js';
-import '@fortawesome/fontawesome-free/css/all.css'
-import { observer } from 'mobx-react-lite';
-import svgStore from "../stores/svgStore.js";
-import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
-import util from '../../utils/util.js';
-import inlet from '../../scripts/inlet.js';
+import { observer } from 'mobx-react-lite';
+import partStore from "./../../../store/partStore.jsx";
+import util from './../../../scripts/util.jsx';
+import inlet from './../../../scripts/inlet.jsx'
+import Panel from './panel.jsx';
+import { addToLog } from './../../../scripts/addToLog.jsx';
+import CustomIcon from './../../../icons/customIcon.jsx';
 
 
 const EdgePanel = observer(() => {
@@ -14,7 +14,7 @@ const EdgePanel = observer(() => {
 	const inputRY = useRef(null);
 
 	const { selectedEdge,
-		selectedEdgePath } = svgStore
+		selectedEdgePath } = partStore
 	const { t } = useTranslation();
 
 	const round = (val, n = 3) => {
@@ -52,7 +52,7 @@ const EdgePanel = observer(() => {
 
 	const toArc = () => {
 		let cid = selectedEdge.cid;
-		let newPath = svgStore.getElementByCidAndClass(cid, 'contour', 'path');
+		let newPath = partStore.getElementByCidAndClass(cid, 'contour', 'path');
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
@@ -83,23 +83,24 @@ const EdgePanel = observer(() => {
 
 		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 });
 		inlet.applyNewPaths(res);
+		addToLog ("Edge transform")
 	};
 
 
 	const toLine = () => {
 		let cid = selectedEdge.cid
-		let newPath = svgStore.getElementByCidAndClass(cid, 'contour', 'path')
+		let newPath = partStore.getElementByCidAndClass(cid, 'contour', 'path')
 		let updPath = util.normPath(newPath)
 		let segment = selectedEdge.edge.segIndex
 		updPath[segment] = ['L', updPath[segment][6], updPath[segment][7]]
 		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 })
 		inlet.applyNewPaths(res)
+		addToLog ("Edge transform")
 	}
-
 
 	const arcFlag = () => {
 		let cid = selectedEdge.cid;
-		let newPath = svgStore.getElementByCidAndClass(cid, 'contour', 'path');
+		let newPath = partStore.getElementByCidAndClass(cid, 'contour', 'path');
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
@@ -120,10 +121,9 @@ const EdgePanel = observer(() => {
 		inlet.applyNewPaths(res);
 	};
 
-
 	const sweepFlag = () => {
 		let cid = selectedEdge.cid;
-		let newPath = svgStore.getElementByCidAndClass(cid, 'contour', 'path');
+		let newPath = partStore.getElementByCidAndClass(cid, 'contour', 'path');
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
@@ -146,7 +146,7 @@ const EdgePanel = observer(() => {
 		let RY = +inputRX.current.textContent
 		if (typeof RX !== 'number' || typeof RY !== 'number') return;
 		let cid = selectedEdge.cid;
-		let newPath = svgStore.getElementByCidAndClass(cid, 'contour', 'path');
+		let newPath = partStore.getElementByCidAndClass(cid, 'contour', 'path');
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
@@ -180,7 +180,18 @@ const EdgePanel = observer(() => {
 	const panelInfo = [
 		{
 			id: "edgePopup",
-			fa: (<><Icon icon="gis:polyline-pt" width="24" height="24" style={{ color: "white" }} className='me-2' /><div>{t('Edge')}</div></>),
+			fa: (<>
+			<CustomIcon
+					icon="edge"
+					width="24"
+					height="24"
+					color="black"
+					fill="black"
+					strokeWidth={1}
+					viewBox='0 0 100 100'
+					className={'m-2'}
+				/>
+			<div>{t('Edge')}</div></>),
 			content: (
 				<>
 					<div className="d-flex flex-column">
@@ -323,11 +334,11 @@ const EdgePanel = observer(() => {
 return (
 	<>
 		{selectedEdge && panelInfo.map((element, index) => (
-			<Panel key={'panel' + index + 11} element={element} index={index + 11} />
+			<Panel key={'panel'+11} element={element} />
 		))}
 	</>
 );
 })
 
 
-export default EdgePanel;
+export default EdgePanel

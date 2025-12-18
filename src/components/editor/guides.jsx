@@ -51,7 +51,7 @@ const Guides = observer(() => {
 				className="smartGuide"
 				id="aGuide"
 			/>
-			<text x="100" y="100">{aGuide?.angle}</text>
+			{/* <text x="100" y="100">{aGuide?.angle}</text> */}
 		</>
 	);
 });

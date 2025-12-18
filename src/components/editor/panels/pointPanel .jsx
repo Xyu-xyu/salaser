@@ -133,7 +133,7 @@ const PointPanel = observer(() => {
 	return (
 		<>
 			{selectedPointOnEdge && panelInfo.map((element, index) => (
-				<Panel key={'panel' + index + 10} element={element} index={index + 10} />
+				<Panel key={'panel' + 10} element={element} />
 			))}
 		</>
 	);

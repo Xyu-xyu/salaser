@@ -413,6 +413,11 @@ const zh = {
     "Set outlet type Tangent for all": "为所有设置出口类型 Tangent",
     "Contour added": "添加轮廓",
     "Apply": "申请",
-    "Point position update": "点位置更新"
+    "Point position update": "点位置更新",
+    "To line": "至行",
+    "Save points": "保存积分",
+    "Save arc angle": "保存圆弧角度",
+    "Length": "长度",
+    "To arc": "转弧"
 }
 export default zh;

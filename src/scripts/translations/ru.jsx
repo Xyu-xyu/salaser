@@ -423,6 +423,13 @@ const ru = {
     "Set outlet type Tangent for all": "Установить тип выхода Тангенциальный для всех",
     "Contour added": "Контур добавлен",
     "Apply": "Применить",
-    "Point position update": "Обновление положения точки"
+    "Point position update": "Обновление положения точки",
+    "Edge": "Грань",
+    "Save points": "Сохранить точки",
+    "Save arc angle": "Сохранить угол дуги",
+    "Length": "Длина",
+    "Edge transform":"Элемент изменен",
+    "To line": "В линию",
+    "To arc": "В дугу",
 }
 export default ru;

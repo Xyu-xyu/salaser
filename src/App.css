@@ -832,6 +832,10 @@ height: fit-content;}
   height:300px;
 }
 
+.font14 {
+  font-size: 14px !important;
+}
+
 .font18 {
   font-size: 18px;
 }
@@ -1819,7 +1823,7 @@ height: fit-content;}
   height: calc(100% - 45px);;
   border-right:1px solid black;
   border-left:1px solid black;
-  border-bottom:1px solid black;
+  border-bottom:2px solid black;
   background-color: var(--mainBg) !important;
   }
 
@@ -2389,3 +2393,15 @@ cursor: url('./images//cursor_plus.cur'), auto !important;
 }
 
 
+#selectedEdge {
+  stroke: aqua;
+  stroke-width: 0.5px;
+  fill: none;
+  marker-start: url(#dotRed);
+  marker-end: url(#dotRed);
+}
+
+.panel_info_text {
+  min-width:50px !important;
+  width:fit-content;
+}
