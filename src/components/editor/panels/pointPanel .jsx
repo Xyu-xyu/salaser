@@ -1,10 +1,12 @@
-import Panel from './panel.js';
-import '@fortawesome/fontawesome-free/css/all.css'
+import Panel from './panel.jsx';
 import { observer } from 'mobx-react-lite';
-import svgStore from "../stores/svgStore.js";
 import { useTranslation } from 'react-i18next';
 import { useRef } from 'react';
-import util from '../../utils/util.js';
+
+import partStore from "../../../store/partStore.jsx";
+import { addToLog } from '../../../scripts/addToLog.jsx';
+import util from '../../../scripts/util.jsx';
+import CustomIcon from '../../../icons/customIcon.jsx';
 
 
 const PointPanel = observer(() => {
@@ -12,7 +14,7 @@ const PointPanel = observer(() => {
     const inputRefY = useRef(null);
 
 	const { t } = useTranslation();
-	const { selectedPointOnEdge } = svgStore;
+	const { selectedPointOnEdge } = partStore;
 
 	const applyPointPosition = () => { 
 		let x = +inputRefX.current.value
@@ -22,46 +24,55 @@ const PointPanel = observer(() => {
 			inputRefY.current.value = "";
 			inputRefX.current.value = "";		
 		}
-	}
-
-	const round = (val, n=3)=>{
-		return (Math.round (val*10**n)) / 10**n
+		addToLog("Point position update")
 	}
 
 	const panelInfo = [
 		{
 			id: "pointPopup",
-			fa: (<><i className="fa-solid fa-location-dot me-2"></i><div>{t('Point')}</div></>),
+			fa: (<>
+				<CustomIcon
+					icon="point"
+					width="36"
+					height="36"
+					color="black"
+					fill="none"
+					strokeWidth={2}
+					className=""					
+				/>
+					<div>{t('Point')}</div>
+				</>),
 			content: (<div className="d-flex flex-column">
 				<table className="table mb-0">
 					<thead className="table-dark">
 						<tr />
 					</thead>
 					<tbody>
+						{/* TODO ДОПИЛИТЬ расчет углов */}
 						<tr>
-							<td>
-								<div className="d-flex align-items-center justify-content-center">
+							{/* <td>
+								<div className="d-flex align-items-center justify-content-center d-none">
 									<div>{t('angle')}:</div>
 									<div className="mx-2">
 										{selectedPointOnEdge ? round(selectedPointOnEdge.angle) + '°' : ''}
 									</div>
 								</div>
-							</td>
+							</td> */}
 							{/* Второй <td> для координаты X */}
-							<td>
+							<td colSpan={2}>
 								<div className="d-flex align-items-center justify-content-center">
 									<div>x:</div>
 									<div className="">
-										{selectedPointOnEdge ? round(selectedPointOnEdge.point.x) + t('mm') : ''}
+										{selectedPointOnEdge ? util.round(selectedPointOnEdge.point.x, 2)+" " + t('mm') : ''}
 									</div>
 								</div>
 							</td>
 							{/* Третий <td> для координаты Y */}
 							<td>
-								<div className="d-flex align-items-center justify-content-center">
+								<div className="d-flex align-items-center justify-content-start">
 									<div>y:</div>
 									<div className="">
-										{selectedPointOnEdge ? round(selectedPointOnEdge.point.y) + t('mm') : ''}
+										{selectedPointOnEdge ? util.round(selectedPointOnEdge.point.y, 2)+" " + t('mm') : ''}
 									</div>
 								</div>
 							</td>

@@ -420,6 +420,9 @@ const ru = {
     "Set outlet type": "Установить тип выхода",
     "Set outlet type Direct for all": "Установить тип выхода Прямой для всех",
     "Set outlet type Hook for all": "Установить тип выхода Крючок для всех",
-    "Set outlet type Tangent for all": "Установить тип выхода Тангенциальный для всех"
+    "Set outlet type Tangent for all": "Установить тип выхода Тангенциальный для всех",
+    "Contour added": "Контур добавлен",
+    "Apply": "Применить",
+    "Point position update": "Обновление положения точки"
 }
 export default ru;

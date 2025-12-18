@@ -6,6 +6,7 @@ import OutletPanel from './outletPanel.jsx';
 import TecnologyPanel from './tecnologyPanel.jsx';
 import TextPanel from './textPanel.jsx';
 import LogPanel from './logPanel.jsx';
+import PointPanel from './pointPanel .jsx';
 
 
 const PartPanels = () => {
@@ -19,6 +20,7 @@ const PartPanels = () => {
 			<TecnologyPanel />
 			<TextPanel />
 			<LogPanel />
+			<PointPanel />
 		</>
 	);
 };

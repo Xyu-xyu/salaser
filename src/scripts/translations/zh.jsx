@@ -410,6 +410,9 @@ const zh = {
     "Set inlet type Straight for all": "设置入口类型为直通",
     "Set outlet type": "设置出口类型",
     "Set outlet type Hook for all": "设置所有插座类型挂钩",
-    "Set outlet type Tangent for all": "为所有设置出口类型 Tangent"
+    "Set outlet type Tangent for all": "为所有设置出口类型 Tangent",
+    "Contour added": "添加轮廓",
+    "Apply": "申请",
+    "Point position update": "点位置更新"
 }
 export default zh;

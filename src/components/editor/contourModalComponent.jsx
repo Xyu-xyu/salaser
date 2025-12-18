@@ -4,7 +4,6 @@ import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { observer } from 'mobx-react-lite';
 import { addToLog } from '../../scripts/addToLog';
-import svgStore from '../../store/svgStore';
 import util from '../../scripts/util';
 import SVGPathCommander from 'svg-path-commander';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +36,8 @@ const contourModalComponent = observer(() => {
 		let scaleY = partHeight / iniY
 		var transformed = util.applyTransform(d, scaleX, scaleY, 0, 0, { angle: 0, x: 0, y: 0 })
 		if (!d || !d.length) return;
-		partStore.addElementPath ( transformed )		
+		partStore.addElementPath ( transformed )
+		addToLog ("Contour added")		
 	}
 
 

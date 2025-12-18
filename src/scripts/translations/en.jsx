@@ -434,6 +434,10 @@ const en = {
     "Set outlet type": "Set outlet type",
     "Set outlet type Direct for all": "Set outlet type Direct for all",
     "Set outlet type Hook for all": "Set outlet type Hook for all",
-    "Set outlet type Tangent for all": "Set outlet type Tangent for all"
+    "Set outlet type Tangent for all": "Set outlet type Tangent for all",
+    "Contour added": "Contour added",
+    "Point": "Point",
+    "Apply": "Apply",
+    "Point position update": "Point position update"
 }
 export default en;

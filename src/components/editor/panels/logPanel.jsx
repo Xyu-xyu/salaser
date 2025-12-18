@@ -80,10 +80,12 @@ const LogPanel = observer(() => {
 							<div className="d-flex justify-content-between pt-2">
 								<div className="d-flex">
 									<div className="messTime ms-2">
-										<h6>{time(element.time)}</h6>
+										<div className='font14'>{time(element.time)}</div>
 									</div>
 									<div className="ms-2">
-										<h6 className="">{t(element.action)}</h6>
+										<div className="fs-6 text-start font14">
+											{t(element.action)}
+										</div>
 									</div>
 								</div>
 								<div className="me-4">
