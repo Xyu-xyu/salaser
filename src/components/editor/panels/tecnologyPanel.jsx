@@ -50,7 +50,6 @@ const TecnologyPanel =  observer(() => {
 						<td colSpan="2">{t('Tags')}</td>
 					  </tr>
 
-
 {/* 					  { jointPositions.length > 0 && (<tr>
 						<td>{t('Joint')}</td>
 						<td>

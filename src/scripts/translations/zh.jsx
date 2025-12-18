@@ -418,6 +418,7 @@ const zh = {
     "Save points": "保存积分",
     "Save arc angle": "保存圆弧角度",
     "Length": "长度",
-    "To arc": "转弧"
+    "To arc": "转弧",
+    "Cutting order": "切割顺序"
 }
 export default zh;

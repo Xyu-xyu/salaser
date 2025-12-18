@@ -428,8 +428,10 @@ const ru = {
     "Save points": "Сохранить точки",
     "Save arc angle": "Сохранить угол дуги",
     "Length": "Длина",
-    "Edge transform":"Элемент изменен",
+    "Edge transform": "Элемент изменен",
     "To line": "В линию",
     "To arc": "В дугу",
+    "Engraving": "Гравировка",
+    "Cutting order": "Порядок резки"
 }
 export default ru;

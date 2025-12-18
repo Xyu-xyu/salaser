@@ -8,6 +8,7 @@ import TextPanel from './textPanel.jsx';
 import LogPanel from './logPanel.jsx';
 import PointPanel from './pointPanel .jsx';
 import EdgePanel from './edgePanel.jsx';
+import CutPanel from './cutPanel.jsx';
 
 
 const PartPanels = () => {
@@ -23,6 +24,7 @@ const PartPanels = () => {
 			<LogPanel />
 			<PointPanel />
 			<EdgePanel />
+			<CutPanel />
 		</>
 	);
 };

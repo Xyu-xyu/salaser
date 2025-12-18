@@ -445,6 +445,9 @@ const en = {
     "Save arc angle": "Save arc angle",
     "Edge transform": "Edge transform",
     "Length": "Length",
-    "To arc": "To arc"
+    "To arc": "To arc",
+    "Cutting order": "Cutting order",
+    "Inner": "Inner",
+    "Engraving": "Engraving"
 }
 export default en;

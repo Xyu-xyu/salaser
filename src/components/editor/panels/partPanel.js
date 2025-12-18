@@ -29,9 +29,7 @@ const PartPanel = observer(() => {
 				collider = collider.replace(' collision', '')
 				svgStore.updateElementValue(cid, 'contour', 'class', collider)
 			})
-
 		},5000)
-
 	}
 
 	const setStoreGuidesMode = (mode)=>{

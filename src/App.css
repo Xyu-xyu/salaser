@@ -2405,3 +2405,80 @@ cursor: url('./images//cursor_plus.cur'), auto !important;
   min-width:50px !important;
   width:fit-content;
 }
+
+.gridWrapper {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.gridWrapperCommon {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+#engravingSort,
+#innerSort {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  height: 100%;
+}
+
+.grid-square,
+.sortable-drag_item {
+  /* width:  var(--sizeSortedItemX, 100px) !important; 
+  height: var(--sizeSortedItemY, 100px) !important;  Значение по умолчанию 100px */ 
+  display: inline-block;
+  background-color: var(--mainBg1);
+  border: solid 1px var(--paleColor);
+  padding: 10px;
+  margin: 12px;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.grid-square.macro5{
+  background-color: whitesmoke !important;
+}
+
+.sortable-ghost_item {
+  display: inline-block;
+/*   background-color: rgb(15, 129, 199);
+ */  color: black;
+}
+
+.sortable-chosen {
+  background-color: var(--violet); 
+  opacity: 0.5;
+}
+
+.highLighted {
+  opacity: 0.3;
+  filter: brightness(2) hue-rotate(180deg) drop-shadow(1px 1px 50px black);
+}
+
+.black-range::-webkit-slider-thumb {
+  background-color: white;
+  border: 1px solid var(--violet);
+}
+
+.black-range::-webkit-slider-runnable-track {
+  background-color: var(--violet);
+}
+
+.black-range::-moz-range-thumb {
+  background-color: var(--violet);
+}
+
+.black-range::-moz-range-track {
+  background-color: var(--violet);
+}
