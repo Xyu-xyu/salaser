@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import Sortable from 'sortablejs';
+import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import partStore from "./../../../store/partStore.jsx";
 import util from './../../../scripts/util.jsx';
@@ -7,44 +6,41 @@ import Panel from './panel.jsx';
 import { addToLog } from './../../../scripts/addToLog.jsx';
 import { useTranslation } from 'react-i18next';
 import CustomIcon from './../../../icons/customIcon.jsx';
+import { ReactSortable } from "react-sortablejs";
+import TooltipCreator from './tooltipCreator';
 
 
 const CutPanel = observer(() => {
 
 	const { t } = useTranslation();
-	const speed = () => { }
-	const runCutQue = () => { }
-	const stopCutQue = () => { }
+	const [speed,setSpeed] = useState(50)
+	const inners = partStore.getFiltered(["contour"], ["outer"]) 		
+	const runCutQue = () => {
+		partStore.setLaserShow ( {on:true, speed:speed} )
+	}
+	const stopCutQue = () => { 
+		partStore.setLaserShow ({on:false, speed:speed})
+	}
+	
+	const setShowSpeed =(e)=>{
+		let val = +e.currentTarget.value
+		partStore.setLaserShow ( {on: partStore.laserShow.on, speed:val})
+		setSpeed (val)
+	}
+
 	const [WH, setWH] = useState({ w: 100, h: 100 })
 	const [miniSvg, setMiniSvg] = useState({ sizeX: 50, sizeY: 50 })
 
-
+	const setList =(e) =>{
+		if (e.length && inners.length) {
+			partStore.reorderItems (e, inners)		
+			addToLog("Cut order was changed")
+		}
 	
+	}
 
-	/* 	
-	const engSort = useRef(null);
-	const engs = partStore.getFiltered('engraving', 'contour')
-	useEffect(() => {
-		if (!engSort.current) return;
-
-		const sortable1 = new Sortable(engSort.current, {
-			animation: 75,
-			ghostClass: "sortable-ghost_item",
-			dragClass: "sortable-drag_item",
-			onEnd: (evt) => {
-				partStore.reorderItems(evt.oldIndex, evt.newIndex); 
-			},
-		});
-
-		return () => sortable1.destroy();
-	}, [engs]); */
-
-	const innerSort = useRef(null);
-	const inners = [
-		...partStore.getFiltered(["inner", "contour"]), 
-		...partStore.getFiltered(["contour", "skeletonText"])
-	]
-
+	//const innerSort = useRef(null);	
+/* 
 	useEffect(() => {
 		if (!innerSort.current) return;
 
@@ -58,11 +54,39 @@ const CutPanel = observer(() => {
 		});
 
 		return () => sortable.destroy();
-	}, [inners]);
+	}, []); */
 
 
 	const createCenteredSVGPath = (element) => {
-		if (!element || !element.path) return null;
+
+		if (!element)  return
+		if (!element.path)  {
+			const { cid } = element;
+
+			return (
+				<div
+					className={`grid-square macro5`}
+					data-cid={cid}
+					key={cid}
+					style={{
+						width: `${100}px`,
+						height: `${100}px`,
+					}}
+					onMouseOver={mouseOver}
+					onMouseLeave={mouseLeave}	
+				>
+					<svg
+						width={0}
+						height={0}
+						fill={"inner"}
+						stroke={"none"}
+						strokeWidth={"0"}
+					>
+						<path d={"M0 0"} />
+					</svg>
+				</div>
+			);
+		};
 
 		const { path, cid, class: className } = element;
 		const classList = className || "";
@@ -172,34 +196,50 @@ const CutPanel = observer(() => {
 						<tr>
 							<td>
 								<div className="d-flex align-items-center justify-content-evenly">
-								<div className="ms-2 w-25">
-									<input
-										type="range"
-										className="form-range black-range"
-										id="speedPartShow"
-										step={1}
-										min={1}
-										max={100}
-										defaultValue={50}
-										onChange={speed}
+									<TooltipCreator
+										element={{
+											id: 'speedPartShow',
+											info: (
+												<div className="ms-2 w-25">
+													<input
+														type="range"
+														className="form-range black-range"
+														id="speedPartShow"
+														step={1}
+														min={1}
+														max={100}
+														value={speed}
+														onChange={setShowSpeed}													
+													/>
+												</div>
+											)
+										}}
 									/>
-								</div>
-									<div className="ms-2">
-										<button
-											type="button"
-											className="btn btn-sm violet_button"
-											id="playCutPartOrder"
-											onMouseDown={runCutQue}
-										>
-											<CustomIcon
-												icon="play"
-												width="24"
-												height="24"
-												color="white"
-												fill="white"
-												strokeWidth={0}
- 											/>
-										</button>
+ 									<div className="ms-2">
+										<TooltipCreator
+											element={
+												{
+													id: 'playCutPartOrder',
+													info:
+														(<button
+															type="button"
+															className="btn btn-sm violet_button"
+															id="playCutPartOrder"
+															onMouseDown={runCutQue}
+														>
+															<CustomIcon
+																icon="play"
+																width="24"
+																height="24"
+																color="white"
+																fill="white"
+																strokeWidth={0}
+															/>
+														</button>
+														)
+												}
+											}
+										/>
 										<button
 											type="button"
 											className="btn btn-sm violet_button ms-1"
@@ -337,11 +377,23 @@ const CutPanel = observer(() => {
 
 								</div> */}
 								<div className="gridWrapperCommon">
-									<div id="innerSort" ref={innerSort}>
-										{inners.map((item, index) => (
-											createCenteredSVGPath(item)
-										))}
-									</div>
+									<div id="innerSort">
+										<ReactSortable
+											dragClass="sortableDrag"
+											filter=".addImageButtonContainer"
+											list={inners}
+											setList={setList}
+											animation={75}
+											easing="ease-out"
+											className='d-flex flex-row flex-wrap'
+											>
+											{inners.map((item, index) => (
+												
+												createCenteredSVGPath(item, index)
+												
+											))}
+										</ReactSortable>
+									</div> 
 								</div>
 							</td>
 						</tr>

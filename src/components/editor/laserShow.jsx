@@ -19,11 +19,10 @@ const LaserShow = observer(() => {
 
 	const getCommonPath = () =>{
 		let commonPath =''
-		//console.log ('getCommonPathgetCommonPathgetCommonPath')
-		const engs  =  partStore.getFiltered(["engraving","contour"], ['macro5'])
-		const inners = partStore.getFiltered(["inner",    "contour"], ['macro5'])
+ 		//const engs  =  partStore.getFiltered(["engraving","contour"], ['macro5'])
+		const inners = partStore.getFiltered(["contour"], ['outer'])
 		const outer  =  partStore.getFiltered(["outer","contour"], ['macro5'])
-		engs.forEach(e => commonPath+=(" "+ e.path))
+		/* engs.forEach(e => commonPath+=(" "+ e.path))*/
 		inners.forEach(e => {
 			let inlet = partStore.getElementByCidAndClass(e.cid, 'inlet', 'path')||''
 			commonPath+=(" "+ inlet)
@@ -78,7 +77,7 @@ const LaserShow = observer(() => {
 			id="laserShow"
 			className="cutDot"
 			fill="none"
-			stroke="white"
+			stroke="red"
 			d={pathData}
 			strokeWidth="1"
 		/>

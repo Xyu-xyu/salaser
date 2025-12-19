@@ -432,6 +432,7 @@ const ru = {
     "To line": "В линию",
     "To arc": "В дугу",
     "Engraving": "Гравировка",
-    "Cutting order": "Порядок резки"
+    "Cutting order": "Порядок резки",
+    "Cut order was changed": "Порядок резки изменен."
 }
 export default ru;

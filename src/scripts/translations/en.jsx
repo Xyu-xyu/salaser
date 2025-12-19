@@ -448,6 +448,7 @@ const en = {
     "To arc": "To arc",
     "Cutting order": "Cutting order",
     "Inner": "Inner",
-    "Engraving": "Engraving"
+    "Engraving": "Engraving",
+    "Cut order was changed": "Cut order was changed"
 }
 export default en;

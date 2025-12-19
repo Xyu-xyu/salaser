@@ -419,6 +419,7 @@ const zh = {
     "Save arc angle": "保存圆弧角度",
     "Length": "长度",
     "To arc": "转弧",
-    "Cutting order": "切割顺序"
+    "Cutting order": "切割顺序",
+    "Cut order was changed": "剪切顺序已更改"
 }
 export default zh;
