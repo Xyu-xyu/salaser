@@ -194,7 +194,7 @@ class PartStore {
 		this.tooltips = val
 	}
 
-	reorderItems(newOrder, oldOrder) {
+/* 	reorderItems(newOrder, oldOrder) {
 		// Создаём копию оригинального массива
 		const originalArray = [...this.svgData.code];
 	  
@@ -214,6 +214,69 @@ class PartStore {
 		});
 	  
 		// Обновляем массив в состоянии
+		this.svgData.code = originalArray;
+	} */
+
+
+	reorderItems(newOrder, oldOrder) {
+		// Создаём копию оригинального массива
+		const originalArray = [...this.svgData.code];
+	
+		// Функция определения приоритета класса
+		const getClassPriority = (item) => {
+			if (item.class.includes('contour')) return 0;
+			if (item.class.includes('inlet'))   return 1;
+			if (item.class.includes('outlet'))  return 2;
+			return 3; // на случай других классов — в конец
+		};
+	
+		// Группируем oldOrder по cid, сохраняя внутри группы правильный порядок
+		const groupedByCid = {};
+		oldOrder.forEach(item => {
+			const cid = item.cid;
+			if (!groupedByCid[cid]) {
+				groupedByCid[cid] = [];
+			}
+			groupedByCid[cid].push(item);
+		});
+	
+		// Сортируем элементы внутри каждой группы по приоритету class
+		Object.keys(groupedByCid).forEach(cid => {
+			groupedByCid[cid].sort((a, b) => getClassPriority(a) - getClassPriority(b));
+		});
+	
+		// Формируем новый порядок: следуем newOrder по cid, но внутри cid берём отсортированные элементы
+		const reorderedItems = [];
+		newOrder.forEach(newItem => {
+			const cid = newItem.cid;
+			const group = groupedByCid[cid];
+			if (group && group.length > 0) {
+				// Берём все элементы из группы в уже отсортированном порядке
+				reorderedItems.push(...group);
+				// Удаляем группу, чтобы не добавить её повторно (на случай дубликатов в newOrder)
+				delete groupedByCid[cid];
+			}
+		});
+	
+		// Если остались группы, которых нет в newOrder (маловероятно, но на всякий случай)
+		// их можно добавить в конец, но обычно newOrder должен содержать все cid
+		Object.keys(groupedByCid).forEach(cid => {
+			reorderedItems.push(...groupedByCid[cid]);
+		});
+	
+		// Теперь находим индексы старых элементов в originalArray и заменяем их
+		const indices = oldOrder.map(item =>
+			originalArray.findIndex(orig => orig.cid === item.cid && orig.class === item.class)
+		);
+	
+		// Заменяем элементы в оригинальном массиве на новые (в нужном порядке)
+		indices.forEach((index, i) => {
+			if (index !== -1) { // на случай, если элемент не найден
+				originalArray[index] = reorderedItems[i];
+			}
+		});
+	
+		// Обновляем состояние
 		this.svgData.code = originalArray;
 	}
 	

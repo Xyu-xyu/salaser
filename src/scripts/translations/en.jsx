@@ -449,6 +449,6 @@ const en = {
     "Cutting order": "Cutting order",
     "Inner": "Inner",
     "Engraving": "Engraving",
-    "Cut order was changed": "Cut order was changed"
+    "Cut order was changed": "Cut order was changed",
 }
 export default en;

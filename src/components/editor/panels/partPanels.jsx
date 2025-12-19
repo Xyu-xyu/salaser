@@ -9,6 +9,7 @@ import LogPanel from './logPanel.jsx';
 import PointPanel from './pointPanel .jsx';
 import EdgePanel from './edgePanel.jsx';
 import CutPanel from './cutPanel.jsx';
+import ExitButton from '../../navbar/ExirButton.jsx';
 
 
 const PartPanels = () => {
@@ -25,6 +26,8 @@ const PartPanels = () => {
 			<PointPanel />
 			<EdgePanel />
 			<CutPanel />
+			<ExitButton />
+
 		</>
 	);
 };
