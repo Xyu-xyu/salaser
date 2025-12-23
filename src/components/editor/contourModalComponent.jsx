@@ -24,9 +24,8 @@ const contourModalComponent = observer(() => {
 	const [partHeight, setPartHeight] = useState(150)
 	const [partCenterXPosition, setPartCenterXPosition] = useState(true)
 	const [partCenterYPosition, setPartCenterYPosition] = useState(true)
-
 	let shapes = constants.shapes
-
+	
 	const addContour = () => {
 		let d = shapes[selected]
 		const myPathBBox = SVGPathCommander.getPathBBox(d)
@@ -34,7 +33,22 @@ const contourModalComponent = observer(() => {
 		let iniY = myPathBBox.height
 		let scaleX = partWidth / iniX
 		let scaleY = partHeight / iniY
-		var transformed = util.applyTransform(d, scaleX, scaleY, 0, 0, { angle: 0, x: 0, y: 0 })
+		let translateX = partXPosition - myPathBBox.cx * scaleX;
+		let translateY = partYPosition - myPathBBox.cy * scaleY;
+		const outer = partStore.getFiltered(["contour", "outer"])
+		if (outer.length && outer[0].hasOwnProperty('path')) {
+			let box  = SVGPathCommander.getPathBBox( outer[0].path)
+			if (partCenterXPosition) {
+				translateX = box.cx - myPathBBox.cx * scaleX
+			}
+	
+			if (partCenterYPosition) {
+				translateY = box.cy - myPathBBox.cy * scaleY
+			} 
+		}
+	
+		var transformed = util.applyTransform(d, scaleX, scaleY, translateX, translateY, { angle: 0, x: 0, y: 0 })
+
 		if (!d || !d.length) return;
 		partStore.addElementPath ( transformed )
 		addToLog ("Contour added")		

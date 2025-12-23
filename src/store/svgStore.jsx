@@ -252,12 +252,10 @@ class SvgStore {
             return;
         }
 
-        // Благодаря makeAutoObservable — это уже внутри action
-        // Можно использовать как splice, так и прямое присваивание
-        this.svgData.part_code[index] = newPartCodeObject;
-        // или: this.svgData.part_code.splice(index, 1, newPartCodeObject);
-
-        console.log(`Объект с uuid "${uuid}" успешно обновлён`);
+		//console.log (JSON.stringify(this.svgData))
+        this.svgData.part_code[index] = Object.assign({}, newPartCodeObject);
+		//console.log(`Объект с uuid "${uuid}" успешно обновлён`);
+		//console.log (JSON.stringify(this.svgData))
     };
 		
 }

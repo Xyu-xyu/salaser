@@ -450,5 +450,10 @@ const en = {
     "Inner": "Inner",
     "Engraving": "Engraving",
     "Cut order was changed": "Cut order was changed",
+    "Mild_Steel": "Mild_Steel",
+    "The content for this response was already consumed": "The content for this response was already consumed",
+    "Do you want to save changes ?": "Do you want to save changes ?",
+    "Exit": "Exit",
+    "Save anf exit": "Save anf exit"
 }
 export default en;

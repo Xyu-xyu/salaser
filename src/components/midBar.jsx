@@ -212,7 +212,14 @@ const MidBar = observer(() => {
 									>
 										{tasks.map((card) => {
 											// Парсим loadResult один раз
-											const loadResult = JSON.parse(card.loadResult);
+											var loadResult
+
+											try {
+												loadResult = JSON.parse(card.loadResult);
+											} catch (e) {
+													
+												loadResult = false
+											}
 
 											return (
 												<SwiperSlide key={card.id}>
@@ -275,7 +282,17 @@ const MidBar = observer(() => {
 																		• {t('sheets')}:{ card.quantity }
 																	</div>
 																	<div className="cardMaterial">
-																		• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+																	
+																	{loadResult?.result?.jobinfo?.attr ? (
+																		<div className="cardMaterial">
+																			• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+																		</div>
+																	) : (
+																		<div className="cardMaterial text-muted">
+																			• {t('No material info')}
+																		</div>
+																	)}
+
 																	</div>
 																	<div className="cardMaterial">
 																		• {card.dimX} * {card.dimY} {t('mm')}

@@ -420,6 +420,9 @@ const zh = {
     "Length": "长度",
     "To arc": "转弧",
     "Cutting order": "切割顺序",
-    "Cut order was changed": "剪切顺序已更改"
+    "Cut order was changed": "剪切顺序已更改",
+    "Mild_steel": "低碳钢",
+    "Do you want to save changes ?": "您想保存更改吗？",
+    "Save anf exit": "保存并退出"
 }
 export default zh;

@@ -74,7 +74,7 @@ const constants = {
 				left: 300,
 				width: 125,
 				height: 380,
-				zIndex:2
+				zIndex:1
 			}
 		},
 		sheetToolsPopup: {
@@ -84,7 +84,7 @@ const constants = {
 				left: 300,
 				width: 125,
 				height: 380,
-				zIndex:2
+				zIndex:1
 			}
 		},
 		contourModesPopup: {
@@ -94,7 +94,7 @@ const constants = {
 				left: 12,
 				width: 350,
 				height: 300,
-				zIndex:3
+				zIndex:1
 			}
 		},
 		contourPopup: {
@@ -104,7 +104,7 @@ const constants = {
 				left: 12,
 				width: 350,
 				height: 600,
-				zIndex:5
+				zIndex:1
 			}
 		},
 		partPopup: {
@@ -114,7 +114,7 @@ const constants = {
 				left: 12,
 				width: 350,
 				height: 300,
-				zIndex:6
+				zIndex:1
 			}
 		},
 		outletPopup: {

@@ -433,6 +433,11 @@ const ru = {
     "To arc": "В дугу",
     "Engraving": "Гравировка",
     "Cutting order": "Порядок резки",
-    "Cut order was changed": "Порядок резки изменен."
+    "Cut order was changed": "Порядок резки изменен.",
+    "Mild_steel": "Мягкая сталь",
+    "Mild_Steel": "Мягкая_сталь",
+    "Exit": "Выход",
+    "Do you want to save changes ?": "Хотите сохранить изменения?",
+    "Save anf exit": "Сохранить и выйти"
 }
 export default ru;

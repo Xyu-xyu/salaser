@@ -52,6 +52,13 @@ class Log {
             console.error('Database not initialized');
             return;
         } 
+
+        console.log (data)
+        if (!data) {
+            console.error('Data is invalid');
+            return;
+        }
+
         const transaction = this.db.transaction(['save'], 'readwrite');
         const objectStore = transaction.objectStore('save');
 

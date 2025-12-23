@@ -50,35 +50,6 @@ const ShapeModalComponent = observer(() => {
 
 		if (!d || !d.length) return;
 
-		//let uuid = util.uuid()
-		//let id = svgStore.nextPartId
-
-		/* 		svgStore.addForm (
-					{
-						"id": uuid,
-						"uuid": uuid,
-						"name": "12___10__2",
-						"code": [
-							{
-								"cid": 1,
-								"class": "contour outer macro0 closed1",
-								"path": transformed,
-								"stroke": "red",
-								"strokeWidth": 0.2
-							},]
-					}
-				)
-		
-		
-				svgStore.addPosition (
-					{
-						"part_id": id,
-						"part_code_id": uuid,
-						"selected":false,
-						"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": translateX, "f": translateY}
-					}
-				) */
-
 		const findExistingFormByCode = (codeArray) => {
 			return svgStore.svgData.part_code.length && svgStore.svgData.part_code.find(form => {
 				if (!form.code || form.code.length !== codeArray.length) return false;
@@ -106,7 +77,7 @@ const ShapeModalComponent = observer(() => {
 			},
 			{
 				cid: 1,
-				class: "inlet inner macro0 closed1",
+				class: "inlet outer macro0 closed1",
 				path: "",
 				stroke: 'red',
 				strokeWidth: 0.2,
@@ -114,7 +85,7 @@ const ShapeModalComponent = observer(() => {
 			},
 			{
 				cid: 1,
-				class: "outlet inner macro0 closed1",
+				class: "outlet outer macro0 closed1",
 				path: "",
 				stroke: 'lime',
 				strokeWidth: 0.2,

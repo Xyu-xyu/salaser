@@ -44,7 +44,7 @@ const AddPlanButton = observer(() => {
 
 		const fileArray = Array.from(selectedFiles);
 		const parseFileContent = (file) => {
-			return new Promise<FileData>((resolve, reject) => {
+			return new Promise ((resolve, reject) => {
 				const readerText = new FileReader();
 				const readerBase64 = new FileReader();
 

@@ -494,7 +494,10 @@ class PartStore {
             //piercingMode: null,
             selected: false
 		};
-		this.svgData.code.push( contour, inlet, outlet);
+		this.svgData.code.push( contour);
+		this.svgData.code.push( inlet );
+		this.svgData.code.push( outlet);
+
 		this.setContourSelected(maxCid)
 	}
 	
@@ -552,6 +555,7 @@ class PartStore {
 		  !excludes.some(e => element.class.includes(e))
 		);
 	}
+	
 	deleteSelected () {
 		let selected = this.getSelectedElement()	
 		let cidSelected = selected.cid		

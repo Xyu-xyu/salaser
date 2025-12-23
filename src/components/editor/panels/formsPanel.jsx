@@ -147,7 +147,9 @@ const FormsPanel = observer(() => {
 															className={`white_button navbar_button small_button40 me-2`} 
 															onPointerDown={()=>{
 																laserStore.setVal("centralBarMode", "partEditor")
-																partStore.setSvgData( a );		
+																//partStore.setSvgData(structuredClone(a));
+																partStore.setSvgData(JSON.parse(JSON.stringify(a)));
+																partStore.setVal( "partInEdit", a.uuid )
 																}
 															}>
 															<div className="d-flex align-items-center justify-content-center">
