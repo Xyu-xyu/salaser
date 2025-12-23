@@ -237,6 +237,28 @@ class SvgStore {
 			});
 		});
 	};
+
+	updateForm (uuid, newPartCodeObject) {
+		//console.log( arguments );
+        if (!this.svgData || !Array.isArray(this.svgData.part_code)) {
+            console.error("svgData или svgData.part_code не определены или не являются массивом");
+            return;
+        }
+
+        const index = this.svgData.part_code.findIndex(item => item.uuid === uuid);
+
+        if (index === -1) {
+            console.warn(`Объект с uuid "${uuid}" не найден в part_code`);
+            return;
+        }
+
+        // Благодаря makeAutoObservable — это уже внутри action
+        // Можно использовать как splice, так и прямое присваивание
+        this.svgData.part_code[index] = newPartCodeObject;
+        // или: this.svgData.part_code.splice(index, 1, newPartCodeObject);
+
+        console.log(`Объект с uuid "${uuid}" успешно обновлён`);
+    };
 		
 }
 

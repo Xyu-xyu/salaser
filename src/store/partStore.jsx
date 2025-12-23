@@ -8,6 +8,7 @@ import CONSTANTS from "./constants";
 
 
 class PartStore {
+	partInEdit = false;
 	tooltips = false;
 	laserShow =  {};
 	highLighted= false;
@@ -190,33 +191,15 @@ class PartStore {
 		}
 	}
 
+	setVal (key, value) {
+		if (key in this) {
+			this[key] = value;
+		}
+	}
+
 	setTooltips (val) {
 		this.tooltips = val
 	}
-
-/* 	reorderItems(newOrder, oldOrder) {
-		// Создаём копию оригинального массива
-		const originalArray = [...this.svgData.code];
-	  
-		// Создаём массив индексов элементов oldOrder в originalArray
-		const indices = oldOrder.map(item =>
-		  originalArray.findIndex(orig => orig.cid === item.cid && orig.class === item.class)
-		);
-	  
-		// Создаём новый массив, упорядоченный в соответствии с newOrder
-		const reorderedItems = newOrder.map(newItem =>
-		  oldOrder.find(oldItem => oldItem.cid === newItem.cid)
-		);
-	  
-		// Вставляем элементы в originalArray на соответствующие позиции
-		indices.forEach((index, i) => {
-		  originalArray[index] = reorderedItems[i];
-		});
-	  
-		// Обновляем массив в состоянии
-		this.svgData.code = originalArray;
-	} */
-
 
 	reorderItems(newOrder, oldOrder) {
 		// Создаём копию оригинального массива
