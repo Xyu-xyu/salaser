@@ -1,472 +1,478 @@
-
-const schema = JSON.parse(`
-    {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "additionalProperties": false,
-        "title": "SGNmotion settings",
-        "description": "SGNmotion settings",
-        "required": [
-            "machine",
-            "technology",
-            "material"
-        ],
-        "properties": {
-            "machine": {
-                "properties": {
-                    "name": {
-                        "minLength": 1,
-                        "type": "string",
-                        "maxLength": 128,
-                        "default": "SGNlaser",
-                        "title": "Название"
-                    },
-                    "sourcePower_w": {
-                        "type": "integer",
-                        "minimum": 100,
-                        "maximum": 100000,
-                        "default": 12000,
-                        "title": "Мощность, Вт"
-                    }
-                },
-                "description": "Current Machine",
-                "required": [
-                    "name",
-                    "sourcePower_w"
-                ],
-                "additionalProperties": false,
-                "title": "Машина",
-                "type": "object"
-            },
-            "material": {
-                "properties": {
-                    "code": {
-                        "minLength": 2,
-                        "type": "string",
-                        "maxLength": 64,
-                        "default": "STEEL",
-                        "title": "Код"
-                    },
-                    "name": {
-                        "default": "Steel",
-                        "type": "string",
-                        "maxLength": 256,
-                        "title": "Название"
-                    },
-                    "thickness": {
-                        "type": "number",
-                        "minimum": 0.1,
-                        "maximum": 60.0,
-                        "default": 1.5,
-                        "title": "Толщина, мм"
-                    }
-                },
-                "required": [
-                    "name",
-                    "code",
-                    "thickness"
-                ],
-                "type": "object",
-                "additionalProperties": false,
-                "title": "Материал"
-            },
-            "technology": {
-                "properties": {
-                    "macros": {
-                        "type": "array",
-                        "items": {
-                            "required": [
-                                "cutting",
-                                "piercingMacro"
-                            ],
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                                "piercingMacro": {
-                                    "$wvEnumRef": "#/technology/piercingMacros",
-                                    "title": "Индекс врезки",
-                                    "minimum": 0,
-                                    "maximum": 7,
-                                    "default": 0,
-                                    "type": "integer"
-                                },
-                                "cutting": {
-                                    "properties": {
-                                        "pressure": {
-                                            "type": "number",
-                                            "minimum": 0.1,
-                                            "maximum": 35.0,
-                                            "default": 8.0,
-                                            "title": "Давление, бар"
-                                        },
-                                        "power_W_mm": {
-                                            "type": "number",
-                                            "minimum": 1,
-                                            "maximum": 100000,
-                                            "default": 100.0,
-                                            "title": "Энергия, Вт/мм"
-                                        },
-                                        "gas": {
-                                            "default": "AIR",
-                                            "type": "string",
-                                            "enum": [
-                                                "AIR",
-                                                "O2",
-                                                "N2"
-                                            ],
-                                            "title": "Газ"
-                                        },
-                                        "focus": {
-                                            "type": "number",
-                                            "minimum": -15.0,
-                                            "maximum": 15.0,
-                                            "default": 1.0,
-                                            "title": "Фокус, мм"
-                                        },
-                                        "enabled": {
-                                            "title": "Разрешено",
-                                            "type": "boolean",
-                                            "default": false
-                                        },
-                                        "feedLimit_mm_s": {
-                                            "type": "number",
-                                            "minimum": 10,
-                                            "maximum": 200000,
-                                            "default": 50000,
-                                            "title": "Ограничение подачи, мм/с"
-                                        },
-                                        "cross_blow": {
-                                            "title": "Охлаждение",
-                                            "type": "boolean",
-                                            "default": false
-                                        },
-                                        "type": {
-                                            "default": "CW",
-                                            "type": "string",
-                                            "enum": [
-                                                "CW",
-                                                "PULSE",
-                                                "ENGRAVING",
-                                                "VAPOR",
-                                                "EDGING"
-                                            ],
-                                            "title": "Тип"
-                                        },
-                                        "modulationMacro": {
-                                            "$wvEnumRef": "#/technology/modulationMacros",
-                                            "title": "Индекс импульсного режима",
-                                            "minimum": 0,
-                                            "maximum": 15,
-                                            "default": 0,
-                                            "type": "integer"
-                                        },
-                                        "height": {
-                                            "type": "number",
-                                            "minimum": 0.1,
-                                            "maximum": 20.0,
-                                            "default": 1.0,
-                                            "title": "Высота, мм"
-                                        },
-                                        "modulationFrequency_Hz": {
-                                            "type": "number",
-                                            "minimum": 100,
-                                            "maximum": 100000,
-                                            "default": 10000.0,
-                                            "title": "Несущая частота, Hz"
-                                        }
-                                    },
-                                    "required": [
-                                        "type",
-                                        "enabled",
-                                        "cross_blow",
-                                        "gas"
-                                    ],
-                                    "type": "object",
-                                    "additionalProperties": false,
-                                    "title": "Резка"
-                                }
-                            }
-                        },
-                        "$wvType": "tabbed",
-                        "additionalProperties": false,
-                        "maxItems": 8,
-                        "minItems": 1,
-                        "title": "Макросы"
-                    },
-                    "piercingMacros": {
-                        "type": "array",
-                        "items": {
-                            "required": [
-                                "gas",
-                                "initial_cross_blow",
-                                "name"
-                            ],
-                            "properties": {
-                                "initial_modulationFrequency_Hz": {
-                                    "type": "number",
-                                    "minimum": 100,
-                                    "maximum": 100000,
-                                    "default": 10000.0,
-                                    "title": "Начальная несущая частота, Hz"
-                                },
-                                "initial_focus": {
-                                    "type": "number",
-                                    "minimum": -15.0,
-                                    "maximum": 15.0,
-                                    "default": 1.0,
-                                    "title": "Начальный фокус, мм"
-                                },
-                                "initial_modulationMacro": {
-                                    "$wvEnumRef": "#/technology/modulationMacros",
-                                    "title": "Индекс начального импульсного режима",
-                                    "minimum": 0,
-                                    "maximum": 15,
-                                    "default": 0,
-                                    "type": "integer"
-                                },
-                                "initial_pressure": {
-                                    "type": "number",
-                                    "minimum": 0.1,
-                                    "maximum": 35.0,
-                                    "default": 8.0,
-                                    "title": "Начальное давление, бар"
-                                },
-                                "gas": {
-                                    "default": "AIR",
-                                    "type": "string",
-                                    "enum": [
-                                        "AIR",
-                                        "O2",
-                                        "N2"
-                                    ],
-                                    "title": "Газ"
-                                },
-                                "name": {
-                                    "minLength": 1,
-                                    "type": "string",
-                                    "maxLength": 32,
-                                    "default": "Врезка №",
-                                    "title": "Название"
-                                },
-                                "initial_power": {
-                                    "type": "integer",
-                                    "minimum": 10,
-                                    "maximum": 100000,
-                                    "default": 1000,
-                                    "title": "Начальная мощность, Вт"
-                                },
-                                "initial_height": {
-                                    "type": "number",
-                                    "minimum": 0.1,
-                                    "maximum": 15.0,
-                                    "default": 1.0,
-                                    "title": "Начальная высота, мм"
-                                },
-                                "stages": {
-                                    "type": "array",
-                                    "items": {
-                                        "required": [
-                                            "enabled",
-                                            "cross_blow"
-                                        ],
-                                        "additionalProperties": false,
-                                        "type": "object",
-                                        "properties": {
-                                            "pressure": {
-                                                "type": "number",
-                                                "minimum": 0.1,
-                                                "maximum": 35.0,
-                                                "default": 8.0,
-                                                "title": "Давление, бар"
-                                            },
-                                            "power": {
-                                                "type": "integer",
-                                                "minimum": 10,
-                                                "maximum": 100000,
-                                                "default": 1000,
-                                                "title": "Максимальная разрешенная мощность, Вт"
-                                            },
-                                            "enabled": {
-                                                "title": "Используется",
-                                                "type": "boolean",
-                                                "default": false
-                                            },
-                                            "delay_s": {
-                                                "title": "Задержка перед шагом, с",
-                                                "type": "number",
-                                                "default": 0,
-                                                "minimum": 0,
-                                                "maximum": 10
-                                            },
-                                            "power_W_s": {
-                                                "type": "integer",
-                                                "minimum": 10,
-                                                "maximum": 1000000,
-                                                "default": 1000,
-                                                "title": "Энергия шага, Вт/с"
-                                            },
-                                            "focus": {
-                                                "type": "number",
-                                                "minimum": -15.0,
-                                                "maximum": 15.0,
-                                                "default": 1.0,
-                                                "title": "Фокус, мм"
-                                            },
-                                            "height": {
-                                                "type": "number",
-                                                "minimum": 0.1,
-                                                "maximum": 15.0,
-                                                "default": 1.0,
-                                                "title": "Высота, мм"
-                                            },
-                                            "modulationMacro": {
-                                                "$wvEnumRef": "#/technology/modulationMacros",
-                                                "title": "Индекс импульсного режима",
-                                                "minimum": 0,
-                                                "maximum": 15,
-                                                "default": 0,
-                                                "type": "integer"
-                                            },
-                                            "cross_blow": {
-                                                "title": "Охлаждение",
-                                                "type": "boolean",
-                                                "default": false
-                                            },
-                                            "modulationFrequency_Hz": {
-                                                "type": "number",
-                                                "minimum": 100,
-                                                "maximum": 100000,
-                                                "default": 10000.0,
-                                                "title": "Несущая частота, Hz"
-                                            }
-                                        }
-                                    },
-                                    "maxItems": 16,
-                                    "minItems": 1,
-                                    "additionalProperties": false,
-                                    "title": "Шаги врезки"
-                                },
-                                "initial_cross_blow": {
-                                    "title": "Охлаждение",
-                                    "type": "boolean",
-                                    "default": false
-                                }
-                            },
-                            "additionalProperties": false,
-                            "$wvFormat": {
-                                "format": "{0}: {1} Hz, {2} stages",
-                                "variables": [
-                                    {
-                                        "type": "value",
-                                        "name": "name",
-                                        "default": "Unknown"
-                                    },
-                                    {
-                                        "type": "value",
-                                        "name": "initial_modulationFrequency_Hz",
-                                        "default": "-1"
-                                    },
-                                    {
-                                        "type": "length",
-                                        "name": "stages",
-                                        "default": "-1"
-                                    }
-                                ]
-                            },
-                            "type": "object"
-                        },
-                        "$wvType": "tabbed",
-                        "additionalProperties": false,
-                        "maxItems": 8,
-                        "minItems": 8,
-                        "title": "Настройки врезок"
-                    },
-                    "modulationMacros": {
-                        "title": "Настройки импульсного реза",
-                        "items": {
-                            "properties": {
-                                "pulseFill_percent": {
-                                    "type": "number",
-                                    "minimum": 0.1,
-                                    "maximum": 100.0,
-                                    "default": 50.0,
-                                    "title": "Заполнение, %"
-                                },
-                                "name": {
-                                    "minLength": 1,
-                                    "type": "string",
-                                    "maxLength": 32,
-                                    "default": "Режим импульса № ",
-                                    "title": "Название"
-                                },
-                                "pulseFrequency_Hz": {
-                                    "type": "number",
-                                    "minimum": 0,
-                                    "maximum": 1000,
-                                    "default": 0,
-                                    "title": "Частота импульсов, Hz"
-                                }
-                            },
-                            "additionalProperties": false,
-                            "type": "object",
-                            "$wvFormat": {
-                                "format": "{0}: {1}%, {2} Hz",
-                                "variables": [
-                                    {
-                                        "type": "value",
-                                        "name": "name",
-                                        "default": "Unknown"
-                                    },
-                                    {
-                                        "type": "value",
-                                        "name": "pulseFill_percent",
-                                        "default": "-1"
-                                    },
-                                    {
-                                        "type": "value",
-                                        "name": "pulseFrequency_Hz",
-                                        "default": "-1"
-                                    }
-                                ]
-                            }
-                        },
-                        "$wvType": "compact",
-                        "additionalProperties": false,
-                        "maxItems": 16,
-                        "minItems": 1,
-                        "type": "array"
-                    },
-                    "feeding": {
-                        "properties": {
-                            "feedLimit_mm_s": {
-                                "type": "number",
-                                "minimum": 10,
-                                "maximum": 200000,
-                                "default": 50000,
-                                "title": "Ограничение подачи, мм/с"
-                            }
-                        },
-                        "required": [
-                            "feedLimit_mm_s"
-                        ],
-                        "type": "object",
-                        "additionalProperties": false,
-                        "title": "Холостые перемещения"
-                    }
-                },
-                "required": [
-                    "macros",
-                    "piercingMacros",
-                    "feeding"
-                ],
-                "$wvType": "tabbed",
-                "additionalProperties": false,
-                "type": "object",
-                "title": "Технология"
-            }
-        },
-        "$id": "sgnMachineSettings",
-        "type": "object"
-    }
+// TODO схема по идее должна загружаться и записываться сюда автоматически и сохраняться для создания дефолтных значений
+const schema = JSON.parse(`{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"required": [
+		"machine",
+		"technology",
+		"material"
+	],
+	"properties": {
+		"machine": {
+			"type": "object",
+			"description": "Current Machine",
+			"properties": {
+				"name": {
+					"title": "Название",
+					"minLength": 1,
+					"maxLength": 128,
+					"default": "SGNlaser",
+					"type": "string"
+				},
+				"sourcePower_w": {
+					"type": "integer",
+					"title": "Мощность, Вт",
+					"maximum": 100000,
+					"default": 12000,
+					"minimum": 100
+				}
+			},
+			"additionalProperties": false,
+			"required": [
+				"name",
+				"sourcePower_w"
+			],
+			"title": "Машина"
+		},
+		"material": {
+			"properties": {
+				"code": {
+					"title": "Код",
+					"minLength": 2,
+					"maxLength": 64,
+					"default": "STEEL",
+					"type": "string"
+				},
+				"name": {
+					"maxLength": 256,
+					"type": "string",
+					"title": "Название",
+					"default": "Steel"
+				},
+				"thickness": {
+					"type": "number",
+					"title": "Толщина, мм",
+					"maximum": 60.0,
+					"default": 1.5,
+					"minimum": 0.1
+				}
+			},
+			"title": "Материал",
+			"required": [
+				"name",
+				"code",
+				"thickness"
+			],
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"technology": {
+			"$wvType": "tabbed",
+			"properties": {
+				"macros": {
+					"$wvType": "tabbed",
+					"title": "Макросы",
+					"items": {
+						"required": [
+							"cutting",
+							"piercingMacro"
+						],
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"piercingMacro": {
+								"$wvEnumRef": "#/technology/piercingMacros",
+								"type": "integer",
+								"title": "Индекс врезки",
+								"maximum": 7,
+								"default": 0,
+								"minimum": 0
+							},
+							"cutting": {
+								"properties": {
+									"pressure": {
+										"type": "number",
+										"title": "Давление, бар",
+										"maximum": 35.0,
+										"default": 8.0,
+										"minimum": 0.1
+									},
+									"power_W_mm": {
+										"type": "number",
+										"title": "Энергия, Вт/мм",
+										"maximum": 100000,
+										"default": 100.0,
+										"minimum": 1
+									},
+									"gas": {
+										"enum": [
+											"AIR",
+											"O2",
+											"N2"
+										],
+										"type": "string",
+										"title": "Газ",
+										"default": "AIR"
+									},
+									"focus": {
+										"type": "number",
+										"title": "Фокус, мм",
+										"maximum": 15.0,
+										"default": 1.0,
+										"minimum": -15.0
+									},
+									"enabled": {
+										"type": "boolean",
+										"title": "Разрешено",
+										"default": false
+									},
+									"type": {
+										"enum": [
+											"CW",
+											"PULSE",
+											"ENGRAVEING",
+											"VAPOR",
+											"EDGING"
+										],
+										"type": "string",
+										"title": "Тип",
+										"default": "CW"
+									},
+									"cross_blow": {
+										"type": "boolean",
+										"title": "Охлаждение",
+										"default": false
+									},
+									"feedLimit_mm_s": {
+										"type": "number",
+										"title": "Ограничение подачи, мм/с",
+										"maximum": 200000,
+										"default": 50000,
+										"minimum": 10
+									},
+									"modulationMacro": {
+										"$wvEnumRef": "#/technology/modulationMacros",
+										"type": "integer",
+										"title": "Индекс импульсного режима",
+										"maximum": 15,
+										"default": 0,
+										"minimum": 0
+									},
+									"height": {
+										"type": "number",
+										"title": "Высота, мм",
+										"maximum": 20.0,
+										"default": 1.0,
+										"minimum": 0.1
+									},
+									"modulationFrequency_Hz": {
+										"type": "number",
+										"title": "Несущая частота, Hz",
+										"maximum": 100000,
+										"default": 10000.0,
+										"minimum": 100
+									}
+								},
+								"title": "Резка",
+								"required": [
+									"type",
+									"enabled",
+									"cross_blow",
+									"gas"
+								],
+								"additionalProperties": false,
+								"type": "object"
+							}
+						}
+					},
+					"additionalProperties": false,
+					"maxItems": 8,
+					"type": "array"
+				},
+				"piercingMacros": {
+					"$wvType": "tabbed",
+					"title": "Настройки врезок",
+					"items": {
+						"$wvFormat": {
+							"format": "{0}: {1} Hz, {2} stages",
+							"variables": [
+								{
+									"type": "value",
+									"name": "name",
+									"default": "Unknown"
+								},
+								{
+									"type": "value",
+									"name": "initial_modulationFrequency_Hz",
+									"default": "-1"
+								},
+								{
+									"type": "length",
+									"name": "stages",
+									"default": "-1"
+								}
+							]
+						},
+						"required": [
+							"gas",
+							"initial_cross_blow",
+							"name"
+						],
+						"additionalProperties": false,
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Название",
+								"minLength": 1,
+								"maxLength": 32,
+								"default": "Unknown incut",
+								"type": "string"
+							},
+							"initial_modulationFrequency_Hz": {
+								"type": "number",
+								"title": "Начальная несущая частота, Hz",
+								"maximum": 100000,
+								"default": 10000.0,
+								"minimum": 100
+							},
+							"stages": {
+								"title": "Шаги врезки",
+								"items": {
+									"required": [
+										"enabled",
+										"cross_blow"
+									],
+									"additionalProperties": false,
+									"type": "object",
+									"properties": {
+										"power": {
+											"type": "integer",
+											"title": "Максимальная разрешенная мощность, Вт",
+											"maximum": 100000,
+											"default": 1000,
+											"minimum": 10
+										},
+										"power_W_s": {
+											"type": "integer",
+											"title": "Энергия шага, Вт/с",
+											"maximum": 1000000,
+											"default": 1000,
+											"minimum": 10
+										},
+										"enabled": {
+											"type": "boolean",
+											"title": "Используется",
+											"default": false
+										},
+										"delay_s": {
+											"type": "number",
+											"title": "Задержка перед шагом, с",
+											"default": 0
+										},
+										"pressure": {
+											"type": "number",
+											"title": "Давление, бар",
+											"maximum": 35.0,
+											"default": 8.0,
+											"minimum": 0.1
+										},
+										"focus": {
+											"type": "number",
+											"title": "Фокус, мм",
+											"maximum": 15.0,
+											"default": 1.0,
+											"minimum": -15.0
+										},
+										"height": {
+											"type": "number",
+											"title": "Высота, мм",
+											"maximum": 20.0,
+											"default": 1.0,
+											"minimum": 0.1
+										},
+										"cross_blow": {
+											"type": "boolean",
+											"title": "Охлаждение",
+											"default": false
+										},
+										"modulationFrequency_Hz": {
+											"type": "number",
+											"title": "Несущая частота, Hz",
+											"maximum": 100000,
+											"default": 10000.0,
+											"minimum": 100
+										},
+										"modulationMacro": {
+											"$wvEnumRef": "#/technology/modulationMacros",
+											"type": "integer",
+											"title": "Индекс импульсного режима",
+											"maximum": 15,
+											"default": 0,
+											"minimum": 0
+										}
+									}
+								},
+								"additionalProperties": false,
+								"maxItems": 16,
+								"type": "array"
+							},
+							"initial_pressure": {
+								"type": "number",
+								"title": "Начальное давление, бар",
+								"maximum": 35.0,
+								"default": 8.0,
+								"minimum": 0.1
+							},
+							"gas": {
+								"enum": [
+									"AIR",
+									"O2",
+									"N2"
+								],
+								"type": "string",
+								"title": "Газ",
+								"default": "AIR"
+							},
+							"initial_power": {
+								"type": "integer",
+								"title": "Начальная мощность, Вт",
+								"maximum": 100000,
+								"default": 1000,
+								"minimum": 10
+							},
+							"initial_height": {
+								"type": "number",
+								"title": "Начальная высота, мм",
+								"maximum": 20.0,
+								"default": 1.0,
+								"minimum": 0.1
+							},
+							"initial_cross_blow": {
+								"type": "boolean",
+								"title": "Охлаждение",
+								"default": false
+							},
+							"initial_focus": {
+								"type": "number",
+								"title": "Начальный фокус, мм",
+								"maximum": 15.0,
+								"default": 1.0,
+								"minimum": -15.0
+							},
+							"initial_modulationMacro": {
+								"$wvEnumRef": "#/technology/modulationMacros",
+								"type": "integer",
+								"title": "Индекс начального импульсного режима",
+								"maximum": 15,
+								"default": 0,
+								"minimum": 0
+							}
+						}
+					},
+					"additionalProperties": false,
+					"maxItems": 8,
+					"type": "array"
+				},
+				"modulationMacros": {
+					"$wvType": "compact",
+					"type": "array",
+					"items": {
+						"$wvFormat": {
+							"format": "{0}: {1}%, {2} Hz",
+							"variables": [
+								{
+									"type": "value",
+									"name": "name",
+									"default": "Unknown"
+								},
+								{
+									"type": "value",
+									"name": "pulseFill_percent",
+									"default": "-1"
+								},
+								{
+									"type": "value",
+									"name": "pulseFill_percent_min",
+									"default": "-1"
+								},
+								{
+									"type": "value",
+									"name": "pulseFrequency_Hz",
+									"default": "-1"
+								}
+							]
+						},
+						"properties": {
+							"name": {
+								"title": "Название",
+								"minLength": 1,
+								"maxLength": 32,
+								"default": "Unknown modulation macro",
+								"type": "string"
+							},
+							"pulseFill_percent": {
+								"type": "number",
+								"title": "Заполнение, %",
+								"maximum": 100.0,
+								"default": 50.0,
+								"minimum": 0.1
+							},
+							"pulseFill_percent_min": {
+								"type": "number",
+								"title": "Мин.Заполнение, %",
+								"maximum": 100.0,
+								"default": 10.0,
+								"minimum": 0.1
+							},
+							"pulseFrequency_Hz": {
+								"type": "number",
+								"title": "Частота импульсов, Hz",
+								"maximum": 1000,
+								"default": 0,
+								"minimum": 0
+							}
+						},
+						"additionalProperties": false,
+						"type": "object"
+					},
+					"additionalProperties": false,
+					"maxItems": 16,
+					"title": "Настройки импульсного реза"
+				},
+				"feeding": {
+					"properties": {
+						"feedLimit_mm_s": {
+							"type": "number",
+							"title": "Ограничение подачи, мм/с",
+							"maximum": 200000,
+							"default": 50000,
+							"minimum": 10
+						}
+					},
+					"title": "Холостые перемещения",
+					"required": [
+						"feedLimit_mm_s"
+					],
+					"additionalProperties": false,
+					"type": "object"
+				}
+			},
+			"title": "Технология",
+			"required": [
+				"macros",
+				"piercingMacros",
+				"feeding"
+			],
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"description": "SGNmotion settings",
+	"$id": "sgnMachineSettings",
+	"type": "object",
+	"additionalProperties": false,
+	"title": "SGNmotion settings"
+}
+    
 `)
 
 export default schema

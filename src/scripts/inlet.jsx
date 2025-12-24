@@ -47,26 +47,32 @@ class Inlet {
     }
 
     detectInletType (selectedInletPath) {
-        let inletMode = 'Straight'
-		if (selectedInletPath) {
-			let path = SVGPathCommander.normalizePath(selectedInletPath).map(a => a.join(' ')).join(' ')
-			if (path && path.length) {
-				if (path.includes('L') || path.includes('H') || path.includes('V')) {
-					inletMode = 'Direct'
-					if (path.includes('A')) {
-						inletMode = 'Hook'
-					}
-					/*                     
-					// пока рисуем треугольник определяем так
-					if (path.match(/L/g) && path.match(/L/gm).length && path.match(/L/gm).length === 3) {
-					inletMode= Straight      
-					} */
-				} else if (path.includes('A')) {
-					inletMode = 'Tangent'
-				}
-			}
-		}
-        return inletMode
+        let inletMode = "Straight"
+        try {
+            if (selectedInletPath) {
+                let path = SVGPathCommander.normalizePath(selectedInletPath).map(a => a.join(' ')).join(' ')
+                if (path && path.length) {
+                    if (path.includes('L') || path.includes('H') || path.includes('V')) {
+                        inletMode = 'Direct'
+                        if (path.includes('A')) {
+                            inletMode = 'Hook'
+                        }
+                        /*                     
+                        // пока рисуем треугольник определяем так
+                        if (path.match(/L/g) && path.match(/L/gm).length && path.match(/L/gm).length === 3) {
+                        inletMode= Straight      
+                        } */
+                    } else if (path.includes('A')) {
+                        inletMode = 'Tangent'
+                    }
+                }
+            }
+            return inletMode
+
+        } catch (e) {
+            return "Straight"
+        }
+		
     }
 
     detectInletLength (path) {
@@ -1638,6 +1644,7 @@ class Inlet {
     }
 
     findDangerInletsOutlets () {
+        return
         let inlets = partStore.getFiltered('inlet')
         let outlets = partStore.getFiltered('outlet')
 

@@ -40,7 +40,7 @@ const PartSvgComponent = observer (() => {
             strokeWidth="0.2"
         >
             <defs>
-                <pattern  
+               {/*  <pattern  
                     id="xsGrid" 
                     width="1" 
                     height="1" 
@@ -58,7 +58,7 @@ const PartSvgComponent = observer (() => {
                     <path  
                     d="M 10 0 L 0 0 0 10 10 10 10 0" 
                     fill={gridState.smallGrid.fill} 
-                    stroke="var(--gridColorStroke)" 
+                    stroke="blue" 
                     strokeWidth="0.1" 
                     visibility={gridState.smallGrid.visibility}/>
                 </pattern>
@@ -76,7 +76,7 @@ const PartSvgComponent = observer (() => {
                     fill={gridState.grid.fill} 
                     stroke="var(--gridColorStroke)" 
                     strokeWidth="0.2"/>
-                </pattern>
+                </pattern> */}
                 <marker id="dotRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
                     <circle 
                     cx="5" 
