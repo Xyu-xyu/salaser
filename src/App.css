@@ -2150,8 +2150,11 @@ g.outer.selected {
   filter: brightness(1.1);
 }
 
+
 g.outlet,
-g.inlet {
+g.inlet,
+g.outlet.outer,
+g.inlet.outer {
     fill:transparent;
 }
 

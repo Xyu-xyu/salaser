@@ -229,7 +229,7 @@ const NewPlanButton = observer(() => {
 										eventKey={preset.id}
 										active={selectedPreset?.id === preset.id}
 									>
-										{preset.name}
+										{preset.name}  {preset.id }
 									</Dropdown.Item>
 								)) || <Dropdown.Item disabled>{t("Loading...")}</Dropdown.Item>}
 							</DropdownButton>

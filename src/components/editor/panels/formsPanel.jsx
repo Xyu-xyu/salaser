@@ -35,6 +35,17 @@ const FormsPanel = observer(() => {
 
 	}
 
+	const startEditor = (a) => {
+		console.log("Starting editor with :  ")
+		console.log(JSON.stringify(a))
+		partStore.printStore()
+		laserStore.setVal("centralBarMode", "partEditor")
+		partStore.setSvgData(JSON.parse(JSON.stringify(a)));
+		partStore.setVal( "partInEdit", a.uuid )
+		partStore.printStore()
+
+	}
+
 	const panelInfo =
 	{
 		id: "formsPopup",
@@ -107,7 +118,7 @@ const FormsPanel = observer(() => {
 															onMouseDown={(e) => { }}
 															onMouseMove={(e) => { }}
 															onTouchStart={(e) => { }}
-															fill={element.class.includes("inner") ? "none" : "aqua"}
+															fill={element.class.includes("inner") ? "url(#grid)" : "#fd7e14"}
 														>
 															<path d={element.path} />
 														</g>
@@ -146,10 +157,9 @@ const FormsPanel = observer(() => {
 														<button
 															className={`white_button navbar_button small_button40 me-2`} 
 															onPointerDown={()=>{
-																laserStore.setVal("centralBarMode", "partEditor")
-																//partStore.setSvgData(structuredClone(a));
-																partStore.setSvgData(JSON.parse(JSON.stringify(a)));
-																partStore.setVal( "partInEdit", a.uuid )
+
+																startEditor(a)
+															
 																}
 															}>
 															<div className="d-flex align-items-center justify-content-center">

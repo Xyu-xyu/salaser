@@ -5,6 +5,7 @@ import { toJS } from "mobx";
 import Part from "./../scripts/part";
 import Util from "./../scripts/util";
 import CONSTANTS from "./constants";
+import log from "../scripts/log";
 
 
 class PartStore {
@@ -191,11 +192,6 @@ class PartStore {
 		}
 	}
 
-	setVal (key, value) {
-		if (key in this) {
-			this[key] = value;
-		}
-	}
 
 	setTooltips (val) {
 		this.tooltips = val
@@ -612,6 +608,54 @@ class PartStore {
 	setLaserShow (val) {
 		Object.assign(this.laserShow, val);
 	}
+
+	setVal (key, value) {
+		if (key in this) {
+			this[key] = value;
+		}
+	}
+
+	getDefaultState() {
+		return {
+			partInEdit: false,
+			tooltips: false,
+			laserShow: {},
+			highLighted: false,
+			svgParams: { width: 0, height: 0 },
+			svgData: {
+				width: 0,
+				height: 0,
+				code: [],
+				params: { id: '', uuid: '', pcode: '' }
+			},
+			selectorCoords: { x: 0, y: 0, width: 0, height: 0 },
+			safeMode: { mode: false, intend: CONSTANTS.defaultInletIntend },
+			copiedCid: false,
+			selectedPointOnPath: false,
+			selectedPointOnEdge: false,
+			pointInMove: false,
+			boundsList: false,
+			xGuide: { x1: 0, y1: 0, x2: 0, y2: 0 },
+			yGuide: { x1: 0, y1: 0, x2: 0, y2: 0 },
+			aGuide: { x1: 0, y1: 0, x2: 0, y2: 0, angle: 0 },
+			guidesMode: true,
+			selectedEdge: false,
+			textFocus: false,
+			matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
+			groupMatrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
+			offset: { x: 0, y: 0 },
+			rectParams: { x: 0, y: 0, width: 0, heigh: 0 }
+		}
+	}
+
+	setToDefault() {
+		log.clearBase()
+		this.clearSvgData()	
+		const defaults = this.getDefaultState()	
+		Object.assign(this, defaults)
+		this.printStore()
+	}
+	
 }
 
 const partStore = new PartStore();

@@ -393,8 +393,7 @@ const OutletPanel = observer(() => {
 										<img id="outlet_viewer__wrapper__img" src={
 											type === "Straight" ? Straight :
 												type === "Hook" ? Hook :
-													type === "Direct" ? Direct :
-														type === "Tangent" ? Tangent : ''
+													type === "Direct" ? Direct : Tangent 
 										}
 										alt="pic"/>
 									</div>

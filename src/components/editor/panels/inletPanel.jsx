@@ -242,7 +242,7 @@ const InletPanel = observer(() => {
 
 	useEffect(() => {
 		let resp;
-		if (DirectA && selectedInletPath) {
+		if (DirectA !==90 && selectedInletPath) {
 			let classes = partStore.getElementByCidAndClass(selectedCid, 'contour', 'class')
 			let contourType = classes.includes('inner') ? 'inner' : 'outer'
 			resp = inlet.inletDirectA(DirectA, selectedInletPath, selectedPath, contourType)

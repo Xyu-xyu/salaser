@@ -20,12 +20,14 @@ const ExitButton = observer(() => {
 	const handleClose = () => {
 		setShow(false)
 		laserStore.setVal("centralBarMode", "planEditor")
+		partStore.setToDefault()
 	};
+
 	const handleSubmit = () => {
 		setShow(false)
 		laserStore.setVal("centralBarMode", "planEditor")
 		svgStore.updateForm( partInEdit, svgData) 
-			
+		partStore.setToDefault()			
 	}
 
 	const modalProps = {
