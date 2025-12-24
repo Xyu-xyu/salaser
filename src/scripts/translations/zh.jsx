@@ -423,6 +423,8 @@ const zh = {
     "Cut order was changed": "剪切顺序已更改",
     "Mild_steel": "低碳钢",
     "Do you want to save changes ?": "您想保存更改吗？",
-    "Save anf exit": "保存并退出"
+    "Save and exit": "保存并退出",
+    "Do you want to save sheet changes ?": "您想保存工作表更改吗？",
+    "Do you want to save file and exit ?": "您想保存文件并退出吗？"
 }
 export default zh;

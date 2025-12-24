@@ -438,6 +438,9 @@ const ru = {
     "Mild_Steel": "Мягкая_сталь",
     "Exit": "Выход",
     "Do you want to save changes ?": "Хотите сохранить изменения?",
-    "Save anf exit": "Сохранить и выйти"
+    "Save and exit": "Сохранить и выйти",
+    "Do you want to save sheet changes ?": "Хотите сохранить изменения листа?",
+    "Save and exit": "Сохранить и выйти",
+    "Do you want to save file and exit ?": "Вы хотите сохранить файл и выйти?"
 }
 export default ru;

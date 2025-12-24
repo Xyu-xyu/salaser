@@ -8,30 +8,27 @@ import partStore from "../../store/partStore";
 import svgStore from "../../store/svgStore";
 
 
-const ExitButton = observer(() => {
+const ExitButtonSheetEditor = observer(() => {
 
 	const [show, setShow] = useState(false);
 	const { t } = useTranslation()
-	const { svgData, partInEdit } = partStore
 	const showModal = () => {
 		setShow(true);
 	};
 
 	const handleClose = () => {
 		setShow(false)
-		laserStore.setVal("centralBarMode", "planEditor")
-		partStore.setToDefault()
+		laserStore.setVal("centralBarMode", "plans")
 	};
 
 	const handleSubmit = () => {
 		setShow(false)
-		laserStore.setVal("centralBarMode", "planEditor")
-		svgStore.updateForm( partInEdit, svgData) 
-		partStore.setToDefault()			
+		laserStore.setVal("centralBarMode", "plans")
+		svgStore.saveNewFile()
 	}
 
 	const modalProps = {
-		modalBody: 'Do you want to save changes ?',
+		modalBody: 'Do you want to save file and exit ?',
 		confirmText: 'Save and exit',
 		cancelText: 'Exit'
 	}
@@ -107,4 +104,4 @@ const ExitButton = observer(() => {
 	)
 });
 
-export default ExitButton;
+export default ExitButtonSheetEditor;

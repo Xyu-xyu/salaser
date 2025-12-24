@@ -150,7 +150,7 @@ const Panel = observer(({ element }) => {
 	};
 
 	const savePanelPosition = (id) => {
-		console.log(toJS(panelStore.positions)); // если используешь mobx
+		//console.log(toJS(panelStore.positions)); // если используешь mobx
 		const entries = Object.entries(panelStore.positions);
 		const sortedEntries = entries.sort(([, a], [, b]) => a.style.zIndex - b.style.zIndex);
 		const updatedPositions = {};

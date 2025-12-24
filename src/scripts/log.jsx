@@ -53,7 +53,7 @@ class Log {
             return;
         } 
 
-        console.log (data)
+        //console.log (data)
         if (!data) {
             console.error('Data is invalid');
             return;
