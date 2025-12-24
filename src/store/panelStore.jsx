@@ -11,6 +11,7 @@ class PanelStore {
 	}
 
 	setMaxZindex (val) {
+		if (typeof val !== 'number') debugger;
 		this.maxZindex = val
 	}
 

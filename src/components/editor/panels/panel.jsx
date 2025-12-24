@@ -1,15 +1,15 @@
 import { observer } from "mobx-react-lite";
 import React, { useState, useRef, useEffect } from "react";
 import panelStore from "./../../../store/panelStore";
-//import { toJS } from "mobx";
+import { toJS } from "mobx";
 
 
-const Panel = observer (({ element }) => {
-	const id =element.id
+const Panel = observer(({ element }) => {
+	const id = element.id
 
-	useEffect(()=>{
+	useEffect(() => {
 		panelStore.getInitialPositions()
-	},[])
+	}, [])
 
 	const panelRef = useRef(null);
 	const startPos = useRef({ x: 0, y: 0 });
@@ -19,23 +19,23 @@ const Panel = observer (({ element }) => {
 	const startX = useRef(0);
 	const move = useRef(0);
 
- 	const toggleMinified = () => {
+	const toggleMinified = () => {
 		handleIncreaseZIndex()
 		let positions = {
-			style:{
+			style: {
 				width: panelStore.positions[id].style.width,
-				height:panelStore.positions[id].style.height,
-				top:   panelStore.positions[id].style.top,
-				left:  panelStore.positions[id].style.left,	
-				zIndex:panelStore.maxZindex
+				height: panelStore.positions[id].style.height,
+				top: panelStore.positions[id].style.top,
+				left: panelStore.positions[id].style.left,
+				zIndex: panelStore.maxZindex
 			}
 		}
-		positions.mini = Boolean(!Number( panelStore.positions[id].mini ))
+		positions.mini = Boolean(!Number(panelStore.positions[id].mini))
 		panelStore.setPosition(id, positions)
 		savePanelPosition()
 	};
 
- 	const handleMouseDown = (e) => {
+	const handleMouseDown = (e) => {
 		handleIncreaseZIndex()
 		//e.preventDefault();
 		e.stopPropagation();
@@ -43,7 +43,7 @@ const Panel = observer (({ element }) => {
 		if (e.type === 'mousedown' || e.type === 'touchstart') {
 			const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
 			const clientY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
-		
+
 			startPos.current = {
 				x: clientX - panelRef.current.offsetLeft,
 				y: clientY - panelRef.current.offsetTop,
@@ -53,12 +53,12 @@ const Panel = observer (({ element }) => {
 		move.current = 'move'
 
 		let positions = {
-			style:{
+			style: {
 				width: panelStore.positions[id].style.width,
-				height:panelStore.positions[id].style.height,
-				top:   panelStore.positions[id].style.top,
-				left:  panelStore.positions[id].style.left,	
-				zIndex:panelStore.maxZindex
+				height: panelStore.positions[id].style.height,
+				top: panelStore.positions[id].style.top,
+				left: panelStore.positions[id].style.left,
+				zIndex: panelStore.maxZindex
 			}
 		}
 		positions.mini = panelStore.positions[id].mini
@@ -67,7 +67,7 @@ const Panel = observer (({ element }) => {
 		document.addEventListener("mousemove", handleMouseMove);
 		document.addEventListener("mouseup", handleMouseUp);
 		document.addEventListener("touchmove", handleMouseMove);
-		document.addEventListener("touchend", handleMouseUp); 
+		document.addEventListener("touchend", handleMouseUp);
 	};
 
 	const initDrag = (e) => {
@@ -75,27 +75,27 @@ const Panel = observer (({ element }) => {
 		handleIncreaseZIndex()
 		const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
 		const clientY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
-	
+
 		startX.current = clientX;
 		startY.current = clientY;
-	
+
 		startWidth.current = panelStore.positions[id].style.width;
 		startHeight.current = panelStore.positions[id].style.height;
-	
+
 		move.current = 'resize';
-	
+
 		// Добавляем слушатели событий
 		document.addEventListener("mousemove", handleMouseMove);
 		document.addEventListener("mouseup", handleMouseUp);
 		document.addEventListener("touchmove", handleMouseMove, { passive: false });
-		document.addEventListener("touchend", handleMouseUp); 
+		document.addEventListener("touchend", handleMouseUp);
 	};
-	
+
 	const handleMouseMove = (e) => {
 		// Определяем тип события и получаем координаты
 		const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
 		const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
-	
+
 		if (move.current === 'move') {
 			const newLeft = clientX - startPos.current.x;
 			const newTop = clientY - startPos.current.y;
@@ -130,33 +130,43 @@ const Panel = observer (({ element }) => {
 	const handleMouseUp = () => {
 		document.removeEventListener("mousemove", handleMouseMove);
 		document.removeEventListener("mouseup", handleMouseUp);
-	 	document.removeEventListener("touchmove", handleMouseMove);
-		document.removeEventListener("touchend", handleMouseUp); 
-		move.current= ''
+		document.removeEventListener("touchmove", handleMouseMove);
+		document.removeEventListener("touchend", handleMouseUp);
+		move.current = ''
 		savePanelPosition()
 	};
 
 	const findHighestZIndex = () => {
-		let inx = [...Object.values(panelStore.positions).map(popup => popup.style.zIndex)]
-		let maxZIndex = Math.max( ...inx  );		
-		return maxZIndex+1;
+		let inx = [...Object.values(panelStore.positions).filter(a => typeof a !== 'number').map(popup => popup.style.zIndex)]
+		let maxZIndex = Math.max(...inx);
+		console.log('maxZIndex' + maxZIndex)
+		if (typeof maxZIndex !== "number") debugger;
+		return maxZIndex + 1;
 	};
 
 	const handleIncreaseZIndex = () => {
 		const currentMaxZIndex = findHighestZIndex();
-		panelStore.setMaxZindex ( currentMaxZIndex )
+		panelStore.setMaxZindex(currentMaxZIndex)
 	};
 
-	const  savePanelPosition =(id)=>{
-		let ppp = localStorage.getItem('ppp')
-		if (!ppp) {
-            let ppp = {}
-            ppp.positions = panelStore.positions
-            localStorage.setItem('ppp', JSON.stringify(panelStore.positions))
-        } else {
- 			localStorage.setItem('ppp', JSON.stringify(panelStore.positions))
-        }
-	}   
+	const savePanelPosition = (id) => {
+		console.log(toJS(panelStore.positions)); // если используешь mobx
+		const entries = Object.entries(panelStore.positions);
+		const sortedEntries = entries.sort(([, a], [, b]) => a.style.zIndex - b.style.zIndex);
+		const updatedPositions = {};
+		sortedEntries.forEach(([key, value], index) => {
+			updatedPositions[key] = {
+				...value,
+				style: {
+					...value.style,
+					zIndex: index + 1,
+				},
+			};
+		});
+
+		panelStore.positions = updatedPositions;
+		localStorage.setItem('ppp', JSON.stringify(updatedPositions));
+	};
 
 	return (
 		<div
@@ -169,12 +179,12 @@ const Panel = observer (({ element }) => {
 				left: `${panelStore.positions[id].style.left}px`,
 				width: `${panelStore.positions[id].style.width}px`,
 				height: `${panelStore.positions[id].mini ? 45 : panelStore.positions[id].style.height}px`,
-			}}			
+			}}
 		>
-			<div className="window-top popup-header" 
+			<div className="window-top popup-header"
 				onMouseDown={handleMouseDown}
-				onTouchStart={handleMouseDown}				
-				>
+				onTouchStart={handleMouseDown}
+			>
 				<div className="d-flex align-items-center justify-content-between">
 					<div className="nav-link">
 						<div className="d-flex align-items-center">
@@ -195,17 +205,17 @@ const Panel = observer (({ element }) => {
 			<div className={`window-content ${panelStore.positions[id].mini ? "mini" : ""}`}>
 				{element.content}
 			</div>
-			<div 
+			<div
 				className={`resizer-right ${panelStore.positions[id].mini ? "mini" : ""}`}
-				onMouseDown={initDrag}				
+				onMouseDown={initDrag}
 				onMouseUp={handleMouseUp}
 			></div>
-			<div 
+			<div
 				className={`resizer-bottom ${panelStore.positions[id].mini ? "mini" : ""}`}
 				onMouseDown={initDrag}
 				onMouseUp={handleMouseUp}
 			></div>
-			<div 
+			<div
 				className={`resizer-both ${panelStore.positions[id].mini ? "mini" : ""}`}
 				onMouseDown={initDrag}
 				onMouseUp={handleMouseUp}
