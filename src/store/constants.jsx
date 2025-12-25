@@ -332,8 +332,41 @@ const constants = {
 				"stroke": "red",
 				"strokeWidth": 0.2
 			}
-		]
-	}
+		],
+		
+	},
+	lines:
+		[
+			`%`,
+			`(<NcpProgram Version="1.0" Units="Metric">)`,
+			`(<MaterialInfo Label="Mild steel" MaterialCode="S235JR" Thickness="2" FormatType="Sheet" DimX="250" DimY="125"/>)`,
+			`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
+			`(<Plan JobCode="1683027664_1683027633_0_23348__S235JR_2.0mm_1_owner">)`,
+			`(<Plan>)`,
+			`N1G29X110Y118P1H1A1`,
+			`N2G52X10Y10L1C0`,
+			`N3G99`,
+			`(</Plan>)`,
+			`(<Part PartCode="box" Debit="1">)`,
+			`N4G28X100Y108L1P1`,
+			`N5G0X50Y108`,
+			`N6G10S0`,
+			`N7G1X51.885618Y102.666667M4`,
+			`N8G42`,
+			`N9G2X50Y100I50J102`,
+			`(<Contour>)`,
+			`N10G1X0`,
+			`N11Y0`,
+			`N12X100`,
+			`N13Y100`,
+			`N14X50M5`,
+			`N15G40`,
+			`(</Contour>)`,
+			`N16G98`,
+			`(</Part>)`,
+			`(</NcpProgram>)`,
+			`&`
+		],
 }
 
 export default constants

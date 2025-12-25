@@ -2,6 +2,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 import SVGPathCommander from 'svg-path-commander';
 import { toJS } from "mobx";
 import utils from "../scripts/util";
+import constants from "./constants";
 
 
 class SvgStore {
@@ -264,203 +265,112 @@ class SvgStore {
 		const data = this.svgData;
 		const res = [];
 		let lineNumber = 4; // начинаем с N4, как в примере
-	  
+
 		// Собираем уникальные детали по part_code_id
 		const uniqueParts = new Map(); // part_code_id → { partInfo, contours }
-	  
+
 		for (const part of data.part_code) {
-		  const partCodeId = part.uuid || part.id;
-		  const contours = part.code.filter(c => c.path && c.path.trim() !== '');
-	  
-		  // Разделяем по типу
-		  const inlet = contours.find(c => c.class.includes('inlet'));
-		  const contour = contours.find(c => c.class.includes('contour'));
-		  const outlet = contours.find(c => c.class.includes('outlet') && c.path.trim() !== '');
-	  
-		  uniqueParts.set(partCodeId, {
-			name: utils.uuid(),
-			width: part.width,
-			height: part.height,
-			inlet,
-			contour,
-			outlet
-		  });
+			const partCodeId = part.uuid || part.id;
+
+			uniqueParts.set(partCodeId, {
+				name: utils.uuid(),
+				width: part.width,
+				height: part.height,
+				code: part.code
+			});
 		}
 		let progNum = 1
 
-		for (const [partCodeId, partInfo] of uniqueParts) {
-		  const { name, inlet, contour, outlet } = partInfo;
-  		  const instancesCount = data.positions.filter(p => p.part_code_id === partCodeId).length;
-		  res.push(`(<Part PartCode="${name}" Debit="${instancesCount}">)`);
-	  
-		  res.push(`N${lineNumber} G28 X0.00 Y0.00 L${progNum}P1`);
-		  progNum++
-		  lineNumber++;
-	  
-		  // Последовательность: inlet → contour → outlet (только если есть path)
-	  
- 		  const sequence = [];
-		  if (inlet) sequence.push(inlet);
-		  if (contour) sequence.push(contour);
-		  if (outlet) sequence.push(outlet);
-	  
-		  for (const cont of sequence) {
-			//const blockLines = this.generateContourBlock(cont, lineNumber, cont === contour);
-			//res.push(...blockLines);
-			lineNumber += blockLines.length;
-		  }
-	   
-		  // Завершение детали
-		  res.push(`N${lineNumber} G98`);
-		  lineNumber++;
-	  
-		  res.push('(</Part>)');
+		for (const [partCodeId, partInfo, code] of uniqueParts) {
+			const { name, code } = partInfo;
+			const instancesCount = data.positions.filter(p => p.part_code_id === partCodeId).length;
+			res.push(`(<Part PartCode="${name}" Debit="${instancesCount}">)`);
+			res.push(`ПРОГРАММА №` + progNum);
+
+			const contours = this.generateSinglePart(code, lineNumber, progNum)
+			res.push(contours);
+
+			progNum++
+			lineNumber += contours.length;
+
+			//
+			res.push(`N${lineNumber} G98`);
+			lineNumber++;
+
+			res.push('(</Part>)');
 		}
-	  
+
 		return res;
-	  }
-	  
-	  // Вспомогательная функция — генерация одного <Contour> блока
-	  generateContourBlock(contour, startLine, isMainContour = false) {
-		const lines = [];
-		let n = startLine;
-	  
-		const commands = this.parseSvgPathToGCode(contour.path);
-	  
-		if (commands.length === 0) return lines; // пустой контур — ничего не генерируем
-	  
-		const startX = commands[0].x.toFixed(6);
-		const startY = commands[0].y.toFixed(6);
-	  
-		// Перемещение к стартовой точке без резки
-		lines.push(`N${n} G0 X${startX} Y${startY}`);
-		n++;
-	  
-		// Выключить лазер
-		lines.push(`N${n} G10 S0`);
-		n++;
-	  
-		// Для основного контура (contour) — включаем компенсацию и lead-in
-		if (isMainContour) {
-		  // Если это inlet — он уже является lead-in, поэтому для contour просто начинаем резать
-		  // Но если inlet отдельно — то здесь просто включаем лазер
-		  lines.push(`N${n} G1 X${startX} Y${startY} M4`); // включить лазер
-		  n++;
-		  lines.push(`N${n} G42`); // компенсация вправо
-		  n++;
-		} else {
-		  // Для inlet/outlet — тоже включаем лазер
-		  lines.push(`N${n} G1 X${startX} Y${startY} M4`);
-		  n++;
-		  if (contour.class.includes('contour')) {
-			lines.push(`N${n} G42`);
-			n++;
-		  }
+	}
+
+	findByCidAndClass(array, cid, classSubstring, caseSensitive = false) {
+		if (!Array.isArray(array)) {
+			return [];
 		}
-	  
-		lines.push('(<Contour>)');
-	  
-		// Основные команды контура
-		let currentX = commands[0].x;
-		let currentY = commands[0].y;
-	  
-		for (let i = 0; i < commands.length; i++) {
-		  const cmd = commands[i];
-		  if (cmd.type === 'L') {
-			lines.push(`N${n} G1 X${cmd.x.toFixed(6)} Y${cmd.y.toFixed(6)}`);
-			currentX = cmd.x;
-			currentY = cmd.y;
-		  } else if (cmd.type === 'A') {
-			// Дуга (Arc) — переводим в G2/G3
-			// A rx ry x-axis-rotation large-arc-flag sweep-flag x y
-			const next = commands[i + 1];
-			if (next && next.type === 'L') {
-			  const rx = cmd.rx;
-			  const ry = cmd.ry;
-			  const xRot = cmd.rot;
-			  const large = cmd.large;
-			  const sweep = cmd.sweep;
-			  const endX = next.x;
-			  const endY = next.y;
-	  
-			  // Упрощённо: если sweep=1 → G3 (по часовой), sweep=0 → G2
-			  const gCode = sweep ? 'G3' : 'G2';
-			  // Вычисляем центр дуги (очень упрощённо, для кругов rx=ry и rot=0)
-			  if (rx === ry && xRot === 0) {
-				const dx = endX - currentX;
-				const dy = endY - currentY;
-				const iOffset = large ? -sweep * dy / 2 : sweep * dy / 2;
-				const jOffset = large ? sweep * dx / 2 : -sweep * dx / 2;
-				lines.push(`N${n} ${gCode} X${endX.toFixed(6)} Y${endY.toFixed(6)} I${iOffset.toFixed(6)} J${jOffset.toFixed(6)}`);
-			  } else {
-				// сложный случай — fallback на G1
-				lines.push(`N${n} G1 X${endX.toFixed(6)} Y${endY.toFixed(6)}`);
-			  }
-			  currentX = endX;
-			  currentY = endY;
-			  i++; // пропускаем следующий L
+		if (typeof classSubstring !== 'string') {
+			classSubstring = '';
+		}
+
+		const searchStr = caseSensitive ? classSubstring : classSubstring.toLowerCase();
+
+		return array.filter(item => {
+			// Проверка cid
+			if (item.cid !== cid) {
+				return false;
 			}
-		  }
-		  n++;
-		}
-	  
-		// Возврат в стартовую точку и выключение
-		lines.push(`N${n} G1 X${startX} Y${startY} M5`);
-		n++;
-		lines.push(`N${n} G40`);
-		n++;
-	  
-		lines.push('(</Contour>)');
-	  
-		return lines;
-	  }
-	  
-	  // Улучшенный парсер SVG path с поддержкой дуг (A)
-	  parseSvgPathToGCode(path) {
-		if (!path) return [];
-	  
-		const commands = [];
-		const tokens = path.trim().replace(/,/g, ' ').split(/\s+/);
-		let i = 0;
-		let currentX = 0, currentY = 0;
-	  
-		while (i < tokens.length) {
-		  let token = tokens[i++];
-	  
-		  if (/^[MLHVAZ]$/i.test(token)) {
-			const type = token.toUpperCase();
-			if (type === 'M') {
-			  currentX = parseFloat(tokens[i++]);
-			  currentY = parseFloat(tokens[i++]);
-			  commands.push({ type: 'M', x: currentX, y: currentY });
-			} else if (type === 'L') {
-			  currentX = parseFloat(tokens[i++]);
-			  currentY = parseFloat(tokens[i++]);
-			  commands.push({ type: 'L', x: currentX, y: currentY });
-			} else if (type === 'A') {
-			  const rx = parseFloat(tokens[i++]);
-			  const ry = parseFloat(tokens[i++]);
-			  const rot = parseFloat(tokens[i++]);
-			  const large = parseFloat(tokens[i++]);
-			  const sweep = parseFloat(tokens[i++]);
-			  const x = parseFloat(tokens[i++]);
-			  const y = parseFloat(tokens[i++]);
-			  commands.push({ type: 'A', rx, ry, rot, large, sweep, x, y });
-			  currentX = x;
-			  currentY = y;
+
+			// Проверка class
+			if (typeof item.class !== 'string') {
+				return false;
 			}
-		  } else {
-			// число без команды — считаем L
-			i--;
-			currentX = parseFloat(tokens[i++]);
-			currentY = parseFloat(tokens[i++]);
-			commands.push({ type: 'L', x: currentX, y: currentY });
-		  }
-		}
-	  
-		// Убираем M, оставляем только траекторию
-		return commands.filter(c => c.type !== 'M');
-	  }
+
+			const classValue = caseSensitive ? item.class : item.class.toLowerCase();
+			return classValue.includes(searchStr)[0] || false;
+		});
+	}
+
+	generateSinglePart(code, lineNumber, progNum) {
+		let res = []
+		let commonPath = ''
+
+		code.map(a => a.path ? commonPath += a.path : commonPath += " ")
+		let box = SVGPathCommander.getPathBBox(commonPath)
+		res.push(`N${lineNumber + res.length + 1} G28 X${box.width} Y${box.height} L${progNum}P1`);
+
+		code.forEach((item) => {
+
+			if (item.class.includes('contour')) {
+				res.push("(<Contour>)")
+				let inlet = this.findByCidAndClass(code, item.cid, 'inlet')
+				let outlet = this.findByCidAndClass(code, item.cid, 'outlet')
+				let contour = item
+
+				if (inlet && inlet.hasOwnProperty('path') && inlet.path.length) {
+					res.push(`N${lineNumber + res.length + 1} INLET`);
+
+				}
+
+				if (contour && contour.hasOwnProperty('path') && contour.path.length) {
+					res.push(`N${lineNumber + res.length + 1} contour`);
+				}
+
+
+				if (outlet && outlet.hasOwnProperty('path') && outlet.path.length) {
+					res.push(`N${lineNumber + res.length + 1} OUTLET`);
+				}
+
+				res.push("(</Contour>)")
+
+			}
+
+
+		})
+
+
+		return res;
+
+	}
+
 
 	generatePositions() {
 		const data = this.svgData;
@@ -538,10 +448,328 @@ class SvgStore {
 			`&`
 		]
 
-		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts, ...ncpFinish]
+		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
 		ncp.forEach((item) => { console.log(item) });
 
 	}
+
+	buildMatrixFromXYC(x = 0, y = 0, c = 0) {
+		const rad = (c * Math.PI) / 180;
+		const cos = Math.cos(rad);
+		const sin = Math.sin(rad);
+
+		return {
+			a: cos,
+			b: sin,
+			c: -sin,
+			d: cos,
+			e: x,
+			f: y
+		};
+	}
+
+
+	makeGcodeParser() {
+		let last = {
+			g: undefined,
+			m: undefined,
+			params: {}
+		};
+
+		let base = { X: 0, Y: 0, C: 0 };
+
+		return function parseGcodeLine(raw) {
+			let s = String(raw).trim();
+
+			const out = {
+				n: undefined,
+				g: undefined,
+				m: undefined,
+				params: {},
+				base: {}
+			};
+
+			// комментарий
+			s = s.replace(/\([^)]*\)/g, " ");
+
+			// N
+			const nMatch = s.match(/^N(\d+)/i);
+			if (nMatch) out.n = Number(nMatch[1]);
+
+			// G / M
+			const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
+			out.g = gMatch ? Number(gMatch[1]) : last.g;
+
+			const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
+			out.m = mMatch ? Number(mMatch[1]) : last.m;
+
+			// параметры
+			const keys = ["X", "Y", "I", "J", "S", "P", "H", "A", "L", "C", "G"];
+			for (const k of keys) {
+				const r = new RegExp(`${k}(-?\\d+(?:\\.\\d+)?)`, "i");
+				const m = s.match(r);
+
+				if (m) {
+					out.params[k] = Number(m[1]);
+				} else if (last.params[k] !== undefined) {
+					out.params[k] = last.params[k];
+				}
+			}
+
+			// G52 — база
+			if (/G52/i.test(s)) {
+				base = {
+					X: out.params.X ?? 0,
+					Y: out.params.Y ?? 0,
+					C: out.params.C ?? 0
+				};
+			}
+
+			out.base = { ...base };
+
+			last = {
+				g: out.g,
+				m: out.m,
+				params: { ...last.params, ...out.params }
+			};
+
+			return out;
+		};
+	}
+
+
+	degToRad(a) {
+		return (a * Math.PI) / 180;
+	}
+
+	rotatePoint(x, y, angleDeg) {
+		const r = this.degToRad(angleDeg);
+		const cos = Math.cos(r);
+		const sin = Math.sin(r);
+
+		return {
+			x: x * cos - y * sin,
+			y: x * sin + y * cos
+		};
+	}
+
+	toWorld(x, y, base) {
+		const p = this.rotatePoint(x, y, base?.C || 0);
+		return {
+			x: p.x + (base?.X || 0),
+			y: p.y + (base?.Y || 0)
+		};
+	}
+
+
+	startToEdit() {
+		const lines = constants.lines
+		const result = {
+			name: "undefined.ncp",
+			width: 100,
+			height: 100,
+			quantity: 1,
+			presetId: 50,
+			presetName: "any_preset",
+			positions: [],
+			part_code: []
+		};
+
+
+		/* ---------------- DIMENSIONS ---------------- */
+		const dimLine = lines.find(l => l.includes("DimX") && l.includes("DimY"));
+		if (dimLine) {
+			const dimX = dimLine.match(/DimX="([\d.]+)"/);
+			const dimY = dimLine.match(/DimY="([\d.]+)"/);
+			result.width = Number(dimX?.[1] || 0);
+			result.height = Number(dimY?.[1] || 0);
+		}
+
+
+		/* ---------------- PLAN (POSITIONS) ---------------- */
+		const parseGcodeLine = this.makeGcodeParser();
+		let inPlan = false;
+		let partPositionId = 1;
+
+		lines.forEach(line => {
+			if (line.includes("<Plan")) {
+				inPlan = true;
+				return;
+			}
+
+			if (line.includes("</Plan")) {
+				inPlan = false;
+				return;
+			}
+
+			if (!inPlan) return;
+
+			// обрабатываем только G-code строки
+			if (!/^N\d+/i.test(line)) return;
+
+			// 👉 stateful G-code парсинг
+			const g = parseGcodeLine(line);
+			const { X = 0, Y = 0, C = 0, L = 1 } = g.params;
+			if (g.g === 29 || g.params.g === 29) {
+				result.positions.push({
+					part_id: partPositionId++,
+					part_code_id: Number(L),
+					positions: {
+						a: Math.cos((C * Math.PI) / 180),
+						b: Math.sin((C * Math.PI) / 180),
+						c: -Math.sin((C * Math.PI) / 180),
+						d: Math.cos((C * Math.PI) / 180),
+						e: X,
+						f: Y
+					}
+				});
+			}
+
+
+		});
+
+
+		/* ---------------- PART CODE ---------------- */
+		//const parseGcodeLine = makeGcodeParser();
+
+		let inPart = false;
+		let currentPart = null;
+		let cid = 1;
+		
+		let cx = 0;
+		let cy = 0;
+
+		lines.forEach(line => {
+
+			/* ---------- PART START ---------- */
+			if (line.includes("<Part")) {
+				inPart = true;
+				cid = 1;
+				cx = 0;
+				cy = 0;
+
+				currentPart = {
+					id: result.part_code.length + 1,
+					uuid: "",
+					name: "",
+					code: []
+				};
+				return;
+			}
+
+			/* ---------- PART END ---------- */
+			if (line.includes("</Part>")) {
+				result.part_code.push(currentPart);
+				currentPart = null;
+				inPart = false;
+				return;
+			}
+
+			if (!inPart) return;
+			if (!/^N\d+/i.test(line)) return;
+
+			const c = parseGcodeLine(line);
+
+			if (typeof c.m === "number") {
+
+				const wp = this.toWorld(cx, cy, c.base);
+
+				if (c.m === 4) {
+					currentPart.code.push({
+						cid,
+						class: "inlet",
+						path: `M${wp.x} ${wp.y}`,
+						stroke: "red",
+						strokeWidth: 0.2
+					});
+				}
+
+				if (c.m === 5) {
+					currentPart.code.push({
+						cid,
+						class: "outlet",
+						path: `M${wp.x} ${wp.y}`,
+						stroke: "red",
+						strokeWidth: 0.2
+					});
+					cid++;
+				}
+			}
+
+
+			if (typeof c.g === "number") {
+				const g = Math.floor(c.g);
+
+				let contour = currentPart.code.find(
+					p => p.cid === cid && p.class === "contour"
+				);
+
+				if (!contour) {
+					const wp = this.toWorld(cx, cy, c.base);
+					contour = {
+						cid,
+						class: "contour",
+						path: `M${wp.x} ${wp.y}`,
+						stroke: "red",
+						strokeWidth: 0.2
+					};
+					currentPart.code.push(contour);
+				}
+
+				if (g === 0 || g === 1) {
+					const tx = c.params.X ?? cx;
+					const ty = c.params.Y ?? cy;
+
+					const wp = this.toWorld(tx, ty, c.base);
+					contour.path += ` L${wp.x} ${wp.y}`;
+
+					cx = tx;
+					cy = ty;
+				}
+
+				else if (g === 2 || g === 3) {
+					const tx = c.params.X ?? cx;
+					const ty = c.params.Y ?? cy;
+					const ci = c.params.I ?? 0;
+					const cj = c.params.J ?? 0;
+
+					// центр дуги в локале
+					const centerLocal = {
+						x: cx + ci,
+						y: cy + cj
+					};
+
+					// переводим в мир
+					const startW =this.toWorld(cx, cy, c.base);
+					const endW =this.toWorld(tx, ty, c.base);
+					const centerW =this.toWorld(centerLocal.x, centerLocal.y, c.base);
+
+					const r = Math.hypot(
+						startW.x - centerW.x,
+						startW.y - centerW.y
+					);
+
+					const sweep = g === 3 ? 1 : 0;
+					const large = 0;
+
+					contour.path +=
+						` A${r} ${r} 0 ${large} ${sweep} ${endW.x} ${endW.y}`;
+
+					cx = tx;
+					cy = ty;
+				}
+			}
+		});
+			  
+		
+
+		console.log(result)
+		svgStore.svgData = Object.assign({}, result)
+
+
+
+	}
+
 
 }
 
@@ -616,38 +844,3 @@ export default svgStore;
 */
 
 
-
-/*
-
-
-%
-(<NcpProgram Version="1.0" Units="Metric">)
-(<MaterialInfo Label="Mild steel" MaterialCode="S235JR" Thickness="2" FormatType="Sheet" DimX="250" DimY="125"/>)
-(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)
-(<Plan JobCode="1683027664_1683027633_0_23348__S235JR_2.0mm_1_owner">)
-(<Plan>)
-N1G29X110Y118P1H1A1
-N2G52X10Y10L1C0
-N3G99
-(</Plan>)
-(<Part PartCode="box" Debit="1">)
-N4G28X100Y108L1P1
-N5G0X50Y108
-N6G10S0
-N7G1X51.885618Y102.666667M4
-N8G42
-N9G2X50Y100I50J102
-(<Contour>)
-N10G1X0
-N11Y0
-N12X100
-N13Y100
-N14X50M5
-N15G40
-(</Contour>)
-N16G98
-(</Part>)
-(</NcpProgram>)
-&
-
-*/

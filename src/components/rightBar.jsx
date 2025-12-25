@@ -11,6 +11,7 @@ import macrosStore from "../store/macrosStore";
 import CustomIcon from "../icons/customIcon";
 import { DetailsButton } from "./detailsButton";
 import NewPlanButton from "./navbar/newPlanButton";
+import svgStore from "../store/svgStore";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
@@ -32,6 +33,13 @@ const RightBar = observer(() => {
 			func: jobStore.deleteJob,
 			args: []
 		})
+	}
+
+	const editSelected = () => {
+
+		laserStore.setVal("centralBarMode", "planEditor")
+		svgStore.startToEdit()
+
 	}
 
 	return (
@@ -69,6 +77,23 @@ const RightBar = observer(() => {
 											className="ms-1"
 										/>
 										<div className="flex-grow-1 text-center">{t("Tidy up")}</div>
+									</div>
+								</button>
+							</div>
+							<div>
+								<button className="w-100"
+									onMouseDown={ editSelected }
+								>
+									<div className="d-flex align-items-center">
+										<CustomIcon
+											icon="material-symbols:delete-outline-sharp"
+											width="24"
+											height="24"
+											fill= {"black"}
+											strokeWidth={0}
+											className="ms-1"
+										/>
+										<div className="flex-grow-1 text-center">{t("EDIT")}</div>
 									</div>
 								</button>
 							</div>
