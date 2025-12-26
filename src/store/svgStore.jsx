@@ -468,99 +468,53 @@ class SvgStore {
 		};
 	}
 
+	line = (x2, y2, c, height) => {
+		const [rx2, ry2] = this.rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
+		return `L${rx2} ${height - ry2}`;
+	};
 
-	makeGcodeParser() {
-		let last = {
-			g: undefined,
-			m: undefined,
-			params: {}
-		};
+	start = (x1, y1, c, height) => {
+		const [rx2, ry2] = this.rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
+		return `M${rx2} ${height - ry2}`;
+	};
 
-		let base = { X: 0, Y: 0, C: 0 };
+	// Крест с поворотом
+	cross = (x, y, size, c, height) => {
+		const [rx, ry] = this.rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
+		const yInv = height - ry;
+		return `M${rx - size},${yInv - size}L${rx + size},${yInv + size}M${rx - size},${yInv + size}L${rx + size},${yInv - size}`;
+	};
 
-		return function parseGcodeLine(raw) {
-			let s = String(raw).trim();
+	// Арка с поворотом
+	arcPath = (
+		ex,
+		ey,
+		r,
+		large,
+		sweep,
+		c,
+		height
+	) => {
+		const [rxEnd, ryEnd] = this.rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
+		return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
+	};
 
-			const out = {
-				n: undefined,
-				g: undefined,
-				m: undefined,
-				params: {},
-				base: {}
-			};
+ 	rotatePoint = (
+		x,
+		y,
+		cx,
+		cy,
+		angleDeg
+	) => {
+		const theta = (angleDeg * Math.PI) / 180; // переводим угол в радианы
+		const dx = x - cx;
+		const dy = y - cy;
 
-			// комментарий
-			s = s.replace(/\([^)]*\)/g, " ");
+		const xRot = cx + dx * Math.cos(theta) - dy * Math.sin(theta);
+		const yRot = cy + dx * Math.sin(theta) + dy * Math.cos(theta);
 
-			// N
-			const nMatch = s.match(/^N(\d+)/i);
-			if (nMatch) out.n = Number(nMatch[1]);
-
-			// G / M
-			const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
-			out.g = gMatch ? Number(gMatch[1]) : last.g;
-
-			const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
-			out.m = mMatch ? Number(mMatch[1]) : last.m;
-
-			// параметры
-			const keys = ["X", "Y", "I", "J", "S", "P", "H", "A", "L", "C", "G"];
-			for (const k of keys) {
-				const r = new RegExp(`${k}(-?\\d+(?:\\.\\d+)?)`, "i");
-				const m = s.match(r);
-
-				if (m) {
-					out.params[k] = Number(m[1]);
-				} else if (last.params[k] !== undefined) {
-					out.params[k] = last.params[k];
-				}
-			}
-
-			// G52 — база
-			if (/G52/i.test(s)) {
-				base = {
-					X: out.params.X ?? 0,
-					Y: out.params.Y ?? 0,
-					C: out.params.C ?? 0
-				};
-			}
-
-			out.base = { ...base };
-
-			last = {
-				g: out.g,
-				m: out.m,
-				params: { ...last.params, ...out.params }
-			};
-
-			return out;
-		};
-	}
-
-
-	degToRad(a) {
-		return (a * Math.PI) / 180;
-	}
-
-	rotatePoint(x, y, angleDeg) {
-		const r = this.degToRad(angleDeg);
-		const cos = Math.cos(r);
-		const sin = Math.sin(r);
-
-		return {
-			x: x * cos - y * sin,
-			y: x * sin + y * cos
-		};
-	}
-
-	toWorld(x, y, base) {
-		const p = this.rotatePoint(x, y, base?.C || 0);
-		return {
-			x: p.x + (base?.X || 0),
-			y: p.y + (base?.Y || 0)
-		};
-	}
-
+		return [xRot, yRot];
+	};
 
 	startToEdit() {
 		const lines = constants.lines
@@ -577,7 +531,7 @@ class SvgStore {
 
 
 		/* ---------------- DIMENSIONS ---------------- */
-		const dimLine = lines.find(l => l.includes("DimX") && l.includes("DimY"));
+		const dimLine = constants.lines.find(l => l.includes("DimX") && l.includes("DimY"));
 		if (dimLine) {
 			const dimX = dimLine.match(/DimX="([\d.]+)"/);
 			const dimY = dimLine.match(/DimY="([\d.]+)"/);
@@ -585,9 +539,19 @@ class SvgStore {
 			result.height = Number(dimY?.[1] || 0);
 		}
 
+		let height = result.height
+		let width = result.width
+
 
 		/* ---------------- PLAN (POSITIONS) ---------------- */
-		const parseGcodeLine = this.makeGcodeParser();
+
+		const parseGcodeLine = utils.makeGcodeParser();
+		let cmds = 	constants.lines/*.trim().split(/\n+/)
+						.map(line => line.trim())
+						.filter(line => line && !line.startsWith(';')) // опционально: фильтр комментариев*/
+		  				.map(parseGcodeLine);	
+
+
 		let inPlan = false;
 		let partPositionId = 1;
 
@@ -634,136 +598,163 @@ class SvgStore {
 
 		let inPart = false;
 		let currentPart = null;
-		let cid = 1;
-		
-		let cx = 0;
-		let cy = 0;
+		let cid = 1;		 
+		let cx = 0, cy = 0;
+		let partOpen = false
+		let res = []; // массив путей
 
-		lines.forEach(line => {
-
-			/* ---------- PART START ---------- */
-			if (line.includes("<Part")) {
-				inPart = true;
+	   for (const c of cmds) {
+		   if (c?.comment?.includes('PartCode')) {
+			   console.log('Part code start')
+			   inPart = true;
 				cid = 1;
 				cx = 0;
 				cy = 0;
 
 				currentPart = {
 					id: result.part_code.length + 1,
-					uuid: "",
+					uuid: result.part_code.length + 1,
 					name: "",
 					code: []
 				};
-				return;
-			}
+			   partOpen = true
+			   res[res.length - 1].class += " groupStart "
+			   continue;
 
-			/* ---------- PART END ---------- */
-			if (line.includes("</Part>")) {
-				result.part_code.push(currentPart);
-				currentPart = null;
-				inPart = false;
-				return;
-			}
+		   } else if (c?.comment?.includes('</Part>')) {
+			   console.log('Part End')
+			   // тут уходим от относительных координат к абс...
 
-			if (!inPart) return;
-			if (!/^N\d+/i.test(line)) return;
-
-			const c = parseGcodeLine(line);
-
-			if (typeof c.m === "number") {
-
-				const wp = this.toWorld(cx, cy, c.base);
-
-				if (c.m === 4) {
-					currentPart.code.push({
-						cid,
-						class: "inlet",
-						path: `M${wp.x} ${wp.y}`,
-						stroke: "red",
-						strokeWidth: 0.2
-					});
-				}
-
-				if (c.m === 5) {
-					currentPart.code.push({
-						cid,
-						class: "outlet",
-						path: `M${wp.x} ${wp.y}`,
-						stroke: "red",
-						strokeWidth: 0.2
-					});
-					cid++;
-				}
-			}
+			   partOpen = false
+			   res[res.length - 1].class += " groupEnd "
+			   res.map(a=> currentPart.code.push(a))
+			   result.part_code.push( currentPart )
 
 
-			if (typeof c.g === "number") {
-				const g = Math.floor(c.g);
+			   cx = cx + (c.base && c.base.X ||0)
+			   cy = cy + (c.base && c.base.Y ||0) 
+			   continue;
+		   }
 
-				let contour = currentPart.code.find(
-					p => p.cid === cid && p.class === "contour"
-				);
+		   if (typeof c.m === 'number') {
 
-				if (!contour) {
-					const wp = this.toWorld(cx, cy, c.base);
-					contour = {
-						cid,
-						class: "contour",
-						path: `M${wp.x} ${wp.y}`,
-						stroke: "red",
-						strokeWidth: 0.2
-					};
-					currentPart.code.push(contour);
-				}
+			   /* if (!pendingBreakCircle) {
+				   if (c.m === 4) pendingBreakCircle = { type: 'in', n: c.n };
+				   if (c.m === 5) pendingBreakCircle = { type: 'out', n: c.n };
+			   } */
 
-				if (g === 0 || g === 1) {
-					const tx = c.params.X ?? cx;
-					const ty = c.params.Y ?? cy;
+			   if (c.m === 4) {
+				   // console.log('laser on')
+				   //laserOn = true;
+				   res[res.length - 1].class += " laserOff "
+				   res.push({ path: '', n: [Infinity, -Infinity], class: '' })
+				   res[res.length - 1].path = this.start(cx + (c.base && c.base.X || 0), cy + (c.base && c.base.Y || 0), c, height);
+			   }
 
-					const wp = this.toWorld(tx, ty, c.base);
-					contour.path += ` L${wp.x} ${wp.y}`;
+			   if (c.m === 5) {
+				   // console.log('laser off')
+				   //laserOn = false;
+				   res[res.length - 1].class += " laserOn "
+				   res.push({ path: '', n: [Infinity, -Infinity], class: '' })
+				   res[res.length - 1].path = this.start(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), c, height);
 
-					cx = tx;
-					cy = ty;
-				}
+			   }
+		   }
 
-				else if (g === 2 || g === 3) {
-					const tx = c.params.X ?? cx;
-					const ty = c.params.Y ?? cy;
-					const ci = c.params.I ?? 0;
-					const cj = c.params.J ?? 0;
+		   if (typeof c.g === 'number') {
+			   const g = Math.floor(c.g);
+			   const n = c.n
+			   if (g === 4) {
 
-					// центр дуги в локале
-					const centerLocal = {
-						x: cx + ci,
-						y: cy + cj
-					};
+				   let crossPath = {
+					   path:partOpen ? 
+					   	this.cross(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), 2.5, c, height) 
+							:
+					    this.cross(cx , cy , 2.5, c, height) ,
+					   n: [n ?? 0, n ?? 0],
+					   class: 'g4'
+				   };
+				   res.splice(0, 0, crossPath);
+				   continue;
+			   }
+			   if (g === 0 || g === 1) {
 
-					// переводим в мир
-					const startW =this.toWorld(cx, cy, c.base);
-					const endW =this.toWorld(tx, ty, c.base);
-					const centerW =this.toWorld(centerLocal.x, centerLocal.y, c.base);
+				   // console.log(`g === 0 || g === 1`)
+				   const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
+				   const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
+				   res[res.length - 1].path += this.line(tx + (c.base && c.base.X ||0), ty + (c.base && c.base.Y ||0), c, height);
+				   if (n) {
+					   let n0 = res[res.length - 1].n[0]
+					   let n1 = res[res.length - 1].n[1]
+					   n < n0 ? res[res.length - 1].n[0] = n : false;
+					   n > n1 ? res[res.length - 1].n[1] = n : false;
+				   }
+				   cx = tx; cy = ty;
 
-					const r = Math.hypot(
-						startW.x - centerW.x,
-						startW.y - centerW.y
-					);
+			   } else if (g === 2 || g === 3) {
 
-					const sweep = g === 3 ? 1 : 0;
-					const large = 0;
+				   // console.log(`g === 2 || g === 3`)
+				   const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
+				   const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
+				   const ci = (c.params.I !== undefined) ? (c.params.I) : 0;
+				   const cj = (c.params.J !== undefined) ? (c.params.J) : 0;
+				   const dxs = cx - (cx + ci);
+				   const dys = cy - (cy + cj);
+				   const dxe = tx - (cx + ci);
+				   const dye = ty - (cy + cj);
+				   let r = Math.round((Math.hypot(tx - ci, ty - cj)) * 1000) / 1000;
+				   const a1 = Math.atan2(dys, dxs);
+				   const a2 = Math.atan2(dye, dxe);
+				   let d = utils.normalizeAngle(a2 - a1);
+				   const ccw = (g === 3);
+				   if (ccw && d < 0) d += 2 * Math.PI;
+				   if (!ccw && d > 0) d -= 2 * Math.PI;
+				   const large = 0;
+				   const sweep = ccw ? 1 : 0;
+				   res[res.length - 1].path += this.arcPath(tx + (c.base && c.base.X ||0), ty + (c.base && c.base.Y ||0), r, large, sweep, c, height);
+				   if (n) {
+					   let n0 = res[res.length - 1].n[0]
+					   let n1 = res[res.length - 1].n[1]
+					   n < n0 ? res[res.length - 1].n[0] = n : false;
+					   n > n1 ? res[res.length - 1].n[1] = n : false;
 
-					contour.path +=
-						` A${r} ${r} 0 ${large} ${sweep} ${endW.x} ${endW.y}`;
+				   }
 
-					cx = tx;
-					cy = ty;
-				}
-			}
-		});
-			  
+				   cx = tx; cy = ty;
+			   } else if (g === 10) {
+				   let macros = ' macros' + c.params.S + ' '
+				   res[res.length - 1].class += macros
+
+			   } else if (g === 29) {
+
+				   //console.log('g === 29')
+
+
+			   } else if (g === 28) {
+
+				   // console.log('g === 28')
+
+			   } else if (g === 52) {
+
+				    console.log('g === 52')
+					res.push({ path: '', n: [Infinity, -Infinity], class: '' })
+
+				   //yobanyi kostyl!!!!
+				   if (res.length > 1) {
+					   let [x1, y1] = utils.getLastTwoNumbers(res[res.length - 2].path)
+					   res[res.length - 1].path = `M${x1} ${y1}`;
+				   } else {
+					   res[res.length - 1].path = `M${cx} ${height - cy}`;
+				   }
+
+			   }
+
+		   }
+	   }  
 		
 
 		console.log(result)
+		console.log(currentPart)
 		svgStore.svgData = Object.assign({}, result)
 
 
