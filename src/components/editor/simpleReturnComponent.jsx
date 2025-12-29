@@ -80,8 +80,6 @@ const SimpleReturnComponent = observer(() => {
 		}
 	}
 
-	<g id="form1_0" data-part-id="1" transform="matrix(1 0 0 1 175 175)"><g id="path101_0_1_0" data-cid="101" class="contour outer macro0 closed1 " fill="red"><path d="M150 75A75 75 0 0 0 0 75 75 75 0 0 0 75 150 75 75 0 0 0 150 75"></path></g><g id="path101_1_1_0" data-cid="101" class="inlet inner macro0 closed1 " fill="url(#grid)"><path d=""></path></g><g id="path101_2_1_0" data-cid="101" class="outlet inner macro0 closed1 " fill="url(#grid)"><path d=""></path></g></g>
-
 	return (
 		<>
 			{svgStore.svgData.positions.map((pos, posIndex) => {
@@ -116,7 +114,7 @@ const SimpleReturnComponent = observer(() => {
 									setSelected(e, pos.part_id)
 									editorStore.setMode('dragging')
 								}}
-								fill={element.class.includes("inner") ? "url(#grid)" : "red"}
+								fill={element.class.includes("inner") ? "none" : "none"}
 							>
 								<path d={element.path} />
 							</g>

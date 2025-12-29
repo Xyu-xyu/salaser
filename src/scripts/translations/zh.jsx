@@ -425,6 +425,7 @@ const zh = {
     "Do you want to save changes ?": "您想保存更改吗？",
     "Save and exit": "保存并退出",
     "Do you want to save sheet changes ?": "您想保存工作表更改吗？",
-    "Do you want to save file and exit ?": "您想保存文件并退出吗？"
+    "Do you want to save file and exit ?": "您想保存文件并退出吗？",
+    "EDIT": "编辑"
 }
 export default zh;

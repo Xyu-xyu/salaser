@@ -457,6 +457,6 @@ const en = {
     "Save and exit": "Save and exit",
     "Do you want to save sheet changes ?": "Do you want to save sheet changes ?",
     "Do you want to save file and exit ?": "Do you want to save file and exit ?",
-    "Save and exit": "Save and exit"
+    "EDIT": "EDIT"
 }
 export default en;

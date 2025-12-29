@@ -518,6 +518,10 @@ class SvgStore {
 
 	startToEdit() {
 		const lines = constants.lines
+			.trim()
+			.split(/\n+/)
+			.map(line => line.trim())
+		
 		const result = {
 			name: "undefined.ncp",
 			width: 100,
@@ -531,7 +535,7 @@ class SvgStore {
 
 
 		/* ---------------- DIMENSIONS ---------------- */
-		const dimLine = constants.lines.find(l => l.includes("DimX") && l.includes("DimY"));
+		const dimLine = lines.find(l => l.includes("DimX") && l.includes("DimY"));
 		if (dimLine) {
 			const dimX = dimLine.match(/DimX="([\d.]+)"/);
 			const dimY = dimLine.match(/DimY="([\d.]+)"/);
@@ -546,10 +550,7 @@ class SvgStore {
 		/* ---------------- PLAN (POSITIONS) ---------------- */
 
 		const parseGcodeLine = utils.makeGcodeParser();
-		let cmds = 	constants.lines/*.trim().split(/\n+/)
-						.map(line => line.trim())
-						.filter(line => line && !line.startsWith(';')) // опционально: фильтр комментариев*/
-		  				.map(parseGcodeLine);	
+		let cmds = 	lines.map(parseGcodeLine);	
 
 
 		let inPlan = false;
@@ -574,23 +575,24 @@ class SvgStore {
 			// 👉 stateful G-code парсинг
 			const g = parseGcodeLine(line);
 			const { X = 0, Y = 0, C = 0, L = 1 } = g.params;
-			if (g.g === 29 || g.params.g === 29) {
+			if (g.g === 28 || g.params.g === 28) {
+				
+			}
+			if (g.g === 52 || g.params.g === 52) {
 				result.positions.push({
 					part_id: partPositionId++,
 					part_code_id: Number(L),
 					positions: {
-						a: Math.cos((C * Math.PI) / 180),
-						b: Math.sin((C * Math.PI) / 180),
-						c: -Math.sin((C * Math.PI) / 180),
-						d: Math.cos((C * Math.PI) / 180),
-						e: X,
-						f: Y
+						a: 1,//Math.cos((C * Math.PI) / 180),
+						b: 0,//Math.sin((C * Math.PI) / 180),
+						c: 0,//-Math.sin((C * Math.PI) / 180),
+						d: 1,//Math.cos((C * Math.PI) / 180),
+						e: g.base.X,
+						f: -result.height+g.base.Y+175
 					}
 				});
 			}
-
-
-		});
+  		});
 
 
 		/* ---------------- PART CODE ---------------- */
@@ -602,23 +604,26 @@ class SvgStore {
 		let cx = 0, cy = 0;
 		let partOpen = false
 		let res = []; // массив путей
+		let laserOn = false
 
 	   for (const c of cmds) {
+			console.log (JSON.stringify(c))		
 		   if (c?.comment?.includes('PartCode')) {
 			   console.log('Part code start')
 			   inPart = true;
-				cid = 1;
-				cx = 0;
-				cy = 0;
+			   cid = 1;
+			   cx = 0;
+			   cy = 0;
 
-				currentPart = {
-					id: result.part_code.length + 1,
-					uuid: result.part_code.length + 1,
-					name: "",
-					code: []
-				};
+			   currentPart = {
+				   id: result.part_code.length + 1,
+				   uuid: result.part_code.length + 1,
+				   name: "",
+				   code: []
+			   };
+
 			   partOpen = true
-			   res[res.length - 1].class += " groupStart "
+			   //res[res.length - 1].class += " groupStart "
 			   continue;
 
 		   } else if (c?.comment?.includes('</Part>')) {
@@ -631,8 +636,8 @@ class SvgStore {
 			   result.part_code.push( currentPart )
 
 
-			   cx = cx + (c.base && c.base.X ||0)
-			   cy = cy + (c.base && c.base.Y ||0) 
+			   cx = cx 
+			   cy = cy  
 			   continue;
 		   }
 
@@ -643,20 +648,27 @@ class SvgStore {
 				   if (c.m === 5) pendingBreakCircle = { type: 'out', n: c.n };
 			   } */
 
-			   if (c.m === 4) {
-				   // console.log('laser on')
-				   //laserOn = true;
-				   res[res.length - 1].class += " laserOff "
-				   res.push({ path: '', n: [Infinity, -Infinity], class: '' })
-				   res[res.length - 1].path = this.start(cx + (c.base && c.base.X || 0), cy + (c.base && c.base.Y || 0), c, height);
+			   if (c.m === 4 || c.m === 14) {
+				   console.log('laser on')
+				   laserOn = true;
+				   res.push({
+					"cid": 1,
+					"class": "",
+					"path": "",
+					"stroke": "red",
+					"strokeWidth": 0.2,
+					"selected": false
+					})
+
+				   res[res.length - 1].class += " laserOn "
+				   res[res.length - 1].path = this.start(cx  , cy , c, height);
 			   }
 
 			   if (c.m === 5) {
 				   // console.log('laser off')
-				   //laserOn = false;
-				   res[res.length - 1].class += " laserOn "
-				   res.push({ path: '', n: [Infinity, -Infinity], class: '' })
-				   res[res.length - 1].path = this.start(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), c, height);
+				   //laserOn = false;				
+				   //res[res.length - 1].class += " groupEnd  laserOff  "
+				   //res[res.length - 1].path = this.start(cx, cy, c, height);
 
 			   }
 		   }
@@ -668,7 +680,7 @@ class SvgStore {
 
 				   let crossPath = {
 					   path:partOpen ? 
-					   	this.cross(cx + (c.base && c.base.X ||0), cy + (c.base && c.base.Y ||0), 2.5, c, height) 
+					   	this.cross(cx, cy, 2.5, c, height) 
 							:
 					    this.cross(cx , cy , 2.5, c, height) ,
 					   n: [n ?? 0, n ?? 0],
@@ -677,12 +689,12 @@ class SvgStore {
 				   res.splice(0, 0, crossPath);
 				   continue;
 			   }
-			   if (g === 0 || g === 1) {
+			   if ( /*g === 0 ||*/ g === 1) {
 
 				   // console.log(`g === 0 || g === 1`)
 				   const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 				   const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-				   res[res.length - 1].path += this.line(tx + (c.base && c.base.X ||0), ty + (c.base && c.base.Y ||0), c, height);
+				   res[res.length - 1].path += this.line(tx, ty, c, height);
 				   if (n) {
 					   let n0 = res[res.length - 1].n[0]
 					   let n1 = res[res.length - 1].n[1]
@@ -711,19 +723,12 @@ class SvgStore {
 				   if (!ccw && d > 0) d -= 2 * Math.PI;
 				   const large = 0;
 				   const sweep = ccw ? 1 : 0;
-				   res[res.length - 1].path += this.arcPath(tx + (c.base && c.base.X ||0), ty + (c.base && c.base.Y ||0), r, large, sweep, c, height);
-				   if (n) {
-					   let n0 = res[res.length - 1].n[0]
-					   let n1 = res[res.length - 1].n[1]
-					   n < n0 ? res[res.length - 1].n[0] = n : false;
-					   n > n1 ? res[res.length - 1].n[1] = n : false;
-
-				   }
-
+				   res[res.length - 1].path += this.arcPath(tx, ty, r, large, sweep, c, height);
+				   
 				   cx = tx; cy = ty;
 			   } else if (g === 10) {
-				   let macros = ' macros' + c.params.S + ' '
-				   res[res.length - 1].class += macros
+				   //let macros = ' macros' + c.params.S + ' '
+				   //res[res.length - 1].class += macros
 
 			   } else if (g === 29) {
 
@@ -736,8 +741,15 @@ class SvgStore {
 
 			   } else if (g === 52) {
 
-				    console.log('g === 52')
-					res.push({ path: '', n: [Infinity, -Infinity], class: '' })
+				  /*   console.log('g === 52')
+					res.push({
+						"cid": 1,
+						"class": "",
+						"path": "",
+						"stroke": "red",
+						"strokeWidth": 0.2,
+						"selected": false
+					})
 
 				   //yobanyi kostyl!!!!
 				   if (res.length > 1) {
@@ -745,7 +757,7 @@ class SvgStore {
 					   res[res.length - 1].path = `M${x1} ${y1}`;
 				   } else {
 					   res[res.length - 1].path = `M${cx} ${height - cy}`;
-				   }
+				   } */
 
 			   }
 

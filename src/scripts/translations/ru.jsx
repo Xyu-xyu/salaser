@@ -440,7 +440,7 @@ const ru = {
     "Do you want to save changes ?": "Хотите сохранить изменения?",
     "Save and exit": "Сохранить и выйти",
     "Do you want to save sheet changes ?": "Хотите сохранить изменения листа?",
-    "Save and exit": "Сохранить и выйти",
-    "Do you want to save file and exit ?": "Вы хотите сохранить файл и выйти?"
+    "Do you want to save file and exit ?": "Вы хотите сохранить файл и выйти?",
+    "EDIT": "РЕДАКТИРОВАТЬ"
 }
 export default ru;
