@@ -377,7 +377,9 @@ const constants = {
 	(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)
 	(<Plan JobCode="1683027664_1683027633_0_23348__S235JR_2.0mm_1_owner">)
 	N1G29X2490.597345Y1220.597345P3H1A1
+
 	N10G52X418.016667Y1045.597345L1C0
+	
 	N27G4M1
 	N28G99
 	(</Plan>)

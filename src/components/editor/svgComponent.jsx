@@ -35,6 +35,8 @@ const SvgComponent = observer (() => {
             version="1.1"
             stroke='var(--color)'
             strokeWidth="0.2"
+            width={svgData.width}
+            height={ svgData.height }
         >
             <defs>
 {/*                 <pattern  
