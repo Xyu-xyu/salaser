@@ -449,7 +449,7 @@ class SvgStore {
 		]
 
 		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
-		ncp.forEach((item) => { console.log(item) });
+		//ncp.forEach((item) => { console.log(item) });
 
 	}
 
@@ -539,10 +539,8 @@ class SvgStore {
 		if (dimLine) {
 			const dimX = dimLine.match(/DimX="([\d.]+)"/);
 			const dimY = dimLine.match(/DimY="([\d.]+)"/);
-			//result.width = Number(dimX?.[1] || 0);
-			//result.height = Number(dimY?.[1] || 0);
-			result.width = Number(dimY?.[1] || 0);
-			result.height = Number(dimX?.[1] || 0);
+			result.width = 1250 //Number(dimY?.[1] || 0);
+			result.height = 2500//Number(dimX?.[1] || 0);
 		}
 
 		let height = result.height
@@ -599,21 +597,21 @@ class SvgStore {
 		/* ---------------- PART CODE ---------------- */
 		//const parseGcodeLine = makeGcodeParser();
 
-		let inPart = false;
-		let currentPart = null;
+ 		let currentPart = null;
 		let cid = 1;
 		let cx = 0, cy = 0;
 		let partOpen = false
-		let contourOpen = false
+		let contourOpen = "before"
 		let res = []; // массив путей
 		let laserOn = false
+		let macros= ''
 
 		for (const c of cmds) {
-			console.log(JSON.stringify(c))
+			//console.log(JSON.stringify(c))
+
 			if (c?.comment?.includes('PartCode')) {
 				console.log('Part code start')
-				inPart = true;
-				cid = 1;
+ 				cid = 1;
 				cx = 0;
 				cy = 0;
 
@@ -625,7 +623,6 @@ class SvgStore {
 				};
 
 				partOpen = true
-				//res[res.length - 1].class += " groupStart "
 				continue;
 
 			} else if (c?.comment?.includes('</Part>')) {
@@ -633,31 +630,52 @@ class SvgStore {
 				console.log('Part End')
 				partOpen = false
 				res[res.length - 1].class += " groupEnd "
+				res[res.length - 1].class = res[res.length - 1].class.replace(" inner ", " outer ")
+
+
+				const order = ['outer', 'contour', 'engraving', 'inlet', 'outlet', 'joint'].reverse();
+				res = res.sort((a, b) => {
+					let ac = a.class.split(' ')
+						.map(cls => order.indexOf(cls))
+						.sort((a, b) => b - a)[0] || -1;
+					
+					let bc = b.class.split(' ')
+						.map(cls => order.indexOf(cls))
+						.sort((a, b) => b - a)[0] || -1;
+		
+					return bc - ac;
+				});
+
 				res.map(a => currentPart.code.push(a))
 				result.part_code.push(currentPart)
-
-				cx = cx
-				cy = cy
 				continue;
 
 			} else if (c?.comment?.includes('<Contour>')) {
 				
 				console.log('Contour Start')
-				contourOpen = true
-				/* res.push({
-					"cid": res.length ? 1 : res.length + 1,
-					"class": "contour ",
-					"path": "",
-					"stroke": "red",
-					"strokeWidth": 0.2,
-					"selected": false
-				}) */
+				contourOpen = "open"
+
+				const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
+				const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
+
+
+	
+				res.push({
+						"cid": res.length ? 1 : res.length + 1,
+						"class": "contour inner "+ macros,
+						"path": "",
+						"stroke": "red",
+						"strokeWidth": 0.2,
+						"selected": false
+				}) 
+				
+		 		res[res.length - 1].path = this.start(cx, cy, c, height);
+				cx = tx; cy = ty;
+				 
 
 			} else if (c?.comment?.includes('</Contour>')) {
 				console.log('Contour Start')
-				contourOpen = false
-				
-
+				contourOpen = "closed"
 			}
 
 			if (typeof c.m === 'number') {
@@ -667,25 +685,16 @@ class SvgStore {
 					if (c.m === 5) pendingBreakCircle = { type: 'out'};
 				} */
 
-				if (c.m === 4 || c.m === 14) {
+				if (c.m === 4 /*|| c.m === 14 */) {
 					console.log('laser on')
 					laserOn = true;
-					res.push({
-						"cid": res.length ? 1 : res.length + 1,
-						"class": "",
-						"path": "",
-						"stroke": "red",
-						"strokeWidth": 0.2,
-						"selected": false
-					})
-
-					res[res.length - 1].class += " laserOn "
+					//res[res.length - 1].class += " laserOn "
 					res[res.length - 1].path = this.start(cx, cy, c, height);
 				}
 
 				if (c.m === 5) {
-					//console.log('laser off')
-					//laserOn = false;				
+					console.log('laser off')
+					laserOn = false;				
 					//res[res.length - 1].class += " groupEnd  laserOff  "
 					//res[res.length - 1].path = this.start(cx, cy, c, height);
 
@@ -705,26 +714,36 @@ class SvgStore {
 					};
 					res.splice(0, 0, crossPath);
 					continue; */
-				}
-				if ( g === 0 || g === 1) {
+				} else if ( g === 0 ) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-					if (res.length) {
-						res[res.length - 1].path += this.line(tx, ty, c, height);
-					} else {
-						res.push({
+		
+					res.push({
 							"cid": res.length ? 1 : res.length + 1,
 							"class": "",
 							"path": "",
 							"stroke": "red",
 							"strokeWidth": 0.2,
 							"selected": false
-						})
-						res[res.length - 1].path = this.start(cx, cy, c, height);
-
-					}
+					}) 
 					
+					if (contourOpen === "before") {
+						res[res.length - 1].class += " inlet inner" + macros + " "
+					} 
+
+					if (contourOpen === "after") {
+						res[res.length - 1].class += " outlet inner"+ macros + " "
+					} 
+
+					res[res.length - 1].path = this.start(cx, cy, c, height);
+					cx = tx; cy = ty;
+
+				} else	if ( g === 1) {
+
+					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
+					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
+					res[res.length - 1].path += this.line(tx, ty, c, height);
 					cx = tx; cy = ty;
 
 				} else if (g === 2 || g === 3) {
@@ -751,8 +770,8 @@ class SvgStore {
 
 					cx = tx; cy = ty;
 				} else if (g === 10) {
-					//let macros = ' macros' + c.params.S + ' '
-					//res[res.length - 1].class += macros
+					macros = ' macro' + c.params.S + ' '
+					res[res.length - 1].class += macros
 
 				} else if (g === 29) {
 
@@ -765,24 +784,8 @@ class SvgStore {
 
 				} else if (g === 52) {
 
-					/*   console.log('g === 52')
-					  res.push({
-						  "cid": 1,
-						  "class": "",
-						  "path": "",
-						  "stroke": "red",
-						  "strokeWidth": 0.2,
-						  "selected": false
-					  })
-  
-					 //yobanyi kostyl!!!!
-					 if (res.length > 1) {
-						 let [x1, y1] = utils.getLastTwoNumbers(res[res.length - 2].path)
-						 res[res.length - 1].path = `M${x1} ${y1}`;
-					 } else {
-						 res[res.length - 1].path = `M${cx} ${height - cy}`;
-					 } */
-
+					// // console.log('g === 52')
+					
 				}
 
 			}
@@ -824,7 +827,8 @@ export default svgStore;
 					}
 				}
 			],
-			"part_code": [
+			"part_code": [	
+
 				{
 					"id": "7f4cdcc4-103c-437e-9c17-69936aadc8f6",
 					"uuid": "7f4cdcc4-103c-437e-9c17-69936aadc8f6",

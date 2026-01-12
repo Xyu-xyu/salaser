@@ -2166,22 +2166,6 @@ g.inlet.outer {
     width: 150px; */
 }
 
-/* input.popup_input {
-    width:150px !important;
-}
- */
-
-g.macro0.closed0, 
-g.macro1.closed0, 
-g.macro3.closed0, 
-g.macro4.closed0, 
-g.macro4.closed0, 
-g.macro5.closed0,
-g.macro6.closed0
-g.macro7.closed0 {
-/*     fill:transparent;
- */    stroke-width: var(--widthThin);;
-}
 
 
 #logger_wrapper {
