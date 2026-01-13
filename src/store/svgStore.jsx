@@ -468,7 +468,7 @@ class SvgStore {
 
 	line = (x2, y2, c, height) => {
 		const [rx2, ry2] = this.rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
-		return `L${rx2} ${height - ry2}`;
+		return ` L${rx2} ${height - ry2}`;
 	};
 
 	start = (x1, y1, c, height) => {
@@ -480,7 +480,7 @@ class SvgStore {
 	cross = (x, y, size, c, height) => {
 		const [rx, ry] = this.rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
 		const yInv = height - ry;
-		return `M${rx - size},${yInv - size}L${rx + size},${yInv + size}M${rx - size},${yInv + size}L${rx + size},${yInv - size}`;
+		return `M${rx - size} ${yInv - size} L${rx + size},${yInv + size} M${rx - size} ${yInv + size}L${rx + size} ${yInv - size}`;
 	};
 
 	// Арка с поворотом
@@ -494,7 +494,7 @@ class SvgStore {
 		height
 	) => {
 		const [rxEnd, ryEnd] = this.rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
-		return `A${r},${r} 0,${large},${1 - sweep} ${rxEnd},${height - ryEnd}`;
+		return ` A${r} ${r} 0 ${large} ${1 - sweep} ${rxEnd} ${height - ryEnd}`;
 	};
 
 	rotatePoint = (
@@ -598,7 +598,7 @@ class SvgStore {
 		//const parseGcodeLine = makeGcodeParser();
 
  		let currentPart = null;
-		let cid = 1;
+		let cid = -1;
 		let cx = 0, cy = 0;
 		let partOpen = false
 		let contourOpen = "before"
@@ -611,7 +611,6 @@ class SvgStore {
 
 			if (c?.comment?.includes('PartCode')) {
 				console.log('Part code start')
- 				cid = 1;
 				cx = 0;
 				cy = 0;
 
@@ -645,7 +644,6 @@ class SvgStore {
 					}
 				}
 
-
 				const order = ['outer', 'contour', 'engraving', 'inlet', 'outlet', 'joint'].reverse();
 				res = res.sort((a, b) => {
 					let ac = a.class.split(' ')
@@ -670,9 +668,13 @@ class SvgStore {
 
 				const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 				const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
+
+				if ( !res[res.length-1].class.includes("inlet") )  {
+					cid +=1
+				}
 	
 				res.push({
-						"cid": res.length ? 1 : res.length + 1,
+						"cid": cid,
 						"class": "contour inner "+ macros,
 						"path": "",
 						"stroke": "red",
@@ -682,28 +684,23 @@ class SvgStore {
 				
 		 		res[res.length - 1].path = this.start(cx, cy, c, height);
 				cx = tx; cy = ty;
-				 
+				continue;
+
 
 			} else if (c?.comment?.includes('</Contour>')) {
 
 				console.log('Contour Start')
-				contourOpen = "after"
-
-				const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
-				const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-	
+				//contourOpen = "after"
+						
 				res.push({
-						"cid": res.length ? 1 : res.length + 1,
-						"class": "inlet "+ macros,
-						"path": "",
-						"stroke": "red",
-						"strokeWidth": 0.2,
-						"selected": false
-				}) 
-				
-		 		res[res.length - 1].path = this.start(cx, cy, c, height);
-				cx = tx; cy = ty;
-
+					"cid": cid,
+					"class": " outlet inner"+ macros + " ",
+					"path": "",
+					"stroke": "red",
+					"strokeWidth": 0.2,
+					"selected": false
+				})
+				continue;				
 			}
 
 			if (typeof c.m === 'number') {
@@ -743,23 +740,19 @@ class SvgStore {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-		
-					res.push({
-							"cid": res.length ? 1 : res.length + 1,
-							"class": "",
+					
+					if (contourOpen === "before") {
+						cid+= 1
+						res.push({
+							"cid": cid,
+							"class": " inlet inner" + macros + " ",
 							"path": "",
 							"stroke": "red",
 							"strokeWidth": 0.2,
 							"selected": false
-					}) 
-					
-					if (contourOpen === "before") {
-						res[res.length - 1].class += " inlet inner" + macros + " "
-					} 
-
-					if (contourOpen === "after") {
-						res[res.length - 1].class += " outlet inner"+ macros + " "
-					} 
+						})						
+ 					} 
+		
 
 					res[res.length - 1].path = this.start(cx, cy, c, height);
 					cx = tx; cy = ty;
@@ -827,73 +820,3 @@ class SvgStore {
 
 const svgStore = new SvgStore();
 export default svgStore;
-
-/*
-
-	/*{
-			"name": "new_plan",
-			"width": 900,
-			"height": 600,
-			"quantity": 1,
-			"presetId": 55,
-			"presetName": "Steel_1.5",
-			"positions": [
-				{
-					"part_id": 1,
-					"part_code_id": "7f4cdcc4-103c-437e-9c17-69936aadc8f6",
-					"selected": false,
-					"positions": {
-						"a": 1,
-						"b": 0,
-						"c": 0,
-						"d": 1,
-						"e": 375,
-						"f": 225
-					}
-				}
-			],
-			"part_code": [	
-
-				{
-					"id": "7f4cdcc4-103c-437e-9c17-69936aadc8f6",
-					"uuid": "7f4cdcc4-103c-437e-9c17-69936aadc8f6",
-					"name": "12___10__2",
-					"code": [
-						{
-							"cid": 1,
-							"class": "contour outer macro0 closed1",
-							"path": "M75 0H150V150H0L0 0 75 0",
-							"stroke": "red",
-							"strokeWidth": 0.2,
-							"selected": false
-						},
-						{
-							"cid": 1,
-							"class": "inlet outer macro0 closed1",
-							"path": "",
-							"stroke": "red",
-							"strokeWidth": 0.2,
-							"selected": false
-						},
-						{
-							"cid": 1,
-							"class": "outlet outer macro0 closed1",
-							"path": "",
-							"stroke": "lime",
-							"strokeWidth": 0.2,
-							"selected": false
-						}
-					],
-					"part_id": 1,
-					"papams": {
-						"code": "",
-						"uuid": ""
-					},
-					"width": 150,
-					"height": 150
-				}
-			]
-		}
-*/
-
-
