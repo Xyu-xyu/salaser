@@ -366,11 +366,9 @@ class SvgStore {
 
 		})
 
-
 		return res;
 
 	}
-
 
 	generatePositions() {
 		const data = this.svgData;
@@ -536,16 +534,18 @@ class SvgStore {
 
 		/* ---------------- DIMENSIONS ---------------- */
 		const dimLine = lines.find(l => l.includes("DimX") && l.includes("DimY"));
+		let height = 0
+		let width = 0
 		if (dimLine) {
 			const dimX = dimLine.match(/DimX="([\d.]+)"/);
 			const dimY = dimLine.match(/DimY="([\d.]+)"/);
-			result.width = 1250 //Number(dimY?.[1] || 0);
-			result.height = 2500//Number(dimX?.[1] || 0);
+			result.width = Number(dimY?.[1] || 0);
+			result.height = Number(dimX?.[1] || 0);
+			//console.log ( result.width, result.height )
+			height = result.height
+			width = result.width
+
 		}
-
-		let height = result.height
-		let width = result.width
-
 
 		/* ---------------- PLAN (POSITIONS) ---------------- */
 		const parseGcodeLine = utils.makeGcodeParser();
@@ -587,7 +587,7 @@ class SvgStore {
 						c: 0,//-Math.sin((C * Math.PI) / 180),
 						d: 1,//Math.cos((C * Math.PI) / 180),
 						e: 0,//height - g.base.Y,
-						f: -2000//g.base.X
+						f: 0//g.base.X
 					}
 				});
 			}
@@ -630,7 +630,20 @@ class SvgStore {
 				console.log('Part End')
 				partOpen = false
 				res[res.length - 1].class += " groupEnd "
-				res[res.length - 1].class = res[res.length - 1].class.replace(" inner ", " outer ")
+				
+				for (let i = res.length - 1; i >= 0; i--) {
+					const item = res[i];
+
+					// Проверяем наличие отдельных слов 'contour' и 'inner'
+					// \b означает границу слова, чтобы не находить части слов
+					const hasContour = /\bcontour\b/i.test(item.class);
+					const hasInner = /\binner\b/i.test(item.class);
+
+					if (hasContour && hasInner) {
+ 						item.class = item.class.replace(/\binner\b/i, 'outer');
+						break;
+					}
+				}
 
 
 				const order = ['outer', 'contour', 'engraving', 'inlet', 'outlet', 'joint'].reverse();
@@ -657,8 +670,6 @@ class SvgStore {
 
 				const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 				const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-
-
 	
 				res.push({
 						"cid": res.length ? 1 : res.length + 1,
@@ -674,8 +685,25 @@ class SvgStore {
 				 
 
 			} else if (c?.comment?.includes('</Contour>')) {
+
 				console.log('Contour Start')
-				contourOpen = "closed"
+				contourOpen = "after"
+
+				const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
+				const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
+	
+				res.push({
+						"cid": res.length ? 1 : res.length + 1,
+						"class": "inlet "+ macros,
+						"path": "",
+						"stroke": "red",
+						"strokeWidth": 0.2,
+						"selected": false
+				}) 
+				
+		 		res[res.length - 1].path = this.start(cx, cy, c, height);
+				cx = tx; cy = ty;
+
 			}
 
 			if (typeof c.m === 'number') {
@@ -688,16 +716,13 @@ class SvgStore {
 				if (c.m === 4 /*|| c.m === 14 */) {
 					console.log('laser on')
 					laserOn = true;
-					//res[res.length - 1].class += " laserOn "
 					res[res.length - 1].path = this.start(cx, cy, c, height);
 				}
 
 				if (c.m === 5) {
 					console.log('laser off')
-					laserOn = false;				
-					//res[res.length - 1].class += " groupEnd  laserOff  "
-					//res[res.length - 1].path = this.start(cx, cy, c, height);
-
+					laserOn = false;		
+					contourOpen = "before"		
 				}
 			}
 
@@ -739,7 +764,7 @@ class SvgStore {
 					res[res.length - 1].path = this.start(cx, cy, c, height);
 					cx = tx; cy = ty;
 
-				} else	if ( g === 1) {
+				} else if ( g === 1) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
