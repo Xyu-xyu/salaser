@@ -505,7 +505,7 @@ const PartSvgWrapper = observer(() => {
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
 			<div className="row  align-items-center h-100">
 				<div className="w-100 h-100">
-					<div className="d-flex" id="editor_main_wrapper">
+					<div className="d-flex w-100 h-100" id="editor_main_wrapper_1">
 						<div id="wrapper_svg" 
 							ref={wrapperSVG}
 							className={ wrapperClass }		 

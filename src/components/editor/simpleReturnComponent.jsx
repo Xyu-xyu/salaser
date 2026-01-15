@@ -80,51 +80,97 @@ const SimpleReturnComponent = observer(() => {
 		}
 	}
 
+
+	const  buildCompoundPath = (code) => {
+		const outer = [];
+		const inner = [];
+		const inletOutlet = [];
+		const engraving = [];
+
+
+		for (const el of code) {
+			if (!el.path) continue;
+			if (el.class.includes("macro2") ) {
+				engraving.push(el.path.trim());
+			} else	if (el.class.includes("outer") && el.class.includes("contour")) {
+				outer.push(el.path.trim());
+			} else if (el.class.includes("inner") && el.class.includes("contour")) {
+				inner.push(el.path.trim());
+			} else if (el.class.includes("inlet") || el.class.includes("outlet")) {
+				inletOutlet.push(el.path.trim());
+			}
+		}
+
+		const res = {}
+		res.contours =  [...outer, ...inner].join("z ");
+		res.inletOutlet =  inletOutlet
+		res.engraving =  engraving
+
+		
+		return res
+	}
+
 	return (
 		<>
 			{svgStore.svgData.positions.map((pos, posIndex) => {
 				// находим part_code по part_id
 				const part = svgStore.svgData.part_code.find(
-					p => p.id === pos.part_code_id
+					(p) => p.id === pos.part_code_id
 				);
 
 				if (!part) return null;
+
 				const { a, b, c, d, e, f } = pos.positions;
+				const compoundPath = buildCompoundPath(part.code);
 
 				return (
 					<g
-						id={"form" + pos.part_id + "_" + posIndex}
-						key={"form" + pos.part_id + "_" + posIndex}
-						data-part-id={pos.part_id}
+						key={`form_${pos.part_id}_${posIndex}`}
 						transform={`matrix(${a} ${b} ${c} ${d} ${e} ${f})`}
+						data-part-id={pos.part_id}
+
+						onMouseDown={(e) => setSelected(e, pos.part_id)}
+						onMouseMove={() => {
+							if (editorStore.mode !== 'dragging') {
+								editorStore.setMode('dragging');
+							}
+						}}
+						onTouchStart={(e) => {
+							setSelected(e, pos.part_id);
+							editorStore.setMode('dragging');
+						}}
 					>
-						{part.code.map((element, index) => (
-							<g
-								key={"path" + "_" + index + "_" + pos.part_id + "_" + posIndex}
-								id={"path" +  "_" + index + "_" + pos.part_id + "_" + posIndex}
-								/*data-cid={element.cid}*/
-								className={element.class + `${pos.selected ? " selected " : " "}`}
-								onMouseDown={(e) => setSelected(e, pos.part_id)}
-								onMouseMove={() => {
-									if (editorStore.mode !== 'dragging') editorStore.setMode('dragging');
-								}
-								}
-								//onMouseUp={ editorStore.setMode ('resize')}
-								onTouchStart={(e) => {
-									setSelected(e, pos.part_id)
-									editorStore.setMode('dragging')
-								}}
-								fill={element.class.includes("inner") ? "none" : "none"}
-							>
-								<path d={element.path} />
-							</g>
-						))}
+						<path
+							d={compoundPath.contours}
+							stroke="red"
+							fill={ pos.selected ? "rgba(0, 255, 255, 0.7)" : "rgba(252, 126, 23, 0.7)" }
+							strokeWidth={0.2}
+							fillRule="evenodd"           // важно для дырок
+							vectorEffect="non-scaling-stroke" // чтобы stroke не масштабировался
+							pointerEvents="visiblePainted"     // клики по заливке, дырки прозрачные
+						/>
+						<path
+							d={compoundPath.inletOutlet}
+							fill="none"
+							strokeWidth={2}
+							stroke={ pos.selected ? "rgba(0, 255, 255, 0.7)" : "rgba(252, 126, 23, 0.7)" }
+							vectorEffect="non-scaling-stroke" // чтобы stroke не масштабировался
+							pointerEvents="visiblePainted"     // клики по заливке, дырки прозрачные
+						/>
+						<path
+							d={compoundPath.engraving}
+ 							fill="None"
+							stroke={"limegreen"}
+							strokeWidth={1}
+ 							vectorEffect="non-scaling-stroke" // чтобы stroke не масштабировался
+							pointerEvents="visiblePainted"     // клики по заливке, дырки прозрачные
+						/>
 					</g>
 				);
 			})}
 		</>
-
 	);
+
 });
 
 export default SimpleReturnComponent;

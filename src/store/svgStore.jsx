@@ -468,23 +468,20 @@ class SvgStore {
 		};
 	}
 
-	line = (x2, y2, c, height) => {
-		height=0 
+	line = (x2, y2, c ) => {
 		const [rx2, ry2] = this.rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
-		return ` L${rx2} ${height - ry2}`;
+		return ` L${rx2} ${ -ry2}`;
 	};
 
-	start = (x1, y1, c, height) => {
-		height=0
+	start = (x1, y1, c ) => {
 		const [rx2, ry2] = this.rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
-		return `M${rx2} ${height - ry2}`;
+		return `M${rx2} ${ - ry2}`;
 	};
 
 	// Крест с поворотом
-	cross = (x, y, size, c, height) => {
-		height=0
+	cross = (x, y, size, c) => {
 		const [rx, ry] = this.rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
-		const yInv = height - ry;
+		const yInv = - ry;
 		return `M${rx - size} ${yInv - size} L${rx + size},${yInv + size} M${rx - size} ${yInv + size}L${rx + size} ${yInv - size}`;
 	};
 
@@ -496,11 +493,9 @@ class SvgStore {
 		large,
 		sweep,
 		c,
-		height
-	) => {
-		height = 0
+ 	) => {
 		const [rxEnd, ryEnd] = this.rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
-		return ` A${r} ${r} 0 ${large} ${1 - sweep} ${rxEnd} ${height - ryEnd}`;
+		return ` A${r} ${r} 0 ${large} ${1 - sweep} ${rxEnd} ${  - ryEnd}`;
 	};
 
 	rotatePoint = (
@@ -590,7 +585,7 @@ class SvgStore {
 					height:0,
 					width:0,
 				};
-
+				res=[]
 				partOpen = true
 				continue;
 
@@ -619,7 +614,7 @@ class SvgStore {
 				let box = SVGPathCommander.getPathBBox(commonPath)
 				currentPart.width = box.width
 				currentPart.height = box.height
-				currentPart.viewBox=`${box.x} ${box.y} ${box.x2} ${box.y2}`
+				//currentPart.viewBox=`${box.x} ${box.y} ${box.x2} ${box.y2}`
 
 				const order = ['outer', 'contour', 'engraving', 'inlet', 'outlet', 'joint'].reverse();
 				res = res.sort((a, b) => {
@@ -659,7 +654,7 @@ class SvgStore {
 						"selected": false
 				}) 
 				
-		 		res[res.length - 1].path = this.start(cx, cy, c, height);
+		 		res[res.length - 1].path = this.start(cx, cy, c );
 				cx = tx; cy = ty;
 				continue;
 
@@ -677,7 +672,7 @@ class SvgStore {
 					"strokeWidth": 0.2,
 					"selected": false
 				})
-				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c, height);
+				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c );
 				continue;				
 			}
 
@@ -691,7 +686,7 @@ class SvgStore {
 				if (c.m === 4 /*|| c.m === 14 */) {
 					console.log('laser on')
 					laserOn = true;
-					res[res.length - 1].path = this.start(cx, cy, c, height);
+					res[res.length - 1].path = this.start(cx, cy, c );
 				}
 
 				if (c.m === 5) {
@@ -707,9 +702,9 @@ class SvgStore {
 
 					/* let crossPath = {
 						path: partOpen ?
-							this.cross(cx, cy, 2.5, c, height)
+							this.cross(cx, cy, 2.5, c )
 							:
-							this.cross(cx, cy, 2.5, c, height),
+							this.cross(cx, cy, 2.5, c ),
 						class: 'g4'
 					};
 					res.splice(0, 0, crossPath);
@@ -732,14 +727,14 @@ class SvgStore {
  					} 
 		
 
-					res[res.length - 1].path = this.start(cx, cy, c, height);
+					res[res.length - 1].path = this.start(cx, cy, c);
 					cx = tx; cy = ty;
 
 				} else if ( g === 1) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-					res[res.length - 1].path += this.line(tx, ty, c, height);
+					res[res.length - 1].path += this.line(tx, ty, c);
 					cx = tx; cy = ty;
 
 				} else if (g === 2 || g === 3) {
@@ -762,7 +757,7 @@ class SvgStore {
 					if (!ccw && d > 0) d -= 2 * Math.PI;
 					const large = 0;
 					const sweep = ccw ? 1 : 0;
-					res[res.length - 1].path += this.arcPath(tx, ty, r, large, sweep, c, height);
+					res[res.length - 1].path += this.arcPath(tx, ty, r, large, sweep, c);
 
 					cx = tx; cy = ty;
 				} else if (g === 10) {
@@ -775,13 +770,9 @@ class SvgStore {
 
 
 				} else if (g === 28) {
-
 					// console.log('g === 28')
-
 				} else if (g === 52) {
-
-					// // console.log('g === 52')
-					
+					// // console.log('g === 52')					
 				}
 
 			}
@@ -813,30 +804,35 @@ class SvgStore {
 				// высота детали (bounding box с incut!)
 
 				let part = result.part_code.filter( a  => a.id === Number(L))[0]
-				const partHeight = part.height
-				const partWidth = part.width
+				//const partHeight = part.height
+				//const partWidth = part.width
 			
-				result.positions.push({
-					part_id: partPositionId++,
-					part_code_id: Number(L),
-					positions: {
-						// поворот листа на -90°
-						a: 0,
-						b: -1,
-						c: 1,
-						d: 0,
-						// смещение из NCP -> SVG
-						e: width - Y,//Y-result.height + partHeight,                  
-						// Xsvg = Yncp
-						f: height - X,    
-						// Ysvg = Xncp - height детали
-					}
-				});
+				if (g.g === 52 || g.params.g === 52) {
+
+					const rad = (-C * Math.PI) / 180;
+					const cos = Math.cos(rad);
+					const sin = Math.sin(rad);
+				
+					result.positions.push({
+						part_id: partPositionId++,
+						part_code_id: Number(L),
+						positions: {
+							// M = R(+90° SVG) × R(-C)
+							a:  sin,
+							b: -cos,
+							c:  cos,
+							d:  sin,
+							e: width  - Y,
+							f: height - X
+						}
+					});
+				}
+	
 			}
 		});
 
-		console.log(result)
-		console.log(currentPart)
+		console.log( toJS(result))
+		//console.log(currentPart)
 		svgStore.svgData = Object.assign({}, result)
 
 	}

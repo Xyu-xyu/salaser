@@ -30,11 +30,13 @@ const SvgComponent = observer (() => {
         <svg
             id="svg"
             baseProfile="full"
+            className='planSvg'
             viewBox={`0.00 0.00 ${svgData.width} ${ svgData.height }`}
             style={{ overflow: 'hidden' }}
             version="1.1"
             stroke='var(--color)'
-            strokeWidth="0.2"          
+            strokeWidth="0.2" 
+            fillRule='evenodd'         
         >
 
             <g id="group2" fill="url(#grid)">
