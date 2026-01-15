@@ -81,18 +81,18 @@ const SimpleReturnComponent = observer(() => {
 	}
 
 
-	const  buildCompoundPath = (code) => {
+	const buildCompoundPath = (code) => {
 		const outer = [];
 		const inner = [];
 		const inletOutlet = [];
 		const engraving = [];
 
-
 		for (const el of code) {
 			if (!el.path) continue;
-			if (el.class.includes("macro2") ) {
+
+			if (el.class.includes("macro2")) {
 				engraving.push(el.path.trim());
-			} else	if (el.class.includes("outer") && el.class.includes("contour")) {
+			} else if (el.class.includes("outer") && el.class.includes("contour")) {
 				outer.push(el.path.trim());
 			} else if (el.class.includes("inner") && el.class.includes("contour")) {
 				inner.push(el.path.trim());
@@ -101,69 +101,84 @@ const SimpleReturnComponent = observer(() => {
 			}
 		}
 
-		const res = {}
-		res.contours =  [...outer, ...inner].join("z ");
-		res.inletOutlet =  inletOutlet
-		res.engraving =  engraving
+		return {
+			contours: [...outer, ...inner].join(" z "),
+			inletOutlet,
+			engraving
+		};
+	};
 
-		
-		return res
-	}
+	// Собираем все уникальные part_code в defs
+	const defs = svgStore.svgData.part_code.map(part => {
+		const { contours, inletOutlet, engraving } = buildCompoundPath(part.code);
+
+		return (
+			<g key={`defs_part_${part.id}`} id={`part_${part.id}`}>
+				{/* Контуры outer + inner */}
+				<path
+					d={contours}
+					fillRule="evenodd"
+					stroke="currentColor"
+					strokeWidth={0.2}
+					vectorEffect="non-scaling-stroke"
+					pointerEvents="visiblePainted"
+				/>
+
+				{/* Врезки inlet/outlet */}
+				<path
+					d={inletOutlet.join(" ")}
+					fill="none"
+					stroke="currentColor"
+					strokeWidth={2}
+					vectorEffect="non-scaling-stroke"
+					pointerEvents="visiblePainted"
+				/>
+
+				{/* Гравировки */}
+				<path
+					d={engraving.join(" ")}
+					fill="none"
+					stroke="limegreen"
+					strokeWidth={1}
+					vectorEffect="non-scaling-stroke"
+					pointerEvents="visiblePainted"
+				/>
+			</g>
+		);
+	});
+
 
 	return (
 		<>
+			<defs>
+				{defs}
+			</defs>
+
 			{svgStore.svgData.positions.map((pos, posIndex) => {
-				// находим part_code по part_id
-				const part = svgStore.svgData.part_code.find(
-					(p) => p.id === pos.part_code_id
-				);
-
-				if (!part) return null;
-
 				const { a, b, c, d, e, f } = pos.positions;
-				const compoundPath = buildCompoundPath(part.code);
+				const fillColor = pos.selected ? "rgba(0,255,255,0.7)" : "rgba(252,126,23,0.7)";
+				const strokeColor = fillColor;
 
 				return (
 					<g
 						key={`form_${pos.part_id}_${posIndex}`}
 						transform={`matrix(${a} ${b} ${c} ${d} ${e} ${f})`}
 						data-part-id={pos.part_id}
-
 						onMouseDown={(e) => setSelected(e, pos.part_id)}
 						onMouseMove={() => {
-							if (editorStore.mode !== 'dragging') {
-								editorStore.setMode('dragging');
-							}
+							if (editorStore.mode !== "dragging") editorStore.setMode("dragging");
 						}}
 						onTouchStart={(e) => {
 							setSelected(e, pos.part_id);
-							editorStore.setMode('dragging');
+							editorStore.setMode("dragging");
 						}}
 					>
-						<path
-							d={compoundPath.contours}
-							stroke="red"
-							fill={ pos.selected ? "rgba(0, 255, 255, 0.7)" : "rgba(252, 126, 23, 0.7)" }
-							strokeWidth={0.2}
-							fillRule="evenodd"           // важно для дырок
-							vectorEffect="non-scaling-stroke" // чтобы stroke не масштабировался
-							pointerEvents="visiblePainted"     // клики по заливке, дырки прозрачные
-						/>
-						<path
-							d={compoundPath.inletOutlet}
-							fill="none"
-							strokeWidth={2}
-							stroke={ pos.selected ? "rgba(0, 255, 255, 0.7)" : "rgba(252, 126, 23, 0.7)" }
-							vectorEffect="non-scaling-stroke" // чтобы stroke не масштабировался
-							pointerEvents="visiblePainted"     // клики по заливке, дырки прозрачные
-						/>
-						<path
-							d={compoundPath.engraving}
- 							fill="None"
-							stroke={"limegreen"}
-							strokeWidth={1}
- 							vectorEffect="non-scaling-stroke" // чтобы stroke не масштабировался
-							pointerEvents="visiblePainted"     // клики по заливке, дырки прозрачные
+						{/* Один use на всю группу part_code */}
+						<use
+							href={`#part_${pos.part_code_id}`}
+							fill={fillColor}
+							stroke={strokeColor}
+							pointerEvents="visiblePainted"
 						/>
 					</g>
 				);
