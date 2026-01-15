@@ -207,6 +207,8 @@ class SvgStore {
 	};
 
 	deleteOutParts = () => {
+		return
+
 		const { width, height } = this.svgData;
 
 		// Если холст не задан — выходим
@@ -467,17 +469,20 @@ class SvgStore {
 	}
 
 	line = (x2, y2, c, height) => {
+		height=0 
 		const [rx2, ry2] = this.rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
 		return ` L${rx2} ${height - ry2}`;
 	};
 
 	start = (x1, y1, c, height) => {
+		height=0
 		const [rx2, ry2] = this.rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
 		return `M${rx2} ${height - ry2}`;
 	};
 
 	// Крест с поворотом
 	cross = (x, y, size, c, height) => {
+		height=0
 		const [rx, ry] = this.rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
 		const yInv = height - ry;
 		return `M${rx - size} ${yInv - size} L${rx + size},${yInv + size} M${rx - size} ${yInv + size}L${rx + size} ${yInv - size}`;
@@ -493,6 +498,7 @@ class SvgStore {
 		c,
 		height
 	) => {
+		height = 0
 		const [rxEnd, ryEnd] = this.rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
 		return ` A${r} ${r} 0 ${large} ${1 - sweep} ${rxEnd} ${height - ryEnd}`;
 	};
@@ -522,8 +528,8 @@ class SvgStore {
 
 		const result = {
 			name: "undefined.ncp",
-			width: 100,
-			height: 100,
+			width: 0,
+			height: 0,
 			quantity: 1,
 			presetId: 50,
 			presetName: "any_preset",
@@ -555,44 +561,6 @@ class SvgStore {
 		let inPlan = false;
 		let partPositionId = 1;
 
-		lines.forEach(line => {
-			if (line.includes("<Plan")) {
-				inPlan = true;
-				return;
-			}
-
-			if (line.includes("</Plan")) {
-				inPlan = false;
-				return;
-			}
-
-			if (!inPlan) return;
-
-			// обрабатываем только G-code строки
-			if (!/^N\d+/i.test(line)) return;
-
-			// 👉 stateful G-code парсинг
-			const g = parseGcodeLine(line);
-			const { X = 0, Y = 0, C = 0, L = 1 } = g.params;
-			if (g.g === 28 || g.params.g === 28) {
-
-			}
-			if (g.g === 52 || g.params.g === 52) {
-				result.positions.push({
-					part_id: partPositionId++,
-					part_code_id: Number(L),
-					positions: {
-						a: 1,//Math.cos((C * Math.PI) / 180),
-						b: 0,//Math.sin((C * Math.PI) / 180),
-						c: 0,//-Math.sin((C * Math.PI) / 180),
-						d: 1,//Math.cos((C * Math.PI) / 180),
-						e: 0,//height - g.base.Y,
-						f: 0//g.base.X
-					}
-				});
-			}
-		});
-
 
 		/* ---------------- PART CODE ---------------- */
 		//const parseGcodeLine = makeGcodeParser();
@@ -618,7 +586,9 @@ class SvgStore {
 					id: result.part_code.length + 1,
 					uuid: result.part_code.length + 1,
 					name: "",
-					code: []
+					code: [],
+					height:0,
+					width:0,
 				};
 
 				partOpen = true
@@ -639,10 +609,17 @@ class SvgStore {
 					const hasInner = /\binner\b/i.test(item.class);
 
 					if (hasContour && hasInner) {
- 						item.class = item.class.replace(/\binner\b/i, 'outer');
+ 						item.class = item.class.replace(/\binner\b/i, 'outer');						
 						break;
 					}
 				}
+
+				let commonPath = ''
+				res.map(a => a.path ? commonPath += a.path : commonPath += " ")
+				let box = SVGPathCommander.getPathBBox(commonPath)
+				currentPart.width = box.width
+				currentPart.height = box.height
+				currentPart.viewBox=`${box.x} ${box.y} ${box.x2} ${box.y2}`
 
 				const order = ['outer', 'contour', 'engraving', 'inlet', 'outlet', 'joint'].reverse();
 				res = res.sort((a, b) => {
@@ -700,6 +677,7 @@ class SvgStore {
 					"strokeWidth": 0.2,
 					"selected": false
 				})
+				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c, height);
 				continue;				
 			}
 
@@ -808,6 +786,54 @@ class SvgStore {
 
 			}
 		}
+
+		lines.forEach(line => {
+			if (line.includes("<Plan")) {
+				inPlan = true;
+				return;
+			}
+
+			if (line.includes("</Plan")) {
+				inPlan = false;
+				return;
+			}
+
+			if (!inPlan) return;
+
+			// обрабатываем только G-code строки
+			if (!/^N\d+/i.test(line)) return;
+
+			// 👉 stateful G-code парсинг
+			const g = parseGcodeLine(line);
+			const { X = 0, Y = 0, C = 0, L = 1 } = g.params;
+			if (g.g === 28 || g.params.g === 28) {
+
+			}
+			if (g.g === 52 || g.params.g === 52) {
+				// высота детали (bounding box с incut!)
+
+				let part = result.part_code.filter( a  => a.id === Number(L))[0]
+				const partHeight = part.height
+				const partWidth = part.width
+			
+				result.positions.push({
+					part_id: partPositionId++,
+					part_code_id: Number(L),
+					positions: {
+						// поворот листа на -90°
+						a: 0,
+						b: -1,
+						c: 1,
+						d: 0,
+						// смещение из NCP -> SVG
+						e: width - Y,//Y-result.height + partHeight,                  
+						// Xsvg = Yncp
+						f: height - X,    
+						// Ysvg = Xncp - height детали
+					}
+				});
+			}
+		});
 
 		console.log(result)
 		console.log(currentPart)
