@@ -34,70 +34,9 @@ const SvgComponent = observer (() => {
             style={{ overflow: 'hidden' }}
             version="1.1"
             stroke='var(--color)'
-            strokeWidth="0.2"
-            width={svgData.width}
-            height={ svgData.height }
+            strokeWidth="0.2"          
         >
-            <defs>
-{/*                 <pattern  
-                    id="xsGrid" 
-                    width="1" 
-                    height="1" 
-                    fill="var(--gridColorFill)" 
-                    patternUnits="userSpaceOnUse" 
-                    visibility={gridState.xsGrid.visibility}>
-                    <path  d="M 0 0 1 0 1 1 0 1 0 0" fill="var(--gridColorFill)" stroke="var(--gridColorStroke)" strokeWidth="0.05"/>
-                </pattern>
-                <pattern 
-                    id="smallGrid" 
-                    width="10" 
-                    height="10" 
-                    patternUnits="userSpaceOnUse" >
-                    <rect  width="100" height="100" fill="url(#xsGrid)"/>
-                    <path  
-                    d="M 10 0 L 0 0 0 10 10 10 10 0" 
-                    fill={gridState.smallGrid.fill} 
-                    stroke="var(--gridColorStroke)" 
-                    strokeWidth="0.1" 
-                    visibility={gridState.smallGrid.visibility}/>
-                </pattern>
-                <pattern  
-                    id="grid" 
-                    width="100" 
-                    height="100" 
-                    patternUnits="userSpaceOnUse"
-                    visibility={gridState.grid.visibility}>
-                    <rect  
-                    width="100" height="100" 
-                    fill="url(#smallGrid)"/>
-                    <path  
-                    d="M 100 0 0 0 0 100 100 100 100 0" 
-                    fill={gridState.grid.fill} 
-                    stroke="green" 
-                    strokeWidth="0.2"/>
-                </pattern> */}
-                <marker id="dotRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
-                    <circle 
-                    cx="5" 
-                    cy="5" 
-                    r="5" 
-                    fill="red"></circle>
-                </marker>
-                <marker id="dotPink" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
-                    <circle 
-                    cx="5" 
-                    cy="5" 
-                    r="5" 
-                    fill="pink"></circle>
-                </marker>
-                <marker id="dotYellow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
-                    <circle 
-                    cx="5" 
-                    cy="5" 
-                    r="5" 
-                    fill="yellow"></circle>
-                </marker>                
-            </defs>
+
             <g id="group2" fill="url(#grid)">
                 <g id="group1" transform={`matrix(${matrixG})`}>
                     <g id="group" transform={`matrix(${matrixM})`} className="grab">
@@ -110,7 +49,7 @@ const SvgComponent = observer (() => {
                                 y={0}
                                 fill="url(#grid)"
                                 stroke='var(--color)'
-                                strokeWidth="0"
+                                strokeWidth="0.25"
                             ></rect>
                             <>
                             < SimpleReturnComponent />

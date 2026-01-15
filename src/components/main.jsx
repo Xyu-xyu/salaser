@@ -149,10 +149,10 @@ const Main = observer(() => {
 							backgroundColor: "var(--mainBg)"							
 						}}
 					>
-						<div>	
+						
 							{centralBarMode === "planEditor" && <SvgWrapper />}
 							{centralBarMode === "planEditor" && <Panels />}
-						</div>
+						
 					</motion.div>
 					{/* PartEditor */}
 					<motion.div

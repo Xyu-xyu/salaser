@@ -79,6 +79,7 @@ const PartSvgComponent = observer (() => {
                 </pattern> */}
                 <marker id="dotRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
                     <circle 
+                    stroke="none"
                     cx="5" 
                     cy="5" 
                     r="5" 
