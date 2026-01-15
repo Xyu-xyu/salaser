@@ -441,6 +441,7 @@ const ru = {
     "Save and exit": "Сохранить и выйти",
     "Do you want to save sheet changes ?": "Хотите сохранить изменения листа?",
     "Do you want to save file and exit ?": "Вы хотите сохранить файл и выйти?",
-    "EDIT": "РЕДАКТИРОВАТЬ"
+    "EDIT": "РЕДАКТИРОВАТЬ",
+    "no label": "без этикетки"
 }
 export default ru;

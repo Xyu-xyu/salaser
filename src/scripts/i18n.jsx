@@ -23,7 +23,17 @@ i18n
 		debug: false, // Можно включить при необходимости
 		saveMissing: true, // Включает событие "missingKey"
 		missingKeyHandler: function (lng, ns, key, fallbackValue) {
-			console.warn(`[i18n] Missing translation for key: "${key}" ${ns} in language: "${lng}"${fallbackValue}`);
+
+			
+			if (!key) {
+				console.group("❌ Empty i18n key detected")
+				console.log({ lng, ns, fallbackValue })
+				console.trace()   // 🔥 ВАЖНО
+				console.groupEnd()
+				return
+			}
+						
+
 			key = key.replace(/"/gm, '`')
 			key = key.replace(/'/gm, '`')
 

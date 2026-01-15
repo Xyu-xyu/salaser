@@ -137,7 +137,7 @@ const CanBan = observer(() => {
 													{/* Безопасно отображаем данные из loadResult */}
 													{loadResult?.result?.jobinfo?.attr ? (
 														<div className="cardMaterial">
-															• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+															• {t(loadResult.result.jobinfo.attr.label ? loadResult.result.jobinfo.attr.label  :"no label")} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
 														</div>
 													) : (
 														<div className="cardMaterial text-muted">
