@@ -683,13 +683,13 @@ class SvgStore {
 					if (c.m === 5) pendingBreakCircle = { type: 'out'};
 				} */
 
-				if (c.m === 4 /*|| c.m === 14 */) {
+				if (c.m === 4 || c.m === 14 ) {
 					console.log('laser on')
 					laserOn = true;
 					res[res.length - 1].path = this.start(cx, cy, c );
 				}
 
-				if (c.m === 5) {
+				if (c.m === 5 || c.m === 15 ) {
 					console.log('laser off')
 					laserOn = false;		
 					contourOpen = "before"		

@@ -459,6 +459,7 @@ const en = {
     "Do you want to save file and exit ?": "Do you want to save file and exit ?",
     "EDIT": "EDIT",
     "Mild_steel": "Mild_steel",
-    "no label": "no label"
+    "no label": "no label",
+    "Total": "Total"
 }
 export default en;

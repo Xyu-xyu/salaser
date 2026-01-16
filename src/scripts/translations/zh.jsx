@@ -427,6 +427,7 @@ const zh = {
     "Do you want to save sheet changes ?": "您想保存工作表更改吗？",
     "Do you want to save file and exit ?": "您想保存文件并退出吗？",
     "EDIT": "编辑",
-    "no label": "没有标签"
+    "no label": "没有标签",
+    "Total": "全部的"
 }
 export default zh;

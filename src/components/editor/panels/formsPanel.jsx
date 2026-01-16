@@ -109,8 +109,8 @@ const FormsPanel = observer(() => {
 													svgStore.svgData.positions.filter(pos => pos.part_code_id === a.uuid).length
 												}
 											</td>
-											<td className="header" scope="col">
-												<svg viewBox={`0 0 ${a.width} ${a.height}`} xmlns="http://www.w3.org/2000/svg" width='40' height='40'>
+											<td scope="col">
+												<svg viewBox={ a.hasOwnProperty("viewBox") ?  a.viewBox :`0 ${-a.height} ${a.width} ${a.height}`} xmlns="http://www.w3.org/2000/svg" width='40' height='40'>
 													{a.code.map((element, i) => (
 														<g
 															key={"fp"+element.cid+"_"+i}
@@ -180,10 +180,12 @@ const FormsPanel = observer(() => {
 									)
 								})
 							}
-							<tr>
-								<td colSpan={3}>{t("Parts on sheet")}: </td>
+							<tr key="final">
+								<td colSpan={1}>#</td>
+								<td  className="header" >{t("Total")}: </td>
 								<td>{ svgStore.svgData.positions.length }</td>
-								<td></td>
+								<td colSpan={2}></td>
+								<td colSpan={1}></td>
 							</tr>
 						</tbody>
 					</table>

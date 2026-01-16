@@ -442,6 +442,7 @@ const ru = {
     "Do you want to save sheet changes ?": "Хотите сохранить изменения листа?",
     "Do you want to save file and exit ?": "Вы хотите сохранить файл и выйти?",
     "EDIT": "РЕДАКТИРОВАТЬ",
-    "no label": "без этикетки"
+    "no label": "без этикетки",
+    "Total": "Итого"
 }
 export default ru;
