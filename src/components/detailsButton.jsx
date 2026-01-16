@@ -193,7 +193,7 @@ export const DetailsButton = observer(({ item }) => {
 
 										{loadResult?.result?.jobinfo?.attr ? (
 											<div className="cardMaterial">
-												• {t(loadResult.result.jobinfo.attr.label)} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+												• {loadResult.result.jobinfo.attr.label ? t(loadResult.result.jobinfo.attr.label): "no label"} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
 											</div>
 										) : (
 											<div className="cardMaterial text-muted">

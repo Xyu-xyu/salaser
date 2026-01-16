@@ -515,9 +515,11 @@ class SvgStore {
 		return [xRot, yRot];
 	};
 
-	startToEdit() {
-		const lines = constants.lines
-			.trim()
+	startToEdit( ncp ) {
+		if (!ncp) {
+			ncp = constants.lines
+		}
+		const lines = ncp.trim()
 			.split(/\n+/)
 			.map(line => line.trim())
 
@@ -762,7 +764,12 @@ class SvgStore {
 					cx = tx; cy = ty;
 				} else if (g === 10) {
 					macros = ' macro' + c.params.S + ' '
-					res[res.length - 1].class += macros
+					try {
+						res[res.length - 1].class += macros	
+					} catch (error) {
+						console.log ("catch in macros")
+					}
+					//res[res.length - 1].class += macros
 
 				} else if (g === 29) {
 
@@ -831,8 +838,10 @@ class SvgStore {
 			}
 		});
 
-		console.log( toJS(result))
+		//console.log( toJS(result))
 		//console.log(currentPart)
+		svgStore.setGroupMatrix({a: 1, b:0,c: 0, d: 1, e: 0, f: 0});
+		svgStore.setMatrix({a: 1, b:0,c: 0, d: 1, e: 0, f: 0});
 		svgStore.svgData = Object.assign({}, result)
 
 	}

@@ -12,9 +12,11 @@ import CustomIcon from "../icons/customIcon";
 import { DetailsButton } from "./detailsButton";
 import NewPlanButton from "./navbar/newPlanButton";
 import svgStore from "../store/svgStore";
+import constants from "../store/constants";
 
 const RightBar = observer(() => {
 	const { rightMode } = laserStore;
+	const { selectedId } = jobStore;
 	const { t } = useTranslation();
 
 	// Настройки анимации для появления/исчезновения
@@ -35,12 +37,38 @@ const RightBar = observer(() => {
 		})
 	}
 
-	const editSelected = () => {
+	const editSelectedHardcode = () => {
 
 		laserStore.setVal("centralBarMode", "planEditor")
 		svgStore.startToEdit()
 
 	}
+
+	const editSelected = async () => {
+
+		console.log("load ncp : " + selectedId)
+
+	
+		if (selectedId) {
+			let resp = await fetch(
+				constants.SERVER_URL + "/jdb/get_ncp",
+				{
+				  method: "POST",
+				  headers: {
+					/*"Content-Type": "application/json"*/
+				  },
+				  body: JSON.stringify({
+					uuid: selectedId
+				  })
+				}
+			  )
+			  
+			  const data = await resp.json()
+			  laserStore.setVal("centralBarMode", "planEditor")
+			  svgStore.startToEdit(data.content)
+		}
+	}
+	
 
 	return (
 		<AnimatePresence mode="wait">
@@ -82,7 +110,7 @@ const RightBar = observer(() => {
 							</div>
 							<div>
 								<button className="w-100"
-									onMouseDown={ editSelected }
+									onMouseDown={ editSelectedHardcode }
 								>
 									<div className="d-flex align-items-center">
 										<CustomIcon
@@ -156,7 +184,7 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100" disabled>
+								<button className="w-100" onClick={ editSelected }>
 									<div className="d-flex align-items-center">
 										<CustomIcon
 											icon="bytesize:edit"
