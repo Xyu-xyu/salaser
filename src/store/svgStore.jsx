@@ -469,18 +469,18 @@ class SvgStore {
 	}
 
 	line = (x2, y2, c ) => {
-		const [rx2, ry2] = this.rotatePoint(x2, y2, c.base.X, c.base.Y, c.base.C);
+		const [rx2, ry2] = this.rotatePoint(x2, y2, 0, 0, 0);;
 		return ` L${rx2} ${ -ry2}`;
 	};
 
 	start = (x1, y1, c ) => {
-		const [rx2, ry2] = this.rotatePoint(x1, y1, c.base.X, c.base.Y, c.base.C);
+		const [rx2, ry2] = this.rotatePoint(x1, y1, 0, 0, 0);
 		return `M${rx2} ${ - ry2}`;
 	};
 
 	// Крест с поворотом
 	cross = (x, y, size, c) => {
-		const [rx, ry] = this.rotatePoint(x, y, c.base.X, c.base.Y, c.base.C);
+		const [rx, ry] = this.rotatePoint(x, y,  0, 0, 0);
 		const yInv = - ry;
 		return `M${rx - size} ${yInv - size} L${rx + size},${yInv + size} M${rx - size} ${yInv + size}L${rx + size} ${yInv - size}`;
 	};
@@ -494,7 +494,7 @@ class SvgStore {
 		sweep,
 		c,
  	) => {
-		const [rxEnd, ryEnd] = this.rotatePoint(ex, ey, c.base.X, c.base.Y, c.base.C);
+		const [rxEnd, ryEnd] = this.rotatePoint(ex, ey, 0, 0, 0);
 		return ` A${r} ${r} 0 ${large} ${1 - sweep} ${rxEnd} ${  - ryEnd}`;
 	};
 
@@ -803,38 +803,32 @@ class SvgStore {
 
 			// 👉 stateful G-code парсинг
 			const g = parseGcodeLine(line);
-			const { X = 0, Y = 0, C = 0, L = 1 } = g.params;
 			if (g.g === 28 || g.params.g === 28) {
 
 			}
 			if (g.g === 52 || g.params.g === 52) {
 				// высота детали (bounding box с incut!)
-
-				let part = result.part_code.filter( a  => a.id === Number(L))[0]
-				//const partHeight = part.height
-				//const partWidth = part.width
-			
-				if (g.g === 52 || g.params.g === 52) {
-
-					const rad = (-C * Math.PI) / 180;
-					const cos = Math.cos(rad);
-					const sin = Math.sin(rad);
-				
-					result.positions.push({
+				const { X = 0, Y = 0, C = 0, L = 1 } = g.params;
+				const rad = (-C * Math.PI) / 180;
+				const cos = Math.cos(rad);
+				const sin = Math.sin(rad);
+				const position = {
+				// M = R(+90° SVG) × R(-C)
+					a:  sin,
+					b: -cos,
+					c:  cos,
+					d:  sin,
+					e: width  - Y,
+					f: height - X
+				}
+					
+				result.positions.push(
+					{
 						part_id: partPositionId++,
 						part_code_id: Number(L),
-						positions: {
-							// M = R(+90° SVG) × R(-C)
-							a:  sin,
-							b: -cos,
-							c:  cos,
-							d:  sin,
-							e: width  - Y,
-							f: height - X
-						}
-					});
-				}
-	
+						positions: position
+					}
+				);
 			}
 		});
 
