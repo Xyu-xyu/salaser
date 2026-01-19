@@ -30,7 +30,7 @@ const NewPlanButton = observer(() => {
 	});
 
 	useEffect(() => {
-		if (!presets) macrosStore.fetchPresets();
+		if (!presets.length) macrosStore.fetchPresets();
 	}, [presets]);
 
 	const validate = () => {

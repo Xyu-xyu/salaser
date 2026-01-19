@@ -16,7 +16,7 @@ const AddPlanButton = observer(() => {
 	const [show, setShow] = useState(false);
 	const { presets } = macrosStore
 	useEffect(() => {
-		if (!presets) macrosStore.fetchPresets();
+		if (!presets.length) macrosStore.fetchPresets();
 	}, [])
 
 

@@ -108,7 +108,7 @@ const RightBar = observer(() => {
 									</div>
 								</button>
 							</div>
-							<div>
+							<div className="d-none">
 								<button className="w-100"
 									onMouseDown={ editSelectedHardcode }
 								>
