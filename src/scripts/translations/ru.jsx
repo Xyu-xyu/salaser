@@ -443,6 +443,8 @@ const ru = {
     "Do you want to save file and exit ?": "Вы хотите сохранить файл и выйти?",
     "EDIT": "РЕДАКТИРОВАТЬ",
     "no label": "без этикетки",
-    "Total": "Итого"
+    "Total": "Итого",
+    "Ooops, something is in cut woodver-01.ncp": "Ой, что-то вырезано из woodver-01.ncp",
+    "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: ВРЕМЯ ШЛЮЗА"
 }
 export default ru;

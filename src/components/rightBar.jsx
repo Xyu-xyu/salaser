@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
 import laserStore from "../store/laserStore";
-import { UploadButton } from "./uploadButton";
 import { AnimatePresence, motion } from "framer-motion";
 import FunctionsForm from "./formFunctionsorm";
 import PlanViewSwitcher from "./planViewSwitcher";
@@ -211,12 +210,7 @@ const RightBar = observer(() => {
 							<div className="mt-2">
 								<h5>{t("Parameters")}</h5>
 							</div>
-
-							<div>
-								<UploadButton />
-							</div>
-
-							<div>
+ 							<div>
 								<button className="w-100" disabled>
 									<div className="d-flex align-items-center">
 										<CustomIcon

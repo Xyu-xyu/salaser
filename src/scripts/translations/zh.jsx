@@ -428,6 +428,8 @@ const zh = {
     "Do you want to save file and exit ?": "您想保存文件并退出吗？",
     "EDIT": "编辑",
     "no label": "没有标签",
-    "Total": "全部的"
+    "Total": "全部的",
+    "Ooops, something is in cut woodver-01.ncp": "糟糕，切割 woodver-01.ncp 中有东西",
+    "Ошибка обновления: GATEWAY TIMEOUT": "问题：网关超时"
 }
 export default zh;
