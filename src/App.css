@@ -30,7 +30,8 @@
   --green: rgb(42, 199, 94);
   --blue: rgb(71, 209, 204);
   --violet: rgb(93, 83, 247);
-  --darkBlue: #3030d1;
+  --darkBlue: rgb(46, 46, 209);
+  --violetTransparent: rgba(46, 46, 209, 0.7);
   --white: rgb(255, 255, 255);
   --grey-progress: rgb(234, 234, 238);
   --grey-main: rgb(244, 244, 247);

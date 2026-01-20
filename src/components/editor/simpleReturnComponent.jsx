@@ -147,6 +147,37 @@ const SimpleReturnComponent = observer(() => {
 		);
 	});
 
+	const renderPos = (pos, posIndex) => {
+		const { a, b, c, d, e, f } = pos.positions;
+		const fillColor = pos.selected
+			? "var(--violetTransparent)"
+			: "var(--grey-nav)";
+
+		return (
+			<g
+				key={`form_${pos.part_id}_${posIndex}`}
+				transform={`matrix(${a} ${b} ${c} ${d} ${e} ${f})`}
+				data-part-id={pos.part_id}
+				onMouseDown={(e) => setSelected(e, pos.part_id)}
+				onMouseMove={() => {
+					if (editorStore.mode !== "dragging") {
+						editorStore.setMode("dragging");
+					}
+				}}
+				onTouchStart={(e) => {
+					setSelected(e, pos.part_id);
+					editorStore.setMode("dragging");
+				}}
+			>
+				<use
+					href={`#part_${pos.part_code_id}`}
+					fill={fillColor}
+					stroke={fillColor}
+					pointerEvents="visiblePainted"
+				/>
+			</g>
+		);
+	};
 
 	return (
 		<>
@@ -154,35 +185,15 @@ const SimpleReturnComponent = observer(() => {
 				{defs}
 			</defs>
 
-			{svgStore.svgData.positions.map((pos, posIndex) => {
-				const { a, b, c, d, e, f } = pos.positions;
-				const fillColor = pos.selected ? "rgba(0,255,255,0.7)" : "rgba(252,126,23,0.7)";
-				const strokeColor = fillColor;
+			{/* сначала НЕ выбранные */}
+			{svgStore.svgData.positions
+				.filter(pos => !pos.selected)
+				.map((pos, posIndex) => renderPos(pos, posIndex))}
 
-				return (
-					<g
-						key={`form_${pos.part_id}_${posIndex}`}
-						transform={`matrix(${a} ${b} ${c} ${d} ${e} ${f})`}
-						data-part-id={pos.part_id}
-						onMouseDown={(e) => setSelected(e, pos.part_id)}
-						onMouseMove={() => {
-							if (editorStore.mode !== "dragging") editorStore.setMode("dragging");
-						}}
-						onTouchStart={(e) => {
-							setSelected(e, pos.part_id);
-							editorStore.setMode("dragging");
-						}}
-					>
-						{/* Один use на всю группу part_code */}
-						<use
-							href={`#part_${pos.part_code_id}`}
-							fill={fillColor}
-							stroke={strokeColor}
-							pointerEvents="visiblePainted"
-						/>
-					</g>
-				);
-			})}
+			{/* потом выбранные — будут поверх */}
+			{svgStore.svgData.positions
+				.filter(pos => pos.selected)
+				.map((pos, posIndex) => renderPos(pos, posIndex))}
 		</>
 	);
 

@@ -1,4 +1,4 @@
-import { makeAutoObservable, computed } from "mobx";
+import { makeAutoObservable, computed, action, runInAction } from "mobx";
 import cut_settings_schema from './cut_settings_schema'
 import cut_settings from "./cut_settings";
 import utils from "../scripts/util";
@@ -18,7 +18,6 @@ class MacrosStore {
         args: []
     };
 
-    //presets:Preset[]=[]
      _presets = []; 
 
 
@@ -106,21 +105,21 @@ class MacrosStore {
             macrosStore.setCutSettings(data.result)
             //macrosStore.cut_settings = data.result;
             //macrosStore.technology = data.result.technology
-            showToast({
+            /* showToast({
                 type: 'success',
                 message: "Upload settings form core 0 success!",
                 position: 'bottom-right',
                 autoClose: 2500
-            });
-            //console.log (data)
+            }); */
+            console.log (data)
         } catch (err) {
             this.error = err.message || "Неизвестная ошибка";
-            showToast({
+           /*  showToast({
                 type: 'error',
                 message: "Upload settings from core error",
                 position: 'bottom-right',
                 autoClose: 2500
-            });
+            }); */
         console.log ( "Upload settings from core error" + err.message)
             // remove in production
             //macrosStore.cut_settings = cut_settings;
@@ -141,21 +140,21 @@ class MacrosStore {
             const data = await resp.json();
             macrosStore.schema = data.result
             macrosStore.macrosProperties = data.result.properties.technology.properties.macros.items.properties
-            showToast({
+          /*   showToast({
                 type: 'success',
                 message: "Upload  schema from core 0 success!",
                 position: 'bottom-right',
                 autoClose: 2500
-            });
+            }); */
             //console.log (data)
         } catch (err) {
             this.error = err.message || "Неизвестная ошибка";
-            showToast({
+            /* showToast({
                 type: 'error',
                 message: "Upload schema from core error",
                 position: 'bottom-right',
                 autoClose: 2500
-            });
+            }); */
             console.log ("Upload schema from core error" + err.message)
 
             macrosStore.schema = cut_settings_schema
@@ -208,6 +207,7 @@ class MacrosStore {
 
     constructor() {
         makeAutoObservable(this, {
+            fetchPresets: action.bound,
             selectedModulationMacro: computed,
             selectedPiercingMacro: computed,
             isVertical: computed,
@@ -753,16 +753,19 @@ class MacrosStore {
           let resp = await fetch(constants.SERVER_URL + "/db/listpresets");
           const data = await resp.json();
           console.log(data); // Печать данных для отладки
-          this._presets = data;
+
+          runInAction(() => {
+            this._presets = data;
+          });
         } catch (error) {
           console.error("Ошибка при загрузке пресетов:", error);
         }
       }
     
-      // Геттер для получения пресетов
-      get presets() {
+    // Геттер для получения пресетов
+    get presets() {
         return this._presets;
-      }
+    }
     
 }
 

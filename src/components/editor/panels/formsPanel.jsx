@@ -111,18 +111,12 @@ const FormsPanel = observer(() => {
 											</td>
 											<td scope="col">
 												<svg viewBox={ a.hasOwnProperty("viewBox") ?  a.viewBox :`0 ${-a.height} ${a.width} ${a.height}`} xmlns="http://www.w3.org/2000/svg" width='40' height='40'>
-													{a.code.map((element, i) => (
-														<g
-															key={"fp"+element.cid+"_"+i}
-															data-cid={element.cid}
-															onMouseDown={(e) => { }}
-															onMouseMove={(e) => { }}
-															onTouchStart={(e) => { }}
-															fill={element.class.includes("inner") ? "url(#grid)" : "#fd7e14"}
-														>
-															<path d={element.path} />
-														</g>
-													))}
+													<use
+														href={`#part_${index+1}`}
+														fill={ svgStore.selectedPosition.part_code_id === index+1 ?  "var(--violetTransparent)" : "var(--grey-nav)"}
+														stroke={ svgStore.selectedPosition.part_code_id === index+1 ?  "var(--violetTransparent)" : "var(--grey-nav)"}
+														pointerEvents="visiblePainted"
+														/>													
 												</svg>
 											</td>
 											<td className="header" scope="col">

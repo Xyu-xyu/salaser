@@ -82,6 +82,11 @@ class SvgStore {
 		});
 	}
 
+	get selectedPosition() {
+		//console.log (this.svgData.positions.find(pos => pos.selected))
+		return this.svgData.positions.find(pos => pos.selected)|| false;
+	}
+
 	get nextPartId() {
 		const positions = this.svgData.positions;
 		if (!positions || positions.length === 0) {
@@ -206,39 +211,76 @@ class SvgStore {
 		});
 	};
 
+	isOutOfRect(bbox, rect) {
+		return (
+			bbox.maxX < rect.x ||
+			bbox.maxY < rect.y ||
+			bbox.minX > rect.x + rect.width ||
+			bbox.minY > rect.y + rect.height
+		);
+	}
+
+
+	getOuterPath(partCode) {
+		return partCode.code.find(p =>
+			p.class?.split(' ').includes('outer') &&
+			p.class?.split(' ').includes('contour')
+		);
+	}
+
+	transformPoint(x, y, m) {
+		return {
+		  x: m.a * x + m.c * y + m.e,
+		  y: m.b * x + m.d * y + m.f,
+		};
+	  }
+
+
+	transformBBox(bbox, matrix) {
+		const points = [
+		  this.transformPoint(bbox.x, bbox.y, matrix),
+		  this.transformPoint(bbox.x + bbox.width, bbox.y, matrix),
+		  this.transformPoint(bbox.x, bbox.y + bbox.height, matrix),
+		  this.transformPoint(bbox.x + bbox.width, bbox.y + bbox.height, matrix),
+		];
+	  
+		const xs = points.map(p => p.x);
+		const ys = points.map(p => p.y);
+	  
+		return {
+		  minX: Math.min(...xs),
+		  maxX: Math.max(...xs),
+		  minY: Math.min(...ys),
+		  maxY: Math.max(...ys),
+		};
+	  }
+
+
 	deleteOutParts = () => {
-		return
-
-		const { width, height } = this.svgData;
-
-		// Если холст не задан — выходим
-		if (!width || !height) {
-			console.warn('deleteOutParts: размеры холста не заданы');
-			return;
-		}
+		const rect = { x: 0, y: 0, width: this.svgData.width, height: this.svgData.height };
 
 		runInAction(() => {
-			this.svgData.positions = this.svgData.positions.filter(part => {
-				// Проверяем только выделенные
-				if (!part.selected) {
-					return true; // оставляем
-				}
-				const x = part.positions.e;
-				const y = part.positions.f;
-				const formId = part.part_code_id
-				const form = this.svgData.part_code.filter(f => formId === f.uuid)
-				const widthF = form[0].width
-				const heightF = form[0].height
+			this.svgData.positions = this.svgData.positions.filter(pos => {
+				if (!pos.selected) return true;
 
-				// Условие: центр детали за пределами холста
-				const isOut =
-					x + widthF < 0 ||
-					y + heightF < 0 ||
-					x > width ||
-					y > height;
+				// 1️⃣ найти part_code
+				const partCode = this.svgData.part_code.find(
+					p => p.uuid === pos.part_code_id || p.id === pos.part_code_id
+				);
+				if (!partCode) return true;
 
-				// Если за пределами — удаляем (filter возвращает false)
-				return !isOut;
+				// 2️⃣ найти внешний контур
+				const outer = this.getOuterPath(partCode);
+				if (!outer) return true;
+
+				// 3️⃣ bbox пути
+				const outerBBox = SVGPathCommander.getPathBBox(outer.path);
+
+				// 4️⃣ применить matrix
+				const worldBBox = this.transformBBox(outerBBox, pos.positions);
+
+				// 5️⃣ проверить выход за пределы
+				return !this.isOutOfRect(worldBBox, rect);
 			});
 		});
 	};
