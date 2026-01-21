@@ -1828,6 +1828,25 @@ height: fit-content;}
   object-fit: contain;
 }
 
+@media (orientation: portrait) {
+  .detailsImage {
+    height: calc(100vh - 800px);
+    padding: 8px;
+    overflow: hidden;
+  }
+
+  .detailsImage img {
+    transform: rotate(-90deg);
+
+    /* компенсация размеров после поворота */
+    width: auto;
+    height: auto;
+   /*  max-width: 100vh;
+    max-height: 100vw; */
+
+    object-fit: contain;
+  }
+}
 
 
 .currentCut1 {
