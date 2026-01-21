@@ -46,7 +46,9 @@ const modalGeneric = observer(() => {
  					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className="position-relative">
-					<div className='modulatiomNacroName text-center'>{t(macrosStore.modalProps.modalBody)}</div>
+					<div className='modulatiomNacroName text-center'>{macrosStore.modalProps.modalBody ? 
+					t(macrosStore.modalProps.modalBody) : ""
+				}</div>
 				</Modal.Body>
 				<Modal.Footer className="position-relative">
 					<Button
@@ -55,7 +57,7 @@ const modalGeneric = observer(() => {
  						size="lg"
 						className='violet_button m-2 py-3 px-5'
 					>
-						{t(macrosStore.modalProps.cancelText)}
+						{macrosStore.modalProps.cancelText ? t(macrosStore.modalProps.cancelText) : "Cancel"}
 					</Button>
 					{ macrosStore.modalProps.func1 && macrosStore.modalProps.confirmText1 &&
 							<Button
@@ -73,7 +75,7 @@ const modalGeneric = observer(() => {
 						size="lg"
 						className='ms-2 m-2 py-3 px-5'
  					>
-						{t(macrosStore.modalProps.confirmText)}
+						{macrosStore.modalProps.confirmText  ? t(macrosStore.modalProps.confirmText) : "Confirm"}
 					</Button>
 				</Modal.Footer>
  			</Modal>
