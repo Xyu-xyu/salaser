@@ -24,13 +24,15 @@ const ExitButtonSheetEditor = observer(() => {
 	const handleSubmit = () => {
 		setShow(false)
 		laserStore.setVal("centralBarMode", "plans")
-		svgStore.saveNewFile()
+		svgStore.saveNcpFile()
 	}
 
 	const modalProps = {
 		modalBody: 'Do you want to save file and exit ?',
 		confirmText: 'Save and exit',
-		cancelText: 'Exit'
+		cancelText: 'Exit',
+		func: svgStore.saveNcpFile,
+		args: []
 	}
 
 

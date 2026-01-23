@@ -3,6 +3,7 @@ import SVGPathCommander from 'svg-path-commander';
 import { toJS } from "mobx";
 import utils from "../scripts/util";
 import constants from "./constants";
+import jobStore from "./jobStore";
 
 
 class SvgStore {
@@ -22,6 +23,8 @@ class SvgStore {
 				"part_id": 1,
 				"part_code_id": 1,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": 0, "f": 0 }
+				cx:0
+				cy:0
 			}*/
 		],
 		"part_code": [
@@ -233,7 +236,7 @@ class SvgStore {
 		  x: m.a * x + m.c * y + m.e,
 		  y: m.b * x + m.d * y + m.f,
 		};
-	  }
+	}
 
 
 	transformBBox(bbox, matrix) {
@@ -417,114 +420,55 @@ class SvgStore {
 	generatePositions() {
 		const data = this.svgData;
 		const res = [];
+ 		res.push(`N1G29X${this.svgData.height}Y${this.svgData.width}P1H1A1`);
+		let lineNumber = 2;
+		let x,y,c,g,l = 0
 
-		// Начало плана
-		res.push('(<Plan>)');
-
-		// Инициализация / возврат в начало (как в твоём примере)
-		res.push('N1 G29 X0.00 Y0.00 P1 H1 A1');
-
-		let lineNumber = 2; // следующая строка после N1
-
-		// Карта для определения номера L (порядковый номер уникальной детали по part_code_id)
-		const partCodeToL = new Map(); // part_code_id → L (начиная с 1)
-
-		// Проходим по всем позициям деталей на листе
 		for (const pos of data.positions) {
-			const partCodeId = pos.part_code_id;
+						
+			let matrix =  pos.positions
+			let sheetHeight = this.svgData.width
+			let L = pos.part_code_id
+			let G =52
+			let partHeight = svgStore.svgData.part_code.filter(a => a.id == L)[0].height
+			let XYC = this.matrixToG52(matrix, sheetHeight, partHeight, pos.cx, pos.cy)
+			let X = utils.smartRound(XYC.X)
+			let Y = utils.smartRound(XYC.Y)
+			let C = utils.smartRound(XYC.C)
+			
+			let g52Line = `N${lineNumber}`;
+			if ( g!==G) g52Line+=`G${G}`
+			if ( x!==X) g52Line+=`X${X}`
+			if ( y!==Y) g52Line+=`Y${Y}`
+			if ( l!==L) g52Line+=`L${L}`
+			if ( c!==C) g52Line+=`C${C}`
 
-			// Определяем L: если эта деталь уже встречалась — берём существующий номер, иначе новый
-			let L = partCodeToL.get(partCodeId);
-			if (L === undefined) {
-				L = partCodeToL.size + 1;
-				partCodeToL.set(partCodeId, L);
-			}
-
-			// Извлекаем параметры матрицы преобразования: a, b, c, d, e, f
-			// Это аффинное преобразование: X' = a*X + c*Y + e;  Y' = b*X + d*Y + f
-			const { a = 1, b = 0, c = 0, d = 1, e = 0, f = 0 } = pos.positions;
-
-			// Смещение (X, Y) — это e и f
-			const X = e.toFixed(2);
-			const Y = f.toFixed(2);
-
-			// Угол поворота в градусах вычисляем из матрицы (a, b, c, d)
-			// Поворот определяется подматрицей [[a, c], [b, d]]
-			// Угол = atan2(b, a) — это угол поворота (в радианах), если масштаб = 1
-			const angleRad = Math.atan2(b, a);
-			const angleDeg = (angleRad * 180 / Math.PI).toFixed(2);
-
-			// Генерируем строку G52
-			// Первый раз для новой детали — G52 с X Y L C
-			// Последующие копии той же детали тоже с G52 (по твоей логике)
-			const g52Line = `N${lineNumber} G52 X${X} Y${Y} L${L} C${angleDeg}`;
 			res.push(g52Line);
-
+			g=G, l=L, x=X, y=Y,c=C;
 			lineNumber++;
+
 		}
 
-		// Конец сектора/плана — завершающая команда
-		res.push(`N${lineNumber} G99`);
-
-		// Закрывающий тег
+ 		res.push(`N${lineNumber} G99`);
 		res.push('(</Plan>)');
-
 		return res;
 	}
-
-	saveNewFile() {
-		console.log("printStore:", toJS(this));
-		let ncpStart = [
-			`%`,
-			`(<NcpProgram Version="1.0" Units="Metric">)`,
-			`(<MaterialInfo Label="Mild steel" MaterialCode="S235JR" Thickness="${1}" FormatType="Sheet" DimX="${this.svgData.width}" DimY="${this.svgData.height}"/>)`,
-			`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
-			`(<Plan JobCode="${this.svgData.name}">)`,
-		]
-
-
-		let ncpPositons = this.generatePositions()
-		let ncpParts = this.generateParts()
-		let ncpFinish = [
-			`(</NcpProgram>)`,
-			`&`
-		]
-
-		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
-		//ncp.forEach((item) => { console.log(item) });
-
-	}
-
-	buildMatrixFromXYC(x = 0, y = 0, c = 0) {
-		const rad = (c * Math.PI) / 180;
-		const cos = Math.cos(rad);
-		const sin = Math.sin(rad);
-
-		return {
-			a: cos,
-			b: sin,
-			c: -sin,
-			d: cos,
-			e: x,
-			f: y
-		};
-	}
-
-	line = (x2, y2, c ) => {
-		const [rx2, ry2] = this.rotatePoint(x2, y2, 0, 0, 0);;
-		return ` L${rx2} ${ -ry2}`;
-	};
-
-	start = (x1, y1, c ) => {
-		const [rx2, ry2] = this.rotatePoint(x1, y1, 0, 0, 0);
-		return `M${rx2} ${ - ry2}`;
-	};
 
 	// Крест с поворотом
 	cross = (x, y, size, c) => {
 		const [rx, ry] = this.rotatePoint(x, y,  0, 0, 0);
-		const yInv = - ry;
+		const yInv =  ry;
 		return `M${rx - size} ${yInv - size} L${rx + size},${yInv + size} M${rx - size} ${yInv + size}L${rx + size} ${yInv - size}`;
+	};
+
+	line = (x2, y2, c, h ) => {
+		const [rx2, ry2] = this.rotatePoint(x2, y2, 0, 0, 0);;
+		return ` L${rx2} ${h - ry2}`;
+	};
+
+	start = (x1, y1, c, h ) => {
+		const [rx2, ry2] = this.rotatePoint(x1, y1, 0, 0, 0);
+		return `M${rx2} ${h - ry2}`;
 	};
 
 	// Арка с поворотом
@@ -535,9 +479,10 @@ class SvgStore {
 		large,
 		sweep,
 		c,
+		h
  	) => {
 		const [rxEnd, ryEnd] = this.rotatePoint(ex, ey, 0, 0, 0);
-		return ` A${r} ${r} 0 ${large} ${1 - sweep} ${rxEnd} ${  - ryEnd}`;
+		return ` A${r} ${r} 0 ${large} ${1 - sweep } ${rxEnd} ${h - ryEnd }`;
 	};
 
 	rotatePoint = (
@@ -612,6 +557,9 @@ class SvgStore {
 		let res = []; // массив путей
 		let laserOn = false
 		let macros= ''
+		let HW = [0]
+		let partHeight = 0 
+		let partWidth = 0 
 
 		for (const c of cmds) {
 			//console.log(JSON.stringify(c))
@@ -698,7 +646,7 @@ class SvgStore {
 						"selected": false
 				}) 
 				
-		 		res[res.length - 1].path = this.start(cx, cy, c );
+		 		res[res.length - 1].path = this.start(cx, cy, c, partHeight );
 				cx = tx; cy = ty;
 				continue;
 
@@ -716,7 +664,7 @@ class SvgStore {
 					"strokeWidth": 0.2,
 					"selected": false
 				})
-				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c );
+				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c, partHeight );
 				continue;				
 			}
 
@@ -730,7 +678,7 @@ class SvgStore {
 				if (c.m === 4 || c.m === 14 ) {
 					console.log('laser on')
 					laserOn = true;
-					res[res.length - 1].path = this.start(cx, cy, c );
+					res[res.length - 1].path = this.start(cx, cy, c, partHeight );
 				}
 
 				if (c.m === 5 || c.m === 15 ) {
@@ -771,14 +719,14 @@ class SvgStore {
  					} 
 		
 
-					res[res.length - 1].path = this.start(cx, cy, c);
+					res[res.length - 1].path = this.start(cx, cy, c, partHeight );
 					cx = tx; cy = ty;
 
 				} else if ( g === 1) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-					res[res.length - 1].path += this.line(tx, ty, c);
+					res[res.length - 1].path += this.line(tx, ty, c, partHeight);
 					cx = tx; cy = ty;
 
 				} else if (g === 2 || g === 3) {
@@ -801,7 +749,7 @@ class SvgStore {
 					if (!ccw && d > 0) d -= 2 * Math.PI;
 					const large = 0;
 					const sweep = ccw ? 1 : 0;
-					res[res.length - 1].path += this.arcPath(tx, ty, r, large, sweep, c);
+					res[res.length - 1].path += this.arcPath(tx, ty, r, large, sweep, c, partHeight);
 
 					cx = tx; cy = ty;
 				} else if (g === 10) {
@@ -819,7 +767,10 @@ class SvgStore {
 
 
 				} else if (g === 28) {
-					// console.log('g === 28')
+					partHeight = c.params.Y
+					partWidth = c.params.X
+					HW.push([partHeight, partWidth])
+
 				} else if (g === 52) {
 					// // console.log('g === 52')					
 				}
@@ -851,37 +802,137 @@ class SvgStore {
 			if (g.g === 52 || g.params.g === 52) {
 				// высота детали (bounding box с incut!)
 				const { X = 0, Y = 0, C = 0, L = 1 } = g.params;
-				const rad = (-C * Math.PI) / 180;
-				const cos = Math.cos(rad);
-				const sin = Math.sin(rad);
-				const position = {
-				// M = R(+90° SVG) × R(-C)
-					a:  sin,
-					b: -cos,
-					c:  cos,
-					d:  sin,
-					e: width  - Y,
-					f: height - X
-				}
-					
+				const rad = ((-C)* Math.PI) / 180;
+				//const cos = Math.cos(rad);
+				//const sin = Math.sin(rad);
+				const partHeight = HW[L][0]
+				const sheetHeight = width;
+
+				const cx = X;
+				const cy = sheetHeight - Y;
+				
+				const tx = X;
+				const ty = sheetHeight - Y - partHeight;
+				
+				const dx = tx - cx;
+				const dy = ty - cy;
+
+				const transform = `rotate(${-C} ${cx} ${cy}) translate(${tx} ${ty})`;
+				//console.log ( transform )
+				//const position = this.svgTransformToMatrix ( transform)
+				const position = this.rotateTranslateToMatrix (C, cx,cy, tx, ty)
+ 
 				result.positions.push(
 					{
 						part_id: partPositionId++,
 						part_code_id: Number(L),
-						positions: position
+						positions: position,
+						cx,
+						cy
 					}
 				);
+
+
+				/*const XYC = this.matrixToG52 (position , sheetHeight, partHeight, cx, cy)
+				if ( Math.abs ( X - XYC.X ) > 0.05 || 
+					 Math.abs ( Y - XYC.Y )> 0.05 ||
+					 Math.abs ( C - XYC.C ) >  0.05
+					) {
+						console.log ("FUCK", JSON.stringify(XYC), X, Y, C )
+				} else {
+					console.log ( "YEEEAH !")
+				}*/			
 			}
 		});
 
-		//console.log( toJS(result))
-		//console.log(currentPart)
-		svgStore.setGroupMatrix({a: 1, b:0,c: 0, d: 1, e: 0, f: 0});
+ 		svgStore.setGroupMatrix({a: 1, b:0,c: 0, d: 1, e: 0, f: 0});
 		svgStore.setMatrix({a: 1, b:0,c: 0, d: 1, e: 0, f: 0});
 		svgStore.svgData = Object.assign({}, result)
 
 	}
 
+	rotateTranslateToMatrix(C, cx, cy, tx, ty) {
+		const rad = (-C * Math.PI) / 180;
+
+		const cos = Math.cos(rad);
+		const sin = Math.sin(rad);
+
+		// R
+		const a = cos;
+		const b = sin;
+		const c = -sin;
+		const d = cos;
+
+		// e, f с учётом центра вращения и translate
+		const e =
+			cos * tx - sin * ty +
+			cx - cos * cx + sin * cy;
+
+		const f =
+			sin * tx + cos * ty +
+			cy - sin * cx - cos * cy;
+
+		return { a, b, c, d, e, f };
+	}
+
+	matrixToG52(matrix, sheetHeight, partHeight, cx, cy) {
+		//console.log (arguments)
+		const { a, b, e, f } = matrix;
+	  	let C = -Math.atan2(b, a) * 180 / Math.PI;
+	  
+		// нормализация
+		if (Math.abs(C) < 1e-6) C = 0;
+		if (Math.abs(C - 90) < 1e-6) C = 90;
+		if (Math.abs(C - 180) < 1e-6) C = 180;
+		if (Math.abs(C - 270) < 1e-6) C = 270;
+		C = (C+360)%360
+	  
+		const cos = a;
+		const sin = b;
+	  
+		// 1. убрать вклад центра вращения
+		const ex = e - (cx - cos * cx + sin * cy);
+		const fy = f - (cy - sin * cx - cos * cy);
+	  
+		// 2. инвертировать вращение
+		const tx =  cos * ex + sin * fy;
+		const ty = -sin * ex + cos * fy;
+	  
+		// 3. вернуть координаты NCP
+		const X = tx;
+		const Y = sheetHeight - ty - partHeight;
+	  
+		return { X, Y, C };
+	}
+ 
+	saveNcpFile () {
+
+		const { selectedId  } = jobStore;
+		const current = jobStore.getJobById( selectedId )
+		if (!current) return;
+		const { loadResult, dimX, dimY, material, materialLabel, name  } = current
+		let parsed = JSON.parse ( loadResult )
+		const {thickness, jobcode }= parsed.result.jobinfo.attr
+
+		let ncpStart = [
+			`%`,
+			`(<NcpProgram Version="1.0" Units="Metric">)`,
+			`(<MaterialInfo Label="${material}" MaterialCode="${materialLabel}" Thickness="${thickness}" FormatType="Sheet" DimX="${dimX}" DimY="${dimY}"/>)`,
+			`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
+			`(<Plan JobCode="${jobcode}">)`,
+		]
+
+		let ncpPositons = this.generatePositions()
+		let ncpParts = this.generateParts()
+		let ncpFinish = [
+			`(</NcpProgram>)`,
+			`&`
+		]
+
+		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
+		//ncp.forEach((item) => { console.log(item) });
+		console.log ( ncp )
+	}
 
 }
 

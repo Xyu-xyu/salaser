@@ -2196,7 +2196,11 @@ class Utils {
 		}
  		const percentage = (closestLength / pathLength) * 100;		
 		return Math.max(0, Math.min(100, percentage)); 
-	} 	
+	}
+	
+	smartRound(num, p=10) {
+		return Number(num.toPrecision(p));
+	}
 } 
 
 

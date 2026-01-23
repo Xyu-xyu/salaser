@@ -6,7 +6,10 @@ import SimpleReturnComponent from './simpleReturnComponent'
 //import Guides from './guides.js'
 //import editorStore from '../../store/editorStore';
 import svgStore from './../../store/svgStore';
+import macrosStore from './../../store/macrosStore';
 import { observer } from 'mobx-react-lite';
+import laserStore from './../../store/laserStore';
+import { transform } from 'svgpath';
 //import Joints from './joints.js';
 ///import HighLighted from './highlighted.js';
 //import LaserShow from './laserShow.js';
@@ -21,6 +24,7 @@ const SvgComponent = observer (() => {
         svgData,
 
     } = svgStore
+    const { isVertical } = macrosStore
 
    
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
@@ -36,23 +40,28 @@ const SvgComponent = observer (() => {
             version="1.1"
             stroke='var(--color)'
             strokeWidth="0.2" 
-            fillRule='evenodd'         
+            fillRule='evenodd' 
+            transform={
+                isVertical
+                  ? `rotate(0)` 
+                  : `rotate(0)` 
+            }           
         >
 
-            <g id="group2" fill="url(#grid)">
+            <g id="group2">
                 <g id="group1" transform={`matrix(${matrixG})`}>
                     <g id="group" transform={`matrix(${matrixM})`} className="grab">
-                        <g id="contours">
-                            <rect
-                                id="dimensionalGrid"
-                                height={ svgData.height }
-                                width={ svgData.width }
-								x={0}
-                                y={0}
-                                fill="url(#grid)"
-                                stroke='var(--color)'
-                                strokeWidth="0.25"
-                            ></rect>
+                        <rect
+                            id="dimensionalGrid"
+                            height={ svgData.width  }
+                            width={  svgData.height}
+                            x={0}
+                            y={0}
+                            fill="url(#grid)"
+                            stroke='var(--color)'
+                            strokeWidth="0.25"
+                        ></rect>
+                        <g id="contours">                            
                             <>
                             < SimpleReturnComponent />
                             </>

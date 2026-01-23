@@ -323,7 +323,7 @@ const ContourPanel = observer(() => {
 							<td colSpan={2} className="text-start ps-2">
 								{t('Type')}:
 							</td>
-							<td colSpan={2}><div id="info_type">{t(selectedType)}</div></td>
+							<td colSpan={2}><div id="info_type">{selectedType ? t(selectedType) : ""}</div></td>
 						</tr>
 						{/* Пирсинг тайп определяется только макросом  */}
 						<tr style={{ height: "1.5rem" }} className='d-none'>

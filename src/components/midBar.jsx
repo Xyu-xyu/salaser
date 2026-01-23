@@ -171,8 +171,10 @@ const MidBar = observer(() => {
 						<div
 							style={{
 								opacity: planViewType === "Carousel" ? 1 : 0,
-								transition: "opacity 0.25s ease-in-out",
+								transition: "opacity 0.25s ease-in-out",								
 							}}
+
+							className={ planViewType === "Carousel" ? "" : "d-none"}
 						>
 							{/* Первый блок (Carousel) */}
 							<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
@@ -314,8 +316,6 @@ const MidBar = observer(() => {
 												</SwiperSlide>
 											);
 										})}
-
-
 									</Swiper>
 								</div>
 							</div>
@@ -345,10 +345,7 @@ const MidBar = observer(() => {
 						</div>
 					</motion.div>
 				</motion.div>
-
-
 			</div>
-
 		</>
 
 	)
