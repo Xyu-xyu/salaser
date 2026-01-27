@@ -371,16 +371,228 @@ class SvgStore {
 		return m ? Number(m[1]) : null
 	}
 
-	svgToGcode(path, height, needStart = false, outer) {
+	svgToGcode(contour, inlet, outlet, height, outer) {
 		const res = []
-		const spc = new SVGPathCommander(path).toAbsolute()
+		const c = contour.length ? new SVGPathCommander(contour).toAbsolute() : {segments:[]}
+		const i = inlet.length ? new SVGPathCommander(inlet).toAbsolute() : {segments:[]}
+		const o = outlet.length ? new SVGPathCommander(outlet).toAbsolute() : {segments:[]}
+
 		let X, Y, G, I, J = null
-		let needLaserOn = false
-		let needG40= false
+		let needLaserOn = true
+		let needLaserOff = false
 
-		spc.segments.forEach(seg => {
+		let needG40 = false
+
+		i?.segments.forEach(seg => {
 			const cmd = seg[0]
+			if (cmd === 'M') {
 
+				const [, x, y] = seg				
+				const g = 'G0'
+				let line = ''
+				if (needLaserOn) {
+					let line = ''
+					if (g !== G) line += g
+					if (x !== X) line += "X" + x
+					if (y !== Y) line += "Y" + (height- y)
+				}
+				G = g
+				X = x
+				Y = y
+				line.length ? res.push(line) : false
+
+			}
+
+			if (cmd === 'L') {
+
+				const [, x, y] = seg
+				const g = 'G1'
+				let line = ''
+
+				if (g !== G) line += g
+				if (x !== X) line += "X" + x
+				if (y !== Y) line += "Y" + (height- y)
+				if (needLaserOn) {
+					line +="M4"
+					needLaserOn = false
+					needLaserOff = true
+				}
+
+				G = g
+				X = x
+				Y = y
+				line.length ? res.push(line) : false
+
+			}
+
+			if (cmd === 'A') {
+
+				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
+				needG40 =true
+				// старт и конец в координатах станка
+				const x1 = X
+				const y1 = height - Y
+				const x2 = x
+				const y2 = height - y
+			  
+				const r = rx // у тебя всегда rx === ry
+			  
+				// восстановление центра дуги
+				const mx = (x1 + x2) / 2
+				const my = (y1 + y2) / 2
+			  
+				const dx = x2 - x1
+				const dy = y2 - y1
+				const q = Math.hypot(dx, dy)
+			  
+				const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
+			  
+				const nx = -dy / q
+				const ny = dx / q
+			  
+				// ВАЖНО: инверсия sweep → G2 / G3
+				const isCCW = sweep === 0   // ← это ключ
+				const sign = isCCW ? 1 : -1
+			  
+				const cx = mx + sign * nx * h
+				const cy = my + sign * ny * h
+			  
+				// ❗ I / J — АБСОЛЮТНЫЕ
+				const i = Math.round(cx * 1000) / 1000
+				const j = Math.round(cy * 1000) / 1000
+			  
+				const g = isCCW ? 'G3' : 'G2'
+				let line = g
+			  
+				line += `X${x2}Y${y2}I${i}J${j}`
+			  
+				G = g
+				X = x
+				Y = y
+				I = i
+				J = j
+			  
+				outer ? res.push('G42') : res.push('G41')
+				if (needLaserOn) {
+					line +="M4"
+					needLaserOn = false
+					needLaserOff = true
+				}	  
+				res.push(line)
+			}
+		})
+
+		res.push('(<Contour>)')
+		c?.segments.forEach(seg => {
+			const cmd = seg[0]
+			if (cmd === 'M') {
+
+				const [, x, y] = seg				
+				const g = 'G0'
+				let line = ''
+				if (needLaserOn) {
+					let line = ''
+					if (g !== G) line += g
+					if (x !== X) line += "X" + x
+					if (y !== Y) line += "Y" + (height- y)
+					needLaserOn = true
+				}
+				G = g
+				X = x
+				Y = y
+				line.length ? res.push(line) : false
+
+			}
+
+			if (cmd === 'L') {
+
+				const [, x, y] = seg
+				const g = 'G1'
+				let line = ''
+
+				if (g !== G) line += g
+				if (x !== X) line += "X" + x
+				if (y !== Y) line += "Y" + (height- y)
+				if (needLaserOn) line +="M4"
+				needLaserOn = false
+
+				G = g
+				X = x
+				Y = y
+				line.length ? res.push(line) : false
+
+			}
+
+			if (cmd === 'A') {
+
+				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
+				needG40 =true
+				// старт и конец в координатах станка
+				const x1 = X
+				const y1 = height - Y
+				const x2 = x
+				const y2 = height - y
+			  
+				const r = rx // у тебя всегда rx === ry
+			  
+				// восстановление центра дуги
+				const mx = (x1 + x2) / 2
+				const my = (y1 + y2) / 2
+			  
+				const dx = x2 - x1
+				const dy = y2 - y1
+				const q = Math.hypot(dx, dy)
+			  
+				const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
+			  
+				const nx = -dy / q
+				const ny = dx / q
+			  
+				// ВАЖНО: инверсия sweep → G2 / G3
+				const isCCW = sweep === 0   // ← это ключ
+				const sign = isCCW ? 1 : -1
+			  
+				const cx = mx + sign * nx * h
+				const cy = my + sign * ny * h
+			  
+				// ❗ I / J — АБСОЛЮТНЫЕ
+				const i = Math.round(cx * 1000) / 1000
+				const j = Math.round(cy * 1000) / 1000
+			  
+				const g = isCCW ? 'G3' : 'G2'
+				let line = g
+			  
+				line += `X${x2}Y${y2}I${i}J${j}`
+			  
+				G = g
+				X = x
+				Y = y
+				I = i
+				J = j
+			  
+				outer ? res.push('G42') : res.push('G41')
+			  
+				if (needLaserOn) line += 'M4'
+				needLaserOn = false			  
+				res.push(line)
+			}
+		})
+
+		if (needLaserOff && !outlet.length) {
+			res[res.length-1]+="M5"
+			needLaserOff = false
+		}
+
+
+		if (needG40 && !outlet.length ) {
+			res.push(`G40`)
+			needG40 = false
+		}
+
+		res.push('(</Contour>)')
+
+		o?.segments.forEach(seg => {
+			const cmd = seg[0]
 			if (cmd === 'M') {
 
 				const [, x, y] = seg				
@@ -473,7 +685,14 @@ class SvgStore {
 				res.push(line)
 			}
 		})
-		if (needG40) res.push(`N${0}G40`)
+
+		if (needLaserOff && outlet.length) {
+			res[res.length-1]+="M5"
+			needLaserOff = false
+		}
+
+
+		if (needG40 ) res.push(`G40`)
 		return res
 	}
 
@@ -505,31 +724,14 @@ class SvgStore {
 				currentMacro = macro
 			}
 
-			// ---- INLET ----
-			if (inlet?.path?.length) {
-				this.svgToGcode(inlet.path, +box.height, true, outer).forEach(cmd =>
-					res.push(`N${0}${cmd}`)
-				)
-			}
-
-			// ---- CORRECTION ----
-			//const isInner = contour.class.includes('inner')
-			//res.push(`N${0}${isInner ? 'G42' : 'G41'}`)
-
-			// ---- CONTOUR ----
-			res.push('(<Contour>)')
-
 			if (contour.path?.length) {
-				this.svgToGcode(contour.path, +box.height, inlet?.path?.length ? false : true, outer ).forEach(cmd =>
-					res.push(`N${0}${cmd}`)
-				)
-			}
-			
-			res.push('(</Contour>)')
-
-			// ---- OUTLET ----
-			if (outlet?.path?.length) {
-				this.svgToGcode(outlet.path, box.height, false, outer).forEach(cmd =>
+				this.svgToGcode(
+					contour.path, 
+					inlet.path,
+					outlet.path, 
+					box.height, 
+					outer)
+					.forEach(cmd =>
 					res.push(`N${0}${cmd}`)
 				)
 			}
@@ -1036,10 +1238,20 @@ class SvgStore {
 			const m = line.match(/^N\d+(.*)$/i)
 			if (!m) return line
 
-			// m[1] — всё, что после номера
+			const rest = m[1].trim()
+
+			// ❗ не нумеруем теги Contour
+			if (
+				rest === '(<Contour>)' ||
+				rest === '(</Contour>)'
+			) {
+				return rest
+			}
+
 			return `N${n++}${m[1]}`
 		})
 	}
+	  
 
 	saveNcpFile() {
 
