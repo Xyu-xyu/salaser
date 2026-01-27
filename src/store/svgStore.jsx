@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import SVGPathCommander from 'svg-path-commander';
-import { toJS } from "mobx";
+//import { toJS } from "mobx";
 import utils from "../scripts/util";
 import constants from "./constants";
 import jobStore from "./jobStore";
@@ -87,7 +87,7 @@ class SvgStore {
 
 	get selectedPosition() {
 		//console.log (this.svgData.positions.find(pos => pos.selected))
-		return this.svgData.positions.find(pos => pos.selected)|| false;
+		return this.svgData.positions.find(pos => pos.selected) || false;
 	}
 
 	get nextPartId() {
@@ -155,7 +155,8 @@ class SvgStore {
 		form.part_id = svgStore.svgData.part_code.length + 1
 		form.papams = {
 			"code": "",
-			"uuid": ""
+			"uuid": "",
+			"name": utils.uuid()
 		}
 		const box = this.findBox(form.code)
 		form.width = 0
@@ -233,33 +234,34 @@ class SvgStore {
 
 	transformPoint(x, y, m) {
 		return {
-		  x: m.a * x + m.c * y + m.e,
-		  y: m.b * x + m.d * y + m.f,
+			x: m.a * x + m.c * y + m.e,
+			y: m.b * x + m.d * y + m.f,
 		};
 	}
 
 
 	transformBBox(bbox, matrix) {
 		const points = [
-		  this.transformPoint(bbox.x, bbox.y, matrix),
-		  this.transformPoint(bbox.x + bbox.width, bbox.y, matrix),
-		  this.transformPoint(bbox.x, bbox.y + bbox.height, matrix),
-		  this.transformPoint(bbox.x + bbox.width, bbox.y + bbox.height, matrix),
+			this.transformPoint(bbox.x, bbox.y, matrix),
+			this.transformPoint(bbox.x + bbox.width, bbox.y, matrix),
+			this.transformPoint(bbox.x, bbox.y + bbox.height, matrix),
+			this.transformPoint(bbox.x + bbox.width, bbox.y + bbox.height, matrix),
 		];
-	  
+
 		const xs = points.map(p => p.x);
 		const ys = points.map(p => p.y);
-	  
+
 		return {
-		  minX: Math.min(...xs),
-		  maxX: Math.max(...xs),
-		  minY: Math.min(...ys),
-		  maxY: Math.max(...ys),
+			minX: Math.min(...xs),
+			maxX: Math.max(...xs),
+			minY: Math.min(...ys),
+			maxY: Math.max(...ys),
 		};
-	  }
+	}
 
 
 	deleteOutParts = () => {
+		return;
 		const rect = { x: 0, y: 0, width: this.svgData.width, height: this.svgData.height };
 
 		runInAction(() => {
@@ -320,7 +322,7 @@ class SvgStore {
 			const partCodeId = part.uuid || part.id;
 
 			uniqueParts.set(partCodeId, {
-				name: utils.uuid(),
+				name: part.name,
 				width: part.width,
 				height: part.height,
 				code: part.code
@@ -332,18 +334,17 @@ class SvgStore {
 			const { name, code } = partInfo;
 			const instancesCount = data.positions.filter(p => p.part_code_id === partCodeId).length;
 			res.push(`(<Part PartCode="${name}" Debit="${instancesCount}">)`);
-			res.push(`ПРОГРАММА №` + progNum);
+			//res.push(`ПРОГРАММА №` + progNum);
 
-			const contours = this.generateSinglePart(code, lineNumber, progNum)
+			const contours = this.generateSinglePart(code, progNum)
 			res.push(contours);
 
 			progNum++
 			lineNumber += contours.length;
 
 			//
-			res.push(`N${lineNumber} G98`);
+			res.push(`N${lineNumber}G98`);
 			lineNumber++;
-
 			res.push('(</Part>)');
 		}
 
@@ -351,122 +352,244 @@ class SvgStore {
 	}
 
 	findByCidAndClass(array, cid, classSubstring, caseSensitive = false) {
-		if (!Array.isArray(array)) {
-			return [];
-		}
-		if (typeof classSubstring !== 'string') {
-			classSubstring = '';
-		}
+		if (!Array.isArray(array)) return null;
+		if (typeof classSubstring !== 'string') classSubstring = '';
 
 		const searchStr = caseSensitive ? classSubstring : classSubstring.toLowerCase();
 
-		return array.filter(item => {
-			// Проверка cid
-			if (item.cid !== cid) {
-				return false;
-			}
-
-			// Проверка class
-			if (typeof item.class !== 'string') {
-				return false;
-			}
+		return array.find(item => {
+			if (item.cid !== cid) return false;
+			if (typeof item.class !== 'string') return false;
 
 			const classValue = caseSensitive ? item.class : item.class.toLowerCase();
-			return classValue.includes(searchStr)[0] || false;
-		});
+			return classValue.includes(searchStr);
+		}) || null;
 	}
 
-	generateSinglePart(code, lineNumber, progNum) {
+	getMacro(cls) {
+		const m = cls.match(/macro(\d+)/)
+		return m ? Number(m[1]) : null
+	}
+
+	svgToGcode(path, height, needStart = false, outer) {
+		const res = []
+		const spc = new SVGPathCommander(path).toAbsolute()
+		let X, Y, G, I, J = null
+		let needLaserOn = false
+		let needG40= false
+
+		spc.segments.forEach(seg => {
+			const cmd = seg[0]
+
+			if (cmd === 'M') {
+
+				const [, x, y] = seg				
+				const g = 'G0'
+				let line = ''
+				if (needStart) {
+					let line = ''
+					if (g !== G) line += g
+					if (x !== X) line += "X" + x
+					if (y !== Y) line += "Y" + (height- y)
+					needLaserOn = true
+				}
+				G = g
+				X = x
+				Y = y
+				line.length ? res.push(line) : false
+
+			}
+
+			if (cmd === 'L') {
+
+				const [, x, y] = seg
+				const g = 'G1'
+				let line = ''
+
+				if (g !== G) line += g
+				if (x !== X) line += "X" + x
+				if (y !== Y) line += "Y" + (height- y)
+				if (needLaserOn) line +="M4"
+				needLaserOn = false
+
+				G = g
+				X = x
+				Y = y
+				line.length ? res.push(line) : false
+
+			}
+
+			if (cmd === 'A') {
+
+				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
+				needG40 =true
+				// старт и конец в координатах станка
+				const x1 = X
+				const y1 = height - Y
+				const x2 = x
+				const y2 = height - y
+			  
+				const r = rx // у тебя всегда rx === ry
+			  
+				// восстановление центра дуги
+				const mx = (x1 + x2) / 2
+				const my = (y1 + y2) / 2
+			  
+				const dx = x2 - x1
+				const dy = y2 - y1
+				const q = Math.hypot(dx, dy)
+			  
+				const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
+			  
+				const nx = -dy / q
+				const ny = dx / q
+			  
+				// ВАЖНО: инверсия sweep → G2 / G3
+				const isCCW = sweep === 0   // ← это ключ
+				const sign = isCCW ? 1 : -1
+			  
+				const cx = mx + sign * nx * h
+				const cy = my + sign * ny * h
+			  
+				// ❗ I / J — АБСОЛЮТНЫЕ
+				const i = Math.round(cx * 1000) / 1000
+				const j = Math.round(cy * 1000) / 1000
+			  
+				const g = isCCW ? 'G3' : 'G2'
+				let line = g
+			  
+				line += `X${x2}Y${y2}I${i}J${j}`
+			  
+				G = g
+				X = x
+				Y = y
+				I = i
+				J = j
+			  
+				outer ? res.push('G42') : res.push('G41')
+			  
+				if (needLaserOn) line += 'M4'
+				needLaserOn = false			  
+				res.push(line)
+			}
+		})
+		if (needG40) res.push(`N${0}G40`)
+		return res
+	}
+
+	generateSinglePart(code, progNum) {
 		let res = []
 		let commonPath = ''
+		let currentMacro = null
 
-		code.map(a => a.path ? commonPath += a.path : commonPath += " ")
-		let box = SVGPathCommander.getPathBBox(commonPath)
-		res.push(`N${lineNumber + res.length + 1} G28 X${box.width} Y${box.height} L${progNum}P1`);
+		code.forEach(a => commonPath += a.path || ' ')
+		const box = SVGPathCommander.getPathBBox(commonPath)
+		res.push(`N${0}G28X${box.width}Y${box.height}L${progNum}P1`)
 
 		code.forEach((item) => {
 
-			if (item.class.includes('contour')) {
-				res.push("(<Contour>)")
-				let inlet = this.findByCidAndClass(code, item.cid, 'inlet')
-				let outlet = this.findByCidAndClass(code, item.cid, 'outlet')
-				let contour = item
+			if (!item.class.includes('contour')) return
+			let outer = item.class.includes('outer')
 
-				if (inlet && inlet.hasOwnProperty('path') && inlet.path.length) {
-					res.push(`N${lineNumber + res.length + 1} INLET`);
+			const inlet = this.findByCidAndClass(code, item.cid, 'inlet')
+			const outlet = this.findByCidAndClass(code, item.cid, 'outlet')
+			const contour = item
 
-				}
+			// generate start 
+			res.push(`N${0}G0X50Y108`)
 
-				if (contour && contour.hasOwnProperty('path') && contour.path.length) {
-					res.push(`N${lineNumber + res.length + 1} contour`);
-				}
-
-
-				if (outlet && outlet.hasOwnProperty('path') && outlet.path.length) {
-					res.push(`N${lineNumber + res.length + 1} OUTLET`);
-				}
-
-				res.push("(</Contour>)")
-
+			// ---- MACRO ----
+			const macro = this.getMacro(contour.class)
+			if (macro !== null && macro !== currentMacro) {
+				res.push(`N${0}G10S${macro}`)
+				currentMacro = macro
 			}
 
+			// ---- INLET ----
+			if (inlet?.path?.length) {
+				this.svgToGcode(inlet.path, +box.height, true, outer).forEach(cmd =>
+					res.push(`N${0}${cmd}`)
+				)
+			}
 
+			// ---- CORRECTION ----
+			//const isInner = contour.class.includes('inner')
+			//res.push(`N${0}${isInner ? 'G42' : 'G41'}`)
+
+			// ---- CONTOUR ----
+			res.push('(<Contour>)')
+
+			if (contour.path?.length) {
+				this.svgToGcode(contour.path, +box.height, inlet?.path?.length ? false : true, outer ).forEach(cmd =>
+					res.push(`N${0}${cmd}`)
+				)
+			}
+			
+			res.push('(</Contour>)')
+
+			// ---- OUTLET ----
+			if (outlet?.path?.length) {
+				this.svgToGcode(outlet.path, box.height, false, outer).forEach(cmd =>
+					res.push(`N${0}${cmd}`)
+				)
+			}
 		})
 
-		return res;
-
+		return res
 	}
 
 	generatePositions() {
 		const data = this.svgData;
 		const res = [];
- 		res.push(`N1G29X${this.svgData.height}Y${this.svgData.width}P1H1A1`);
+		// fix need workinfg area
+		//res.push(`N1G29X${this.svgData.height}Y${this.svgData.width}P1H1A1`);
+		res.push(`N1G29X${110}Y${118}P1H1A1`);
 		let lineNumber = 2;
-		let x,y,c,g,l = 0
+		let x, y, c, g, l = 0
 
 		for (const pos of data.positions) {
-						
-			let matrix =  pos.positions
+
+			let matrix = pos.positions
 			let sheetHeight = this.svgData.width
 			let L = pos.part_code_id
-			let G =52
+			let G = 52
 			let partHeight = svgStore.svgData.part_code.filter(a => a.id == L)[0].height
 			let XYC = this.matrixToG52(matrix, sheetHeight, partHeight, pos.cx, pos.cy)
 			let X = utils.smartRound(XYC.X)
 			let Y = utils.smartRound(XYC.Y)
 			let C = utils.smartRound(XYC.C)
-			
+
 			let g52Line = `N${lineNumber}`;
-			if ( g!==G) g52Line+=`G${G}`
-			if ( x!==X) g52Line+=`X${X}`
-			if ( y!==Y) g52Line+=`Y${Y}`
-			if ( l!==L) g52Line+=`L${L}`
-			if ( c!==C) g52Line+=`C${C}`
+			if (g !== G) g52Line += `G${G}`
+			if (x !== X) g52Line += `X${X}`
+			if (y !== Y) g52Line += `Y${Y}`
+			if (l !== L) g52Line += `L${L}`
+			if (c !== C) g52Line += `C${C}`
 
 			res.push(g52Line);
-			g=G, l=L, x=X, y=Y,c=C;
+			g = G, l = L, x = X, y = Y, c = C;
 			lineNumber++;
 
 		}
 
- 		res.push(`N${lineNumber} G99`);
+		res.push(`N${lineNumber}G99`);
 		res.push('(</Plan>)');
 		return res;
 	}
 
 	// Крест с поворотом
 	cross = (x, y, size, c) => {
-		const [rx, ry] = this.rotatePoint(x, y,  0, 0, 0);
-		const yInv =  ry;
+		const [rx, ry] = this.rotatePoint(x, y, 0, 0, 0);
+		const yInv = ry;
 		return `M${rx - size} ${yInv - size} L${rx + size},${yInv + size} M${rx - size} ${yInv + size}L${rx + size} ${yInv - size}`;
 	};
 
-	line = (x2, y2, c, h ) => {
+	line = (x2, y2, c, h) => {
 		const [rx2, ry2] = this.rotatePoint(x2, y2, 0, 0, 0);;
 		return ` L${rx2} ${h - ry2}`;
 	};
 
-	start = (x1, y1, c, h ) => {
+	start = (x1, y1, c, h) => {
 		const [rx2, ry2] = this.rotatePoint(x1, y1, 0, 0, 0);
 		return `M${rx2} ${h - ry2}`;
 	};
@@ -480,9 +603,9 @@ class SvgStore {
 		sweep,
 		c,
 		h
- 	) => {
+	) => {
 		const [rxEnd, ryEnd] = this.rotatePoint(ex, ey, 0, 0, 0);
-		return ` A${r} ${r} 0 ${large} ${1 - sweep } ${rxEnd} ${h - ryEnd }`;
+		return ` A${r} ${r} 0 ${large} ${1 - sweep} ${rxEnd} ${h - ryEnd}`;
 	};
 
 	rotatePoint = (
@@ -502,7 +625,7 @@ class SvgStore {
 		return [xRot, yRot];
 	};
 
-	startToEdit( ncp ) {
+	startToEdit(ncp) {
 		if (!ncp) {
 			ncp = constants.lines
 		}
@@ -549,17 +672,17 @@ class SvgStore {
 		/* ---------------- PART CODE ---------------- */
 		//const parseGcodeLine = makeGcodeParser();
 
- 		let currentPart = null;
+		let currentPart = null;
 		let cid = -1;
 		let cx = 0, cy = 0;
 		let partOpen = false
 		let contourOpen = "before"
 		let res = []; // массив путей
 		let laserOn = false
-		let macros= ''
+		let macros = ''
 		let HW = [0]
-		let partHeight = 0 
-		let partWidth = 0 
+		let partHeight = 0
+		let partWidth = 0
 
 		for (const c of cmds) {
 			//console.log(JSON.stringify(c))
@@ -568,25 +691,26 @@ class SvgStore {
 				console.log('Part code start')
 				cx = 0;
 				cy = 0;
+				const name = c.comment.match(/PartCode="([^"]+)"/)[1];
 
 				currentPart = {
 					id: result.part_code.length + 1,
 					uuid: result.part_code.length + 1,
-					name: "",
+					name: name,
 					code: [],
-					height:0,
-					width:0,
+					height: 0,
+					width: 0,
 				};
-				res=[]
+				res = []
 				partOpen = true
 				continue;
 
 			} else if (c?.comment?.includes('</Part>')) {
-				
+
 				console.log('Part End')
 				partOpen = false
 				res[res.length - 1].class += " groupEnd "
-				
+
 				for (let i = res.length - 1; i >= 0; i--) {
 					const item = res[i];
 
@@ -596,7 +720,7 @@ class SvgStore {
 					const hasInner = /\binner\b/i.test(item.class);
 
 					if (hasContour && hasInner) {
- 						item.class = item.class.replace(/\binner\b/i, 'outer');						
+						item.class = item.class.replace(/\binner\b/i, 'outer');
 						break;
 					}
 				}
@@ -613,11 +737,11 @@ class SvgStore {
 					let ac = a.class.split(' ')
 						.map(cls => order.indexOf(cls))
 						.sort((a, b) => b - a)[0] || -1;
-					
+
 					let bc = b.class.split(' ')
 						.map(cls => order.indexOf(cls))
 						.sort((a, b) => b - a)[0] || -1;
-		
+
 					return bc - ac;
 				});
 
@@ -626,27 +750,27 @@ class SvgStore {
 				continue;
 
 			} else if (c?.comment?.includes('<Contour>')) {
-				
+
 				console.log('Contour Start')
 				contourOpen = "open"
 
 				const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 				const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
 
-				if ( !res[res.length-1].class.includes("inlet") )  {
-					cid +=1
+				if (!res[res.length - 1].class.includes("inlet")) {
+					cid += 1
 				}
-	
+
 				res.push({
-						"cid": cid,
-						"class": "contour inner "+ macros,
-						"path": "",
-						"stroke": "red",
-						"strokeWidth": 0.2,
-						"selected": false
-				}) 
-				
-		 		res[res.length - 1].path = this.start(cx, cy, c, partHeight );
+					"cid": cid,
+					"class": "contour inner " + macros,
+					"path": "",
+					"stroke": "red",
+					"strokeWidth": 0.2,
+					"selected": false
+				})
+
+				res[res.length - 1].path = this.start(cx, cy, c, partHeight);
 				cx = tx; cy = ty;
 				continue;
 
@@ -655,17 +779,17 @@ class SvgStore {
 
 				console.log('Contour Start')
 				//contourOpen = "after"
-						
+
 				res.push({
 					"cid": cid,
-					"class": " outlet inner"+ macros + " ",
+					"class": " outlet inner" + macros + " ",
 					"path": "",
 					"stroke": "red",
 					"strokeWidth": 0.2,
 					"selected": false
 				})
-				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c, partHeight );
-				continue;				
+				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c, partHeight);
+				continue;
 			}
 
 			if (typeof c.m === 'number') {
@@ -675,22 +799,22 @@ class SvgStore {
 					if (c.m === 5) pendingBreakCircle = { type: 'out'};
 				} */
 
-				if (c.m === 4 || c.m === 14 ) {
+				if (c.m === 4 || c.m === 14) {
 					console.log('laser on')
 					laserOn = true;
-					res[res.length - 1].path = this.start(cx, cy, c, partHeight );
+					res[res.length - 1].path = this.start(cx, cy, c, partHeight);
 				}
 
-				if (c.m === 5 || c.m === 15 ) {
+				if (c.m === 5 || c.m === 15) {
 					console.log('laser off')
-					laserOn = false;		
-					contourOpen = "before"		
+					laserOn = false;
+					contourOpen = "before"
 				}
 			}
 
 			if (typeof c.g === 'number') {
 				const g = Math.floor(c.g);
- 				if (g === 4) {
+				if (g === 4) {
 
 					/* let crossPath = {
 						path: partOpen ?
@@ -701,13 +825,13 @@ class SvgStore {
 					};
 					res.splice(0, 0, crossPath);
 					continue; */
-				} else if ( g === 0 ) {
+				} else if (g === 0) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
-					
+
 					if (contourOpen === "before") {
-						cid+= 1
+						cid += 1
 						res.push({
 							"cid": cid,
 							"class": " inlet inner" + macros + " ",
@@ -715,14 +839,14 @@ class SvgStore {
 							"stroke": "red",
 							"strokeWidth": 0.2,
 							"selected": false
-						})						
- 					} 
-		
+						})
+					}
 
-					res[res.length - 1].path = this.start(cx, cy, c, partHeight );
+
+					res[res.length - 1].path = this.start(cx, cy, c, partHeight);
 					cx = tx; cy = ty;
 
-				} else if ( g === 1) {
+				} else if (g === 1) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
@@ -755,9 +879,9 @@ class SvgStore {
 				} else if (g === 10) {
 					macros = ' macro' + c.params.S + ' '
 					try {
-						res[res.length - 1].class += macros	
+						res[res.length - 1].class += macros
 					} catch (error) {
-						console.log ("catch in macros")
+						console.log("catch in macros")
 					}
 					//res[res.length - 1].class += macros
 
@@ -802,7 +926,7 @@ class SvgStore {
 			if (g.g === 52 || g.params.g === 52) {
 				// высота детали (bounding box с incut!)
 				const { X = 0, Y = 0, C = 0, L = 1 } = g.params;
-				const rad = ((-C)* Math.PI) / 180;
+				const rad = ((-C) * Math.PI) / 180;
 				//const cos = Math.cos(rad);
 				//const sin = Math.sin(rad);
 				const partHeight = HW[L][0]
@@ -810,18 +934,18 @@ class SvgStore {
 
 				const cx = X;
 				const cy = sheetHeight - Y;
-				
+
 				const tx = X;
 				const ty = sheetHeight - Y - partHeight;
-				
+
 				const dx = tx - cx;
 				const dy = ty - cy;
 
 				const transform = `rotate(${-C} ${cx} ${cy}) translate(${tx} ${ty})`;
 				//console.log ( transform )
 				//const position = this.svgTransformToMatrix ( transform)
-				const position = this.rotateTranslateToMatrix (C, cx,cy, tx, ty)
- 
+				const position = this.rotateTranslateToMatrix(C, cx, cy, tx, ty)
+
 				result.positions.push(
 					{
 						part_id: partPositionId++,
@@ -841,12 +965,12 @@ class SvgStore {
 						console.log ("FUCK", JSON.stringify(XYC), X, Y, C )
 				} else {
 					console.log ( "YEEEAH !")
-				}*/			
+				}*/
 			}
 		});
 
- 		svgStore.setGroupMatrix({a: 1, b:0,c: 0, d: 1, e: 0, f: 0});
-		svgStore.setMatrix({a: 1, b:0,c: 0, d: 1, e: 0, f: 0});
+		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
+		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		svgStore.svgData = Object.assign({}, result)
 
 	}
@@ -878,41 +1002,53 @@ class SvgStore {
 	matrixToG52(matrix, sheetHeight, partHeight, cx, cy) {
 		//console.log (arguments)
 		const { a, b, e, f } = matrix;
-	  	let C = -Math.atan2(b, a) * 180 / Math.PI;
-	  
+		let C = -Math.atan2(b, a) * 180 / Math.PI;
+
 		// нормализация
 		if (Math.abs(C) < 1e-6) C = 0;
 		if (Math.abs(C - 90) < 1e-6) C = 90;
 		if (Math.abs(C - 180) < 1e-6) C = 180;
 		if (Math.abs(C - 270) < 1e-6) C = 270;
-		C = (C+360)%360
-	  
+		C = (C + 360) % 360
+
 		const cos = a;
 		const sin = b;
-	  
+
 		// 1. убрать вклад центра вращения
 		const ex = e - (cx - cos * cx + sin * cy);
 		const fy = f - (cy - sin * cx - cos * cy);
-	  
+
 		// 2. инвертировать вращение
-		const tx =  cos * ex + sin * fy;
+		const tx = cos * ex + sin * fy;
 		const ty = -sin * ex + cos * fy;
-	  
+
 		// 3. вернуть координаты NCP
 		const X = tx;
 		const Y = sheetHeight - ty - partHeight;
-	  
+
 		return { X, Y, C };
 	}
- 
-	saveNcpFile () {
 
-		const { selectedId  } = jobStore;
-		const current = jobStore.getJobById( selectedId )
+	renumberNLines(lines, start = 1) {
+		let n = start
+
+		return lines.map(line => {
+			const m = line.match(/^N\d+(.*)$/i)
+			if (!m) return line
+
+			// m[1] — всё, что после номера
+			return `N${n++}${m[1]}`
+		})
+	}
+
+	saveNcpFile() {
+
+		const { selectedId } = jobStore;
+		const current = jobStore.getJobById(selectedId)
 		if (!current) return;
-		const { loadResult, dimX, dimY, material, materialLabel, name  } = current
-		let parsed = JSON.parse ( loadResult )
-		const {thickness, jobcode }= parsed.result.jobinfo.attr
+		const { loadResult, dimX, dimY, material, materialLabel, name } = current
+		let parsed = JSON.parse(loadResult)
+		const { thickness, jobcode } = parsed.result.jobinfo.attr
 
 		let ncpStart = [
 			`%`,
@@ -920,6 +1056,7 @@ class SvgStore {
 			`(<MaterialInfo Label="${material}" MaterialCode="${materialLabel}" Thickness="${thickness}" FormatType="Sheet" DimX="${dimX}" DimY="${dimY}"/>)`,
 			`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
 			`(<Plan JobCode="${jobcode}">)`,
+			`(<Plan>)`,
 		]
 
 		let ncpPositons = this.generatePositions()
@@ -930,8 +1067,10 @@ class SvgStore {
 		]
 
 		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
-		//ncp.forEach((item) => { console.log(item) });
-		console.log ( ncp )
+		ncp = this.renumberNLines (ncp, 1)
+
+		ncp.forEach((item) => { console.log(item) });
+		//console.log ( ncp )
 	}
 
 }
