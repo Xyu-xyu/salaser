@@ -373,13 +373,15 @@ class SvgStore {
 
 	svgToGcode(contour, inlet, outlet, height, outer) {
 		const res = []
-		const c = contour.length ? new SVGPathCommander(contour).toAbsolute() : {segments:[]}
-		const i = inlet.length ? new SVGPathCommander(inlet).toAbsolute() : {segments:[]}
-		const o = outlet.length ? new SVGPathCommander(outlet).toAbsolute() : {segments:[]}
+		const c = contour.path.length ? new SVGPathCommander(contour.path).toAbsolute() : {segments:[]}
+		const i = inlet.path.length ? new SVGPathCommander(inlet.path).toAbsolute() : {segments:[]}
+		const o = outlet.path.length ? new SVGPathCommander(outlet.path).toAbsolute() : {segments:[]}
+		let currentMacro = false
 
 		let X, Y, G, I, J = null
 		let needLaserOn = true
 		let needLaserOff = false
+		let needStart = true
 
 		let needG40 = false
 
@@ -390,11 +392,11 @@ class SvgStore {
 				const [, x, y] = seg				
 				const g = 'G0'
 				let line = ''
-				if (needLaserOn) {
-					let line = ''
+				if (needStart) {
 					if (g !== G) line += g
 					if (x !== X) line += "X" + x
 					if (y !== Y) line += "Y" + (height- y)
+					needStart =  false					
 				}
 				G = g
 				X = x
@@ -413,6 +415,13 @@ class SvgStore {
 				if (x !== X) line += "X" + x
 				if (y !== Y) line += "Y" + (height- y)
 				if (needLaserOn) {
+					
+					const macro = this.getMacro(inlet.class)
+					if (macro !== null && macro !== currentMacro) {
+						res.push(`G10S${macro}`)
+						currentMacro = macro
+					}
+
 					line +="M4"
 					needLaserOn = false
 					needLaserOff = true
@@ -474,6 +483,13 @@ class SvgStore {
 			  
 				outer ? res.push('G42') : res.push('G41')
 				if (needLaserOn) {
+
+					const macro = this.getMacro(inlet.class)
+					if (macro !== null && macro !== currentMacro) {
+						res.push(`G10S${macro}`)
+						currentMacro = macro
+					}
+
 					line +="M4"
 					needLaserOn = false
 					needLaserOff = true
@@ -490,12 +506,12 @@ class SvgStore {
 				const [, x, y] = seg				
 				const g = 'G0'
 				let line = ''
-				if (needLaserOn) {
+				if (needStart) {
 					let line = ''
 					if (g !== G) line += g
 					if (x !== X) line += "X" + x
 					if (y !== Y) line += "Y" + (height- y)
-					needLaserOn = true
+					needStart = false
 				}
 				G = g
 				X = x
@@ -621,6 +637,13 @@ class SvgStore {
 				if (g !== G) line += g
 				if (x !== X) line += "X" + x
 				if (y !== Y) line += "Y" + (height- y)
+
+				const macro = this.getMacro(inlet.class)
+					if (macro !== null && macro !== currentMacro) {
+						res.push(`G10S${macro}`)
+						currentMacro = macro
+				}
+
 				if (needLaserOn) line +="M4"
 				needLaserOn = false
 
@@ -679,7 +702,12 @@ class SvgStore {
 				J = j
 			  
 				outer ? res.push('G42') : res.push('G41')
-			  
+				const macro = this.getMacro(inlet.class)
+				if (macro !== null && macro !== currentMacro) {
+					res.push(`G10S${macro}`)
+					currentMacro = macro
+				}
+
 				if (needLaserOn) line += 'M4'
 				needLaserOn = false			  
 				res.push(line)
@@ -699,8 +727,6 @@ class SvgStore {
 	generateSinglePart(code, progNum) {
 		let res = []
 		let commonPath = ''
-		let currentMacro = null
-
 		code.forEach(a => commonPath += a.path || ' ')
 		const box = SVGPathCommander.getPathBBox(commonPath)
 		res.push(`N${0}G28X${box.width}Y${box.height}L${progNum}P1`)
@@ -714,21 +740,13 @@ class SvgStore {
 			const outlet = this.findByCidAndClass(code, item.cid, 'outlet')
 			const contour = item
 
-			// generate start 
-			res.push(`N${0}G0X50Y108`)
-
 			// ---- MACRO ----
-			const macro = this.getMacro(contour.class)
-			if (macro !== null && macro !== currentMacro) {
-				res.push(`N${0}G10S${macro}`)
-				currentMacro = macro
-			}
 
 			if (contour.path?.length) {
 				this.svgToGcode(
-					contour.path, 
-					inlet.path,
-					outlet.path, 
+					contour, 
+					inlet,
+					outlet, 
 					box.height, 
 					outer)
 					.forEach(cmd =>
@@ -1268,7 +1286,7 @@ class SvgStore {
 			`(<MaterialInfo Label="${material}" MaterialCode="${materialLabel}" Thickness="${thickness}" FormatType="Sheet" DimX="${dimX}" DimY="${dimY}"/>)`,
 			`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
 			`(<Plan JobCode="${jobcode}">)`,
-			`(<Plan>)`,
+			//`(<Plan>)`,
 		]
 
 		let ncpPositons = this.generatePositions()
