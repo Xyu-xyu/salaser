@@ -377,6 +377,7 @@ class SvgStore {
 		const i = inlet.path.length ? new SVGPathCommander(inlet.path).toAbsolute() : {segments:[]}
 		const o = outlet.path.length ? new SVGPathCommander(outlet.path).toAbsolute() : {segments:[]}
 		let currentMacro = false
+		let currentCompensation = false
 
 		let X, Y, G, I, J = null
 		let needLaserOn = true
@@ -394,8 +395,8 @@ class SvgStore {
 				let line = ''
 				if (needStart) {
 					if (g !== G) line += g
-					if (x !== X) line += "X" + x
-					if (y !== Y) line += "Y" + (height- y)
+					if (x !== X) line += "X" + utils.smartRound(x)
+					if (y !== Y) line += "Y" + utils.smartRound(height- y)
 					needStart =  false					
 				}
 				G = g
@@ -412,8 +413,8 @@ class SvgStore {
 				let line = ''
 
 				if (g !== G) line += g
-				if (x !== X) line += "X" + x
-				if (y !== Y) line += "Y" + (height- y)
+				if (x !== X) line += "X" + utils.smartRound(x)
+				if (y !== Y) line += "Y" + utils.smartRound(height- y)
 				if (needLaserOn) {
 					
 					const macro = this.getMacro(inlet.class)
@@ -467,13 +468,18 @@ class SvgStore {
 				const cy = my + sign * ny * h
 			  
 				// ❗ I / J — АБСОЛЮТНЫЕ
-				const i = Math.round(cx * 1000) / 1000
-				const j = Math.round(cy * 1000) / 1000
+				const i = utils.smartRound (cx) 
+				const j = utils.smartRound (cy)
 			  
 				const g = isCCW ? 'G3' : 'G2'
-				let line = g
-			  
-				line += `X${x2}Y${y2}I${i}J${j}`
+				let line = ''
+
+				if (g !== G) line += g
+				if (x !== X) line += "X" + x2
+				if (y !== Y) line += "Y" + y2
+				if (i !== I) line += "I" + i
+				if (y !== Y) line += "J" + j
+				  
 			  
 				G = g
 				X = x
@@ -481,7 +487,14 @@ class SvgStore {
 				I = i
 				J = j
 			  
-				outer ? res.push('G42') : res.push('G41')
+
+				if (currentCompensation !== (outer ? 'G42' : 'G41')) {
+
+					currentCompensation = (outer ? 'G42' :'G41')
+					outer ? res.push('G42') : res.push('G41')
+
+				}								
+ 
 				if (needLaserOn) {
 
 					const macro = this.getMacro(inlet.class)
@@ -499,6 +512,7 @@ class SvgStore {
 		})
 
 		res.push('(<Contour>)')
+
 		c?.segments.forEach(seg => {
 			const cmd = seg[0]
 			if (cmd === 'M') {
@@ -509,8 +523,8 @@ class SvgStore {
 				if (needStart) {
 					let line = ''
 					if (g !== G) line += g
-					if (x !== X) line += "X" + x
-					if (y !== Y) line += "Y" + (height- y)
+					if (x !== X) line += "X" + utils.smartRound ( x )
+					if (y !== Y) line += "Y" + utils.smartRound ( height - y )
 					needStart = false
 				}
 				G = g
@@ -527,8 +541,8 @@ class SvgStore {
 				let line = ''
 
 				if (g !== G) line += g
-				if (x !== X) line += "X" + x
-				if (y !== Y) line += "Y" + (height- y)
+				if (x !== X) line += "X" + utils.smartRound (x)
+				if (y !== Y) line += "Y" + utils.smartRound (height- y)
 				if (needLaserOn) line +="M4"
 				needLaserOn = false
 
@@ -572,13 +586,18 @@ class SvgStore {
 				const cy = my + sign * ny * h
 			  
 				// ❗ I / J — АБСОЛЮТНЫЕ
-				const i = Math.round(cx * 1000) / 1000
-				const j = Math.round(cy * 1000) / 1000
+				const i = utils.smartRound (cx)
+				const j = utils.smartRound (cy)
 			  
 				const g = isCCW ? 'G3' : 'G2'
-				let line = g
-			  
-				line += `X${x2}Y${y2}I${i}J${j}`
+				let line = ''
+
+				if (g !== G) line += g
+				if (x !== X) line += "X" + x2
+				if (y !== Y) line += "Y" + y2
+				if (i !== I) line += "I" + i
+				if (y !== Y) line += "J" + j
+				  
 			  
 				G = g
 				X = x
@@ -586,7 +605,12 @@ class SvgStore {
 				I = i
 				J = j
 			  
-				outer ? res.push('G42') : res.push('G41')
+				if (currentCompensation !== (outer ? 'G42' : 'G41')) {
+
+					currentCompensation = outer ? 'G42' :'G41'
+					outer ? res.push('G42') : res.push('G41')
+
+				}
 			  
 				if (needLaserOn) line += 'M4'
 				needLaserOn = false			  
@@ -617,8 +641,8 @@ class SvgStore {
 				if (needStart) {
 					let line = ''
 					if (g !== G) line += g
-					if (x !== X) line += "X" + x
-					if (y !== Y) line += "Y" + (height- y)
+					if (x !== X) line += "X" + utils.smartRound (x)
+					if (y !== Y) line += "Y" + utils.smartRound (height- y)
 					needLaserOn = true
 				}
 				G = g
@@ -635,8 +659,8 @@ class SvgStore {
 				let line = ''
 
 				if (g !== G) line += g
-				if (x !== X) line += "X" + x
-				if (y !== Y) line += "Y" + (height- y)
+				if (x !== X) line += "X" + utils.smartRound (x)
+				if (y !== Y) line += "Y" + utils.smartRound (height- y)
 
 				const macro = this.getMacro(inlet.class)
 					if (macro !== null && macro !== currentMacro) {
@@ -687,13 +711,19 @@ class SvgStore {
 				const cy = my + sign * ny * h
 			  
 				// ❗ I / J — АБСОЛЮТНЫЕ
-				const i = Math.round(cx * 1000) / 1000
-				const j = Math.round(cy * 1000) / 1000
+				const i = utils.smartRound (cx)
+				const j = utils.smartRound (cy)
 			  
 				const g = isCCW ? 'G3' : 'G2'
-				let line = g
-			  
-				line += `X${x2}Y${y2}I${i}J${j}`
+				let line = ''
+
+				if (g !== G) line += g
+				if (x !== X) line += "X" + x2
+				if (y !== Y) line += "Y" + y2
+				if (i !== I) line += "I" + i
+				if (y !== Y) line += "J" + j
+				  
+				//line += `X${x2}Y${y2}I${i}J${j}`
 			  
 				G = g
 				X = x
@@ -701,7 +731,13 @@ class SvgStore {
 				I = i
 				J = j
 			  
-				outer ? res.push('G42') : res.push('G41')
+				if (currentCompensation !== (outer ? 'G42' : 'G41')) {
+
+					currentCompensation = outer ? 'G42' :'G41'
+					outer ? res.push('G42') : res.push('G41')
+
+				}
+
 				const macro = this.getMacro(inlet.class)
 				if (macro !== null && macro !== currentMacro) {
 					res.push(`G10S${macro}`)
@@ -731,7 +767,11 @@ class SvgStore {
 		const box = SVGPathCommander.getPathBBox(commonPath)
 		res.push(`N${0}G28X${box.width}Y${box.height}L${progNum}P1`)
 
-		code.forEach((item) => {
+		const sorted = [...code].sort((a, b) =>
+			b.class.includes('inner') - a.class.includes('inner')
+	  	);
+
+		sorted.forEach((item) => {
 
 			if (!item.class.includes('contour')) return
 			let outer = item.class.includes('outer')
