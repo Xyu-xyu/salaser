@@ -108,12 +108,12 @@ export const StartButton = observer(() => {
 				}
 			});
 		} catch (error) {
-			showToast({
+			/* showToast({
 				type: 'error',
 				message: "loadresult error",
 				position: 'bottom-right',
 				autoClose: 2500
-			});
+			}); */
 			console.log("loadresult error:" + error)
 		}
 	}

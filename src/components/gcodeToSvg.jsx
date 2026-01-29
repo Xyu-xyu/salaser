@@ -175,12 +175,12 @@ const GCodeToSvg = observer(() => {
 			if (error.name === 'AbortError') {
 			  console.warn("Запрос был отменён");
 			} else {
-			  showToast({
+			  /* showToast({
 				type: 'error',
 				message: "loadresult error",
 				position: 'bottom-right',
 				autoClose: 2500
-			});
+			}); */
 			console.log ( "loadresult error:"+ error.message || error,)		  
 			}
 		  }

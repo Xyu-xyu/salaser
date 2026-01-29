@@ -446,8 +446,11 @@ class Utils {
 			const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
 			out.g = gMatch ? Number(gMatch[1]) : last.g;
 
-			const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
-			out.m = mMatch ? Number(mMatch[1]) : false;
+			//const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
+			//out.m = mMatch ? Number(mMatch[1]) : false;
+
+			const mMatches = [...s.matchAll(/M(-?\d+(?:\.\d+)?)/gi)];
+			out.m = mMatches.map(m => Number(m[1]));
 
 			// Параметры
 			const keys = ["X", "Y", "I", "J", "S", "P", "H", "A", "L", "C"];
@@ -2201,6 +2204,11 @@ class Utils {
 	smartRound(num, p=10) {
 		return Number(num.toPrecision(p));
 	}
+
+	smartRound(num, p = 5) {
+		const factor = 10 ** p;
+		return Math.trunc(num * factor) / factor;
+	  }
 } 
 
 

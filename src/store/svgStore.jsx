@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import SVGPathCommander from 'svg-path-commander';
-//import { toJS } from "mobx";
+import { toJS } from "mobx";
 import utils from "../scripts/util";
 import constants from "./constants";
 import jobStore from "./jobStore";
@@ -373,9 +373,9 @@ class SvgStore {
 
 	svgToGcode(contour, inlet, outlet, height, outer) {
 		const res = []
-		const c = contour.path.length ? new SVGPathCommander(contour.path).toAbsolute() : {segments:[]}
-		const i = inlet.path.length ? new SVGPathCommander(inlet.path).toAbsolute() : {segments:[]}
-		const o = outlet.path.length ? new SVGPathCommander(outlet.path).toAbsolute() : {segments:[]}
+		const c = contour?.path.length ? new SVGPathCommander(contour.path).toAbsolute() : {segments:[]}
+		const i = inlet?.path.length ? new SVGPathCommander(inlet.path).toAbsolute() : {segments:[]}
+		const o = outlet?.path.length ? new SVGPathCommander(outlet.path).toAbsolute() : {segments:[]}
 		let currentMacro = false
 		let currentCompensation = false
 
@@ -383,6 +383,7 @@ class SvgStore {
 		let needLaserOn = true
 		let needLaserOff = false
 		let needStart = true
+		let g = null 
 
 		let needG40 = false
 
@@ -391,25 +392,25 @@ class SvgStore {
 			if (cmd === 'M') {
 
 				const [, x, y] = seg				
-				const g = 'G0'
-				let line = ''
 				if (needStart) {
+					g = 'G0'
+					let line = ''
 					if (g !== G) line += g
 					if (x !== X) line += "X" + utils.smartRound(x)
 					if (y !== Y) line += "Y" + utils.smartRound(height- y)
-					needStart =  false					
-				}
-				G = g
-				X = x
-				Y = y
-				line.length ? res.push(line) : false
+					needStart =  false	
+					G = g
+					X = x
+					Y = y
+					line.length ? res.push(line) : false
+				}				
 
 			}
 
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
-				const g = 'G1'
+				g = 'G1'
 				let line = ''
 
 				if (g !== G) line += g
@@ -421,6 +422,7 @@ class SvgStore {
 					if (macro !== null && macro !== currentMacro) {
 						res.push(`G10S${macro}`)
 						currentMacro = macro
+						G = 'G10'
 					}
 
 					line +="M4"
@@ -471,14 +473,14 @@ class SvgStore {
 				const i = utils.smartRound (cx) 
 				const j = utils.smartRound (cy)
 			  
-				const g = isCCW ? 'G3' : 'G2'
+				g = isCCW ? 'G3' : 'G2'
 				let line = ''
 
 				if (g !== G) line += g
 				if (x !== X) line += "X" + x2
 				if (y !== Y) line += "Y" + y2
 				if (i !== I) line += "I" + i
-				if (y !== Y) line += "J" + j
+				if (j !== J) line += "J" + j
 				  
 			  
 				G = g
@@ -492,6 +494,7 @@ class SvgStore {
 
 					currentCompensation = (outer ? 'G42' :'G41')
 					outer ? res.push('G42') : res.push('G41')
+					G = outer ? 'G42': 'G41'
 
 				}								
  
@@ -501,6 +504,7 @@ class SvgStore {
 					if (macro !== null && macro !== currentMacro) {
 						res.push(`G10S${macro}`)
 						currentMacro = macro
+						G = 'G10'
 					}
 
 					line +="M4"
@@ -511,33 +515,33 @@ class SvgStore {
 			}
 		})
 
-		res.push('(<Contour>)')
+		if (contour.class.includes("contour") && !contour.class.includes("engraving")) res.push('(<Contour>)');
 
 		c?.segments.forEach(seg => {
 			const cmd = seg[0]
 			if (cmd === 'M') {
 
 				const [, x, y] = seg				
-				const g = 'G0'
-				let line = ''
+				
 				if (needStart) {
+					g = 'G0'
 					let line = ''
 					if (g !== G) line += g
 					if (x !== X) line += "X" + utils.smartRound ( x )
 					if (y !== Y) line += "Y" + utils.smartRound ( height - y )
 					needStart = false
-				}
-				G = g
-				X = x
-				Y = y
-				line.length ? res.push(line) : false
+					G = g
+					X = x
+					Y = y
+					line.length ? res.push(line) : false
+				}				
 
 			}
 
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
-				const g = 'G1'
+				g = 'G1'
 				let line = ''
 
 				if (g !== G) line += g
@@ -589,14 +593,14 @@ class SvgStore {
 				const i = utils.smartRound (cx)
 				const j = utils.smartRound (cy)
 			  
-				const g = isCCW ? 'G3' : 'G2'
+				g = isCCW ? 'G3' : 'G2'
 				let line = ''
 
 				if (g !== G) line += g
 				if (x !== X) line += "X" + x2
 				if (y !== Y) line += "Y" + y2
 				if (i !== I) line += "I" + i
-				if (y !== Y) line += "J" + j
+				if (j !== J) line += "J" + j
 				  
 			  
 				G = g
@@ -609,6 +613,7 @@ class SvgStore {
 
 					currentCompensation = outer ? 'G42' :'G41'
 					outer ? res.push('G42') : res.push('G41')
+					G = outer ? 'G42': 'G41'
 
 				}
 			  
@@ -618,25 +623,26 @@ class SvgStore {
 			}
 		})
 
-		if (needLaserOff && !outlet.length) {
+		if (needLaserOff && (!outlet ||!outlet.length )) {
 			res[res.length-1]+="M5"
 			needLaserOff = false
 		}
 
 
-		if (needG40 && !outlet.length ) {
+		if (needG40 && (!outlet ||!outlet.length )) {
 			res.push(`G40`)
+			G="G40"
 			needG40 = false
 		}
 
-		res.push('(</Contour>)')
+		if (contour.class.includes("contour") && !contour.class.includes("engraving")) res.push('(</Contour>)');
 
 		o?.segments.forEach(seg => {
 			const cmd = seg[0]
 			if (cmd === 'M') {
 
 				const [, x, y] = seg				
-				const g = 'G0'
+				g = 'G0'
 				let line = ''
 				if (needStart) {
 					let line = ''
@@ -644,18 +650,17 @@ class SvgStore {
 					if (x !== X) line += "X" + utils.smartRound (x)
 					if (y !== Y) line += "Y" + utils.smartRound (height- y)
 					needLaserOn = true
+					G = g
+					X = x
+					Y = y
+					line.length ? res.push(line) : false
 				}
-				G = g
-				X = x
-				Y = y
-				line.length ? res.push(line) : false
-
 			}
 
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
-				const g = 'G1'
+				g = 'G1'
 				let line = ''
 
 				if (g !== G) line += g
@@ -665,6 +670,7 @@ class SvgStore {
 				const macro = this.getMacro(inlet.class)
 					if (macro !== null && macro !== currentMacro) {
 						res.push(`G10S${macro}`)
+						G = 'G10'
 						currentMacro = macro
 				}
 
@@ -714,14 +720,14 @@ class SvgStore {
 				const i = utils.smartRound (cx)
 				const j = utils.smartRound (cy)
 			  
-				const g = isCCW ? 'G3' : 'G2'
+				g = isCCW ? 'G3' : 'G2'
 				let line = ''
 
 				if (g !== G) line += g
 				if (x !== X) line += "X" + x2
 				if (y !== Y) line += "Y" + y2
 				if (i !== I) line += "I" + i
-				if (y !== Y) line += "J" + j
+				if (j !== J) line += "J" + j
 				  
 				//line += `X${x2}Y${y2}I${i}J${j}`
 			  
@@ -735,6 +741,7 @@ class SvgStore {
 
 					currentCompensation = outer ? 'G42' :'G41'
 					outer ? res.push('G42') : res.push('G41')
+					G = outer ? 'G42': 'G41'
 
 				}
 
@@ -742,6 +749,7 @@ class SvgStore {
 				if (macro !== null && macro !== currentMacro) {
 					res.push(`G10S${macro}`)
 					currentMacro = macro
+					G = "G10"
 				}
 
 				if (needLaserOn) line += 'M4'
@@ -765,7 +773,7 @@ class SvgStore {
 		let commonPath = ''
 		code.forEach(a => commonPath += a.path || ' ')
 		const box = SVGPathCommander.getPathBBox(commonPath)
-		res.push(`N${0}G28X${box.width}Y${box.height}L${progNum}P1`)
+		res.push(`N${0}G28X${utils.smartRound(box.width)}Y${utils.smartRound(box.height)}L${progNum}P1`)
 
 		const sorted = [...code].sort((a, b) =>
 			b.class.includes('inner') - a.class.includes('inner')
@@ -779,6 +787,7 @@ class SvgStore {
 			const inlet = this.findByCidAndClass(code, item.cid, 'inlet')
 			const outlet = this.findByCidAndClass(code, item.cid, 'outlet')
 			const contour = item
+			// ебана гравировка
 
 			// ---- MACRO ----
 
@@ -1052,25 +1061,45 @@ class SvgStore {
 				continue;
 			}
 
-			if (typeof c.m === 'number') {
 
-				/* if (!pendingBreakCircle) {
-					if (c.m === 4) pendingBreakCircle = { type: 'in'};
-					if (c.m === 5) pendingBreakCircle = { type: 'out'};
-				} */
 
-				if (c.m === 4 || c.m === 14) {
+			if (Array.isArray(c.m)) {
+
+				const m = new Set(c.m);
+			  
+				const only = (...vals) =>
+				vals.length === m.size && vals.every(v => m.has(v));
+			  
+				if (only(4) || only(4, 14) ) {
 					console.log('laser on')
 					laserOn = true;
 					res[res.length - 1].path = this.start(cx, cy, c, partHeight);
 				}
+				else if (only(5) || only(5, 15) ) {
 
-				if (c.m === 5 || c.m === 15) {
 					console.log('laser off')
 					laserOn = false;
 					contourOpen = "before"
+				  
 				}
-			}
+
+				else if (only(5, 15, 4, 14)) {
+				  // только M5 M15
+				  	console.log('laser on')
+					laserOn = true;
+					res[res.length - 1].class = 
+					res[res.length - 1].class
+						.replace('inlet', 'contour')
+						.replace('outlet', 'contour')
+
+					res[res.length - 1].path = this.start(cx, cy, c, partHeight);
+
+					contourOpen = "before"
+					laserOn = false;
+
+				}
+			  
+			  }
 
 			if (typeof c.g === 'number') {
 				const g = Math.floor(c.g);
