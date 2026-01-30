@@ -364,71 +364,51 @@ const PartSvgWrapper = observer(() => {
 		}		
 	}, [coordsStore.needeToFit]); 
 
-	const fitToPage =() => {
-		//console.log (coordsStore.fittedPosition)
 
-		if (!coordsStore.fittedPosition) {
-			//console.log('calculate without store')
+	const fitToPage = () => {
+		const padding = 100;
+			// реальные размеры того, что масштабируем внутри SVG
 
-			partStore.setRectParams({x:0, y:0, width: 0, height: 0})
-			partStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
-			partStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
- 
-			let box = document.querySelector('#group').getBoundingClientRect()
-			const wBox = wrapperSVG.current.getBoundingClientRect();
-			
-			let scaleW = wBox.width/ box.width
-			let scaleH = wBox.height / box.height
-			let scale = scaleW < scaleH ? scaleW : scaleH
+		const widthContent = partStore.svgData.width;
+		const heightContent = partStore.svgData.height
 
-			let xd = (box.x + box.width * 0.5)
-			let yd = (box.y + box.height * 0.5)
-
-			let coords1 = util.convertScreenCoordsToSvgCoords (xd, yd);
-			let center = util.convertScreenCoordsToSvgCoords (wBox.x+wBox.width*0.5, wBox.y+wBox.height*0.5)
-		
-			let outerBox = document.querySelector('#contours').getBoundingClientRect()
-			let oxd = (outerBox.x + outerBox.width * 0.5)
-			let oyd = (outerBox.y + outerBox.height * 0.5)
-
-			let dif = util.convertScreenCoordsToSvgCoords (oxd, oyd)
-			let ydif = dif.y - center.y
-			let xdif = dif.x - center.x
-
-			let matrixN = { a: scale, b: 0, c: 0, d: scale, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }
-			//TODO ЗДЕСЬ в некоторых случаях вылезает ошибка и матрица  получает неверные значения
-			////TODOTODO//TDOD  потестить где баг есть!!!
-			let allNumbersAreValid = Object.values(matrixN).every(value => Number.isFinite(value));
-			if ( allNumbersAreValid ) {
-				partStore.setGroupMatrix (matrixN)
-			}		
-			
- 			coordsStore.setNeedToFit(false)
-			coordsStore.setFittedPosition ({matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }, 'groupMatrix': matrixN , 'rectParams':rectParams})
-
-		} else {
-			//console.log('from store')
-			partStore.setMatrix(coordsStore.fittedPosition.matrix)
-			partStore.setGroupMatrix(coordsStore.fittedPosition.groupMatrix)
-			partStore.setRectParams(coordsStore.fittedPosition.rectParams)
-			coordsStore.setNeedToFit(false)
- 
-		/*	TODO: доделть смещение e f.
-			масштаб поучаем из мм1
-			а вот смещение надо рпассчитать как отклонение центра swgWrapper от центра outer при том что это  постоянное 
-			соотношение... от соотношение рахмеров окна и svg
-			//console.log ("matrix  " + JSON.stringify(toJS(coordsStore.fittedPosition.matrix)))
-			//console.log ( "groupMatrix  " + JSON.stringify(toJS(coordsStore.fittedPosition.groupMatrix)))
-
-			
-			let mm1 = document.querySelector('#group1').transform.baseVal.consolidate().matrix
-			//console.log(mm1)
-			partStore.setMatrix( { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
-			partStore.setGroupMatrix(mm1)
-			coordsStore.setNeedToFit(false)		
-  			*/
-		}	
-    }
+		const x = 0;
+		const y = 0;
+	
+		// размеры SVG (viewBox), в которое хотим вписать контент
+		const svgW = 1250;
+		const svgH = 650	
+		// доступная область с padding
+		const viewW = svgW - padding * 2;
+		const viewH = svgH - padding * 2;
+	
+		// масштаб
+		const scale = Math.min(viewW / widthContent, viewH / heightContent);
+	
+		// центр доступной области
+		const cx = padding + viewW / 2;
+		const cy = padding + viewH / 2;
+	
+		// центр контента
+		const contentCX = x + widthContent / 2;
+		const contentCY = y + heightContent / 2;
+	
+		// смещение, чтобы центр контента совпал с центром области
+		const tx = cx - contentCX * scale;
+		const ty = cy - contentCY * scale;
+	
+		partStore.setGroupMatrix({
+			a: scale,
+			b: 0,
+			c: 0,
+			d: scale,
+			e: tx,
+			f: ty
+		});
+	
+		console.log("FIT DONE:", { scale, tx, ty });
+	};
+	    
 
 	useEffect(() => {
 		//console.log ('UseEffect in Matrix')
