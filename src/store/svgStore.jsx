@@ -10,7 +10,6 @@ class SvgStore {
 	tooltips = false;
 	laserShow = {};
 	highLighted = false;
-	//svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	svgData = {
 		"name": "undefined.ncp",
 		"width": 500,
@@ -477,8 +476,8 @@ class SvgStore {
 				let line = ''
 
 				if (g !== G) line += g
-				if (x !== X) line += "X" + x2
-				if (y !== Y) line += "Y" + y2
+				if (x !== X) line += "X" + utils.smartRound (x2)
+				if (y !== Y) line += "Y" + utils.smartRound (y2)
 				if (i !== I) line += "I" + i
 				if (j !== J) line += "J" + j
 				  
@@ -597,8 +596,8 @@ class SvgStore {
 				let line = ''
 
 				if (g !== G) line += g
-				if (x !== X) line += "X" + x2
-				if (y !== Y) line += "Y" + y2
+				if (x !== X) line += "X" + utils.smartRound(x2)
+				if (y !== Y) line += "Y" + utils.smartRound(y2)
 				if (i !== I) line += "I" + i
 				if (j !== J) line += "J" + j
 				  
@@ -724,8 +723,8 @@ class SvgStore {
 				let line = ''
 
 				if (g !== G) line += g
-				if (x !== X) line += "X" + x2
-				if (y !== Y) line += "Y" + y2
+				if (x !== X) line += "X" + utils.smartRound(x2)
+				if (y !== Y) line += "Y" + utils.smartRound(y2)
 				if (i !== I) line += "I" + i
 				if (j !== J) line += "J" + j
 				  

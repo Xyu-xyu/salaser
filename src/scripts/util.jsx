@@ -2271,12 +2271,12 @@ class Utils {
 		};
 	}
 
-
-
 	smartRound(num, p = 5) {
 		const factor = 10 ** p;
-		return Math.trunc(num * factor) / factor;
-	  }
+		let res = Math.round(num * factor) / factor;
+		res = Math.abs(res) < 1e-12 ? 0 : res;
+		return res
+	}
 } 
 
 
