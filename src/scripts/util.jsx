@@ -2201,9 +2201,77 @@ class Utils {
 		return Math.max(0, Math.min(100, percentage)); 
 	}
 	
-	smartRound(num, p=10) {
-		return Number(num.toPrecision(p));
+	makeOLDGcodeParser() {
+		console.log("makeGcodeParser");
+
+		let last = { g: undefined, m: undefined, params: {} };
+		let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
+
+		return function parseGcodeLine(raw) {
+			let s = String(raw).trim();
+			s = s.replace(/^\d+\s*/, "");
+
+			const out = { n: undefined, g: undefined, m: undefined, params: {} };
+
+			// Комментарий
+			const commentMatch = s.match(/\(([^)]*)\)/);
+			if (commentMatch) {
+				out.comment = commentMatch[1];
+				s = s.replace(/\([^)]*\)/g, " ");
+			}
+
+			// N-номер
+			const nMatch = raw.match(/(\d+)N/i);
+			if (nMatch) {
+				out.n = parseInt(nMatch[1], 10); // используем первую группу
+			}
+
+			// G/M команды
+			const gMatch = s.match(/G(-?\d+(?:\.\d+)?)/i);
+			out.g = gMatch ? Number(gMatch[1]) : last.g;
+
+			const mMatch = s.match(/M(-?\d+(?:\.\d+)?)/i);
+			out.m = mMatch ? Number(mMatch[1]) : false;
+
+			// Параметры
+			const keys = ["X", "Y", "I", "J", "S", "P", "H", "A", "L", "C"];
+			for (const k of keys) {
+				const r = new RegExp(`${k}(-?\\d+(?:\\.\\d+)?)`, "i");
+				const m = s.match(r);
+				if (m) {
+					out.params[k] = Number(m[1]);
+				} else if (last.params[k] !== undefined) {
+					out.params[k] = last.params[k];
+				}
+			}
+
+			// Обработка "Part End"
+			if (/(Part End)/i.test(s)) {
+				out.base = { X: 0, Y: 0, C: 0 };
+			}
+
+			// Если это строка с G52 — сохраняем как базовую
+			if (/G52/i.test(s)) {
+				base = {
+					X: out.params.X ?? 0,
+					Y: out.params.Y ?? 0,
+					C: out.params.C ?? 0,
+				};
+				out.base = { ...base };
+			} else {
+				out.base = { ...base };
+			}
+
+			// Обновляем last
+			last.g = out.g;
+			last.m = out.m;
+			last.params = { ...last.params, ...out.params };
+
+			return out;
+		};
 	}
+
+
 
 	smartRound(num, p = 5) {
 		const factor = 10 ** p;

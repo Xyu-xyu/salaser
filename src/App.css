@@ -1015,6 +1015,10 @@ height: fit-content;}
     flex-direction: column;
 }
 
+.ccard.selected {
+  border: 2px solid var(--violet) !important;
+}
+
 .ccard-icon {
     position: absolute;
     right: 10px;
@@ -1958,7 +1962,7 @@ height: fit-content;}
  text-align: center;
  min-height: 80px;
  min-width: 80px;
- max-height: 1000px;
+ max-height: fit-content;
  max-width: 1200px;
  position: absolute;
  overflow: hidden;

@@ -76,7 +76,7 @@ const FormsPanel = observer(() => {
 									{t("id")}
 								</th>
 								<th className="header longText" scope="col">
-									{t("part_code")}
+									{t("part")}
 								</th>
 								<th className="header" scope="col">
 									{t("amount")}
@@ -95,21 +95,21 @@ const FormsPanel = observer(() => {
 
 									return (
 										<tr key={index}>
-											<td className="header align-middle" scope="col">
+											<td className="  align-middle" scope="col">
 												{Number(index + 1)}
 											</td>
-											<td className="header longText longText5 align-middle" scope="col">
+											<td className="  longText longText5 align-middle" scope="col">
 												Part_{Number(index + 1)}
 											</td>
-											<td className="header longText align-middle" scope="col">
+											<td className="  longText align-middle" scope="col">
 												{a.uuid}
 											</td>
-											<td className="header align-middle" scope="col">
+											<td className="  align-middle" scope="col">
 												{
 													svgStore.svgData.positions.filter(pos => pos.part_code_id === a.uuid).length
 												}
 											</td>
-											<td scope="col">
+											<td scope="col" >
 												<svg viewBox={ a.hasOwnProperty("viewBox") ?  a.viewBox :`0 0 ${a.width} ${a.height}`} xmlns="http://www.w3.org/2000/svg" width='40' height='40'>
 													<use
 														href={`#part_${index+1}`}
@@ -119,7 +119,7 @@ const FormsPanel = observer(() => {
 														/>													
 												</svg>
 											</td>
-											<td className="header" scope="col">
+											<td className=" " scope="col">
 												<div className='d-flex align-items-center justify-content-center'>												
 													<div className='d-flex'>
 														<button

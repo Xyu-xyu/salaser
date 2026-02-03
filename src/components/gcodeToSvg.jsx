@@ -49,7 +49,7 @@ const GCodeToSvg = observer(() => {
 
 	const cmds = useMemo(() => {
 		if (!listing.trim()) return [];	
-		const parseGcodeLine = utils.makeGcodeParser();
+		const parseGcodeLine = utils.makeOLDGcodeParser();
 		const lines = listing.trim().split(/\n+/);
 		return lines
 		  .map(line => line.trim())
@@ -599,6 +599,29 @@ const GCodeToSvg = observer(() => {
 					</button>
 				</div>			
 			</div>
+			
+			<div className="d-flex flex-column">
+					<input
+						type="range"
+						className="w-full cursor-pointer accent-orange-500"
+						min={0}
+						max={ listing.trim().split(/\n+/).length }
+						step={1}
+						value={cutSeg}
+						onChange={(e)=> laserStore.setVal('cutSeg', e.target.value)}
+					/>
+
+					{/* Поле ввода */}
+					<input
+						type="number"
+						className="w-full p-2 border rounded-md d-none"
+						min={0}
+						step={1}
+						value={ cutSeg}
+						onChange={(e)=> laserStore.setVal('cutSeg', e.target.value)}
+					/>
+ 			</div>
+
 			<div className="d-flex flex-column position-absolute mx-2 mt-2 p-2"
 				style={{ right: '0px', border: "1px solid var(--grey-nav)", borderRadius: "5px", backgroundColor: "#fff" }}
 			>

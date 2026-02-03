@@ -322,7 +322,7 @@ const PartSvgWrapper = observer(() => {
 			coordsStore.setPreloader(false)
 			let attr = calculateRectAttributes()
 			partStore.setRectParams( attr)
-		}, 500);
+		}, 1);
 	  		
 		const handleKeyDown = (e) => {
 				console.log ('handleKeyDown')

@@ -23,12 +23,11 @@ const MidBar = observer(() => {
 		jobStore.loadJobs()
 	}, [])
 
-
-	const { paramsLimit, planViewType } = laserStore;
+	const { paramsLimit, planViewType,  centralBarMode  } = laserStore;
 	const { leftMode } = laserStore
 	const swiperRef = useRef(null);
 	const { isVertical, presets } = macrosStore
-	const { mockCards } = jobStore
+	const { mockCards,selectedId } = jobStore
 	let tasks = []
 	if (mockCards.Completed && mockCards.Completed.length) {
 		tasks.push(mockCards.Completed[mockCards.Completed.length-1])
@@ -152,11 +151,14 @@ const MidBar = observer(() => {
 				>
 					{/* Плавное переключение содержимого */}
 					<motion.div
-						key="content"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 0.25 }}
+						key="Carousel" 
+						initial={false}
+						animate={{
+							opacity: centralBarMode === 'plans'  && planViewType === "Carousel"  ? 1 : 0,
+							x: planViewType === "Carousel" ? 0 : 20,
+							pointerEvents: planViewType === "Carousel" ? "auto" : "none",
+					}}
+ 						transition={{ duration: 0.25, ease: "easeInOut" }}
 						style={{
 							position: "absolute",
 							inset: 0,
@@ -168,14 +170,7 @@ const MidBar = observer(() => {
 
 						}}
 					>
-						<div
-							style={{
-								opacity: planViewType === "Carousel" ? 1 : 0,
-								transition: "opacity 0.25s ease-in-out",								
-							}}
-
-							className={ planViewType === "Carousel" ? "" : "d-none"}
-						>
+						<div>
 							{/* Первый блок (Carousel) */}
 							<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
 								<div className="planMain">
@@ -191,7 +186,7 @@ const MidBar = observer(() => {
 										grabCursor={true}
 										centeredSlides={true}
 										slidesPerView={5}
-										initialSlide={macrosStore.selectedModulationMacro}
+										//initialSlide={macrosStore.selectedModulationMacro}
 										freeMode={false}
 										coverflowEffect={{
 											rotate: 0,
@@ -208,8 +203,6 @@ const MidBar = observer(() => {
 											justifyContent: 'center',
 										}}
 										onSlideChange={(swiper) => {
-											const currentSlide = swiper.activeIndex;
-											macrosStore.setSelectedSlide(currentSlide);
 										}}
 									>
 										{tasks.map((card) => {
@@ -225,8 +218,11 @@ const MidBar = observer(() => {
 
 											return (
 												<SwiperSlide key={card.id}>
-													<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4">
-														<div className="ccard">
+													<div className="swiperSlide swiperSlideInTasks position-absolute top-50 start-50 translate-middle fs-4"
+													
+														onPointerDown={() => { jobStore.setVal('selectedId', card.id);}}
+													>
+														<div className={card.id === selectedId ?  "ccard selected":"ccard"}>
 															<div className="ccard-header">{card.name} {card.status} {card.is_cutting}</div>
 															<div className="ccard-icon">
 
@@ -267,11 +263,7 @@ const MidBar = observer(() => {
 																	className="ms-1"
 																	viewBox='0 0 36 36'
 																/>
-															}
-
-
-
-															
+															}															
 															</div>
 															<div className="ccard-image-wrapper">
 																<div className="ccard-image">
@@ -323,7 +315,7 @@ const MidBar = observer(() => {
 					</motion.div>
 
 					<motion.div
-						key="content1"
+						key="CanBan"
 						initial={{ opacity: 0 }}
 						animate={{ opacity: planViewType === "CanBan" ? 1 : 0 }}
 						transition={{ duration: 0.25 }}
