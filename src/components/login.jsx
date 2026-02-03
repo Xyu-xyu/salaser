@@ -2,6 +2,7 @@ import { useState, FormEvent } from "react";
 import { useTranslation } from 'react-i18next';
 import LanguageButton from "./navbar/languageButton";
 import laserStore from "../store/laserStore";
+import img11 from "./../images/11.png"
 
 
 const LoginPage = () => {
@@ -76,7 +77,7 @@ const LoginPage = () => {
 			style={{
 				bottom:"0px",
 				right:"0px",
-				background: "url('/src/images/11.png",
+				backgroundImage: `url(${img11})`, 
 				width: "100vw",
 				height: "500vh",
 				mixBlendMode: "luminosity",

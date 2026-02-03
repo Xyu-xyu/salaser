@@ -10,10 +10,11 @@ import { useTranslation } from 'react-i18next';
 import macrosStore from "../store/macrosStore";
 import Hammer from "hammerjs";
 import CustomIcon from "../icons/customIcon";
+import jobStore from "../store/jobStore";
 
 
 const GCodeToSvg = observer(() => {
-
+	const { currentCuttingJobId} = jobStore
 	const { loadResult, cutSeg } = laserStore
 	const { isVertical } = macrosStore
 	const containerRef = useRef(null);
@@ -43,10 +44,6 @@ const GCodeToSvg = observer(() => {
 	let groupRefs = useRef([]); // Рефы на группы
 	const { t } = useTranslation()
 
-	useEffect(() => {
-		update()
-	}, [])
-
 	const cmds = useMemo(() => {
 		if (!listing.trim()) return [];	
 		const parseGcodeLine = utils.makeOLDGcodeParser();
@@ -60,7 +57,8 @@ const GCodeToSvg = observer(() => {
 	useEffect(() => {
  		setLabels([])
 		update()
-	}, [loadResult])
+		console.log ()
+	}, [currentCuttingJobId])
 
 	useEffect(() => {
 		if (!paths) return;
