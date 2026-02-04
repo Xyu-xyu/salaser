@@ -514,7 +514,12 @@ class SvgStore {
 			}
 		})
 
-		if (contour.class.includes("contour") && !contour.class.includes("engraving")) res.push('(<Contour>)');
+		if ( contour.class.includes("contour") && 
+			!contour.class.includes("engraving") &&
+			c?.segments.length > 2) { 
+				
+				res.push('(<Contour>)');
+		}
 
 		c?.segments.forEach(seg => {
 			const cmd = seg[0]
@@ -537,6 +542,15 @@ class SvgStore {
 
 			}
 
+			if (needLaserOn && c.segments.length == 2 ) {
+				const macro = this.getMacro(contour.class)
+				if (macro !== null && macro !== currentMacro) {
+					res.push(`G10S${macro}`)
+					G = 'G10'
+					currentMacro = macro
+				}
+			}
+
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
@@ -546,7 +560,11 @@ class SvgStore {
 				if (g !== G) line += g
 				if (x !== X) line += "X" + utils.smartRound (x)
 				if (y !== Y) line += "Y" + utils.smartRound (height- y)
-				if (needLaserOn) line +="M4"
+
+				
+				if (needLaserOn && c.segments.length == 2 ) line +="M14M4M5M15";
+				if (needLaserOn && c.segments.length > 2) line +="M4"
+
 				needLaserOn = false
 
 				G = g
@@ -600,8 +618,11 @@ class SvgStore {
 				if (y !== Y) line += "Y" + utils.smartRound(y2)
 				if (i !== I) line += "I" + i
 				if (j !== J) line += "J" + j
-				  
-			  
+
+				if (needLaserOn && c.segments.length == 2 ) line +="M14M4M5M15";
+				if (needLaserOn && c.segments.length > 2) line +="M4"
+
+
 				G = g
 				X = x
 				Y = y
@@ -622,7 +643,7 @@ class SvgStore {
 			}
 		})
 
-		if (needLaserOff && (!outlet ||!outlet.length )) {
+		if (needLaserOff && (!outlet ||!outlet.length ) && c.segments.length > 2) {
 			res[res.length-1]+="M5"
 			needLaserOff = false
 		}
@@ -634,7 +655,13 @@ class SvgStore {
 			needG40 = false
 		}
 
-		if (contour.class.includes("contour") && !contour.class.includes("engraving")) res.push('(</Contour>)');
+		if (contour.class.includes("contour") 
+			&& !contour.class.includes("engraving")
+			&& c?.segments.length > 2
+
+		) {
+			res.push('(</Contour>)');
+		}
 
 		o?.segments.forEach(seg => {
 			const cmd = seg[0]
@@ -1060,8 +1087,6 @@ class SvgStore {
 				continue;
 			}
 
-
-
 			if (Array.isArray(c.m)) {
 
 				const m = new Set(c.m);
@@ -1073,16 +1098,13 @@ class SvgStore {
 					console.log('laser on')
 					laserOn = true;
 					res[res.length - 1].path = this.start(cx, cy, c, partHeight);
-				}
-				else if (only(5) || only(5, 15) ) {
+				}	else if (only(5) || only(5, 15) ) {
 
 					console.log('laser off')
 					laserOn = false;
 					contourOpen = "before"
 				  
-				}
-
-				else if (only(5, 15, 4, 14)) {
+				} else if (only(5, 15, 4, 14) || only(5, 4)) {
 				  // только M5 M15
 				  	console.log('laser on')
 					laserOn = true;
@@ -1166,13 +1188,24 @@ class SvgStore {
 					cx = tx; cy = ty;
 				} else if (g === 10) {
 					macros = ' macro' + c.params.S + ' '
-					try {
+					/*try {
 						res[res.length - 1].class += macros
 					} catch (error) {
 						console.log("catch in macros")
-					}
-					//res[res.length - 1].class += macros
+					}*/
 
+					try {
+
+						 res[res.length - 1].class = (
+							( res[res.length - 1].class || '')
+								.replace(/\bmacro\d+\b/g, '')
+								+ macros
+						)
+
+					} catch (error) {
+						console.log("catch in macros");
+					}
+ 
 				} else if (g === 29) {
 
 					//console.log('g === 29')
@@ -1361,7 +1394,7 @@ class SvgStore {
 		let ncpParts = this.generateParts()
 		let ncpFinish = [
 			`(</NcpProgram>)`,
-			`&`
+			`& \n`
 		]
 
 		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]

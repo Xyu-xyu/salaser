@@ -120,6 +120,7 @@ const SimpleReturnComponent = observer(() => {
 					fillRule="evenodd"
 					stroke="currentColor"
 					strokeWidth={0.2}
+					strokeLinecap={'round'}
 					vectorEffect="non-scaling-stroke"
 					pointerEvents="visiblePainted"
 				/>
@@ -130,6 +131,7 @@ const SimpleReturnComponent = observer(() => {
 					fill="none"
 					stroke="currentColor"
 					strokeWidth={2}
+					strokeLinecap={'round'}
 					vectorEffect="non-scaling-stroke"
 					pointerEvents="visiblePainted"
 				/>
@@ -140,7 +142,7 @@ const SimpleReturnComponent = observer(() => {
 					fill="none"
 					stroke="limegreen"
 					strokeWidth={1}
-					vectorEffect="non-scaling-stroke"
+					strokeLinecap={'round'}
 					pointerEvents="visiblePainted"
 				/>
 			</g>

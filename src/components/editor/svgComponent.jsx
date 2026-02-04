@@ -20,9 +20,7 @@ const SvgComponent = observer (() => {
     const {
         matrix,  
         groupMatrix,
-        gridState,
         svgData,
-
     } = svgStore
     const { isVertical } = macrosStore
 
@@ -35,7 +33,7 @@ const SvgComponent = observer (() => {
             id="svg"
             baseProfile="full"
             className='planSvg'
-            viewBox={`0.00 0.00 ${svgData.width} ${ svgData.height }`}
+            viewBox={`0.00 0.00 ${ svgData.height }  ${svgData.width}`}
             style={{ overflow: 'hidden' }}
             version="1.1"
             stroke='var(--color)'
@@ -53,8 +51,8 @@ const SvgComponent = observer (() => {
                     <g id="group" transform={`matrix(${matrixM})`} className="grab">
                         <rect
                             id="dimensionalGrid"
-                            height={ svgData.width  }
-                            width={  svgData.height}
+                            height={ svgData.width }
+                            width={ svgData.height}
                             x={0}
                             y={0}
                             fill="url(#grid)"

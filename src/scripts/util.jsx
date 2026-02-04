@@ -2202,8 +2202,6 @@ class Utils {
 	}
 	
 	makeOLDGcodeParser() {
-		console.log("makeGcodeParser");
-
 		let last = { g: undefined, m: undefined, params: {} };
 		let base = { X: 0, Y: 0, C: 0 }; // базовые значения из строки перед Part code
 
