@@ -310,6 +310,32 @@ class JobStore {
 		}
 		return false;
 	}
+
+	async saveNcpToServer(ncpText) {
+
+		if (!this.selectedId) return;
+	
+		let resp = await fetch(constants.SERVER_URL + "/jdb/update_ncp", {
+			method: "POST",
+			headers: {
+				/*"Content-Type": "application/json"*/
+			},
+			body: JSON.stringify({
+				uuid: this.selectedId,
+				content: ncpText.join("\n")
+			})
+		})
+	
+		if (!resp.ok)
+			throw new Error("Update failed")
+	
+		const data = await resp.json()
+	
+		console.log("updated:", data)
+	
+		jobStore.loadJobs()
+	}
+	
 }
 
 const jobStore = new JobStore();

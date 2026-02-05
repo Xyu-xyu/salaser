@@ -838,7 +838,8 @@ class SvgStore {
 		const res = [];
 		// fix need workinfg area
 		//res.push(`N1G29X${this.svgData.height}Y${this.svgData.width}P1H1A1`);
-		res.push(`N1G29X${110}Y${118}P1H1A1`);
+		let contBox = document.querySelector("#contours").getBBox()
+		res.push(`N1G29X${contBox.width}Y${contBox.height}P1H1A1`);
 		let lineNumber = 2;
 		let x, y, c, g, l = 0
 
@@ -1400,11 +1401,16 @@ class SvgStore {
 		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
 		ncp = this.renumberNLines (ncp, 1)
 
-		ncp.forEach((item) => { console.log(item) });
-		//console.log ( ncp )
+		//ncp.forEach((item) => { console.log(item) });
+		jobStore.saveNcpToServer(ncp)
 	}
 
 }
 
 const svgStore = new SvgStore();
 export default svgStore;
+
+
+// сохранние ручного
+// вращение деталей
+// удаление детлаей
