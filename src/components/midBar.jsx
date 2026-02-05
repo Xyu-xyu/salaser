@@ -14,6 +14,7 @@ import jobStore from "../store/jobStore";
 import { useTranslation } from 'react-i18next';
 import constants from "../store/constants";
 import CustomIcon from "../icons/customIcon";
+import DetailsButtonImg from "./detailsButtonImg"
  
 
 const MidBar = observer(() => {
@@ -267,7 +268,7 @@ const MidBar = observer(() => {
 															</div>
 															<div className="ccard-image-wrapper">
 																<div className="ccard-image">
-				    												<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
+																	<DetailsButtonImg id={card.id} updated_at={card.updated_at} />
  																</div>
 															</div>
 															<div className="ccard-info-block">

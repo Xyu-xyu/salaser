@@ -1,18 +1,18 @@
-import constants from "../store/constants";
+ import constants from "../store/constants"
 
+const DetailsButtonImg = ({ id, updated_at }) => {
 
+	const src = `${constants.SERVER_URL}/api/get_svg/${id}?v=${updated_at}`
 
-const detailsButtonImg = ({ id }) => {
-
- 	return (
+	return (
 		<>
-			<div className="detailsImage">
-				<img src={`${constants.SERVER_URL}/api/get_svg/${id}`} alt={"img"} />
-			</div>
+			<img
+				src={src}
+				alt="img"
+			/>
 		</>
-	);
-};
+	)
+}
 
-export default detailsButtonImg;
-
+export default DetailsButtonImg
 

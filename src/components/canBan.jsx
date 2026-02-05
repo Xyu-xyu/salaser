@@ -7,6 +7,7 @@ import macrosStore from '../store/macrosStore';
 import { useEffect } from 'react';
 import constants from '../store/constants';
 import CustomIcon from '../icons/customIcon';
+import DetailsButtonImg from "./detailsButtonImg"
 
 const CanBan = observer(() => {
 	const { t } = useTranslation();
@@ -126,7 +127,7 @@ const CanBan = observer(() => {
 
 
 												<div className="cardImage">
-													<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
+													<DetailsButtonImg id={card.id} updated_at={card.updated_at} />
 												</div>
 
 												<div className="mt-2">

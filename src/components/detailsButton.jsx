@@ -180,11 +180,8 @@ export const DetailsButton = observer(({ item }) => {
 
 									</div>
 
-							{/* 		<div className="detailsImage">
-										<img src={`${constants.SERVER_URL}/api/get_svg/${card.id}`} alt={"img"} />
-									</div> */}
+									<DetailsButtonImg id={card.id} updated_at={card.updated_at} />
 
-									<DetailsButtonImg id={card.id}/>
 
 									<div className="m-4">
 										<div className="cardTime">
