@@ -179,8 +179,9 @@ export const DetailsButton = observer(({ item }) => {
 										</div>
 
 									</div>
-
-									<DetailsButtonImg id={card.id} updated_at={card.updated_at} />
+									<div className="detailsImage">
+										<DetailsButtonImg id={card.id} updated_at={card.updated_at} />
+									</div>
 
 
 									<div className="m-4">
