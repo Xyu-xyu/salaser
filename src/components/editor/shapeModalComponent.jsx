@@ -118,9 +118,7 @@ const ShapeModalComponent = observer(() => {
 		part_id: svgStore.nextPartId, // или как у тебя правильно
 		part_code_id: uuid,           // вот здесь критично — правильный uuid!
 		selected: false,
-		positions: { a: 1, b: 0, c: 0, d: 1, e: translateX, f: translateY },
-		cx:iniX,
-		cy:iniY
+		positions: { a: 1, b: 0, c: 0, d: 1, e: translateX, f: translateY },		
 	});
 }
 
@@ -134,7 +132,7 @@ const ShapeModalComponent = observer(() => {
 					icon="fa-shapes"
 					width="20"
 					height="20"
-					fill='black'
+					fill={"var(--violet)"}
 					strokeWidth={0}
 					viewBox='0 0 512 512'
 				/>

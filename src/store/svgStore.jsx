@@ -22,9 +22,9 @@ class SvgStore {
 				"part_id": 1,
 				"part_code_id": 1,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": 0, "f": 0 }
-				cx:0
-				cy:0
-			}*/
+				selected: true
+
+			}
 		],
 		"part_code": [
 			/*{
@@ -833,6 +833,71 @@ class SvgStore {
 		return res
 	}
 
+	deleteSelectedPosition () {		
+		runInAction(() => {
+			this.svgData.positions = this.svgData.positions.filter(pos => !pos.selected);
+		})	
+	}
+
+	rotateSelectedPosition(angle = 45) {
+		runInAction(() => {
+	  
+		  const rad = angle * Math.PI / 180;
+		  const cos = Math.cos(rad);
+		  const sin = Math.sin(rad);
+	  
+		  const multiply = (m1, m2) => ([
+			[
+			  m1[0][0]*m2[0][0] + m1[0][1]*m2[1][0],
+			  m1[0][0]*m2[0][1] + m1[0][1]*m2[1][1],
+			  m1[0][0]*m2[0][2] + m1[0][1]*m2[1][2] + m1[0][2]
+			],
+			[
+			  m1[1][0]*m2[0][0] + m1[1][1]*m2[1][0],
+			  m1[1][0]*m2[0][1] + m1[1][1]*m2[1][1],
+			  m1[1][0]*m2[0][2] + m1[1][1]*m2[1][2] + m1[1][2]
+			],
+			[0,0,1]
+		  ]);
+	  
+		  this.svgData.positions.forEach(pos => {
+			if (!pos.selected) return;
+	  
+			const part = this.svgData.part_code.find(p => p.id === pos.part_code_id);
+			if (!part) return;
+	  
+			const px = part.width  / 2;
+			const py = part.height / 2;
+	  
+			const { a, b, c, d, e, f } = pos.positions;
+	  
+			const oldM = [
+			  [a, c, e],
+			  [b, d, f],
+			  [0, 0, 1]
+			];
+	  
+			// 🔥 точно как в твоём рабочем коде
+			const rotM = [
+			  [cos, -sin, px*(1-cos) + py*sin],
+			  [sin,  cos, py*(1-cos) - px*sin],
+			  [0, 0, 1]
+			];
+	  
+			const m = multiply(oldM, rotM); // ← КЛЮЧ
+	  
+			pos.positions = {
+			  a: m[0][0],
+			  b: m[1][0],
+			  c: m[0][1],
+			  d: m[1][1],
+			  e: m[0][2],
+			  f: m[1][2],
+			};
+		  });
+		});
+	}
+
 	generatePositions() {
 		const data = this.svgData;
 		const res = [];
@@ -1053,7 +1118,7 @@ class SvgStore {
 				const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 				const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
 
-				if (!res[res.length - 1].class.includes("inlet")) {
+				if (res.length && !res[res.length - 1].class.includes("inlet")) {
 					cid += 1
 				}
 
@@ -1321,9 +1386,9 @@ class SvgStore {
 		return { a, b, c, d, e, f };
 	}
 
-	matrixToG52(matrix, sheetHeight, partHeight, cx, cy) {
+ 	matrixToG52(matrix, sheetHeight, partHeight) {
 		//console.log (arguments)
-		const { a, b, e, f } = matrix;
+		const {a, b, c, d, e, f} = matrix;
 		let C = -Math.atan2(b, a) * 180 / Math.PI;
 
 		// нормализация
@@ -1332,24 +1397,17 @@ class SvgStore {
 		if (Math.abs(C - 180) < 1e-6) C = 180;
 		if (Math.abs(C - 270) < 1e-6) C = 270;
 		C = (C + 360) % 360
+		let x = 0
+		let y = partHeight
 
-		const cos = a;
-		const sin = b;
-
-		// 1. убрать вклад центра вращения
-		const ex = e - (cx - cos * cx + sin * cy);
-		const fy = f - (cy - sin * cx - cos * cy);
-
-		// 2. инвертировать вращение
-		const tx = cos * ex + sin * fy;
-		const ty = -sin * ex + cos * fy;
+		const xNew = a * x + c * y + e;
+		const yNew = b * x + d * y + f;
 
 		// 3. вернуть координаты NCP
-		const X = tx;
-		const Y = sheetHeight - ty - partHeight;
-
+		const X = utils.smartRound(xNew);
+		const Y = utils.smartRound ( sheetHeight - yNew );
 		return { X, Y, C };
-	}
+	} 
 
 	renumberNLines(lines, start = 1) {
 		let n = start

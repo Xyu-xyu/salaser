@@ -20,9 +20,7 @@ const FormsPanel = observer(() => {
 				"part_id": id,
 				"part_code_id": uuid,
 				"selected":false,
-				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": x, "f": y},
-				"cx":WH.width,
-				"cy":WH.height,
+				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": x, "f": y},				
 			}
 		)
 	}
