@@ -6,6 +6,7 @@ import macrosStore from "../../store/macrosStore";
 import CustomIcon from "../../icons/customIcon";
 import laserStore from "../../store/laserStore";
 import svgStore from "../../store/svgStore";
+import jobStore from "../../store/jobStore";
 
 
 const NewPlanButton = observer(() => {
@@ -18,6 +19,7 @@ const NewPlanButton = observer(() => {
 	const [width, setWidth] = useState("900");
 	const [height, setHeight] = useState("600");
 	const [quantity, setQuantity] = useState("1");
+	const [thickness, setThickness] = useState("1");
 	const [selectedPreset, setSelectedPreset] = useState(null);
 
 	// Ошибки валидации
@@ -26,7 +28,8 @@ const NewPlanButton = observer(() => {
 		width: "",
 		height: "",
 		quantity: "",
-		preset: ""
+		preset: "",
+		thickness:""
 	});
 
 	useEffect(() => {
@@ -63,6 +66,11 @@ const NewPlanButton = observer(() => {
 			newErrors.quantity = t("Quantity must be a positive integer");
 		}
 
+		const th = parseInt(thickness, 10);
+		if (!thickness || isNaN(th) || th <= 0 || !Number.isInteger(th)) {
+			newErrors.thickness = t("Thickness must be a positive integer");
+		}
+
 		// Preset обязателен
 		if (!selectedPreset) {
 			newErrors.preset = t("Please select a preset");
@@ -81,6 +89,7 @@ const NewPlanButton = observer(() => {
 			width: parseFloat(width),
 			height: parseFloat(height),
 			quantity: parseInt(quantity, 10),
+			thickness: parseInt(thickness, 10),
 			presetId: selectedPreset.id,
 			presetName: selectedPreset.name,
 			part_code: [],
@@ -92,7 +101,7 @@ const NewPlanButton = observer(() => {
 			svgStore.setVal ('svgData', key, res[key])
 		}	
 		laserStore.setVal("centralBarMode", "planEditor");
-		svgStore.c
+		jobStore.setVal('selectedId', 'newSheet')
 		handleClose();
 	};
 
@@ -103,6 +112,7 @@ const NewPlanButton = observer(() => {
 		setWidth("");
 		setHeight("");
 		setQuantity("");
+		setThickness("");
 		setSelectedPreset(null);
 		//setErrors({});
 	};
@@ -157,7 +167,7 @@ const NewPlanButton = observer(() => {
 						</Form.Group>
 
 						<div className="row">
-							<div className="col-md-4">
+							<div className="col-md-6">
 								<Form.Group className="mb-3">
 									<Form.Label>{t("Width (mm)")} *</Form.Label>
 									<Form.Control
@@ -174,7 +184,7 @@ const NewPlanButton = observer(() => {
 								</Form.Group>
 							</div>
 
-							<div className="col-md-4">
+							<div className="col-md-6">
 								<Form.Group className="mb-3">
 									<Form.Label>{t("Height (mm)")} *</Form.Label>
 									<Form.Control
@@ -190,8 +200,11 @@ const NewPlanButton = observer(() => {
 									</Form.Control.Feedback>
 								</Form.Group>
 							</div>
+						</div>
 
-							<div className="col-md-4">
+
+						<div className="row">
+							<div className="col-md-6">
 								<Form.Group className="mb-3">
 									<Form.Label>{t("Quantity")} *</Form.Label>
 									<Form.Control
@@ -207,6 +220,22 @@ const NewPlanButton = observer(() => {
 									</Form.Control.Feedback>
 								</Form.Group>
 
+							</div>
+							<div className="col-md-6">
+								<Form.Group className="mb-3">
+									<Form.Label>{t("Thickness")} *</Form.Label>
+									<Form.Control
+										type="number"
+										value={thickness}
+										onChange={(e) => setThickness(e.target.value)}
+										isInvalid={!!errors.thickness}
+										min="1"
+										step="0.1"
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.thickness}
+									</Form.Control.Feedback>
+								</Form.Group>
 							</div>
 						</div>
 

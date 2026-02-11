@@ -591,7 +591,7 @@ class Utils {
 		return deg * (Math.PI / 180);
 	}
 
-		getBisectorPoint(x, y, x1, y1, x2, y2, l) {
+	getBisectorPoint(x, y, x1, y1, x2, y2, l) {
 		// вычисляем точку на биисектрисе для поиска координать скругдления
 		// Вычисляем векторы A и B
 		let vectorA = { x: x1 - x, y: y1 - y };
@@ -621,14 +621,14 @@ class Utils {
 		};
 	}
 
-/* 	isPathClosed(normalizedPath) {
+ 	isPathClosed(normalizedPath) {
 		normalizedPath = SVGPathCommander.normalizePath(normalizedPath); 
 		if (!normalizedPath || normalizedPath.length < 2) return false;
 		const first = normalizedPath[0]; 
 		const last = normalizedPath[normalizedPath.length - 1]; 
 		if (first[0] !== "M") return false;
 		return first[1] === last[last.length - 2] && first[2] === last[last.length - 1];
-	} */
+	}
 	
 	radianToDegree(rad) {
 		return rad * (180 / Math.PI);

@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { showToast } from "../components/toast";
 import constants from "./constants";
+import svgStore from "./svgStore";
 /* 
 interface JobInfoAttr {
 	thickness;
@@ -330,10 +331,50 @@ class JobStore {
 			throw new Error("Update failed")
 	
 		const data = await resp.json()
-	
-		console.log("updated:", data)
-	
+		console.log("updated:", data)	
 		jobStore.loadJobs()
+	}
+
+
+	async saveNcpAsNewSheet( ncpText ) {
+
+		const material = "Mild steel"
+		const materialLabel = "S235JR"
+		const { name, thickness, quantity, width, height, presetId } = svgStore.svgData
+		
+		const fileData = {
+			name:name,
+			thickness:thickness,
+			quantity:quantity,
+			preset: presetId,
+			material:material,
+			materialLabel:materialLabel,
+			dimX: width,
+			dimY: height,
+			file: ncpText.join("\n")
+		}
+
+		console.log( fileData )
+		console.log( ncpText )
+
+	/* 
+		let resp = await fetch(
+			constants.SERVER_URL + "/jdb/create_from_ncp",
+			{
+				method: "POST",
+				headers: {},
+				body: JSON.stringify(fileData)
+			}
+		) 
+	
+	 	if (!resp.ok)
+			throw new Error("create sheet failed")
+	
+		const data = await resp.json() */
+	
+		console.log("created:", data)
+	 
+		jobStore.loadJobs() 	
 	}
 	
 }

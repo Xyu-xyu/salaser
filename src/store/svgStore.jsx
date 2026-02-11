@@ -12,6 +12,8 @@ class SvgStore {
 	highLighted = false;
 	svgData = {
 		"name": "undefined.ncp",
+		"thickness":1,
+		"jobcode":"",
 		"width": 500,
 		"height": 500,
 		"quantity": 1,
@@ -22,15 +24,17 @@ class SvgStore {
 				"part_id": 1,
 				"part_code_id": 1,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": 0, "f": 0 }
-				selected: true
+				"selected": true
 
-			}
+			}*/
 		],
 		"part_code": [
 			/*{
 				"id": 1,
 				"uuid": "n2-d0170e56-3c47-411e-84de-813bb41a7245",
 				"name": "12___10__2",
+				"height":100,
+				"width":100,
 				"code": [
 					{
 						"cid": 1,
@@ -166,7 +170,6 @@ class SvgStore {
 		}
 
 		console.log(form)
-
 		this.svgData.part_code.push(form)
 	}
 
@@ -514,14 +517,16 @@ class SvgStore {
 			}
 		})
 
-		if ( contour.class.includes("contour") && 
+
+		if (contour.class.includes("contour") && 
 			!contour.class.includes("engraving") &&
-			c?.segments.length > 2) { 
+			c?.segments.length > 2 && 
+			i.segments.length !== 0) { 
 				
 				res.push('(<Contour>)');
 		}
 
-		c?.segments.forEach(seg => {
+		c?.segments.forEach((seg, ind) => {
 			const cmd = seg[0]
 			if (cmd === 'M') {
 
@@ -542,7 +547,7 @@ class SvgStore {
 
 			}
 
-			if (needLaserOn && c.segments.length == 2 ) {
+			if (needLaserOn && c.segments.length === 2) {
 				const macro = this.getMacro(contour.class)
 				if (macro !== null && macro !== currentMacro) {
 					res.push(`G10S${macro}`)
@@ -641,9 +646,29 @@ class SvgStore {
 				needLaserOn = false			  
 				res.push(line)
 			}
+
+			if (i.segments.length === 0 && ind === 0) {
+				const macro = this.getMacro(contour.class)
+				if (macro !== null && macro !== currentMacro) {
+					res.push(`G10S${macro}`)
+					G = 'G10'
+					currentMacro = macro
+				}
+			}
+
+			if (i.segments.length === 0	&& 
+				ind === 1 &&
+				c?.segments.length > 2 ) {
+				res.push('(<Contour>)');
+			}
 		})
 
-		if (needLaserOff && (!outlet ||!outlet.length ) && c.segments.length > 2) {
+		if (needLaserOff && (!outlet ||o.segments.length ===0 ) && c.segments.length > 2) {
+			res[res.length-1]+="M5"
+			needLaserOff = false
+		}
+
+		if (o.segments.length === 0 ) {
 			res[res.length-1]+="M5"
 			needLaserOff = false
 		}
@@ -771,7 +796,7 @@ class SvgStore {
 
 				}
 
-				const macro = this.getMacro(inlet.class)
+				const macro = this.getMacro(inlet.class|| "")
 				if (macro !== null && macro !== currentMacro) {
 					res.push(`G10S${macro}`)
 					currentMacro = macro
@@ -1358,9 +1383,116 @@ class SvgStore {
 
 		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
-		svgStore.svgData = Object.assign({}, result)
+		let result1 = this.defineInlets (result)
+		svgStore.svgData = Object.assign({}, result1)
 
 	}
+
+	defineInlets(result) {
+	
+	  const EPS = 0.001
+	
+	  const pointsEqual = (a, b) =>
+		Math.abs(a[0] - b[0]) < EPS &&
+		Math.abs(a[1] - b[1]) < EPS
+	
+	
+	  const getStartPoint = (segments) => {
+		const [, x, y] = segments[0] // M x y
+		return [x, y]
+	  }
+	
+	
+	  // безопасно для любых команд (A/C/Q/...)
+	  const getEndPoint = (cmd) => {
+		const len = cmd.getTotalLength()
+		const { x, y } = cmd.getPointAtLength(len)
+		return [x, y]
+	  }
+	
+	
+	  const removeFirstMove = (segments) =>
+		segments[0][0] === 'M' ? segments.slice(1) : segments
+	
+	
+	  // =====================================================
+	
+	  for (const part of result.part_code) {
+	
+		const contours = part.code.filter(c => c.class.includes('contour'))
+	
+		// ⚡ быстрее чем find каждый раз
+		const inletMap = new Map(
+		  part.code
+			.filter(c => c.class.includes('inlet') && c.path)
+			.map(i => [i.cid, i])
+		)
+	
+	
+		for (const contour of contours) {
+	
+		  if (
+			!contour.path ||
+			contour.class.includes('macro2') ||
+			utils.isPathClosed(contour.path)
+		  ) continue
+	
+	
+		  const inlet = inletMap.get(contour.cid)
+		  if (!inlet) continue
+	
+	
+		  // ✅ normalize обязателен
+		  const contourCmd = new SVGPathCommander(contour.path).normalize()
+		  const inletCmd   = new SVGPathCommander(inlet.path).normalize()
+	
+		  const contourSeg = contourCmd.segments
+		  const inletSeg   = inletCmd.segments
+	
+	
+		  const contourStart = getStartPoint(contourSeg)
+		  const contourEnd   = getEndPoint(contourCmd)
+	
+		  const inletStart = getStartPoint(inletSeg)
+		  const inletEnd   = getEndPoint(inletCmd)
+	
+	
+		  let mergedSegments = null
+	
+	
+		  // inlet -> contour
+		  if (pointsEqual(inletEnd, contourStart)) {
+			mergedSegments = [
+			  ...inletSeg,
+			  ...removeFirstMove(contourSeg)
+			]
+		  }
+	
+		  // contour -> inlet
+		  else if (pointsEqual(contourEnd, inletStart)) {
+			mergedSegments = [
+			  ...contourSeg,
+			  ...removeFirstMove(inletSeg)
+			]
+		  }
+	
+	
+		  if (!mergedSegments) continue
+	
+	
+		  // ✅ ПРАВИЛЬНАЯ сборка пути
+		  contour.path = new SVGPathCommander(mergedSegments).toString()
+	
+		  // очищаем inlet
+		  inlet.path = ''
+		}
+	  }
+	
+	  return result
+	}
+	
+	  
+	  
 
 	rotateTranslateToMatrix(C, cx, cy, tx, ty) {
 		const rad = (-C * Math.PI) / 180;
@@ -1432,22 +1564,38 @@ class SvgStore {
 	  
 
 	saveNcpFile() {
-
+		
 		const { selectedId } = jobStore;
-		const current = jobStore.getJobById(selectedId)
-		if (!current) return;
-		const { loadResult, dimX, dimY, material, materialLabel, name } = current
-		let parsed = JSON.parse(loadResult)
-		const { thickness, jobcode } = parsed.result.jobinfo.attr
+		let ncpStart;
 
-		let ncpStart = [
-			`%`,
-			`(<NcpProgram Version="1.0" Units="Metric">)`,
-			`(<MaterialInfo Label="${material}" MaterialCode="${materialLabel}" Thickness="${thickness}" FormatType="Sheet" DimX="${dimX}" DimY="${dimY}"/>)`,
-			`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
-			`(<Plan JobCode="${jobcode}">)`,
-			//`(<Plan>)`,
-		]
+		if (selectedId === 'newSheet') {
+
+			let material = "Mild steel" 
+			let materialLabel = "S235JR"
+
+			ncpStart = [
+				`%`,
+				`(<NcpProgram Version="1.0" Units="Metric">)`,
+				`(<MaterialInfo Label="${material}" MaterialCode="${materialLabel}" Thickness="${this.svgData.thickness}" FormatType="Sheet" DimX="${this.svgData.width}" DimY="${this.svgData.height}"/>)`,
+				`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
+				`(<Plan JobCode="${this?.svgData.jobcode ? this.svgData.jobcode : "no_discrition"}">)`,
+			]			
+
+		} else {
+
+			const current = jobStore.getJobById(selectedId)
+			if (!current) return;
+			const { loadResult, dimX, dimY, material, materialLabel, name } = current
+			let parsed = JSON.parse(loadResult)
+			const { thickness, jobcode } = parsed.result.jobinfo.attr
+			ncpStart = [
+				`%`,
+				`(<NcpProgram Version="1.0" Units="Metric">)`,
+				`(<MaterialInfo Label="${material}" MaterialCode="${materialLabel}" Thickness="${thickness}" FormatType="Sheet" DimX="${dimX}" DimY="${dimY}"/>)`,
+				`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
+				`(<Plan JobCode="${jobcode}">)`,
+			]
+		}
 
 		let ncpPositons = this.generatePositions()
 		let ncpParts = this.generateParts()
@@ -1459,8 +1607,13 @@ class SvgStore {
 		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
 		ncp = this.renumberNLines (ncp, 1)
 
-		//ncp.forEach((item) => { console.log(item) });
-		jobStore.saveNcpToServer(ncp)
+		ncp.forEach((item) => { console.log(item) });
+		return
+		if (selectedId ==='newSheet' ) {
+			jobStore.saveNcpAsNewSheet(ncp)
+		} else {
+			jobStore.saveNcpToServer(ncp)
+		}
 	}
 
 }
@@ -1470,5 +1623,4 @@ export default svgStore;
 
 
 // сохранние ручного
-// вращение деталей
-// удаление детлаей
+// баг  с добавлением контуров
