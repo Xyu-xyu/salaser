@@ -16,7 +16,7 @@ const NewPlanButton = observer(() => {
 
 	// Форма
 	const [name, setName] = useState("new_plan");
-	const [width, setWidth] = useState("900");
+	const [width, setWidth] = useState("600");
 	const [height, setHeight] = useState("600");
 	const [quantity, setQuantity] = useState("1");
 	const [thickness, setThickness] = useState("1");

@@ -354,10 +354,10 @@ class JobStore {
 			file: ncpText.join("\n")
 		}
 
-		console.log( fileData )
-		console.log( ncpText )
+		//console.log( fileData )
+		//console.log( ncpText )
 
-	/* 
+	 
 		let resp = await fetch(
 			constants.SERVER_URL + "/jdb/create_from_ncp",
 			{
@@ -370,7 +370,7 @@ class JobStore {
 	 	if (!resp.ok)
 			throw new Error("create sheet failed")
 	
-		const data = await resp.json() */
+		const data = await resp.json() 
 	
 		console.log("created:", data)
 	 

@@ -23,44 +23,53 @@ class SvgStore {
 			/*{
 				"part_id": 1,
 				"part_code_id": 1,
-				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": 0, "f": 0 }
-				"selected": true
-
+				"positions": {
+					"a": -1,
+					"b": -1.2246467991473532e-16,
+					"c": 1.2246467991473532e-16,
+					"d": -1,
+					"e": 112.99999999999999,
+					"f": 120.65419999999995
+				},
+				"cx": 113,
+				"cy": 65.65419999999995,
+				"selected": false
 			}*/
 		],
 		"part_code": [
 			/*{
 				"id": 1,
-				"uuid": "n2-d0170e56-3c47-411e-84de-813bb41a7245",
-				"name": "12___10__2",
-				"height":100,
-				"width":100,
+				"uuid": 1,
+				"name": "31715200",
 				"code": [
 					{
-						"cid": 1,
-						"class": "contour outer macro0 closed1",
-						"path": "M15 199.5 V254.358 A9.999969 9.999969 0 0 1 12.071 261.429 L2.929 270.571 A9.999969 9.999969 0 0 0 0 277.642 V389 A9.999993 9.999993 0 0 0 10 399 H54.555 A10.000573 10.000573 0 0 0 62.955 394.426 L65.619 390.302 A10.000073 10.000073 0 0 1 74.019 385.729 H180.981 A10.000073 10.000073 0 0 1 189.381 390.302 L192.045 394.426 A10.000573 10.000573 0 0 0 200.445 399 H245 A9.999993 9.999993 0 0 0 255 389 V277.642 A9.999969 9.999969 0 0 0 252.071 270.571 L242.929 261.429 A9.999969 9.999969 0 0 1 240 254.358 V144.642 A9.999969 9.999969 0 0 1 242.929 137.571 L252.071 128.429 A9.999969 9.999969 0 0 0 255 121.358 V10 A9.999993 9.999993 0 0 0 245 0 H200.445 A10.000573 10.000573 0 0 0 192.045 4.574 L189.381 8.698 A10.000073 10.000073 0 0 1 180.981 13.271 H74.019 A10.000073 10.000073 0 0 1 65.619 8.698 L62.955 4.574 A10.000573 10.000573 0 0 0 54.555 0 H10 A9.999993 9.999993 0 0 0 0 10 V121.358 A9.999969 9.999969 0 0 0 2.929 128.429 L12.071 137.571 A9.999969 9.999969 0 0 1 15 144.642 V199.5 ",
+						"cid": 0,
+						"class": "contour outer  macro0 ",
+						"path": "M8 27.5 L8 51 A4 4 0 0 0 12 55 L109 55 A4 4 0 0 0 113 51 L113 4 A4 4 0 0 0 109 0 L12 0 A4 4 0 0 0 8 4 L8 27.5",
 						"stroke": "red",
-						"strokeWidth": 0.2
+						"strokeWidth": 0.2,
+						"selected": false
 					},
 					{
-						"cid": 2,
-						"class": "inlet outer macro1 pulse0",
-						"path": "M7 199.5 L12.333333 197.614382 A2 2 0 0 1 15 199.5 ",
+						"cid": 0,
+						"class": " inlet inner  macro0 ",
+						"path": "M0 27.5 L5.333333 25.614382 A2 2 0 0 1 8 27.5",
 						"stroke": "red",
-						"strokeWidth": 0.2
+						"strokeWidth": 0.2,
+						"selected": false
 					},
 					{
-						"cid": 2,
-						"class": "contour inner macro0 closed1",
-						"path": "M100.025 283.243 V241.243 A9.999993 9.999993 0 0 1 110.025 231.243 H144.482 A9.999993 9.999993 0 0 1 154.482 241.243 V325.243 A9.999993 9.999993 0 0 1 144.482 335.243 H110.025 A9.999993 9.999993 0 0 1 100.025 325.243 V283.243",
+						"cid": 0,
+						"class": " outlet inner macro0   groupEnd ",
+						"path": "",
 						"stroke": "red",
-						"strokeWidth": 0.2
+						"strokeWidth": 0.2,
+						"selected": false
 					}
-
-				]
-			}*/
-
+				],
+				"height": 55,
+				"width": 113
+			} */      
 		]
 	}
 
@@ -93,7 +102,7 @@ class SvgStore {
 		return this.svgData.positions.find(pos => pos.selected) || false;
 	}
 
-	get nextPartId() {
+	get nextPosId() {
 		const positions = this.svgData.positions;
 		if (!positions || positions.length === 0) {
 			return 1;
@@ -155,12 +164,7 @@ class SvgStore {
 	}
 
 	addForm(form) {
-		form.part_id = svgStore.svgData.part_code.length + 1
-		form.papams = {
-			"code": "",
-			"uuid": "",
-			"name": utils.uuid()
-		}
+
 		const box = this.findBox(form.code)
 		form.width = 0
 		form.height = 0
@@ -1607,8 +1611,8 @@ class SvgStore {
 		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
 		ncp = this.renumberNLines (ncp, 1)
 
-		ncp.forEach((item) => { console.log(item) });
-		return
+		//ncp.forEach((item) => { console.log(item) });
+		//return
 		if (selectedId ==='newSheet' ) {
 			jobStore.saveNcpAsNewSheet(ncp)
 		} else {

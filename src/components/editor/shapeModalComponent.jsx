@@ -30,23 +30,12 @@ const ShapeModalComponent = observer(() => {
 	const addContour = () => {
 		let d = shapes[selected]
 		const myPathBBox = SVGPathCommander.getPathBBox(d)
-
 		let iniX = myPathBBox.width
 		let iniY = myPathBBox.height
 		let scaleX = partWidth / iniX
 		let scaleY = partHeight / iniY
 		var transformed = util.applyTransform(d, scaleX, scaleY, 0, 0, { angle: 0, x: 0, y: 0 })
-
-		let translateX = partXPosition - myPathBBox.cx * scaleX
-		let translateY = partYPosition - myPathBBox.cy * scaleY
-
-		if (partCenterXPosition) {
-			translateX = svgStore.svgData.width * 0.5 - myPathBBox.cx * scaleX
-		}
-
-		if (partCenterYPosition) {
-			translateY = svgStore.svgData.height * 0.5 - myPathBBox.cy * scaleY
-		}
+	
 
 		if (!d || !d.length) return;
 
@@ -65,7 +54,8 @@ const ShapeModalComponent = observer(() => {
 
 		// === ТВОЙ КОД С ПРОВЕРКОЙ ===
 		let uuid = util.uuid();
-		const id = svgStore.nextPartId;
+		const id = svgStore.nextPosId;
+		let part_code_id = svgStore.svgData.part_code.length+1
 		let newForm = [
 			{
 				cid: 1,
@@ -99,26 +89,26 @@ const ShapeModalComponent = observer(() => {
 
 		if (existingForm) {
 			// Форма уже существует — используем её uuid!
-			uuid = existingForm.uuid;
-			console.log("Форма уже существует, используем uuid:", uuid);
+			part_code_id = existingForm.id;
+			console.log("Форма уже существует, используем:", part_code_id);
 		} else {
 			// Создаём новую форму с новым uuid
-			svgStore.addForm({
-				id: uuid,
-				uuid: uuid,
-				name: "12___10__2", // можно тоже генерить по code, если хочешь
+ 			svgStore.addForm({
+				id: part_code_id,
+				uuid: part_code_id,
+				name: uuid, // можно тоже генерить по code, если хочешь
 				code: newForm
 			});
-			console.log("Создана новая форма с uuid:", uuid);
+			console.log("Создана новая форма с именем:", uuid);
 		}
 
 
 	// В любом случае — добавляем позицию с правильным part_code_id
 	svgStore.addPosition({
-		part_id: svgStore.nextPartId, // или как у тебя правильно
-		part_code_id: uuid,           // вот здесь критично — правильный uuid!
+		part_id: svgStore.nextPosId, // или как у тебя правильно
+		part_code_id: part_code_id,           // вот здесь критично — правильный uuid!
 		selected: false,
-		positions: { a: 1, b: 0, c: 0, d: 1, e: translateX, f: translateY },		
+		positions: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },		
 	});
 }
 

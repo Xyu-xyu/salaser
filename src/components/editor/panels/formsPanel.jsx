@@ -12,8 +12,7 @@ const FormsPanel = observer(() => {
 
 	const { t } = useTranslation()
 	const add = (uuid, x, y)=> {
-		let id = svgStore.nextPartId
-		let WH = svgStore.svgData.part_code.filter(a => a.id == uuid)[0]
+		let id = svgStore.nextPosId
 
 		svgStore.addPosition (
 			{
