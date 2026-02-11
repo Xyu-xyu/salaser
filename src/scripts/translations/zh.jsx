@@ -430,6 +430,7 @@ const zh = {
     "no label": "没有标签",
     "Total": "全部的",
     "Ooops, something is in cut woodver-01.ncp": "糟糕，切割 woodver-01.ncp 中有东西",
-    "Ошибка обновления: GATEWAY TIMEOUT": "问题：网关超时"
+    "Ошибка обновления: GATEWAY TIMEOUT": "问题：网关超时",
+    "Aluminium": "铝"
 }
 export default zh;

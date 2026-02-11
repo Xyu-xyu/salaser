@@ -462,6 +462,7 @@ const en = {
     "no label": "no label",
     "Total": "Total",
     "Ooops, something is in cut woodver-01.ncp": "Ooops, something is in cut woodver-01.ncp",
-    "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: GATEWAY TIMEOUT"
+    "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: GATEWAY TIMEOUT",
+    "Aluminium": "Aluminium"
 }
 export default en;

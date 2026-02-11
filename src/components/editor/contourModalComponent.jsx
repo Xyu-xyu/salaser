@@ -20,8 +20,8 @@ const contourModalComponent = observer(() => {
 	const [selected, setSelected] = useState(0)
 	const [partXPosition, setPartXPosition] = useState(0)
 	const [partYPosition, setPartYPosition] = useState(0)
-	const [partWidth, setPartWidth] = useState(150)
-	const [partHeight, setPartHeight] = useState(150)
+	const [partWidth, setPartWidth] = useState(50)
+	const [partHeight, setPartHeight] = useState(50)
 	const [partCenterXPosition, setPartCenterXPosition] = useState(true)
 	const [partCenterYPosition, setPartCenterYPosition] = useState(true)
 	let shapes = constants.shapes

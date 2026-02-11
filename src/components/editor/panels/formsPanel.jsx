@@ -38,9 +38,9 @@ const FormsPanel = observer(() => {
 	}
 
 	const startEditor = (a) => {
-		console.log("Starting editor with :  ")
-		console.log(JSON.stringify(a))
-		partStore.printStore()
+		//console.log("Starting editor with  ")
+		//console.log(JSON.stringify(a))
+		//partStore.printStore()
 		laserStore.setVal("centralBarMode", "partEditor")
 		partStore.setSvgData(JSON.parse(JSON.stringify(a)));
 		partStore.setVal( "partInEdit", a.uuid )

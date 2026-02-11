@@ -445,6 +445,7 @@ const ru = {
     "no label": "без этикетки",
     "Total": "Итого",
     "Ooops, something is in cut woodver-01.ncp": "Ой, что-то вырезано из woodver-01.ncp",
-    "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: ВРЕМЯ ШЛЮЗА"
+    "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: ВРЕМЯ ШЛЮЗА",
+    "Aluminium": "Алюминий"
 }
 export default ru;
