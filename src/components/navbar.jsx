@@ -8,13 +8,14 @@ import { showToast } from "./toast";
 import FavoritesButton from "./navbar/favoritesButton";
 import LanguageButton from "./navbar/languageButton";
 import { StartButton } from "./startButton";
+import { StartButtonWithDefSettings } from "./startButtonWithDefSettings";
 import CustomIcon from "../icons/customIcon";
 import jobStore from '../store/jobStore';
 import svgStore from '../store/svgStore';
 
 const NavBar = observer(() => {
 
-	const { knobMode, centralBarMode } = laserStore
+	const { knobMode, centralBarMode } = laserStore 
 
 
 	const handleClick = () => {
@@ -103,6 +104,9 @@ const NavBar = observer(() => {
 							/>
 						</div>
 					</button>
+				</div>
+				<div className="ms-2">
+					<StartButtonWithDefSettings />
 				</div>
 				<div className="ms-2">
 					<StartButton />

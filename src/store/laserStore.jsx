@@ -110,6 +110,7 @@ class LaserStore {
 			//lastUpdate = now;
 			runInAction(() => {
 				this.paramsLimit = data;
+				//console.log (data)
 				const execLineValue =
 					data.find((item) => item?.name === 'exec_line')?.val ?? 0;
 

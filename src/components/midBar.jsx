@@ -89,11 +89,11 @@ const MidBar = observer(() => {
 										<div className="currentPlanLimits my-2 ms-2">
 											<div className="d-flex flex-column">
 												<div className="d-flex align-items-center mb-1">
-													<div className={ detectLimit (item.name, 'minus') === 0 ? "led-green-medium" : "led-gray-medium"}></div>
+													<div className={ detectLimit (item.name, 'minus') === 1 ? "led-green-medium" : "led-gray-medium"}></div>
 													<div className="limitText">Limit-</div>
 												</div>
 												<div className="d-flex align-items-center">
-													<div className={ detectLimit (item.name, 'plus') === 0 ? "led-green-medium" : "led-gray-medium"}></div>
+													<div className={ detectLimit (item.name, 'plus') === 1 ? "led-green-medium" : "led-gray-medium"}></div>
 													<div className="limitText">Limit+</div>
 												</div>
 											</div>
