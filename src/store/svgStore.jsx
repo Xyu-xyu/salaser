@@ -382,6 +382,8 @@ class SvgStore {
 		const c = contour?.path.length ? new SVGPathCommander(contour.path).toAbsolute() : {segments:[]}
 		const i = inlet?.path.length ? new SVGPathCommander(inlet.path).toAbsolute() : {segments:[]}
 		const o = outlet?.path.length ? new SVGPathCommander(outlet.path).toAbsolute() : {segments:[]}
+		const direction = SVGPathCommander.getDrawDirection(contour.path)//true G41 false 42
+
 		let currentMacro = false
 		let currentCompensation = false
 
@@ -496,11 +498,11 @@ class SvgStore {
 				J = j
 			  
 
-				if (currentCompensation !== (outer ? 'G42' : 'G41')) {
+				if (currentCompensation !== (direction ? 'G41' : 'G42')) {
 
-					currentCompensation = (outer ? 'G42' :'G41')
-					outer ? res.push('G42') : res.push('G41')
-					G = outer ? 'G42': 'G41'
+					currentCompensation = (direction ? 'G41' : 'G42')
+					direction ? res.push('G41') : res.push('G42')
+					G = direction ? 'G41': 'G42'
 
 				}								
  
@@ -638,13 +640,13 @@ class SvgStore {
 				I = i
 				J = j
 			  
-				if (currentCompensation !== (outer ? 'G42' : 'G41')) {
+				if (currentCompensation !== (direction ? 'G41' : 'G42')) {
 
-					currentCompensation = outer ? 'G42' :'G41'
-					outer ? res.push('G42') : res.push('G41')
-					G = outer ? 'G42': 'G41'
+					currentCompensation = (direction ? 'G41' : 'G42')
+					direction ? res.push('G41') : res.push('G42')
+					G = direction ? 'G41': 'G42'
 
-				}
+				}	
 			  
 				if (needLaserOn) line += 'M4'
 				needLaserOn = false			  
@@ -792,13 +794,13 @@ class SvgStore {
 				I = i
 				J = j
 			  
-				if (currentCompensation !== (outer ? 'G42' : 'G41')) {
+				if (currentCompensation !== (direction ? 'G41' : 'G42')) {
 
-					currentCompensation = outer ? 'G42' :'G41'
-					outer ? res.push('G42') : res.push('G41')
-					G = outer ? 'G42': 'G41'
+					currentCompensation = (direction ? 'G41' : 'G42')
+					direction ? res.push('G41') : res.push('G42')
+					G = direction ? 'G41': 'G42'
 
-				}
+				}	
 
 				const macro = this.getMacro(inlet.class|| "")
 				if (macro !== null && macro !== currentMacro) {
