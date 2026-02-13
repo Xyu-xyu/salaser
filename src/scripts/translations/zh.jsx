@@ -431,6 +431,7 @@ const zh = {
     "Total": "全部的",
     "Ooops, something is in cut woodver-01.ncp": "糟糕，切割 woodver-01.ncp 中有东西",
     "Ошибка обновления: GATEWAY TIMEOUT": "问题：网关超时",
-    "Aluminium": "铝"
+    "Aluminium": "铝",
+    "Do you want to start laser cut with default settings ?": "您想使用默认设置开始激光切割吗？"
 }
 export default zh;
