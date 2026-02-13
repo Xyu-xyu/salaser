@@ -191,14 +191,17 @@ const GCodeToSvg = observer(() => {
 			.then((r) => r.text())
 			.then((data) => {
 				clearTimeout(timeoutId);
-				setListing(utils.extractGcodeLines(data)  /*|| sampleListing*/);
-			})
+				if (data.includes("404 Page Not Found")) {
+					throw new Error("HTML error page received");
+				} 
+			
+				setListing(utils.extractGcodeLines(data));			})
 			.catch(() => {
 				clearTimeout(timeoutId);
 				//setListing(sampleListing);
 			});
 
-		return () => {
+ 		return () => {
 			clearTimeout(timeoutId);
 			controller.abort();
 		};

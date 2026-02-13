@@ -1,17 +1,19 @@
 import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
+import { toJS } from "mobx";
  
 
 const LaserMarker = observer(() => {
  	const {  paramsLimit } = laserStore
  
 	const genererateLaserMarker = () => {
+		//console.log (toJS(paramsLimit))
 		const axisMap = Object.fromEntries(
 		  paramsLimit.map(a => [a.name, a])
 		)
 	  
-		const X = axisMap.X?.value||0
-		const Y = axisMap.Y?.value||0
+		const X = axisMap.X?.val||0
+		const Y = axisMap.Y?.val||0
 	  
 		if (typeof X !== "number" || typeof Y !== "number") return null
 	  
