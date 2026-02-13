@@ -159,7 +159,6 @@ export const StartButtonWithDefSettings = observer(() => {
 
 				if (index === 0) {
 					id = item['id']
-					preset = item['preset']
 				}
 			})
 		}

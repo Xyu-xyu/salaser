@@ -11,6 +11,7 @@ import macrosStore from "../store/macrosStore";
 import Hammer from "hammerjs";
 import CustomIcon from "../icons/customIcon";
 import jobStore from "../store/jobStore";
+import LaserMarker from "./laserMarker";
 
 
 const GCodeToSvg = observer(() => {
@@ -27,6 +28,7 @@ const GCodeToSvg = observer(() => {
 	console.log ("STOP MACHINE") */
 	let width= 500 
 	let height = 500
+
 
 	try {
 
@@ -751,6 +753,7 @@ const GCodeToSvg = observer(() => {
 								})()}
 								{generateCutSeg()}
 								{labels}
+								<LaserMarker />
 							</g>
 						</g>
 					</g>
