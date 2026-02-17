@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import laserStore from "../store/laserStore";
+import svgStore from "../store/svgStore";
 import { toJS } from "mobx";
  
 
@@ -11,9 +12,27 @@ const LaserMarker = observer(() => {
 		const axisMap = Object.fromEntries(
 		  paramsLimit.map(a => [a.name, a])
 		)
+
+		const { loadResult   } = laserStore
+		const data = JSON.parse(loadResult)
+
+ 		let height = 500
+		let width = 500
+
+		try {
+
+ 			height = Number(data.result.jobinfo.attr?.dimx)
+			width = Number(data.result.jobinfo.attr?.dimy)
+			
+		} catch (e) {
+			
+			console.log ("ЕБАТЬ")		
+	
+		}
+		
 	  
 		const X = axisMap.X?.val||0
-		const Y = axisMap.Y?.val||0
+		const Y = (height - axisMap.Y?.val)||0
 	  
 		if (typeof X !== "number" || typeof Y !== "number") return null
 	  
@@ -30,7 +49,7 @@ const LaserMarker = observer(() => {
 		return (
 		  <path
 			d={d}
-			stroke="red"
+			stroke="green"
 			strokeWidth="2"
 			fill="none"
 			pointerEvents="none"

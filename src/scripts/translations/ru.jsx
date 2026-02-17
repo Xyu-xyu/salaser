@@ -447,6 +447,7 @@ const ru = {
     "Ooops, something is in cut woodver-01.ncp": "Ой, что-то вырезано из woodver-01.ncp",
     "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: ВРЕМЯ ШЛЮЗА",
     "Aluminium": "Алюминий",
-    "Do you want to start laser cut with default settings ?": "Хотите начать лазерную резку с настройками по умолчанию?"
+    "Do you want to start laser cut with default settings ?": "Хотите начать лазерную резку с настройками по умолчанию?",
+    "Ooops, something is in cut new_plan": "Ой, что-то вырезано new_plan"
 }
 export default ru;

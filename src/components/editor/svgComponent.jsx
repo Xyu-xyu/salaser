@@ -39,11 +39,7 @@ const SvgComponent = observer (() => {
             stroke='var(--color)'
             strokeWidth="0.2" 
             fillRule='evenodd' 
-            transform={
-                isVertical
-                  ? `rotate(0)` 
-                  : `rotate(0)` 
-            }           
+                   
         >
 
             <g id="group2">

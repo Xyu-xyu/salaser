@@ -464,6 +464,7 @@ const en = {
     "Ooops, something is in cut woodver-01.ncp": "Ooops, something is in cut woodver-01.ncp",
     "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: GATEWAY TIMEOUT",
     "Aluminium": "Aluminium",
-    "Do you want to start laser cut with default settings ?": "Do you want to start laser cut with default settings ?"
+    "Do you want to start laser cut with default settings ?": "Do you want to start laser cut with default settings ?",
+    "Ooops, something is in cut new_plan": "Ooops, something is in cut new_plan"
 }
 export default en;

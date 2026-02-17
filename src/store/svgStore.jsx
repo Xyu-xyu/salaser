@@ -10,14 +10,16 @@ class SvgStore {
 	tooltips = false;
 	laserShow = {};
 	highLighted = false;
+
 	svgData = {
+		"file":"",
 		"name": "undefined.ncp",
 		"thickness":1,
 		"jobcode":"",
 		"width": 500,
 		"height": 500,
 		"quantity": 1,
-		"presetId": 50,
+		"presetId": 55,
 		"presetName": "any_preset",
 		"positions": [
 			/*{
@@ -942,7 +944,8 @@ class SvgStore {
 		for (const pos of data.positions) {
 
 			let matrix = pos.positions
-			let sheetHeight = this.svgData.width
+			// высота листа по оси Y в системе станка
+			let sheetHeight = this.svgData.height
 			let L = pos.part_code_id
 			let G = 52
 			let partHeight = svgStore.svgData.part_code.filter(a => a.id == L)[0].height
@@ -1026,30 +1029,35 @@ class SvgStore {
 			.map(line => line.trim())
 
 		const result = {
+			file:"",
 			name: "undefined.ncp",
+			thickness:1,
+			jobcode:'',
 			width: 0,
 			height: 0,
 			quantity: 1,
-			presetId: 50,
+			presetId: 55,
 			presetName: "any_preset",
 			positions: [],
-			part_code: []
+			part_code: [],
 		};
 
 
 		/* ---------------- DIMENSIONS ---------------- */
 		const dimLine = lines.find(l => l.includes("DimX") && l.includes("DimY"));
-		let height = 0
-		let width = 0
+		let height = 0;
+		let width = 0;
 		if (dimLine) {
 			const dimX = dimLine.match(/DimX="([\d.]+)"/);
 			const dimY = dimLine.match(/DimY="([\d.]+)"/);
-			result.width = Number(dimY?.[1] || 0);
-			result.height = Number(dimX?.[1] || 0);
-			//console.log ( result.width, result.height )
-			height = result.height
-			width = result.width
 
+			// Используем DimX как ширину, DimY как высоту,
+			// чтобы не менять их местами при повороте -90°
+			result.width = Number(dimX?.[1] || 0);
+			result.height = Number(dimY?.[1] || 0);
+
+			width = result.width;
+			height = result.height;
 		}
 
 		/* ---------------- PLAN (POSITIONS) ---------------- */
@@ -1348,7 +1356,8 @@ class SvgStore {
 				//const cos = Math.cos(rad);
 				//const sin = Math.sin(rad);
 				const partHeight = HW[L][0]
-				const sheetHeight = width;
+				// высота листа по оси Y (DimY)
+				const sheetHeight = height;
 
 				const cx = X;
 				const cy = sheetHeight - Y;

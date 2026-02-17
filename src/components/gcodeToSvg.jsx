@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, ReactNode, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import svgPanZoom from "svg-pan-zoom";
 import constants from "../store/constants";
 import { observer } from "mobx-react-lite";
@@ -32,8 +32,8 @@ const GCodeToSvg = observer(() => {
 
 	try {
 
-		width = (isVertical ? Number(data.result.jobinfo.attr?.dimy) : Number(data.result.jobinfo.attr?.dimx) )|| (isVertical? 1500 : 3000);
-		height =(isVertical ? Number(data.result.jobinfo.attr?.dimx) : Number(data.result.jobinfo.attr?.dimy) ) || (isVertical? 3000 : 1500);
+		width = Number(data.result.jobinfo.attr?.dimy)
+		height =Number(data.result.jobinfo.attr?.dimx)
 		
 	} catch (e) {
 		
@@ -435,7 +435,7 @@ const GCodeToSvg = observer(() => {
 							fill="#fff"
 							stroke="none"
 							dy=".35em" // сдвиг по вертикали для центрирования
-							transform={isVertical ? `rotate(90, ${cx}, ${cy})` : undefined}
+							transform={ `rotate(90, ${cx}, ${cy})`}
 						>
 							{labelNum}
 						</text>
@@ -678,9 +678,9 @@ const GCodeToSvg = observer(() => {
 							<g
 								className={`sgn_main_els ${showInners ? " showInners " : " hideInners "}  ${showLabels ? " showLeabels " : " hideLabels "}`}
 								transform={
-									isVertical
-									  ? `rotate(-90) translate(${-height},${width-height} )` 
-									  : undefined
+									
+									 `rotate(-90) translate(${-height},${width-height} )` 
+									
 								}
 								style={{
 								  fill: "none",
