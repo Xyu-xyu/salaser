@@ -1,37 +1,9 @@
 import { observer } from "mobx-react-lite";
 import svgStore from "./../../store/svgStore.jsx";
 import editorStore from "./../../store/editorStore.jsx";
-import Part from "./../../scripts/part.jsx";
-import React, { useEffect, useId } from 'react';
-
+  
 
 const SimpleReturnComponent = observer(() => {
-
-	var url = new URL(window.location.href);
-	var searchParams = new URLSearchParams(url.search);
-	var handle = searchParams.get('handle') || 0;
-	var partNumber = searchParams.get('part') || 0;
-
-	const {
-		selectedCid,
-	} = svgStore;
-
-	useEffect(() => {
-		const fetchData = async () => {
-			//const svg = await Part.getPartCode(handle, partNumber); // Получаем данные
-			/* 			const newSvgData = {
-							width: svg.width,
-							height: svg.height,
-							code: svg.code,
-							params: svg.params,
-							positions: []
-						}; */
-			//svgStore.setSvgData(newSvgData); 
-			//jointStore.loadJoints (svg.joints)			
-		};
-		fetchData();
-
-	}, []);
 
 	const setSelected = (e, part_id) => {
 		console.log(part_id)
@@ -71,12 +43,6 @@ const SimpleReturnComponent = observer(() => {
 				svgStore.addTextElement(coords)
 				svgStore.setTextFocus(true)
 			}*/
-		}
-	}
-
-	const detectCanMove = () => {
-		if (editorStore.inletMode === 'inletInMoving') {
-			editorStore.setInletMode('move')
 		}
 	}
 

@@ -658,31 +658,31 @@ class Utils {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-/* 	convertScreenCoordsToSvgCoords(x, y) {
-		var svg = document.getElementById("svg")
-		var group = document.getElementById("group");
-		var pt = svg.createSVGPoint();  // An SVGPoint SVG DOM object
-		pt.x = x;
-		pt.y = y;
-
-		try {
-			pt = pt.matrixTransform(group.getScreenCTM().inverse());
-			return { 'x': pt.x, 'y': pt.y };
-		} catch (e) {
-			return false
-		}
-	} */
-	 
-	getMousePosition = (evt) => {
+ 
+/*  	getMousePosition = (evt) => {
 		var svg = document.getElementById("svg")
     	let CTM = svg.getScreenCTM();
         
         return   {
             x: (evt.clientX + CTM.f)/ CTM.a,
             y: (evt.clientY + CTM.e)/ CTM.d
-        }; 
-    }
+        };  
+    } */
 
+	getMousePosition = (evt) => {
+		const svg = document.getElementById("svg");
+		const pt = svg.createSVGPoint();
+		
+		pt.x = evt.clientX;
+		pt.y = evt.clientY;
+	
+		const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+	
+		return {
+			x: svgP.x,
+			y: svgP.y
+		};
+	};
 	 
  
 	getValueFromString(str, targetChar, num = true) {

@@ -366,8 +366,8 @@ const PartSvgWrapper = observer(() => {
 
 
 	const fitToPage = () => {
+	/* 		// реальные размеры того, что масштабируем внутри SVG
 		const padding = 100;
-			// реальные размеры того, что масштабируем внутри SVG
 
 		const widthContent = partStore.svgData.width;
 		const heightContent = partStore.svgData.height
@@ -406,7 +406,7 @@ const PartSvgWrapper = observer(() => {
 			f: ty
 		});
 	
-		console.log("FIT DONE:", { scale, tx, ty });
+		console.log("FIT DONE:", { scale, tx, ty }); */
 	};
 	    
 

@@ -18,14 +18,11 @@ const PartSvgComponent = observer (() => {
     const {
         matrix,  
         groupMatrix,
-        gridState,
         rectParams
 
     } = partStore
 
-    const { svgData } = svgStore
-
-   
+  
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${groupMatrix.a} ${groupMatrix.b} ${groupMatrix.c} ${groupMatrix.d} ${groupMatrix.e} ${groupMatrix.f}`;
 
@@ -33,7 +30,7 @@ const PartSvgComponent = observer (() => {
         <svg
             id="svg"
             baseProfile="full"
-            viewBox={`0.00 0.00 ${svgData.width} ${svgData.height}`}
+            viewBox={`0.00 0.00 ${ partStore.svgData.width } ${ partStore.svgData.height }`}
             style={{ overflow: 'hidden', border: '1px solid var(--color)' }}
             version="1.1"
             stroke='var(--color)'
@@ -63,7 +60,7 @@ const PartSvgComponent = observer (() => {
                     fill="yellow"></circle>
                 </marker>                
             </defs>
-            <g id="group2" fill="url(#grid)">
+            <g id="group2">
                 <g id="group1" transform={`matrix(${matrixG})`}>
                     <g id="group" transform={`matrix(${matrixM})`} className="grab">
                         <g id="contours">

@@ -413,9 +413,7 @@ const SvgWrapper = observer(() => {
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="planeditor">
-			<div className="row align-items-center h-100">
-				<div className="w-100 h-100">
-					<div className="d-flex w-100 h-100" id="editor_main_wrapper_2">
+					<div className="rotated d-flex w-100 h-100" id="editor_main_wrapper_2">
 						<div
 							ref={wrapperRef}
 							id="wrapper_svg"
@@ -436,8 +434,6 @@ const SvgWrapper = observer(() => {
 						>
 							<SvgComponent />
 						</div>
-					</div>
-				</div>
 			</div>
 		</main>
 	);

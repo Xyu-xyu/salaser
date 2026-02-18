@@ -1384,15 +1384,7 @@ class SvgStore {
 				);
 
 
-				/*const XYC = this.matrixToG52 (position , sheetHeight, partHeight, cx, cy)
-				if ( Math.abs ( X - XYC.X ) > 0.05 || 
-					 Math.abs ( Y - XYC.Y )> 0.05 ||
-					 Math.abs ( C - XYC.C ) >  0.05
-					) {
-						console.log ("FUCK", JSON.stringify(XYC), X, Y, C )
-				} else {
-					console.log ( "YEEEAH !")
-				}*/
+				
 			}
 		});
 

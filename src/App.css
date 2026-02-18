@@ -1854,19 +1854,42 @@ height: fit-content;}
   50% { stroke-opacity: 0.5; }
 }
 
-#wrapper_svg {
+#planeditor {
+  height: 100%;
   overflow: hidden;
-  border: 0.2px solid var(--paleColor);
-  border-top: none;
+  position: relative;
+}
+
+/* Повернутый блок */
+.rotated {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100vh !important;
+  height: 100vw !important;
+
+  transform: rotate(-90deg) translateX(-100%);
+  transform-origin: top left;
+
+  display: flex;
+}
+
+/* Внутренний блок */
+#wrapper_svg {
+  flex: 1;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+
+  border: 0.2px solid var(--paleColor);
+  border-top: none;
+
   box-shadow: -1px -4px 20px 5px var(--transColor);
   background-color: var(--darkBg);
 }
+
 
 .btn-shape-selected svg path,
 .btn-figure-selected svg path{
