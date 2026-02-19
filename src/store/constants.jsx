@@ -44,7 +44,7 @@ const constants = {
 	fontSize:11.88,
 	kerning:1,
 	defaultInletIntend: 1,
-	defaultInletLength: 12,
+	defaultInletLength: 6,
 	defaultStringInterval:18,
 	defaultJointSize: 0.2,
     contourTypes:['engraving', 'inner', 'outer'],
