@@ -30,7 +30,7 @@ const PartSvgComponent = observer (() => {
         <svg
             id="svg"
             baseProfile="full"
-            viewBox={`0.00 0.00 ${ partStore.svgData.width } ${ partStore.svgData.height }`}
+            viewBox={`0.00 0.00 ${ window.innerWidth } ${  window.innerHeight }`}
             style={{ overflow: 'hidden', border: '1px solid var(--color)' }}
             version="1.1"
             stroke='var(--color)'

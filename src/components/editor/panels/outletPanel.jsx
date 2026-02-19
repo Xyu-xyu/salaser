@@ -135,6 +135,7 @@ const OutletPanel = observer(() => {
 		console.log(newType)
 		if (type === newType) return;
 		let classes = partStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+		if (!classes) return;
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
 		let resp = inlet.setOutletType (newType, false, 'set', selectedPath, selectedOutletPath, contourType)
 		if ( resp ) {
@@ -154,17 +155,18 @@ const OutletPanel = observer(() => {
 		if (mode) {
 			for (let i in  outlets ) {
 				let element = outlets[i]
-				let contourType = element.class.includes('inner') ? 'inner' : 'outer'	
 				let outletPath = element.path
 				let contour = partStore.getElementByCidAndClass ( element.cid, 'contour')
-
-				let resp = inlet.setOutletType (mode, false, 'set', contour.path, outletPath, contourType)
-				if (resp ) {
-					let paths = {}
-					paths.cid = element.cid
-					paths.outlet = resp.newOutletPath		
-					inlet.applyNewPaths(paths)
-					setOutletParams ()
+				let contourType = contour.class.includes('inner') ? 'inner' : 'outer'	
+				if (!contour.class.includes("macro2")){
+					let resp = inlet.setOutletType (mode, false, 'set', contour.path, outletPath, contourType)
+					if (resp ) {
+						let paths = {}
+						paths.cid = element.cid
+						paths.outlet = resp.newOutletPath		
+						inlet.applyNewPaths(paths)
+						setOutletParams ()
+					}
 				}
 			}
 			addToLog(`Set outlet type ${mode} for all`)

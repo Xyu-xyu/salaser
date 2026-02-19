@@ -41,6 +41,7 @@ const InletPanel = observer(() => {
 		console.log(newType)
 		if (type === newType) return;
 		let classes = partStore.getElementByCidAndClass(selectedCid, 'contour', 'class')
+		if (!classes) return;
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'
 		let resp = inlet.setInletType(newType, false, 'set', selectedPath, selectedInletPath, contourType)
 		if (resp) {
@@ -66,16 +67,20 @@ const InletPanel = observer(() => {
 		if (inletMode) {
 			for (let i in inlets) {
 				let element = inlets[i]
-				let contourType = element.class.includes('inner') ? 'inner' : 'outer'
 				let inletPath = element.path
 				let contour = partStore.getElementByCidAndClass(element.cid, 'contour')
-				let resp = inlet.setInletType(inletMode, false, 'set', contour.path, inletPath, contourType)
-				if (resp) {
-					let paths = {}
-					paths.cid = element.cid
-					paths.inlet = resp.newInletPath
-					inlet.applyNewPaths(paths)
+				let contourType = contour.class.includes('inner') ? 'inner' : 'outer'
+				if (!contour.class.includes("macro2")){
+					let resp = inlet.setInletType(inletMode, false, 'set', contour.path, inletPath, contourType)
+					if (resp) {
+						let paths = {}
+						paths.cid = element.cid
+						paths.inlet = resp.newInletPath
+						inlet.applyNewPaths(paths)
+					}
+
 				}
+				
 			}
 			addToLog(`Set inlet type ${inletMode} for all`)
 		}

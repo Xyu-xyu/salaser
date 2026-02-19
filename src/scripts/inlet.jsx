@@ -5,6 +5,7 @@ import CONSTANTS from './../store/constants.jsx';
 import partStore from './../store/partStore.jsx';
 //import editorStore from './../store/editorStore.jsx';
 import { addToLog } from './../scripts/addToLog';
+import PathAnalyzer from "./pathAnalyzer.jsx"
 
 
 class Inlet {
@@ -75,7 +76,8 @@ class Inlet {
 		
     }
 
-    detectInletLength (path) {
+    detectInletLength (path, contourPath='') {
+        console.log ("detectInletLength for ...." + contourPath )
         let type = this.detectInletType ( path )
         let IL = CONSTANTS.defaultInletLength
         path = SVGPathCommander.normalizePath( path )
@@ -90,6 +92,18 @@ class Inlet {
             let lastSeg = path[path.length-1]
             let end = {x: lastSeg[lastSeg.length-2], y: lastSeg[lastSeg.length-1]}
             IL =  util.distance (start, end)
+        } else if (type === 'Straight' ) {
+            if (contourPath){
+                let box = SVGPathCommander.getPathBBox(contourPath)
+                let minSide = Math.min (box.width, box.height ) * 0.5
+                const analyzer = new PathAnalyzer(contourPath);
+                let minInCoolision =  analyzer.getInnerPerpendicularData()?.length|| Infinity;
+                console.log ( "DDDDDDDRRRRRRRRUUUMMMMMMM")
+                console.log ( minInCoolision, minSide, CONSTANTS.defaultInletLength)
+                IL = Math.min (minInCoolision-CONSTANTS.defaultInletIntend,/* minSide,*/ CONSTANTS.defaultInletLength)
+            }
+            
+
         }
         //console.log ('Detected length ' + Math.round(IL*1000)/1000)
         return Math.round(IL*1000)/1000
@@ -735,7 +749,7 @@ class Inlet {
         if ('move' === action && !endPoint.hasOwnProperty('x')) return false;
         //console.log (arguments)
         let centers, checkPoint;
-        let IL = this.detectInletLength ( oldInletPath )
+        let IL = this.detectInletLength ( oldInletPath, contourPath )
         let newInletPath = ''
         let contourCommand = SVGPathCommander.normalizePath( contourPath )
         var clockwise = Number(SVGPathCommander.getDrawDirection(contourCommand))
@@ -1023,7 +1037,7 @@ class Inlet {
         if ('move' === action && !endPoint.hasOwnProperty('x')) return false;
 
         let centers, checkPoint; 
-        let IL = this.detectInletLength ( oldOutletPath )
+        let IL = this.detectInletLength ( oldOutletPath, contourPath )
         let newOutletPath = ''
         let contourCommand  = SVGPathCommander.normalizePath( contourPath )
         var clockwise = Number(SVGPathCommander.getDrawDirection(contourCommand))
