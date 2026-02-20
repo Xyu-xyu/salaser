@@ -98,9 +98,15 @@ class Inlet {
                 let minSide = Math.min (box.width, box.height ) 
                 const analyzer = new PathAnalyzer(contourPath);
                 let minInCoolision =  analyzer.getInnerPerpendicularData()?.length|| Infinity;
+                let minInCoolision1 =  analyzer.getInnerPerpendicularData1( contourPath )?.length|| Infinity;
                 console.log ( "DDDDDDDRRRRRRRRUUUMMMMMMM")
-                console.log ( minInCoolision, minSide, CONSTANTS.defaultInletLength)
-                IL = Math.min (minInCoolision-CONSTANTS.defaultInletIntend, minSide, CONSTANTS.defaultInletLength)
+                console.log ( minInCoolision, minInCoolision1, minSide, CONSTANTS.defaultInletLength)
+                IL = Math.min (
+                    minInCoolision, 
+                    minInCoolision1, 
+                    minSide, 
+                    CONSTANTS.defaultInletLength
+                )
             }
             
 
