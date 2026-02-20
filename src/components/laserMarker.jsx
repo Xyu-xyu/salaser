@@ -26,7 +26,7 @@ const LaserMarker = observer(() => {
 			
 		} catch (e) {
 			
-			console.log ("ЕБАТЬ")		
+			//console.log ("ЕБАТЬ")		
 	
 		}
 		

@@ -433,6 +433,7 @@ const zh = {
     "Ошибка обновления: GATEWAY TIMEOUT": "问题：网关超时",
     "Aluminium": "铝",
     "Do you want to start laser cut with default settings ?": "您想使用默认设置开始激光切割吗？",
-    "Ooops, something is in cut new_plan": "哎呀，有东西被剪掉了 new_plan"
+    "Ooops, something is in cut new_plan": "哎呀，有东西被剪掉了 new_plan",
+    "Stainless_Steel": "不锈钢"
 }
 export default zh;

@@ -448,6 +448,7 @@ const ru = {
     "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: ВРЕМЯ ШЛЮЗА",
     "Aluminium": "Алюминий",
     "Do you want to start laser cut with default settings ?": "Хотите начать лазерную резку с настройками по умолчанию?",
-    "Ooops, something is in cut new_plan": "Ой, что-то вырезано new_plan"
+    "Ooops, something is in cut new_plan": "Ой, что-то вырезано new_plan",
+    "Stainless_Steel": "Нержавеющая сталь"
 }
 export default ru;

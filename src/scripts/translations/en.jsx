@@ -465,6 +465,7 @@ const en = {
     "Ошибка обновления: GATEWAY TIMEOUT": "Ошибка обновления: GATEWAY TIMEOUT",
     "Aluminium": "Aluminium",
     "Do you want to start laser cut with default settings ?": "Do you want to start laser cut with default settings ?",
-    "Ooops, something is in cut new_plan": "Ooops, something is in cut new_plan"
+    "Ooops, something is in cut new_plan": "Ooops, something is in cut new_plan",
+    "Stainless_Steel": "Stainless_Steel"
 }
 export default en;

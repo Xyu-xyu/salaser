@@ -43,7 +43,7 @@ const constants = {
 	`(</Part id="4" part_id="4">)`],
 	fontSize:11.88,
 	kerning:1,
-	defaultInletIntend: 0.5,
+	defaultInletIntend: 0.1,
 	defaultInletLength: 6,
 	defaultStringInterval:18,
 	defaultJointSize: 0.2,
