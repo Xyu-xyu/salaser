@@ -86,6 +86,94 @@ const InletPanel = observer(() => {
 		}
 	}
 
+	const setInletParamForAll = () => {
+		console.log('setInletParamForAll')
+		let inletMode = inlet.detectInletType(selectedInletPath)
+		let inlets = partStore.getFiltered("inlet")
+		if (inletMode) {
+			for (let i in inlets) {
+				let element = inlets[i]
+				let inletPath = element.path
+				let currentInletMode = inlet.detectInletType(inletPath)
+
+				let contour = partStore.getElementByCidAndClass(element.cid, 'contour')
+				let contourType = contour.class.includes('inner') ? 'inner' : 'outer'
+
+				if (!contour.class.includes("macro2") && currentInletMode === inletMode) {
+					console.log ("Apply params")
+					if ( currentInletMode == "Hook") {
+
+						if (HookR && HookL && selectedInletPath) {
+							let resp = inlet.setInletType(
+								inletMode, 
+								false, 
+								'setForAll', 
+								contour.path, 
+								inletPath, 
+								contourType,
+								{HookR, HookL}
+
+							)
+							if (true) {
+								let paths = {}
+								paths.cid = element.cid
+								paths.inlet = resp.newInletPath
+								inlet.applyNewPaths(paths)
+							}
+						}
+					}
+					
+					if ( currentInletMode == "Tangent") {
+
+						if (TangentL && TangentR && selectedInletPath) {
+							let resp = inlet.setInletType(
+								inletMode, 
+								false, 
+								'setForAll', 
+								contour.path, 
+								inletPath, 
+								contourType,
+								{TangentL, TangentR}
+
+							)
+							if (true) {
+								let paths = {}
+								paths.cid = element.cid
+								paths.inlet = resp.newInletPath
+								inlet.applyNewPaths(paths)
+							}
+						}
+					}
+
+					if ( currentInletMode == "Direct") {
+
+						if (DirectL && selectedInletPath) {
+							let resp = inlet.setInletType(
+								inletMode, 
+								false, 
+								'setForAll', 
+								contour.path, 
+								inletPath, 
+								contourType,
+								{ DirectL }
+
+							)
+							if (true) {
+								let paths = {}
+								paths.cid = element.cid
+								paths.inlet = resp.newInletPath
+								inlet.applyNewPaths(paths)
+							}
+						}
+					}
+
+				}
+				
+			}
+		}
+
+	}
+
 	const setInletParams = (inletMode) => {
 		if (inletMode === 'Tangent') {
 			let R;
@@ -474,12 +562,18 @@ const InletPanel = observer(() => {
 							</tr>
 							<tr>
 								<td colSpan={2}>
-									<div className="d-flex ms-3">
+									<div className="d-flex justify-content-center">
 										<button
-											className="btn btn-sm btn-primary btn_inletApplyForAll"
+											className="btn btn-sm btn-primary btn_inletApplyForAll me-2"
 											id="inletApplyForAll"
 											onMouseDown={() => { setInletForAll() }}
-										>{t('Apply for all')}</button>
+										>{t('Apply type for all')}</button>
+									 
+										<button
+											className="btn btn-sm btn-primary btn_ApplyParamForAll"
+											id="inletApplyParamsForAll"
+											onMouseDown={() => { setInletParamForAll() }}
+										>{t('Apply params for all')}</button>
 									</div>
 								</td>
 							</tr>
@@ -554,7 +648,7 @@ const InletPanel = observer(() => {
 																</div>
 															</div>
 														</div>
-														<div className="d-flex justify-content-center">
+														<div className="d-flex justify-content-center d-none">
 															<div className="d-flex align-items-center">
 																<div className="mr-2">
 																	<div className='popup_input_label'>{t('a')}</div>

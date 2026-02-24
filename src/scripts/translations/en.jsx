@@ -466,6 +466,8 @@ const en = {
     "Aluminium": "Aluminium",
     "Do you want to start laser cut with default settings ?": "Do you want to start laser cut with default settings ?",
     "Ooops, something is in cut new_plan": "Ooops, something is in cut new_plan",
-    "Stainless_Steel": "Stainless_Steel"
+    "Stainless_Steel": "Stainless_Steel",
+    "Apply type for all": "Apply type for all",
+    "Apply params for all": "Apply params for all"
 }
 export default en;

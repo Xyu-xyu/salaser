@@ -2192,9 +2192,9 @@ g.macro4,
 g.macro5 {
     fill:url(#grid);
     stroke-width: var(--widthUsual);
-    marker-start: url(#dotRed);
+   /*  marker-start: url(#dotRed);
     marker-end: url(#dotRed);
-    marker-mid: url(#dotRed); 
+    marker-mid: url(#dotRed);  */
 } 
 
 g.macro5 {

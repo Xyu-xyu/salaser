@@ -750,10 +750,17 @@ class Inlet {
         }
     }
     
-    setInletType (newInleType, endPoint=false, action='set', contourPath, oldInletPath,contourType='inner') {
+    setInletType (
+        newInleType, 
+        endPoint=false, 
+        action='set', 
+        contourPath, 
+        oldInletPath,
+        contourType='inner',
+        params=false) {
         //debugger
         if ('move' === action && !endPoint.hasOwnProperty('x')) return false;
-        //console.log (arguments)
+        console.log (arguments)
         let centers, checkPoint;
         let IL = this.detectInletLength ( oldInletPath, contourPath )
         let newInletPath = ''
@@ -777,6 +784,9 @@ class Inlet {
         } 
         else if (newInleType === "Direct") {
             const commandType = nearestSegment[0]
+            if (params) {
+                IL = params.DirectL
+            }
             let x1, y1;
             switch (commandType) {       
                 case 'L':
@@ -825,6 +835,10 @@ class Inlet {
           
             if (contourType==='outer') clockwise=Number(!Boolean(clockwise));
             let r = IL*0.5
+            if (params) {
+                r = params.TangentR                
+            }
+
             let detectOldInletType = this.detectInletType(oldInletPath)
             const commandType = nearestSegment[0]
             switch (commandType) {                
@@ -859,6 +873,12 @@ class Inlet {
                         if (radius <= 0 || arcLength <= 0 || arcLength > 2*Math.PI*radius ) {
                             newInletPath= oldInletPath
                         }
+
+                        if (params) {
+                            arcLength = params.TangentL
+                            radius = params.TangentR
+                            r = params.TangentR
+                        }
                         centers={}
                         perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, r)
                         checkPoint = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 0.01) 
@@ -888,6 +908,10 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
+
+                    if (params) {
+                        IL= params.TangentR*2
+                    }
 
                     let PP = this.getPrevEndPoint (contourCommand, nearestSegment);
                     let arcParams= arc.svgArcToCenterParam ( PP.x, PP.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
@@ -920,8 +944,14 @@ class Inlet {
                             newInletPath= oldInletPath
                         }
 
+
+                        if (params) {
+                            arcLength = params.TangentL
+                            radius = params.TangentR
+                        }
+
                         inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, radius)
-                        checkPoint = util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, 1)
+                        checkPoint = util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, 0.01)
                         var pointIn = util.pointInSvgPath(contourPath , checkPoint.x, checkPoint.y)
                         if (Math.abs(arcLength) > Math.PI*radius) {
                             flag2=1
@@ -956,6 +986,11 @@ class Inlet {
                     }
                 })
             } 
+
+            if (params) {
+                r = params.HookR
+                IL= params.HookL
+            }
 
             var pointIndex, directionIndex;
             var midPoint;

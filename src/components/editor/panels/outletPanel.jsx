@@ -403,12 +403,17 @@ const OutletPanel = observer(() => {
 							</tr>
 							<tr>
 								<td colSpan={2}>
-									<div className="d-flex ms-3">
+									<div className="d-flex justify-content-center">
 										<button
-											className="btn btn-sm btn-primary btn_outletApplyForAll"
+											className="btn btn-sm btn-primary btn_outletApplyForAll me-2"
 											id="outletApplyForAll"
 											onMouseDown={()=>{ setOutletForAll()}}
-										>{t('Apply for all')}</button>
+										>{t('Apply type for all')}</button>
+										<button
+											className="btn btn-sm btn-primary btn_ApplyParamForAll disabled"
+											id="inletApplyParamsForAll"
+											onMouseDown={() => { setInletForAll() }}
+										>{t('Apply params for all')}</button>
 									</div>
 								</td>
 							</tr>
@@ -483,7 +488,7 @@ const OutletPanel = observer(() => {
 																</div>
 															</div>
 														</div>
-														<div className="d-flex justify-content-center">
+														<div className="d-flex justify-content-center d-none">
 															<div className="d-flex align-items-center"><div className="mr-2">
 																<div className='popup_input_label'>{t('a')}</div>
 															</div>

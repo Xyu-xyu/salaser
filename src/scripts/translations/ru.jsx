@@ -449,6 +449,8 @@ const ru = {
     "Aluminium": "Алюминий",
     "Do you want to start laser cut with default settings ?": "Хотите начать лазерную резку с настройками по умолчанию?",
     "Ooops, something is in cut new_plan": "Ой, что-то вырезано new_plan",
-    "Stainless_Steel": "Нержавеющая сталь"
+    "Stainless_Steel": "Нержавеющая сталь",
+    "Apply type for all": "Применить тип для всех",
+    "Apply params for all": "Применить параметры для всех"
 }
 export default ru;

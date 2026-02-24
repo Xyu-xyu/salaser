@@ -434,6 +434,8 @@ const zh = {
     "Aluminium": "铝",
     "Do you want to start laser cut with default settings ?": "您想使用默认设置开始激光切割吗？",
     "Ooops, something is in cut new_plan": "哎呀，有东西被剪掉了 new_plan",
-    "Stainless_Steel": "不锈钢"
+    "Stainless_Steel": "不锈钢",
+    "Apply type for all": "适用于所有类型",
+    "Apply params for all": "将参数应用于所有"
 }
 export default zh;
