@@ -43,6 +43,7 @@ const constants = {
 	`(</Part id="4" part_id="4">)`],
 	fontSize:11.88,
 	kerning:1,
+	defaultIntend:10,
 	defaultInletIntend: 0.2,
 	defaultInletLength: 6,
 	defaultStringInterval:18,
@@ -81,6 +82,16 @@ const constants = {
 			mini: false,
 			style: {
 				top: 40,
+				left: 300,
+				width: 125,
+				height: 380,
+				zIndex:1
+			}
+		},
+		sheetPopup: {
+			mini: false,
+			style: {
+				top: 80,
 				left: 300,
 				width: 125,
 				height: 380,

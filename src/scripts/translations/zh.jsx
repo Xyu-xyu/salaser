@@ -437,6 +437,12 @@ const zh = {
     "Stainless_Steel": "不锈钢",
     "Apply type for all": "适用于所有类型",
     "Apply params for all": "将参数应用于所有",
-    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "url 超出最大重试次数。 "
+    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "url 超出最大重试次数。",
+    "Parts collide": "零件碰撞",
+    "Intends": "打算",
+    "Sheet size": "板材尺寸",
+    "width": "宽度",
+    "height": "高度",
+    "heigth": "高度"
 }
 export default zh;

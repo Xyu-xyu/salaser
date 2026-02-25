@@ -469,6 +469,20 @@ const en = {
     "Stainless_Steel": "Stainless_Steel",
     "Apply type for all": "Apply type for all",
     "Apply params for all": "Apply params for all",
-    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))"
+    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))",
+    "Sheet data": "Sheet data",
+    "Time for cut": "Time for cut",
+    "thickness": "thickness",
+    "file": "file",
+    "Parts collide": "Parts collide",
+    "Part intend": "Part intend",
+    "Part in part": "Part in part",
+    "Move with inner part": "Move with inner part",
+    "Rotate sheet": "Rotate sheet",
+    "Intends": "Intends",
+    "Sheet size": "Sheet size",
+    "width": "width",
+    "height": "height",
+    "heigth": "heigth"
 }
 export default en;

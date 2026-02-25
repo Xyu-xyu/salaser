@@ -452,6 +452,16 @@ const ru = {
     "Stainless_Steel": "Нержавеющая сталь",
     "Apply type for all": "Применить тип для всех",
     "Apply params for all": "Применить параметры для всех",
-    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "Превышено максимальное количество повторов с URL-адресом. "
+    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "Превышено максимальное количество повторов с URL-адресом.",
+    "file": "файл",
+    "Sheet data": "Данные листа",
+    "thickness": "толщина",
+    "Move with inner part": "Переместить внутреннюю часть",
+    "Time for cut": "Время резать",
+    "Intends": "Намеревается",
+    "Sheet size": "Размер листа",
+    "width": "ширина",
+    "height": "высота",
+    "heigth": "высота"
 }
 export default ru;
