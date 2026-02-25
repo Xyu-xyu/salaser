@@ -323,7 +323,13 @@ class JobStore {
 			},
 			body: JSON.stringify({
 				uuid: this.selectedId,
-				content: ncpText.join("\n")
+				content: ncpText.join("\n"),
+				params:JSON.stringify(
+					{
+					"dimX":svgStore.svgData.width,
+					"dimY":svgStore.svgData.height
+					}
+				)
 			})
 		})
 	
@@ -331,6 +337,9 @@ class JobStore {
 			throw new Error("Update failed")
 	
 		const data = await resp.json()
+
+		
+
 		console.log("updated:", data)	
 		jobStore.loadJobs()
 	}

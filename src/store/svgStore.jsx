@@ -1598,7 +1598,7 @@ class SvgStore {
 			ncpStart = [
 				`%`,
 				`(<NcpProgram Version="1.0" Units="Metric">)`,
-				`(<MaterialInfo Label="${material}" MaterialCode="${materialLabel}" Thickness="${thickness}" FormatType="Sheet" DimX="${dimX}" DimY="${dimY}"/>)`,
+				`(<MaterialInfo Label="${material}" MaterialCode="${materialLabel}" Thickness="${thickness}" FormatType="Sheet" DimX="${this.svgData.width}" DimY="${this.svgData.height}"/>)`,
 				`(<ProcessInfo CutTechnology="Laser" Clamping="False"/>)`,
 				`(<Plan JobCode="${jobcode}">)`,
 			]
