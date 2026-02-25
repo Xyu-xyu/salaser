@@ -366,48 +366,42 @@ const PartSvgWrapper = observer(() => {
 
 
 	const fitToPage = () => {
-	/* 		// реальные размеры того, что масштабируем внутри SVG
-		const padding = 100;
+		const PADDING = 50
 
-		const widthContent = partStore.svgData.width;
-		const heightContent = partStore.svgData.height
-
-		const x = 0;
-		const y = 0;
+		const svgWidth = window.innerWidth
+		//Navbar height fron css
+		const svgHeight = window.innerHeight-58
 	
-		// размеры SVG (viewBox), в которое хотим вписать контент
-		const svgW = 1250;
-		const svgH = 650	
-		// доступная область с padding
-		const viewW = svgW - padding * 2;
-		const viewH = svgH - padding * 2;
+		const contentWidth = partStore?.svgData?.width
+		const contentHeight = partStore?.svgData?.height
 	
-		// масштаб
-		const scale = Math.min(viewW / widthContent, viewH / heightContent);
+		if (!contentWidth || !contentHeight) return
 	
-		// центр доступной области
-		const cx = padding + viewW / 2;
-		const cy = padding + viewH / 2;
+		// доступная область с отступами
+		const availableWidth = svgWidth - PADDING * 2
+		const availableHeight = svgHeight - PADDING * 2
 	
-		// центр контента
-		const contentCX = x + widthContent / 2;
-		const contentCY = y + heightContent / 2;
+		const scaleX = availableWidth / contentWidth
+		const scaleY = availableHeight / contentHeight
 	
-		// смещение, чтобы центр контента совпал с центром области
-		const tx = cx - contentCX * scale;
-		const ty = cy - contentCY * scale;
+		const scale = Math.min(scaleX, scaleY)
 	
+		const scaledWidth = contentWidth * scale
+		const scaledHeight = contentHeight * scale
+	
+		const translateX = (svgWidth - scaledWidth) / 2
+		const translateY = (svgHeight - scaledHeight) / 2
 		partStore.setGroupMatrix({
 			a: scale,
 			b: 0,
 			c: 0,
 			d: scale,
-			e: tx,
-			f: ty
-		});
-	
-		console.log("FIT DONE:", { scale, tx, ty }); */
-	};
+			e: translateX,
+			f: translateY,
+		})
+		//console.log ( "setGroupMatrix"+(`${scale} 0 0 ${scale} ${translateX} ${translateY}`))
+
+ 	};
 	    
 
 	useEffect(() => {

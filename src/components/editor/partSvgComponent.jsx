@@ -4,7 +4,7 @@ import SelectedEdge from './selectedEdge';
 import Guides from './guides'
 //import editorStore from '../../store/editorStore';
 import partStore from '../../store/partStore';
-import svgStore from '../../store/svgStore';
+//import svgStore from '../../store/svgStore';
 import { observer } from 'mobx-react-lite';
 import Joints from './joints';
 import HighLighted from './highlighted'
