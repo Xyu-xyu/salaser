@@ -468,6 +468,7 @@ const en = {
     "Ooops, something is in cut new_plan": "Ooops, something is in cut new_plan",
     "Stainless_Steel": "Stainless_Steel",
     "Apply type for all": "Apply type for all",
-    "Apply params for all": "Apply params for all"
+    "Apply params for all": "Apply params for all",
+    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))"
 }
 export default en;

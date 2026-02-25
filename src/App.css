@@ -403,7 +403,7 @@ body {
   display: block;
   width: 100%;
   display: block;
-  max-width: 400px;
+  max-width: 200px;
   max-height: 200px;    
   object-fit: contain;  
 }
@@ -1047,6 +1047,8 @@ height: fit-content;}
 .ccard-image {
   width: fit-content;
   height: fit-content;
+  transform: rotate(-90deg);
+  transform-origin: center;
  
 }
 

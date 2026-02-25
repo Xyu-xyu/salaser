@@ -436,6 +436,7 @@ const zh = {
     "Ooops, something is in cut new_plan": "哎呀，有东西被剪掉了 new_plan",
     "Stainless_Steel": "不锈钢",
     "Apply type for all": "适用于所有类型",
-    "Apply params for all": "将参数应用于所有"
+    "Apply params for all": "将参数应用于所有",
+    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "url 超出最大重试次数。 "
 }
 export default zh;

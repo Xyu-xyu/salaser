@@ -122,7 +122,7 @@ const ShapeModalComponent = observer(() => {
 					icon="fa-shapes"
 					width="20"
 					height="20"
-					fill={"var(--violet)"}
+					fill={"black"}
 					strokeWidth={0}
 					viewBox='0 0 512 512'
 				/>

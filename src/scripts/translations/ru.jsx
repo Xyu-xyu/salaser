@@ -451,6 +451,7 @@ const ru = {
     "Ooops, something is in cut new_plan": "Ой, что-то вырезано new_plan",
     "Stainless_Steel": "Нержавеющая сталь",
     "Apply type for all": "Применить тип для всех",
-    "Apply params for all": "Применить параметры для всех"
+    "Apply params for all": "Применить параметры для всех",
+    " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "Превышено максимальное количество повторов с URL-адресом. "
 }
 export default ru;

@@ -169,6 +169,7 @@ const Panel = observer(({ element }) => {
 	};
 
 	return (
+		<div>
 		<div
 			ref={panelRef}
 			id={element.id}
@@ -180,14 +181,15 @@ const Panel = observer(({ element }) => {
 				width: `${panelStore.positions[id].style.width}px`,
 				height: `${panelStore.positions[id].mini ? 45 : panelStore.positions[id].style.height}px`,
 			}}
+			
 		>
 			<div className="window-top popup-header"
-				onMouseDown={handleMouseDown}
-				onTouchStart={handleMouseDown}
+				 onMouseDown={handleMouseDown}
+				onTouchStart={handleMouseDown} 
 			>
 				<div className="d-flex align-items-center justify-content-between">
-					<div className="nav-link">
-						<div className="d-flex align-items-center">
+					<div className="nav-link d-flex align-items-center">
+						<div className="d-flex align-items-center" style={{height: "42px"}}>
 							{element.fa}
 						</div>
 					</div>
@@ -202,7 +204,11 @@ const Panel = observer(({ element }) => {
 					</div>
 				</div>
 			</div>
-			<div className={`window-content ${panelStore.positions[id].mini ? "mini" : ""}`}>
+			<div className={`window-content ${panelStore.positions[id].mini ? "mini" : ""}`}
+			 onMouseDown={handleMouseDown}
+			 onTouchStart={handleMouseDown} 
+			
+			>
 				{element.content}
 			</div>
 			<div
@@ -223,6 +229,7 @@ const Panel = observer(({ element }) => {
 				onTouchEnd={handleMouseUp}
 			>
 			</div>
+		</div>		
 		</div>
 	);
 });
