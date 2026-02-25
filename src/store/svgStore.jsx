@@ -269,7 +269,7 @@ class SvgStore {
 
 
 	deleteOutParts = () => {
-		return;
+		
 		const rect = { x: 0, y: 0, width: this.svgData.width, height: this.svgData.height };
 
 		runInAction(() => {
