@@ -1018,9 +1018,9 @@ class SvgStore {
 	}
 
 	// Крест с поворотом
-	cross = (x, y, size, c) => {
+	cross = (x, y, size, h) => {
 		const [rx, ry] = this.rotatePoint(x, y, 0, 0, 0);
-		const yInv = ry;
+		const yInv = h -ry;
 		return `M${rx - size} ${yInv - size} L${rx + size},${yInv + size} M${rx - size} ${yInv + size}L${rx + size} ${yInv - size}`;
 	};
 
@@ -1284,15 +1284,20 @@ class SvgStore {
 				const g = Math.floor(c.g);
 				if (g === 4) {
 
-					/* let crossPath = {
-						path: partOpen ?
-							this.cross(cx, cy, 2.5, c )
-							:
-							this.cross(cx, cy, 2.5, c ),
-						class: 'g4'
-					};
-					res.splice(0, 0, crossPath);
-					continue; */
+									
+
+					let joint = {
+						"cid": cid,
+						"class": "joint",
+						"path": this.cross(cx, cy, 2.5, partHeight),
+						"stroke": "red",
+						"strokeWidth": 1,
+						"selected": false
+					}
+					res = [joint, ...res]
+					
+				
+					continue; 
 				} else if (g === 0) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
@@ -1421,7 +1426,7 @@ class SvgStore {
 				const dx = tx - cx;
 				const dy = ty - cy;
 
-				const transform = `rotate(${-C} ${cx} ${cy}) translate(${tx} ${ty})`;
+				//const transform = `rotate(${-C} ${cx} ${cy}) translate(${tx} ${ty})`;
 				//console.log ( transform )
 				//const position = this.svgTransformToMatrix ( transform)
 				const position = this.rotateTranslateToMatrix(C, cx, cy, tx, ty)

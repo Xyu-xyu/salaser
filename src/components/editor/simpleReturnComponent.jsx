@@ -52,6 +52,7 @@ const SimpleReturnComponent = observer(() => {
 		const inner = [];
 		const inletOutlet = [];
 		const engraving = [];
+		const joint =[]
 
 		for (const el of code) {
 			if (!el.path) continue;
@@ -64,19 +65,22 @@ const SimpleReturnComponent = observer(() => {
 				inner.push(el.path.trim());
 			} else if (el.class.includes("inlet") || el.class.includes("outlet")) {
 				inletOutlet.push(el.path.trim());
+			} else if (el.class.includes("joint")) {
+				joint.push(el.path.trim());
 			}
 		}
 
 		return {
 			contours: [...outer, ...inner].join(" z "),
 			inletOutlet,
-			engraving
+			engraving,
+			joint
 		};
 	};
 
 	// Собираем все уникальные part_code в defs
 	const defs = svgStore.svgData.part_code.map(part => {
-		const { contours, inletOutlet, engraving } = buildCompoundPath(part.code);
+		const { contours, inletOutlet, engraving, joint } = buildCompoundPath(part.code);
 
 		return (
 			<g key={`defs_part_${part.id}`} id={`part_${part.id}`}>
@@ -107,6 +111,15 @@ const SimpleReturnComponent = observer(() => {
 					d={engraving.join(" ")}
 					fill="none"
 					stroke="limegreen"
+					strokeWidth={1}
+					strokeLinecap={'round'}
+					pointerEvents="visiblePainted"
+				/>
+
+				<path
+					d={joint.join(" ")}
+					fill="none"
+					stroke="red"
 					strokeWidth={1}
 					strokeLinecap={'round'}
 					pointerEvents="visiblePainted"

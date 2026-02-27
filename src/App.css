@@ -1840,6 +1840,7 @@ height: fit-content;}
   transform-origin: center;
 
   object-fit: contain;
+  border: 1px solid grey;
 }
 
 .currentCut1 {
