@@ -6,6 +6,7 @@ import Hook from './../../../images/Hook.jpg';
 import Direct from './../../../images/Direct.jpg';
 import Straight from './../../../images/Straight.jpg';
 import Tangent from './../../../images//Tangent.jpg';
+//import Follow from './../../../images//Tangent.jpg';
 import SVGPathCommander from 'svg-path-commander';
 import util from './../../../scripts/util.jsx';
 import inlet from './../../../scripts/inlet.jsx'
@@ -551,11 +552,16 @@ const InletPanel = observer(() => {
 								</td>
 								<td colSpan={2}>
 									<div id="inlet_viewer__wrapper">
-										<img id="inlet_viewer__wrapper__img" src={
-											type === "Straight" ? Straight :
-												type === "Hook" ? Hook :
-													type === "Direct" ? Direct : Tangent
-										} alt="no img"
+										<img 
+											  id="inlet_viewer__wrapper__img"
+											  src={
+												type === "Straight" ? Straight :
+												type === "Hook"     ? Hook :
+												type === "Direct"   ? Direct :
+												type === "Tangent"  ? Tangent :
+												Straight
+											  }
+											  alt="no img"
 										/>
 									</div>
 								</td>

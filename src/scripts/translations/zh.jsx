@@ -443,6 +443,6 @@ const zh = {
     "Sheet size": "板材尺寸",
     "width": "宽度",
     "height": "高度",
-    "heigth": "高度"
+    "Follow the path": "跟随路径"
 }
 export default zh;

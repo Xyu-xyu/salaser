@@ -95,20 +95,19 @@ class Inlet {
         } else if (type === 'Straight' ) {
             if (contourPath){
                 let box = SVGPathCommander.getPathBBox(contourPath)
-                let minSide = Math.min (box.width, box.height ) 
+                let minSide = Math.min (box.width/2, box.height/2 ) 
                 const analyzer = new PathAnalyzer(contourPath);
                 let minInCoolision =  analyzer.getInnerPerpendicularData()?.length|| Infinity;
                 let minInCoolision1 =  analyzer.getInnerPerpendicularData1( contourPath )?.length|| Infinity;
-                console.log ( "DDDDDDDRRRRRRRRUUUMMMMMMM")
-                console.log ( minInCoolision, minInCoolision1, minSide, CONSTANTS.defaultInletLength)
+                //console.log ( "DDDDDDDRRRRRRRRUUUMMMMMMM")
+                //console.log ( minInCoolision, minInCoolision1, minSide, CONSTANTS.defaultInletLength)
                 IL = Math.min (
                     minInCoolision, 
                     minInCoolision1, 
                     minSide, 
                     CONSTANTS.defaultInletLength
                 )
-            }
-            
+            }            
 
         }
         //console.log ('Detected length ' + Math.round(IL*1000)/1000)

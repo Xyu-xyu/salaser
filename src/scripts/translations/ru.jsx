@@ -462,6 +462,6 @@ const ru = {
     "Sheet size": "Размер листа",
     "width": "ширина",
     "height": "высота",
-    "heigth": "высота"
+    "Follow the path": "Следуйте по пути"
 }
 export default ru;

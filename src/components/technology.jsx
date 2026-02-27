@@ -2,8 +2,8 @@ import cut_settings_schema from "../store/cut_settings_schema";
 import { useTranslation } from 'react-i18next';
   
 
-const getAllEntries = (obj, parentKey = ''): { path, value }[] => {
-    const entries: { path, value }[] = [];
+const getAllEntries = (obj, parentKey = '') => {
+    const entries = [];
 
     for (const key in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {

@@ -483,6 +483,7 @@ const en = {
     "Sheet size": "Sheet size",
     "width": "width",
     "height": "height",
-    "heigth": "heigth"
+    "heigth": "heigth",
+    "Follow the path": "Follow the path"
 }
 export default en;

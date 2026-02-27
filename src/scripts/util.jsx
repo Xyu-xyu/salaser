@@ -2269,14 +2269,28 @@ class Utils {
 		};
 	}
 
-	smartRound(num, p = 5) {
+	
+	smartRound(num, p = 3) {
 		const factor = 10 ** p;
+
+		// обычное округление до p знаков
 		let res = Math.round(num * factor) / factor;
-		res = Math.abs(res) < 1e-12 ? 0 : res;
-		return res
+
+		// если число близко к целому — возвращаем целое
+		const nearestInt = Math.round(res);
+		if (Math.abs(res - nearestInt) < 10 ** (-p)) {
+			return nearestInt;
+		}
+
+		// убираем -0
+		if (Math.abs(res) < 1e-12) return 0;
+
+		return res;
 	}
 } 
 
 
 const utils = new Utils();
 export default utils;
+
+

@@ -500,14 +500,23 @@ class SvgStore {
 				J = j
 			  
 
-				if (currentCompensation !== (direction ? 'G41' : 'G42')) {
+				const inner = contour.class.includes("inner");
+				let neededComp;
 
-					currentCompensation = (direction ? 'G41' : 'G42')
-					direction ? res.push('G41') : res.push('G42')
-					G = direction ? 'G41': 'G42'
+				if (
+					(direction === true && inner === false) ||
+					(direction === false && inner === true)
+				) {
+					neededComp = 'G41';
+				}
+				else {
+					neededComp = 'G42';
+				}
 
-				}								
- 
+				if (currentCompensation !== neededComp) {
+					currentCompensation = neededComp;
+					res.push(neededComp);
+				}
 				if (needLaserOn) {
 
 					const macro = this.getMacro(inlet.class)
@@ -642,13 +651,24 @@ class SvgStore {
 				I = i
 				J = j
 			  
-				if (currentCompensation !== (direction ? 'G41' : 'G42')) {
+				const inner = contour.class.includes("inner");
+				let neededComp;
 
-					currentCompensation = (direction ? 'G41' : 'G42')
-					direction ? res.push('G41') : res.push('G42')
-					G = direction ? 'G41': 'G42'
+				if (
+					(direction === true && inner === false) ||
+					(direction === false && inner === true)
+				) {
+					neededComp = 'G41';
+				}
+				else {
+					neededComp = 'G42';
+				}
 
-				}	
+				if (currentCompensation !== neededComp) {
+					currentCompensation = neededComp;
+					res.push(neededComp);
+				}
+
 			  
 				if (needLaserOn) line += 'M4'
 				needLaserOn = false			  
@@ -796,14 +816,25 @@ class SvgStore {
 				I = i
 				J = j
 			  
-				if (currentCompensation !== (direction ? 'G41' : 'G42')) {
+ 				const inner = contour.class.includes("inner");
+				let neededComp;
 
-					currentCompensation = (direction ? 'G41' : 'G42')
-					direction ? res.push('G41') : res.push('G42')
-					G = direction ? 'G41': 'G42'
+				if (
+					(direction === true  && inner === false) ||
+					(direction === false && inner === true)
+				) {
+					neededComp = 'G41';
+				}
+				else {
+					neededComp = 'G42';
+				}
 
-				}	
+				if (currentCompensation !== neededComp) {
+					currentCompensation = neededComp;
+					res.push(neededComp);
+				}
 
+				
 				const macro = this.getMacro(inlet.class|| "")
 				if (macro !== null && macro !== currentMacro) {
 					res.push(`G10S${macro}`)
@@ -937,7 +968,7 @@ class SvgStore {
 		// fix need workinfg area
 		//res.push(`N1G29X${this.svgData.height}Y${this.svgData.width}P1H1A1`);
 		let contBox = document.querySelector("#contours").getBBox()
-		res.push(`N1G29X${contBox.width}Y${contBox.height}P1H1A1`);
+		res.push(`N1G29X${ utils.smartRound(contBox.width + contBox.x)}Y${ utils.smartRound(contBox.height+ + contBox.y)}P1H1A1`);
 		let lineNumber = 2;
 		let x, y, c, g, l = 0
 
@@ -1627,7 +1658,3 @@ class SvgStore {
 
 const svgStore = new SvgStore();
 export default svgStore;
-
-
-// сохранние ручного
-// баг  с добавлением контуров
