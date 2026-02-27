@@ -503,6 +503,20 @@ class SvgStore {
 				const inner = contour.class.includes("inner");
 				let neededComp;
 
+				if (needLaserOn) {
+
+					const macro = this.getMacro(inlet.class)
+					if (macro !== null && macro !== currentMacro) {
+						res.push(`G10S${macro}`)
+						currentMacro = macro
+						G = 'G10'
+					}
+
+					line +="M4"
+					needLaserOn = false
+					needLaserOff = true
+				}
+				
 				if (
 					(direction === true && inner === false) ||
 					(direction === false && inner === true)
@@ -517,20 +531,9 @@ class SvgStore {
 					currentCompensation = neededComp;
 					res.push(neededComp);
 				}
-				if (needLaserOn) {
-
-					const macro = this.getMacro(inlet.class)
-					if (macro !== null && macro !== currentMacro) {
-						res.push(`G10S${macro}`)
-						currentMacro = macro
-						G = 'G10'
-					}
-
-					line +="M4"
-					needLaserOn = false
-					needLaserOff = true
-				}	  
 				res.push(line)
+
+
 			}
 		})
 
@@ -573,6 +576,24 @@ class SvgStore {
 				}
 			}
 
+			const inner = contour.class.includes("inner");
+			let neededComp;
+
+			if (
+				(direction === true && inner === false) ||
+				(direction === false && inner === true)
+			) {
+				neededComp = 'G41';
+			}
+			else {
+				neededComp = 'G42';
+			}
+
+			if (currentCompensation !== neededComp) {
+				currentCompensation = neededComp;
+				res.push(neededComp);
+			}
+
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
@@ -584,11 +605,15 @@ class SvgStore {
 				if (y !== Y) line += "Y" + utils.smartRound (height- y)
 
 				
-				if (needLaserOn && c.segments.length == 2 ) line +="M14M4M5M15";
-				if (needLaserOn && c.segments.length > 2) line +="M4"
-
-				needLaserOn = false
-
+				if (needLaserOn && c.segments.length == 2 ){ 
+					line +="M14M4M5M15";
+					needLaserOn = true
+				}
+				if (needLaserOn && c.segments.length > 2){
+					line +="M4"
+					needLaserOn = false
+				} 
+ 
 				G = g
 				X = x
 				Y = y
@@ -641,8 +666,14 @@ class SvgStore {
 				if (i !== I) line += "I" + i
 				if (j !== J) line += "J" + j
 
-				if (needLaserOn && c.segments.length == 2 ) line +="M14M4M5M15";
-				if (needLaserOn && c.segments.length > 2) line +="M4"
+				if (needLaserOn && c.segments.length == 2 ) {
+					line +="M14M4M5M15";
+					needLaserOn = true
+				}
+				if (needLaserOn && c.segments.length > 2) {
+					line +="M4"
+					needLaserOn = false
+				}
 
 
 				G = g
@@ -650,28 +681,12 @@ class SvgStore {
 				Y = y
 				I = i
 				J = j
-			  
-				const inner = contour.class.includes("inner");
-				let neededComp;
-
-				if (
-					(direction === true && inner === false) ||
-					(direction === false && inner === true)
-				) {
-					neededComp = 'G41';
-				}
-				else {
-					neededComp = 'G42';
-				}
-
-				if (currentCompensation !== neededComp) {
-					currentCompensation = neededComp;
-					res.push(neededComp);
-				}
 
 			  
-				if (needLaserOn) line += 'M4'
-				needLaserOn = false			  
+				if (needLaserOn) {
+					line += 'M4'
+					needLaserOn = false			  
+				}
 				res.push(line)
 			}
 
@@ -683,6 +698,7 @@ class SvgStore {
 					currentMacro = macro
 				}
 			}
+
 
 			if (i.segments.length === 0	&& 
 				ind === 1 &&
@@ -696,13 +712,8 @@ class SvgStore {
 			needLaserOff = false
 		}
 
-		if (o.segments.length === 0 ) {
-			res[res.length-1]+="M5"
-			needLaserOff = false
-		}
 
-
-		if (needG40 && (!outlet ||!outlet.length )) {
+		if (needG40 && (!outlet || o.segments.length ===0 )) {
 			res.push(`G40`)
 			G="G40"
 			needG40 = false
@@ -753,8 +764,10 @@ class SvgStore {
 						currentMacro = macro
 				}
 
-				if (needLaserOn) line +="M4"
-				needLaserOn = false
+				if (needLaserOn) {
+					line +="M4"
+					needLaserOn = false
+				}
 
 				G = g
 				X = x
@@ -815,8 +828,15 @@ class SvgStore {
 				Y = y
 				I = i
 				J = j
-			  
- 				const inner = contour.class.includes("inner");
+
+				const macro = this.getMacro(inlet.class|| "")
+				if (macro !== null && macro !== currentMacro) {
+					res.push(`G10S${macro}`)
+					currentMacro = macro
+					G = "G10"
+				}
+
+				const inner = contour.class.includes("inner");
 				let neededComp;
 
 				if (
@@ -834,25 +854,19 @@ class SvgStore {
 					res.push(neededComp);
 				}
 
-				
-				const macro = this.getMacro(inlet.class|| "")
-				if (macro !== null && macro !== currentMacro) {
-					res.push(`G10S${macro}`)
-					currentMacro = macro
-					G = "G10"
+				if (needLaserOn) {
+					line += 'M4'
+					needLaserOn = false			  
 				}
-
-				if (needLaserOn) line += 'M4'
-				needLaserOn = false			  
-				res.push(line)
+				res.push(line)			  
+				
 			}
 		})
 
-		if (needLaserOff && outlet.length) {
+		if (needLaserOff || !outlet  || o?.segments?.length) {
 			res[res.length-1]+="M5"
 			needLaserOff = false
 		}
-
 
 		if (needG40 ) res.push(`G40`)
 		return res
@@ -1081,14 +1095,22 @@ class SvgStore {
 		if (dimLine) {
 			const dimX = dimLine.match(/DimX="([\d.]+)"/);
 			const dimY = dimLine.match(/DimY="([\d.]+)"/);
+			const Thickness = dimLine.match(/Thickness="([\d.]+)"/);
 
 			// Используем DimX как ширину, DimY как высоту,
 			// чтобы не менять их местами при повороте -90°
 			result.width = Number(dimX?.[1] || 0);
 			result.height = Number(dimY?.[1] || 0);
+			result.thickness = Number(Thickness?.[1] || 0);
 
 			width = result.width;
 			height = result.height;
+		}
+
+		const JobCodeLine = lines.find(l => l.includes("JobCode"));
+ 		if (dimLine) {
+			const JobCode = JobCodeLine.match(/JobCode="([\d\D]+)"/);
+			result.jobcode = (JobCode?.[1] || t("no_description"));
 		}
 
 		/* ---------------- PLAN (POSITIONS) ---------------- */
@@ -1119,7 +1141,7 @@ class SvgStore {
 			//console.log(JSON.stringify(c))
 
 			if (c?.comment?.includes('PartCode')) {
-				console.log('Part code start')
+				//console.log('Part code start')
 				cx = 0;
 				cy = 0;
 				const name = c.comment.match(/PartCode="([^"]+)"/)[1];
@@ -1138,7 +1160,7 @@ class SvgStore {
 
 			} else if (c?.comment?.includes('</Part>')) {
 
-				console.log('Part End')
+				//console.log('Part End')
 				partOpen = false
 				res[res.length - 1].class += " groupEnd "
 
@@ -1182,7 +1204,7 @@ class SvgStore {
 
 			} else if (c?.comment?.includes('<Contour>')) {
 
-				console.log('Contour Start')
+				//console.log('Contour Start')
 				contourOpen = "open"
 
 				const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
@@ -1208,7 +1230,7 @@ class SvgStore {
 
 			} else if (c?.comment?.includes('</Contour>')) {
 
-				console.log('Contour Start')
+				//console.log('Contour Start')
 				//contourOpen = "after"
 
 				res.push({
@@ -1231,18 +1253,18 @@ class SvgStore {
 				vals.length === m.size && vals.every(v => m.has(v));
 			  
 				if (only(4) || only(4, 14) ) {
-					console.log('laser on')
+					//console.log('laser on')
 					laserOn = true;
 					res[res.length - 1].path = this.start(cx, cy, c, partHeight);
 				}	else if (only(5) || only(5, 15) ) {
 
-					console.log('laser off')
+					//console.log('laser off')
 					laserOn = false;
 					contourOpen = "before"
 				  
 				} else if (only(5, 15, 4, 14) || only(5, 4)) {
 				  // только M5 M15
-				  	console.log('laser on')
+				  	//console.log('laser on')
 					laserOn = true;
 					res[res.length - 1].class = 
 					res[res.length - 1].class
@@ -1413,9 +1435,6 @@ class SvgStore {
 						cy
 					}
 				);
-
-
-				
 			}
 		});
 
@@ -1528,9 +1547,6 @@ class SvgStore {
 	
 	  return result
 	}
-	
-	  
-	  
 
 	rotateTranslateToMatrix(C, cx, cy, tx, ty) {
 		const rad = (-C * Math.PI) / 180;
@@ -1623,9 +1639,8 @@ class SvgStore {
 
 			const current = jobStore.getJobById(selectedId)
 			if (!current) return;
-			const { loadResult, dimX, dimY, material, materialLabel, name } = current
-			let parsed = JSON.parse(loadResult)
-			const { thickness, jobcode } = parsed.result.jobinfo.attr
+			const { material, materialLabel } = current
+			const { thickness, jobcode } = svgStore.svgData
 			ncpStart = [
 				`%`,
 				`(<NcpProgram Version="1.0" Units="Metric">)`,
