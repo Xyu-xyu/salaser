@@ -1,20 +1,20 @@
-import Panel from './panel.js';
-import '@fortawesome/fontawesome-free/css/all.css'
-import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
-import util from '../../utils/util.js';
+import {  useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import CONSTANTS from '../../constants/constants.js';
-import { addToLog } from './../../scripts/addToLog.jsx';
-import jointStore from '../stores/jointStore.js';
-import svgStore from '../stores/svgStore.js';
-import editorStore from '../stores/editorStore.js';
+import CONSTANTS from './../../../store/constants.jsx';
+import { observer } from 'mobx-react-lite';
+import jointStore from './../../../store/jointStore.jsx';
+import partStore from './../../../store/partStore.jsx';
+import editorStore from './../../../store/editorStore.jsx';
+import Panel from './panel.jsx';
+import { addToLog } from './../../../scripts/addToLog.jsx';
+import CustomIcon from './../../../icons/customIcon.jsx';
+
 
 
 const JointPanel = observer(() => {
 	const { t } = useTranslation();
 	const { jointsForSelectedCid } = jointStore
-	const { selectedCid } = svgStore
+	const { selectedCid } = partStore
 	const jointQuantity = useRef(null);
 	const jointDistance = useRef(null);
 
@@ -72,7 +72,19 @@ const JointPanel = observer(() => {
 	const panelInfo = 
 		  {
 			id: 'jointPopup',
-			fa: (<><i className="fa-solid fa-xmark me-2" /><div>{t('Joint')}</div></>),
+			fa: (<>
+				<CustomIcon
+						icon="fa-xmark"
+						width="24"
+						height="24"
+						color="black"
+						fill="none"
+						strokeWidth={50}
+						viewBox='0 0 384 512'
+						className={'m-2'}
+					/>
+					<div>{t('Joint')}</div>
+				</>),
 			content:  (
 	<div className="d-flex flex-column">
 		<table className="table">

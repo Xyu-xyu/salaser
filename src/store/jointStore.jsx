@@ -1,5 +1,6 @@
 import { makeAutoObservable, observable, computed, set } from "mobx";
-import svgStore from "./svgStore";
+import partStore from "./partStore.jsx";
+
 import SVGPathCommander from "svg-path-commander";
 
 class JointStore {
@@ -23,10 +24,9 @@ class JointStore {
 			if (!jointData) continue; // Если данных нет — пропускаем
 
 	
-			let contour = svgStore.getElementByCidAndClass(cid, 'contour');
+			let contour = partStore.getElementByCidAndClass(cid, 'contour');
 			if (!contour || !contour.path) continue; // Проверяем, существует ли объект
-			
-			let path = contour.path;
+			let path = contour.path
 			let updPath = SVGPathCommander.normalizePath(path);	
 			let totalLength = SVGPathCommander.getTotalLength(path);
 
@@ -74,8 +74,8 @@ class JointStore {
 	}
 
 	get jointsForSelectedCid() {
-		if (!svgStore.selectedCid) return null;		
-		return this.joints[svgStore.selectedCid] || null;
+		if (!partStore.selectedCid) return null;		
+		return this.joints[partStore.selectedCid] || null;
 	}
 
 	loadJoints(loaded) {

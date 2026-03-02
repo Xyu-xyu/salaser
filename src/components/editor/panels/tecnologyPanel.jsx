@@ -4,13 +4,13 @@ import partStore from "./../../../store/partStore.jsx";
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import CustomIcon from './../../../icons/customIcon.jsx';
-//import jointStore from '../stores/jointStore';
+import jointStore from './../../../store/jointStore.jsx';
 
 
 const TecnologyPanel =  observer(() => {
 	const { t } = useTranslation();
 	const { tecnology } = partStore
-	//const { jointPositions } = jointStore
+	const { jointPositions } = jointStore
 	const panelInfo = [
 		  {
 			id: 'contourModesPopup',
@@ -50,12 +50,17 @@ const TecnologyPanel =  observer(() => {
 						<td colSpan="2">{t('Tags')}</td>
 					  </tr>
 
-{/* 					  { jointPositions.length > 0 && (<tr>
+					  { jointPositions.length > 0 && (<tr>
 						<td>{t('Joint')}</td>
 						<td>
-						  <i className="fa-solid fa-xmark"></i>
+						<CustomIcon icon="material-symbols:close-rounded"
+								width="24"
+								height="24"
+								fill='red'
+								strokeWidth={0}
+						/>	
 						</td>
-					  </tr>)} */}
+					  </tr>)}
 					</tbody>
 				  </table>
 				</div>

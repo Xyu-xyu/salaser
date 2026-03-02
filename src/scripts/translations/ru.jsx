@@ -462,6 +462,13 @@ const ru = {
     "Sheet size": "Размер листа",
     "width": "ширина",
     "height": "высота",
-    "Follow the path": "Следуйте по пути"
+    "Follow the path": "Следуйте по пути",
+    "Joint": "Перемычка",
+    "Distance ": "Расстояние",
+    "toEnd": "до конца",
+    "Add joint": "Добавить сустав",
+    "Updated joints": "Обновлены суставы",
+    "Added joint": "Добавлен сустав",
+    "Removed joint": "Удаленный сустав"
 }
 export default ru;

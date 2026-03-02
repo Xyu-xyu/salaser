@@ -10,6 +10,7 @@ import PointPanel from './pointPanel .jsx';
 import EdgePanel from './edgePanel.jsx';
 import CutPanel from './cutPanel.jsx';
 import ExitButton from '../../navbar/ExitButton.jsx';
+import JointPanel from './jointPanel.jsx';
 
 
 const PartPanels = () => {
@@ -26,6 +27,7 @@ const PartPanels = () => {
 			<PointPanel />
 			<EdgePanel />
 			<CutPanel />
+			<JointPanel />
 			<ExitButton />
 
 		</>

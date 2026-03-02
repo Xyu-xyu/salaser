@@ -12,7 +12,12 @@ const Joints = observer(() => {
 	return (
 		<>
 			{jointPositions.map((element, i) => ( 
-				<g key={i} className="joint" fill="none">
+				<g key={i} 
+					className="joint" 
+					fill="none"
+					stroke="red"	
+					strokeWidth={.5}
+				>
 					<path d={getJointPath(element.x, element.y)}></path>
 				</g>
 			))}

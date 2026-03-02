@@ -103,7 +103,7 @@ const RightBar = observer(() => {
 											strokeWidth={0}
 											className="ms-1"
 										/>
-										<div className="flex-grow-1 text-center">{t("Tidy up")}</div>
+										<div className="flex-grow-1 text-center">{t("Delete")}</div>
 									</div>
 								</button>
 							</div>

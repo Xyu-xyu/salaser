@@ -484,6 +484,17 @@ const en = {
     "width": "width",
     "height": "height",
     "heigth": "heigth",
-    "Follow the path": "Follow the path"
+    "Follow the path": "Follow the path",
+    "Joint": "Joint",
+    "Avto": "Avto",
+    "Manual": "Manual",
+    "Size": "Size",
+    "Distance ": "Distance",
+    "pcs": "pcs",
+    "toEnd": "toEnd",
+    "Add joint": "Add joint",
+    "Updated joints": "Updated joints",
+    "Added joint": "Added joint",
+    "Removed joint": "Removed joint"
 }
 export default en;

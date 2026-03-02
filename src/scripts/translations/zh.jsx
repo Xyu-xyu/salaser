@@ -443,6 +443,12 @@ const zh = {
     "Sheet size": "板材尺寸",
     "width": "宽度",
     "height": "高度",
-    "Follow the path": "跟随路径"
+    "Follow the path": "跟随路径",
+    "Joint": "联合的",
+    "Avto": "阿夫托",
+    "Add joint": "添加关节",
+    "Updated joints": "更新关节",
+    "Added joint": "添加关节",
+    "Removed joint": "移除关节"
 }
 export default zh;
