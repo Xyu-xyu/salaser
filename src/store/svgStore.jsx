@@ -43,6 +43,8 @@ class SvgStore {
 				"id": 1,
 				"uuid": 1,
 				"name": "31715200",
+				"height": 55,
+				"width": 113
 				"code": [
 					{
 						"cid": 0,
@@ -69,8 +71,25 @@ class SvgStore {
 						"selected": false
 					}
 				],
-				"height": 55,
-				"width": 113
+
+				"joints": 
+				[
+					{
+						"cid": 1,
+						"atEnd": true/false
+						"quantity": number,
+						"distance": number,
+						"manual":[]					
+					},
+					{
+						"cid": 2,
+						"atEnd": true/false
+						"quantity": number,
+						"distance": number,
+						"manual":[]					
+					}
+					
+				]
 			} */      
 		]
 	}
@@ -1123,9 +1142,7 @@ class SvgStore {
 
 
 		/* ---------------- PART CODE ---------------- */
-		//const parseGcodeLine = makeGcodeParser();
-
-		let currentPart = null;
+ 		let currentPart = null;
 		let cid = -1;
 		let cx = 0, cy = 0;
 		let partOpen = false
@@ -1134,8 +1151,9 @@ class SvgStore {
 		let laserOn = false
 		let macros = ''
 		let HW = [0]
-		let partHeight = 0
+		let partHeight = 0		
 		let partWidth = 0
+		let joints = [] // массив джойнтов
 
 		for (const c of cmds) {
 			//console.log(JSON.stringify(c))
@@ -1153,8 +1171,11 @@ class SvgStore {
 					code: [],
 					height: 0,
 					width: 0,
+					joints:[],
 				};
 				res = []
+				joints = []
+
 				partOpen = true
 				continue;
 
@@ -1183,8 +1204,7 @@ class SvgStore {
 				let box = SVGPathCommander.getPathBBox(commonPath)
 				currentPart.width = box.width
 				currentPart.height = box.height
-				//currentPart.viewBox=`${box.x} ${box.y} ${box.x2} ${box.y2}`
-
+ 
 				const order = ['outer', 'contour', 'engraving', 'inlet', 'outlet', 'joint'].reverse();
 				res = res.sort((a, b) => {
 					let ac = a.class.split(' ')
@@ -1199,6 +1219,7 @@ class SvgStore {
 				});
 
 				res.map(a => currentPart.code.push(a))
+				joints.map(a => currentPart.joints.push(a))
 				result.part_code.push(currentPart)
 				continue;
 
@@ -1278,26 +1299,27 @@ class SvgStore {
 
 				}
 			  
-			  }
+			}
 
 			if (typeof c.g === 'number') {
 				const g = Math.floor(c.g);
 				if (g === 4) {
+					let pathLength = SVGPathCommander.getTotalLength(
+						res[res.length - 1].path
+					);
 
-									
+					// ищем существующий контейнер
+					let current = {
+						[String(cid)]: {
+							length: constants.defaultJointSize,
+							x: cy,
+							y: cx-partHeight,
+							d: pathLength,
+						}
+					};
+					joints.push(current)
+					continue;
 
-					let joint = {
-						"cid": cid,
-						"class": "joint",
-						"path": this.cross(cx, cy, 2.5, partHeight),
-						"stroke": "red",
-						"strokeWidth": 1,
-						"selected": false
-					}
-					res = [joint, ...res]
-					
-				
-					continue; 
 				} else if (g === 0) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
@@ -1446,6 +1468,8 @@ class SvgStore {
 		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		let result1 = this.defineInlets (result)
+		// adding joints
+		
 		svgStore.svgData = Object.assign({}, result1)
 
 	}

@@ -1,10 +1,11 @@
 import { observer } from "mobx-react-lite";
 import partStore from "../../store/partStore.jsx";
 import editorStore from "../../store/editorStore.jsx";
-import Part from "../../scripts/part.jsx";
+//import Part from "../../scripts/part.jsx";
 import React, { useEffect, useRef } from 'react';
 import jointStore from "../../store/jointStore.jsx";
-import constants from "../../store/constants.jsx";
+//import constants from "../../store/constants.jsx";
+//import svgStore from "../../store/svgStore.jsx";
 
 const PartSimpleReturnComponent = observer(() => {
 
@@ -73,6 +74,10 @@ const PartSimpleReturnComponent = observer(() => {
 			editorStore.setInletMode('move')
 		} 
 	} 
+
+	useEffect(() => {
+		jointStore.loadJoints(partStore.svgData['joints'])
+	}, [])
 
 	return (
 		<>

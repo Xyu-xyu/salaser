@@ -1,6 +1,5 @@
 import { makeAutoObservable, observable, computed, set } from "mobx";
 import partStore from "./partStore.jsx";
-
 import SVGPathCommander from "svg-path-commander";
 
 class JointStore {
@@ -97,11 +96,14 @@ class JointStore {
 	
 			let dpValues = [];
 			let dValues = []; // Сюда собираем все d (расстояния)
+			let path = partStore.getElementByCidAndClass (+cid, 'contour', 'path')
+			let pathLength = SVGPathCommander.getTotalLength( path)
 	
 			jointMap[cid].forEach(j => {
-				const { dp, d, d1 } = j;	
+				const { d } = j;	
+				const dp = d / pathLength * 100
 				// Проверяем atEnd
-				if (d1 !== 0 && Math.abs(Math.round(dp) - Math.round((d / d1) * 100)) < 1) {
+				if (Math.abs (d - pathLength) < 0.002 ) {
 					this.updJointVal(Number(cid), 'atEnd', true);
 				} else {
 					dpValues.push(Math.round(dp * 100) / 100);

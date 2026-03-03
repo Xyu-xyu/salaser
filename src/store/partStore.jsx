@@ -626,7 +626,8 @@ class PartStore {
 				width: 0,
 				height: 0,
 				code: [],
-				params: { id: '', uuid: '', pcode: '' }
+				params: { id: '', uuid: '', pcode: '' },
+				joints:[]
 			},
 			selectorCoords: { x: 0, y: 0, width: 0, height: 0 },
 			safeMode: { mode: false, intend: CONSTANTS.defaultInletIntend },

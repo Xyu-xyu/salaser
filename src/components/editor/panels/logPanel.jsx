@@ -47,7 +47,7 @@ const LogPanel = observer(() => {
 					params: parsed.params,
 				  };
 				partStore.setSvgData(newSvgData)
-				//jointStore.setData(joints)
+				jointStore.setData(joints)
 			}		
 			logStore.makeNoteActive(tpoint)	
 			
