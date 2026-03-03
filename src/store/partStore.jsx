@@ -6,6 +6,7 @@ import Part from "./../scripts/part";
 import Util from "./../scripts/util";
 import CONSTANTS from "./constants";
 import log from "../scripts/log";
+import jointStore from "./jointStore";
 
 
 class PartStore {
@@ -627,7 +628,6 @@ class PartStore {
 				height: 0,
 				code: [],
 				params: { id: '', uuid: '', pcode: '' },
-				joints:[]
 			},
 			selectorCoords: { x: 0, y: 0, width: 0, height: 0 },
 			safeMode: { mode: false, intend: CONSTANTS.defaultInletIntend },
@@ -655,6 +655,7 @@ class PartStore {
 		const defaults = this.getDefaultState()	
 		Object.assign(this, defaults)
 		this.printStore()
+		jointStore.setData({})
 	}
 	
 }

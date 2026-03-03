@@ -1,6 +1,7 @@
 import { makeAutoObservable, observable, computed, set } from "mobx";
 import partStore from "./partStore.jsx";
 import SVGPathCommander from "svg-path-commander";
+import CONSTANTS from "./constants.jsx";
 
 class JointStore {
     joints = {};
@@ -197,8 +198,44 @@ class JointStore {
 		}
 	}
 
+	exportForCurrentPart() {
+		const jointsArray = [];
+		const partHeight = partStore.svgData?.height || 0;
+		const pathCache = new Map();
+
+		// подготовим длины контуров по cid
+		const getLength = (cid) => {
+			if (pathCache.has(cid)) return pathCache.get(cid);
+			const path = partStore.getElementByCidAndClass(cid, 'contour', 'path');
+			if (!path) return null;
+			const len = SVGPathCommander.getTotalLength(path);
+			pathCache.set(cid, len);
+			return len;
+		};
+
+		this.jointPositions.forEach(({ x, y, percent, cid }) => {
+			const totalLength = getLength(cid);
+			if (!totalLength) return;
+			const d = totalLength * (percent / 100);
+
+			jointsArray.push({
+				[String(cid)]: {
+					length: CONSTANTS.defaultJointSize,
+					x,
+					y: partHeight - y,
+					d,
+					partHeight: partHeight,
+				},
+			});
+		});
+
+		return jointsArray;
+	}
+	
+
 	setData (data) {
-		Object.assign(this.joints, data);
+		console.log ("ДАННЫЕ ОБНУЛЕНЫ JOINTSTOR ")
+		this.joints = data || {};
 	}
 }
 

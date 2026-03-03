@@ -1312,9 +1312,10 @@ class SvgStore {
 					let current = {
 						[String(cid)]: {
 							length: constants.defaultJointSize,
-							x: cy,
-							y: cx-partHeight,
+							x: cx,
+							y: cy,
 							d: pathLength,
+							partHeight:partHeight
 						}
 					};
 					joints.push(current)

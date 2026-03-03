@@ -1,6 +1,8 @@
 import { observer } from "mobx-react-lite";
 import svgStore from "./../../store/svgStore.jsx";
 import editorStore from "./../../store/editorStore.jsx";
+//import jointStore from "./../../store/jointStore.jsx";
+//import { toJS } from "mobx";
   
 
 const SimpleReturnComponent = observer(() => {
@@ -52,7 +54,6 @@ const SimpleReturnComponent = observer(() => {
 		const inner = [];
 		const inletOutlet = [];
 		const engraving = [];
-		const joint =[]
 
 		for (const el of code) {
 			if (!el.path) continue;
@@ -65,8 +66,6 @@ const SimpleReturnComponent = observer(() => {
 				inner.push(el.path.trim());
 			} else if (el.class.includes("inlet") || el.class.includes("outlet")) {
 				inletOutlet.push(el.path.trim());
-			} else if (el.class.includes("joint")) {
-				joint.push(el.path.trim());
 			}
 		}
 
@@ -74,13 +73,17 @@ const SimpleReturnComponent = observer(() => {
 			contours: [...outer, ...inner].join(" z "),
 			inletOutlet,
 			engraving,
-			joint
 		};
+	};
+
+	const getJointPath = (x, y, height) => {
+		return `M${x} ${height-y} l2 2 -4 -4 2 2 2 -2 -4 4`;
 	};
 
 	// Собираем все уникальные part_code в defs
 	const defs = svgStore.svgData.part_code.map(part => {
-		const { contours, inletOutlet, engraving, joint } = buildCompoundPath(part.code);
+	const { contours, inletOutlet, engraving } = buildCompoundPath(part.code);
+	const { joints } = part;	
 
 		return (
 			<g key={`defs_part_${part.id}`} id={`part_${part.id}`}>
@@ -114,17 +117,27 @@ const SimpleReturnComponent = observer(() => {
 					strokeWidth={1}
 					strokeLinecap={'round'}
 					pointerEvents="visiblePainted"
-				/>
+				/> 
 
-				<path
-					d={joint.join(" ")}
-					fill="none"
-					stroke="red"
-					strokeWidth={1}
-					strokeLinecap={'round'}
-					pointerEvents="visiblePainted"
-				/>
+				{
+				joints.map((item, i) => {
+					const element = Object.values(item)[0]; // берём внутренний объект
+
+					return (
+					<g
+						key={i}
+						className="joint"
+						fill="none"
+						stroke="red"
+						strokeWidth={0.5}
+					>
+						<path d={getJointPath(element.x, element.y, element.partHeight)} />
+					</g>
+					);
+				})
+				}
 			</g>
+			
 		);
 	});
 

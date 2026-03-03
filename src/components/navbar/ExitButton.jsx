@@ -6,7 +6,7 @@ import laserStore from "../../store/laserStore";
 import { useTranslation } from 'react-i18next';
 import partStore from "../../store/partStore";
 import svgStore from "../../store/svgStore";
-
+import jointStore from "../../store/jointStore";
 
 const ExitButton = observer(() => {
 
@@ -23,10 +23,30 @@ const ExitButton = observer(() => {
 		partStore.setToDefault()
 	};
 
-	const handleSubmit = () => {
+/* 	const handleSubmit = () => {
 		setShow(false)
 		laserStore.setVal("centralBarMode", "planEditor")
 		svgStore.updateForm( partInEdit, svgData) 
+		partStore.setToDefault()			
+	}
+ */
+	const handleSubmit = () => {
+		setShow(false)
+		laserStore.setVal("centralBarMode", "planEditor")
+	
+		// 1) получаем joints из jointStore
+		const updatedJoints = jointStore.exportForCurrentPart();
+	
+		// 2) формируем объект для svgStore:
+		const updatedPart = {
+			...svgData,
+			joints: updatedJoints,
+		};
+	
+		// 3) сохраняем в svgStore
+		svgStore.updateForm(partInEdit, updatedPart);
+	
+		// 4) сбрасываем состояние редактора
 		partStore.setToDefault()			
 	}
 
