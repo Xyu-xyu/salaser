@@ -74,7 +74,7 @@ class JointStore {
 	}
 
 	get jointsForSelectedCid() {
-		if (!partStore.selectedCid) return null;		
+		if (typeof partStore.selectedCid !== 'number') return null;		
 		return this.joints[partStore.selectedCid] || null;
 	}
 
@@ -158,9 +158,12 @@ class JointStore {
 			}
 
 			// === 3. manual только для оставшихся joints ===
-			let manualDp = dpValues.filter(dp => !usedDpValues.has(dp));
+			let manualDp = dValues.filter(a => !usedDValues.has(a))
+			//		dpValues.filter(dp => !usedDpValues.has(dp));
 			if (manualDp.length > 0) {
-				this.updJointVal(Number(cid), 'manual', manualDp);
+				manualDp.forEach((d)=>{
+					this.updJointVal(Number(cid), 'manual', d / pathLength * 100);
+				})
 			}
 		});
 	} 
