@@ -79,94 +79,139 @@ class JointStore {
 	}
 
 	loadJoints(loaded) {
-		let cids = new Set();
+
 		let jointMap = {};
-		loaded.forEach((elm) => {
+	
+		// 1️⃣ группировка по cid
+		loaded.forEach(elm => {
 			for (let key in elm) {
-				cids.add(key);
-				if (!jointMap[key]) {
-					jointMap[key] = [];
-				}
-				jointMap[key].push(elm[key]);  
+				if (!jointMap[key]) jointMap[key] = [];
+				jointMap[key].push(elm[key]);
 			}
 		});
 	
-		// Обрабатываем каждый уникальный cid
-		cids.forEach((cid) => {
-			console.log(`Обрабатываем cid: ${cid}`, jointMap[cid]);
+		// 2️⃣ обработка каждого cid
+		Object.keys(jointMap).forEach(cid => {
 	
-			let dpValues = [];
-			let dValues = []; // Сюда собираем все d (расстояния)
-			let path = partStore.getElementByCidAndClass (+cid, 'contour', 'path')
-			let pathLength = SVGPathCommander.getTotalLength( path)
+			cid = Number(cid);
 	
+			let path = partStore.getElementByCidAndClass(cid, 'contour', 'path');
+			if (!path) return;
+	
+			let pathLength = SVGPathCommander.getTotalLength(path);
+	
+			let rawD = [];
+			let atEnd = false;
+	
+			// --- сбор расстояний ---
 			jointMap[cid].forEach(j => {
-				const { d } = j;	
-				const dp = d / pathLength * 100
-				// Проверяем atEnd
-				if (Math.abs (d - pathLength) < 0.002 ) {
-					this.updJointVal(Number(cid), 'atEnd', true);
+	
+				let d = Math.round(j.d * 100) / 100;
+	
+				if (Math.abs(d - pathLength) < 0.01) {
+					atEnd = true;
 				} else {
-					dpValues.push(Math.round(dp * 100) / 100);
-					dValues.push(Math.round(d * 100) / 100);
+					rawD.push(d);
 				}
 			});
 	
-			let usedDpValues = new Set();
-			let usedDValues = new Set();	
+			this.updJointVal(cid, 'atEnd', atEnd);
 	
-			// === 2. Определяем distance (шаг по d) только если quantity НЕ найден ===
-			if (dValues.length > 1) {
-				dValues.sort((a, b) => a - b);
-				for (let i = 0; i < dValues.length; i++) {
-					let testArray = [];
-					let dist = dValues[i];
-					let ii = 1;
-					while (ii * dist <= dValues[dValues.length - 1]) {
-						testArray.push(Math.round(ii * dist * 100) / 100);
-						ii++;
+			if (!rawD.length) {
+				this.updJointVal(cid, 'distance', false);
+				this.updJointVal(cid, 'quantity', false);
+				this.updJointVal(cid, 'manual', []);
+				return;
+			}
+	
+			// Убираем дубли
+			rawD = [...new Set(rawD)].sort((a, b) => a - b);
+	
+			let remaining = [...rawD];
+	
+			// =====================================================
+			// 3️⃣ SEARCH DISTANCE
+			// =====================================================
+	
+			let distance = false;
+	
+			if (remaining.length > 1) {
+	
+				for (let base of remaining) {
+	
+					let multiples = [];
+					let i = 1;
+	
+					while (i * base <= remaining[remaining.length - 1] + 0.01) {
+						multiples.push(Math.round(i * base * 100) / 100);
+						i++;
 					}
 	
-					if (testArray.every(value => dValues.includes(value))) {
-						usedDValues = new Set(dValues.filter(a => testArray.includes(a)));
-						dpValues = dpValues.filter((dp, i) => !usedDValues.has(dValues[i]));
-						this.updJointVal(Number(cid), 'distance', dist);
+					if (multiples.length > 1 &&
+						multiples.every(v => remaining.includes(v))) {
+	
+						distance = base;
+	
+						// удаляем использованные точки
+						remaining = remaining.filter(d => !multiples.includes(d));
+	
 						break;
 					}
 				}
 			}
-
-			// 1. Проверяем все возможные шаги dp от 1 до 50
-			let bestStep = null;
-			let testArray;
-			//console.log ('dpValues  ' + JSON.stringify(dpValues))
-			for (let step = 50; step >= 2; step--) { // Двигаемся от 50 к 2
-				testArray = Array.from({ length: (100 / step) - 1 }, (_, ind) => Math.round((100/step)*(ind+1) *100) /100).filter(a => a<100)
-				//console.log('Step:', step, JSON.stringify(testArray));
-			
-				if (testArray.every(value => dpValues.includes(value))) {
-					//console.log ('BEST STEP:   '+ step)
-					bestStep = step;
-					break							
+	
+			this.updJointVal(cid, 'distance', distance || false);
+	
+			// =====================================================
+			// 4️⃣ SEARCH QUANTITY
+			// =====================================================
+	
+			let quantity = false;
+	
+			if (remaining.length > 0) {
+	
+				let dpValues = remaining.map(d =>
+					Math.round((d / pathLength * 100) * 100) / 100
+				);
+	
+				for (let step = 50; step >= 2; step--) {
+	
+					let expected = Array.from(
+						{ length: step - 1 },
+						(_, i) => Math.round(((i + 1) * (100 / step)) * 100) / 100
+					);
+	
+					if (expected.length &&
+						expected.every(v => dpValues.includes(v))) {
+	
+						quantity = step - 1;
+	
+						remaining = []; // всё использовано
+						break;
+					}
 				}
 			}
-
-			if (bestStep) {
-				usedDpValues = new Set(dpValues.filter(a => testArray.includes(a)));	
-				dValues = dValues.filter((_, i) => !usedDpValues.has(dpValues[i]));	
-				this.updJointVal(Number(cid), 'quantity',  bestStep - 1);	
+	
+			this.updJointVal(cid, 'quantity', quantity || false);
+	
+			// =====================================================
+			// 5️⃣ MANUAL (процент)
+			// =====================================================
+	
+			if (remaining.length > 0) {
+	
+				let manual = remaining.map(d =>
+					Math.round((d / pathLength * 100) * 100) / 100
+				);
+	
+				this.updJointVal(cid, 'manual', manual);
+	
+			} else {
+				this.updJointVal(cid, 'manual', []);
 			}
-
-			// === 3. manual только для оставшихся joints ===
-			let manualDp = dValues.filter(a => !usedDValues.has(a))
-			//		dpValues.filter(dp => !usedDpValues.has(dp));
-			if (manualDp.length > 0) {
-				manualDp.forEach((d)=>{
-					this.updJointVal(Number(cid), 'manual', d / pathLength * 100);
-				})
-			}
+	
 		});
-	} 
+	}
 	
 	updJointVal(cid, param, val) {
 		console.log(cid, param, val);

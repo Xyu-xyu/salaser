@@ -97,7 +97,8 @@ const ShapeModalComponent = observer(() => {
 				id: part_code_id,
 				uuid: part_code_id,
 				name: uuid, // можно тоже генерить по code, если хочешь
-				code: newForm
+				code: newForm,
+				joints:[]
 			});
 			console.log("Создана новая форма с именем:", uuid);
 		}

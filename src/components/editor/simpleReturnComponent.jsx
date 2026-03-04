@@ -120,7 +120,7 @@ const SimpleReturnComponent = observer(() => {
 				/> 
 
 				{
-				joints.map((item, i) => {
+				joints.length && joints.map((item, i) => {
 					const element = Object.values(item)[0]; // берём внутренний объект
 
 					return (

@@ -2462,7 +2462,7 @@ cursor: url('./images//cursor_plus.cur'), auto !important;
 }
 
 .cursorAddJoint {
-  cursor: crosshair !important;
+  cursor: url('./images//cursor_plus.cur'), auto !important;
 }
 
 .cursorRemoveJoint {

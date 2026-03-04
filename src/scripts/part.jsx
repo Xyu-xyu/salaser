@@ -73,7 +73,7 @@ class Part {
     static add(create=false) {
     }
     
-    static ncpToSvg(/* ncpCode, number */) {
+/*     static ncpToSvg() {
         let svg = []
         let joints = []
         //console.log ('ncp to svg') 
@@ -323,7 +323,7 @@ class Part {
             params:{ id, code: pcode, uuid: uuid},
             joints:joints,
         }        
-    }
+    } */
 
     static detectContourType (classes) {
        /*  for (let t in CONSTANTS.contourTypes) {

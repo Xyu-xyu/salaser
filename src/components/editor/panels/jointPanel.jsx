@@ -96,7 +96,9 @@ const JointPanel = observer(() => {
 								<div className="nav nav-tabs mb-3" id="nav-tab" role="tablist">
 									<button className="nav-link active" id="nav-jointAuto-tab" data-bs-toggle="tab"
 										data-bs-target="#nav-jointAuto" type="button" role="tab"
-										aria-controls="nav-jointAuto" aria-selected="true" tabIndex={-1}>
+										aria-controls="nav-jointAuto" aria-selected="true" tabIndex={-1}
+										onMouseDown={ ()=>{ editorStore.setMode('resize')}}												
+										>
 										{t('Avto')}
 									</button>
 									<button className="nav-link" id="nav-jointManual-tab" data-bs-toggle="tab"
@@ -104,11 +106,11 @@ const JointPanel = observer(() => {
 										aria-controls="nav-jointManual" aria-selected="false" tabIndex={-1}>
 										{t('Manual')}
 									</button>
-									<button className="nav-link" id="nav-jointSize-tab" data-bs-toggle="tab"
+								{/* 	<button className="nav-link" id="nav-jointSize-tab" data-bs-toggle="tab"
 										data-bs-target="#nav-jointSize" type="button" role="tab"
 										aria-controls="nav-jointSize" aria-selected="false" tabIndex={-1}>
 										{t('Size')}
-									</button>
+									</button> */}
 								</div>
 							</nav>
 							<div className="tab-content" id="nav-tabContent">
@@ -238,7 +240,7 @@ const JointPanel = observer(() => {
 									</div>
 									<hr className="dropdown-divider" />
 								</div>
-								<div className="tab-pane" id="nav-jointSize" role="tabpanel"
+								{/* <div className="tab-pane" id="nav-jointSize" role="tabpanel"
 									aria-labelledby="nav-jointManual-tab">
 									<div>
 										<div className="me-1" style={{ marginTop: 32 }}>
@@ -256,7 +258,7 @@ const JointPanel = observer(() => {
 										</div>
 									</div>
 									<hr className="dropdown-divider" />
-								</div>
+								</div> */}
 							</div>
 						</div>
 					</td>
