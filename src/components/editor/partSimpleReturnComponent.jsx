@@ -37,7 +37,7 @@ const PartSimpleReturnComponent = observer(() => {
 			let cid = Number(e.currentTarget.getAttribute('data-cid'));
 			if (typeof cid === 'number') {
 				if (cid !== selectedCid) {
-					console.log ("ПИК ПИК ПИК "+ cid)
+					//console.log ("ПИК ПИК ПИК "+ cid)
 					partStore.setContourSelected(cid)
 				} else {
 					//console.log (e)

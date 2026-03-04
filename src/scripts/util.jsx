@@ -1427,7 +1427,7 @@ class Utils {
 	}
 
 	pointInSvgPath(path, x, y) {
-		console.log(arguments)
+		//console.log(arguments)
 		let polyline = this.pathToPolyline(path)
 		let polygon = this.transformCoordinates(polyline)
 		let pointIn = inside([x, y], polygon)

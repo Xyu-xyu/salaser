@@ -752,7 +752,7 @@ class MacrosStore {
         try {
           let resp = await fetch(constants.SERVER_URL + "/db/listpresets");
           const data = await resp.json();
-          console.log(data); // Печать данных для отладки
+          //console.log(data); // Печать данных для отладки
 
           runInAction(() => {
             this._presets = data;

@@ -22,11 +22,11 @@ class EditorStore {
 
   setMode = (newMode )=> {
     if (newMode !== this.mode  ) {
-      console.log ("WAS " + this.mode +" WE SET NEW MODE :" + newMode)
+      //console.log ("WAS " + this.mode +" WE SET NEW MODE :" + newMode)
       this.mode = newMode
       
     } else {
-      console.log ("STILL OLDMODE :" + this.mode)
+      //console.log ("STILL OLDMODE :" + this.mode)
     }
   };
 
@@ -35,7 +35,7 @@ class EditorStore {
   };
 
   setVal (key, value) {
-    console.log ("Set VAL in EDITOR store" + value)
+    //console.log ("Set VAL in EDITOR store" + value)
 		if (key in this) {
 			this[key] = value;
 		}
