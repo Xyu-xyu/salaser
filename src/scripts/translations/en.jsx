@@ -495,6 +495,7 @@ const en = {
     "Add joint": "Add joint",
     "Updated joints": "Updated joints",
     "Added joint": "Added joint",
-    "Removed joint": "Removed joint"
+    "Removed joint": "Removed joint",
+    "Thickness must be a positive integer": "Thickness must be a positive integer"
 }
 export default en;

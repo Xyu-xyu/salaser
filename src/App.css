@@ -1721,8 +1721,7 @@ height: fit-content;}
       display: flex;
       flex-direction: column;
       align-items: center;
-      /*gap: 12px;
-      padding: 12px;*/
+      margin: 0 0 2px 0;
       max-height: none;
 
     }
@@ -2195,9 +2194,9 @@ g.macro4,
 g.macro5 {
     fill:url(#grid);
     stroke-width: var(--widthUsual);
-   /*  marker-start: url(#dotRed);
+    marker-start: url(#dotRed);
     marker-end: url(#dotRed);
-    marker-mid: url(#dotRed);  */
+    marker-mid: url(#dotRed);  
 } 
 
 g.macro5 {

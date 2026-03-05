@@ -352,18 +352,19 @@ class SvgStore {
 				name: part.name,
 				width: part.width,
 				height: part.height,
-				code: part.code
+				code: part.code,
+				joints:part.joints
 			});
 		}
 		let progNum = 1
 
-		for (const [partCodeId, partInfo, code] of uniqueParts) {
+		for (const [partCodeId, partInfo ] of uniqueParts) {
 			const { name, code } = partInfo;
 			const instancesCount = data.positions.filter(p => p.part_code_id === partCodeId).length;
 			res.push(`(<Part PartCode="${name}" Debit="${instancesCount}">)`);
 			//res.push(`ПРОГРАММА №` + progNum);
 
-			const contours = this.generateSinglePart(code, progNum)
+			const contours = this.generateSinglePart(code, progNum, partInfo.joints)
 			res.push(contours);
 
 			progNum++
@@ -397,8 +398,8 @@ class SvgStore {
 		const m = cls.match(/macro(\d+)/)
 		return m ? Number(m[1]) : null
 	}
-
-	svgToGcode(contour, inlet, outlet, height, outer) {
+	// adding joints in ncp
+	svgToGcode(contour, inlet, outlet, height, outer, joints) {
 		const res = []
 		const c = contour?.path.length ? new SVGPathCommander(contour.path).toAbsolute() : {segments:[]}
 		const i = inlet?.path.length ? new SVGPathCommander(inlet.path).toAbsolute() : {segments:[]}
@@ -613,11 +614,41 @@ class SvgStore {
 				res.push(neededComp);
 			}
 
-			if (cmd === 'L') {
+/* 			if (cmd === 'L') {
 
 				const [, x, y] = seg
 				g = 'G1'
 				let line = ''
+
+				for (const joint of joints) {
+
+					const path = `M${X} ${Y} ` + seg.join(" ")
+					let j = joint[Object.keys(joint)[0]]
+					let jx = j.x
+					let jy = height - j.y 
+				
+					const nearest = utils.findNearestPointOnPath(
+						path,
+						{ x: jx, y: jy }
+					)
+
+					if (nearest)  {
+						let dist = utils.distance ( nearest.x, nearest.y, jx, jy )
+						if (dist < 0.01) {
+							console.log ("NEAREST SEG", nearest.x, nearest.y, seg)
+							if (G !== "G1") line+= "G1"
+							if (nearest.x !== X) line += "X" + utils.smartRound (nearest.x)
+							if (nearest.y !== Y) line += "Y" + utils.smartRound (height - nearest.y)
+							res.push(line)
+							res.push(`G4M80`)
+							G = "G4"
+							X = nearest.x
+							Y = nearest.y
+							line=""
+						}					
+					}			
+					
+				}
 
 				if (g !== G) line += g
 				if (x !== X) line += "X" + utils.smartRound (x)
@@ -639,8 +670,119 @@ class SvgStore {
 				line.length ? res.push(line) : false
 
 			}
+ */			
 
-			if (cmd === 'A') {
+			if (cmd === 'L') {
+
+				const [, x2, y2] = seg
+				g = 'G1'
+			
+				const segLen = utils.distance(X, Y, x2, y2)
+			
+				let midJoints = []
+				let startJoint = false
+				let endJoint = false
+			
+				for (const joint of joints) {
+			
+					let j = joint[Object.keys(joint)[0]]
+			
+					let jx = j.x
+					let jy = height - j.y
+			
+					const path = `M${X} ${Y} ` + seg.join(" ")
+			
+					const nearest = utils.findNearestPointOnPath(
+						path,
+						{ x: jx, y: jy }
+					)
+			
+					if (!nearest) continue
+			
+					let dist = utils.distance(nearest.x, nearest.y, jx, jy)
+			
+					if (dist < 0.01) {
+			
+						let partLen = utils.distance(X, Y, nearest.x, nearest.y)
+			
+						// начало сегмента
+						if (partLen < 0.01) {
+							startJoint = true
+							continue
+						}
+			
+						// конец сегмента
+						if (Math.abs(partLen - segLen) < 0.01) {
+							endJoint = true
+							continue
+						}
+			
+						// середина
+						midJoints.push({
+							x: nearest.x,
+							y: nearest.y,
+							t: partLen / segLen
+						})
+					}
+				}
+			
+				midJoints.sort((a,b)=>a.t-b.t)
+			
+				let px = X
+				let py = Y
+			
+				// joint в начале
+				if (startJoint) {
+					//res.push("G4M80")
+				}
+			
+				// joints в середине
+				for (const j of midJoints) {
+			
+					let line = ""
+			
+					if (G !== "G1") line += "G1"
+			
+					if (px !== j.x)
+						line += "X" + utils.smartRound(j.x)
+			
+					if (py !== j.y)
+						line += "Y" + utils.smartRound(height - j.y)
+			
+					if (line) res.push(line)
+			
+					res.push("G4M80")
+			
+					px = j.x
+					py = j.y
+					G = "G4"
+				}
+			
+				// конец сегмента
+				let line = ""
+			
+				if (g !== G) line += g
+			
+				if (px !== x2)
+					line += "X" + utils.smartRound(x2)
+			
+				if (py !== y2)
+					line += "Y" + utils.smartRound(height - y2)
+			
+				if (line) res.push(line)
+			
+				// joint в конце
+				if (endJoint) {
+					res.push("G4M80")
+					g = "G4"
+				}
+			
+				X = x2
+				Y = y2
+				G = g
+			}
+
+/* 			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
 				needG40 =true
@@ -679,6 +821,10 @@ class SvgStore {
 				g = isCCW ? 'G3' : 'G2'
 				let line = ''
 
+				for (const joint of joints) {
+
+				}
+
 				if (g !== G) line += g
 				if (x !== X) line += "X" + utils.smartRound(x2)
 				if (y !== Y) line += "Y" + utils.smartRound(y2)
@@ -707,6 +853,142 @@ class SvgStore {
 					needLaserOn = false			  
 				}
 				res.push(line)
+			} */
+
+			if (cmd === 'A') {
+
+				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
+			
+				const x1 = X
+				const y1 = height - Y
+			
+				const x2 = x
+				const y2 = height - y
+			
+				const r = rx
+			
+				// --- центр дуги ---
+				const mx = (x1 + x2) / 2
+				const my = (y1 + y2) / 2
+			
+				const dx = x2 - x1
+				const dy = y2 - y1
+				const q = Math.hypot(dx, dy)
+			
+				const h = Math.sqrt(Math.max(0, r*r - (q*q)/4))
+			
+				const nx = -dy / q
+				const ny = dx / q
+			
+				const isCCW = sweep === 0
+				const sign = isCCW ? 1 : -1
+			
+				const cx = mx + sign * nx * h
+				const cy = my + sign * ny * h
+			
+				const i = utils.smartRound(cx)
+				const j = utils.smartRound(cy)
+			
+				g = isCCW ? "G3" : "G2"
+			
+				// --- углы ---
+				let startAngle = Math.atan2(y1 - cy, x1 - cx)
+				let endAngle   = Math.atan2(y2 - cy, x2 - cx)
+			
+				if (isCCW && endAngle < startAngle) endAngle += Math.PI * 2
+				if (!isCCW && endAngle > startAngle) endAngle -= Math.PI * 2
+			
+				let arcJoints = []
+				let endJoint = false
+			
+				for (const joint of joints) {
+			
+					let jnt = joint[Object.keys(joint)[0]]
+			
+					let jx = jnt.x
+					let jy = height - jnt.y
+			
+					let angle = Math.atan2(jy - cy, jx - cx)
+			
+					let a = angle
+			
+					if (isCCW && a < startAngle) a += Math.PI * 2
+					if (!isCCW && a > startAngle) a -= Math.PI * 2
+			
+					// проверка попадания на дугу
+					if (isCCW) {
+						if (a <= startAngle || a >= endAngle) continue
+					} else {
+						if (a >= startAngle || a <= endAngle) continue
+					}
+			
+					// проверка радиуса
+					let dist = utils.distance(cx,cy,jx,jy)
+					if (Math.abs(dist - r) > 0.01) continue
+			
+					// проверка конца дуги
+					if (Math.abs(jx - x2) < 0.01 && Math.abs(jy - y2) < 0.01) {
+						endJoint = true
+						continue
+					}
+			
+					arcJoints.push({
+						x: jx,
+						y: jy,
+						a: a
+					})
+				}
+			
+				arcJoints.sort((a,b)=>a.a-b.a)
+			
+				let px = x1
+				let py = y1
+			
+				for (const p of arcJoints) {
+			
+					let line = ""
+			
+					/*if (g !== G)*/ line += g
+			
+					line += "X" + utils.smartRound(p.x)
+					line += "Y" + utils.smartRound(p.y)
+					line += "I" + i
+					line += "J" + j
+			
+					res.push(line)
+					res.push("G4M80")
+			
+					G = g
+					X = p.x
+					Y = height - p.y
+					I = i
+					J = j
+			
+					px = p.x
+					py = p.y
+				}
+				g = "G4"
+			
+				let line = ""
+			
+				if (g !== G) line += g
+				if (x !== X) line += "X" + utils.smartRound(x2)
+				if (y !== Y) line += "Y" + utils.smartRound(y2)
+				if (i !== I) line += "I" + i
+				if (j !== J) line += "J" + j
+			
+				res.push(line)
+			
+				if (endJoint) {
+					res.push("G4M80")
+					g = "G4"
+				}
+			
+				G = g
+				X = x
+				Y = y
+				I = i
+				J = j
 			}
 
 			if (i.segments.length === 0 && ind === 0) {
@@ -891,8 +1173,9 @@ class SvgStore {
 		return res
 	}
 
-	generateSinglePart(code, progNum) {
+	generateSinglePart(code, progNum, joints) {
 		let res = []
+		//if (joints && joints.length) debugger;
 		let commonPath = ''
 		code.forEach(a => commonPath += a.path || ' ')
 		const box = SVGPathCommander.getPathBBox(commonPath)
@@ -902,6 +1185,7 @@ class SvgStore {
 			b.class.includes('inner') - a.class.includes('inner')
 	  	);
 
+
 		sorted.forEach((item) => {
 
 			if (!item.class.includes('contour')) return
@@ -910,6 +1194,7 @@ class SvgStore {
 			const inlet = this.findByCidAndClass(code, item.cid, 'inlet')
 			const outlet = this.findByCidAndClass(code, item.cid, 'outlet')
 			const contour = item
+			const filteredJoints = joints.filter(i => Number(Object.keys(i)[0]) === item.cid);
 			// ебана гравировка
 
 			// ---- MACRO ----
@@ -920,7 +1205,8 @@ class SvgStore {
 					inlet,
 					outlet, 
 					box.height, 
-					outer)
+					outer,
+					filteredJoints)
 					.forEach(cmd =>
 					res.push(`N${0}${cmd}`)
 				)

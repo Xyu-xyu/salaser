@@ -469,6 +469,7 @@ const ru = {
     "Add joint": "Добавить сустав",
     "Updated joints": "Обновлены суставы",
     "Added joint": "Добавлен сустав",
-    "Removed joint": "Удаленный сустав"
+    "Removed joint": "Удаленный сустав",
+    "Thickness must be a positive integer": "Толщина должна быть положительным целым числом."
 }
 export default ru;
