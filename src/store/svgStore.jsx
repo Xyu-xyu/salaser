@@ -2,6 +2,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 import SVGPathCommander from 'svg-path-commander';
 import { toJS } from "mobx";
 import utils from "../scripts/util";
+import arc from "../scripts/arc";
 import constants from "./constants";
 import jobStore from "./jobStore";
 
@@ -782,7 +783,7 @@ class SvgStore {
 				G = g
 			}
 
-/* 			if (cmd === 'A') {
+ 			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
 				needG40 =true
@@ -791,39 +792,36 @@ class SvgStore {
 				const y1 = height - Y
 				const x2 = x
 				const y2 = height - y
-			  
+
+ 
 				const r = rx // у тебя всегда rx === ry
-			  
+			
 				// восстановление центра дуги
 				const mx = (x1 + x2) / 2
 				const my = (y1 + y2) / 2
-			  
+			
 				const dx = x2 - x1
 				const dy = y2 - y1
 				const q = Math.hypot(dx, dy)
-			  
+			
 				const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
-			  
+			
 				const nx = -dy / q
 				const ny = dx / q
-			  
+			
 				// ВАЖНО: инверсия sweep → G2 / G3
 				const isCCW = sweep === 0   // ← это ключ
 				const sign = isCCW ? 1 : -1
-			  
+			
 				const cx = mx + sign * nx * h
 				const cy = my + sign * ny * h
-			  
+			
 				// ❗ I / J — АБСОЛЮТНЫЕ
 				const i = utils.smartRound (cx)
 				const j = utils.smartRound (cy)
-			  
+			
 				g = isCCW ? 'G3' : 'G2'
 				let line = ''
-
-				for (const joint of joints) {
-
-				}
 
 				if (g !== G) line += g
 				if (x !== X) line += "X" + utils.smartRound(x2)
@@ -847,149 +845,15 @@ class SvgStore {
 				I = i
 				J = j
 
-			  
+			
 				if (needLaserOn) {
 					line += 'M4'
 					needLaserOn = false			  
 				}
 				res.push(line)
-			} */
 
-			if (cmd === 'A') {
-
-				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
-			
-				const x1 = X
-				const y1 = height - Y
-			
-				const x2 = x
-				const y2 = height - y
-			
-				const r = rx
-			
-				// --- центр дуги ---
-				const mx = (x1 + x2) / 2
-				const my = (y1 + y2) / 2
-			
-				const dx = x2 - x1
-				const dy = y2 - y1
-				const q = Math.hypot(dx, dy)
-			
-				const h = Math.sqrt(Math.max(0, r*r - (q*q)/4))
-			
-				const nx = -dy / q
-				const ny = dx / q
-			
-				const isCCW = sweep === 0
-				const sign = isCCW ? 1 : -1
-			
-				const cx = mx + sign * nx * h
-				const cy = my + sign * ny * h
-			
-				const i = utils.smartRound(cx)
-				const j = utils.smartRound(cy)
-			
-				g = isCCW ? "G3" : "G2"
-			
-				// --- углы ---
-				let startAngle = Math.atan2(y1 - cy, x1 - cx)
-				let endAngle   = Math.atan2(y2 - cy, x2 - cx)
-			
-				if (isCCW && endAngle < startAngle) endAngle += Math.PI * 2
-				if (!isCCW && endAngle > startAngle) endAngle -= Math.PI * 2
-			
-				let arcJoints = []
-				let endJoint = false
-			
-				for (const joint of joints) {
-			
-					let jnt = joint[Object.keys(joint)[0]]
-			
-					let jx = jnt.x
-					let jy = height - jnt.y
-			
-					let angle = Math.atan2(jy - cy, jx - cx)
-			
-					let a = angle
-			
-					if (isCCW && a < startAngle) a += Math.PI * 2
-					if (!isCCW && a > startAngle) a -= Math.PI * 2
-			
-					// проверка попадания на дугу
-					if (isCCW) {
-						if (a <= startAngle || a >= endAngle) continue
-					} else {
-						if (a >= startAngle || a <= endAngle) continue
-					}
-			
-					// проверка радиуса
-					let dist = utils.distance(cx,cy,jx,jy)
-					if (Math.abs(dist - r) > 0.01) continue
-			
-					// проверка конца дуги
-					if (Math.abs(jx - x2) < 0.01 && Math.abs(jy - y2) < 0.01) {
-						endJoint = true
-						continue
-					}
-			
-					arcJoints.push({
-						x: jx,
-						y: jy,
-						a: a
-					})
-				}
-			
-				arcJoints.sort((a,b)=>a.a-b.a)
-			
-				let px = x1
-				let py = y1
-			
-				for (const p of arcJoints) {
-			
-					let line = ""
-			
-					/*if (g !== G)*/ line += g
-			
-					line += "X" + utils.smartRound(p.x)
-					line += "Y" + utils.smartRound(p.y)
-					line += "I" + i
-					line += "J" + j
-			
-					res.push(line)
-					res.push("G4M80")
-			
-					G = g
-					X = p.x
-					Y = height - p.y
-					I = i
-					J = j
-			
-					px = p.x
-					py = p.y
-				}
-				g = "G4"
-			
-				let line = ""
-			
-				if (g !== G) line += g
-				if (x !== X) line += "X" + utils.smartRound(x2)
-				if (y !== Y) line += "Y" + utils.smartRound(y2)
-				if (i !== I) line += "I" + i
-				if (j !== J) line += "J" + j
-			
-				res.push(line)
-			
-				if (endJoint) {
-					res.push("G4M80")
-					g = "G4"
-				}
-			
-				G = g
-				X = x
-				Y = y
-				I = i
-				J = j
-			}
+			}  
+							  
 
 			if (i.segments.length === 0 && ind === 0) {
 				const macro = this.getMacro(contour.class)
@@ -1195,7 +1059,42 @@ class SvgStore {
 			const outlet = this.findByCidAndClass(code, item.cid, 'outlet')
 			const contour = item
 			const filteredJoints = joints.filter(i => Number(Object.keys(i)[0]) === item.cid);
-			// ебана гравировка
+			let CP = SVGPathCommander.normalizePath(contour.path)
+
+			let rx, ry, x1, y1, x2, y2, flag1, flag2, flag3;
+			if (contour.path.length) {
+				CP.forEach((seg, i) => {
+					if (seg.includes('A')) {
+						flag1 = seg[3]
+						flag2 = seg[4]
+						flag3 = seg[5]
+						rx = seg[1]
+						ry = seg[2]
+						x2 = seg[6]
+						y2 = seg[7]
+						if (rx !== ry) {
+							let nArc = arc.converting (`M${x1} ${y1}` + seg.join(" ")) 
+							CP[i] = SVGPathCommander
+								.normalizePath(nArc)
+								.slice(1)
+								.join(" ");
+						}
+						x1 = x2
+						y1 = y2
+					}
+					if (seg.includes('M')) {
+						x1 = seg[1]
+						y1 = seg[2]
+					}
+
+					if (seg.includes('L')) {
+						x1 = seg[1]
+						y1 = seg[2]
+					}
+				})
+			}
+
+			contour.path = CP.join(" ").replaceAll(',', ' ');
 
 			// ---- MACRO ----
 

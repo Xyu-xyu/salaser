@@ -1,56 +1,7 @@
 import util from "./util.jsx";
-import inlet from "./inlet.jsx";
 import SVGPathCommander from "svg-path-commander";
 
 class ArcConverting {
-
-    findMaxDeviationPoint(pathData1, pathData2, numSamples = 1000) {
-        const svgNS = "http://www.w3.org/2000/svg";
-        const svg = document.getElementById("svg");
-        const path1 = document.createElementNS(svgNS, "path");
-        const path2 = document.createElementNS(svgNS, "path");
-
-        path1.setAttribute("d", pathData1);
-        path2.setAttribute("d", pathData2);
-
-        svg.appendChild(path1);
-        svg.appendChild(path2);
-
-        const totalLength1 = path1.getTotalLength();
-        const totalLength2 = path2.getTotalLength();
-
-        let maxDeviation = 0;
-        let maxDeviationPoint = null;
-        let correspondingPoint = null;
-
-        for (let i = 0; i <= numSamples; i++) {
-            const ratio = i / numSamples;
-            const length1 = totalLength1 * ratio;
-            const length2 = totalLength2 * ratio;
-
-            const point1 = path1.getPointAtLength(length1);
-            const point2 = path2.getPointAtLength(length2);
-
-            const currentDeviation = util.distance(point1, point2);
-
-            if (currentDeviation > maxDeviation) {
-                maxDeviation = currentDeviation;
-                maxDeviationPoint = point1;
-                correspondingPoint = point2;
-            }
-        }
-
-        // Clean up the temporary SVG elements
-        path2.remove();
-        path1.remove();
-        console.log(maxDeviation)
-
-        return {
-            maxDeviation,
-            maxDeviationPoint,
-            correspondingPoint
-        };
-    }
 
     ellipeinc(phi, m) {
         const n = 100000;
@@ -201,81 +152,7 @@ class ArcConverting {
         return (angle % twoPi + twoPi) % twoPi;
     }
 
-    check(ppath2, ppath3, seg = 1) {
-        let errors = 0
-        let diff = 0
-        let maxPane = { a: { x: 0, y: 0 }, b: { x: 0, y: 0 } }
-
-
-        var fakePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        fakePath.setAttribute("d", ppath2);
-        fakePath.setAttribute("id", 'path2');
-        var svg = document.getElementById('svg')
-        svg.appendChild(fakePath);
-
-
-        var fakePath1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        fakePath1.setAttribute("d", ppath3);
-        fakePath1.setAttribute("id", `path3`);
-        svg.appendChild(fakePath1);
-
-        let path2 = document.querySelector('#path2')
-        let path3 = document.querySelector('#path3')
-
-        const tl = (path2.getTotalLength() / seg);
-        const tl1 = (path3.getTotalLength() / seg);
-        let ratio = tl1 / tl
-
-        for (let i = 0; i < tl; i++) {
-
-            const point = path2.getPointAtLength(i * seg);
-            let { x, y } = point;
-            const point1 = path3.getPointAtLength(i * seg * ratio);
-            const x1 = point1.x
-            const y1 = point1.y
-
-            let distance = Math.round(util.distance({ x: x, y: y }, { x: x1, y: y1 }) * 10000) / 10000
-            if (distance > 0.005) {
-                errors += 1
-                if (distance > diff) {
-                    diff = distance
-                    maxPane.a = point
-                    maxPane.b = point1
-                }
-            }
-        }
-        //console.log('errors ' + errors)
-        //console.log(maxPane.a)
-        if (diff > 0.05) {
-            console.error('diff  ' + diff)
-        } else {
-           // console.log('diff  ' + diff)
-        }
-
-        try {
-           // $('.errorPoint').remove()
-        } catch (e) { }
-
-        this.createAndRemoveCircle(maxPane.a.x, maxPane.a.y)
-        this.createAndRemoveCircle(maxPane.b.x, maxPane.b.y)
-
-        document.querySelector('#path2').remove()
-        document.querySelector('#path3').remove()
-    }
-
-    createAndRemoveCircle(cx, cy) {
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("r", 1);
-        circle.setAttribute("stroke", "limegreen");
-        circle.setAttribute("stroke-width", 0.5);
-        circle.setAttribute("cx", cx);
-        circle.setAttribute("cy", cy);
-        circle.setAttribute("fill", "none");
-        circle.setAttribute("class", "errorPoint");
-        document.querySelector("#contours").appendChild(circle);
-    }
-
-    generateNewArc(path/*, rx, ry*/) {
+    generateNewArc(path) {
         let pathArc = SVGPathCommander.normalizePath(path)
         let rx, ry, x1, y1, x2, y2, flag1, flag2, flag3;
         if (pathArc.length) {
@@ -314,7 +191,7 @@ class ArcConverting {
     circularArcLength(x1, y1, rr, flag1, flag2, flag3, x2, y2) {
         const chordLength = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         const theta = 2 * Math.asin((chordLength / (2 * rr)));
-        inlet.theta = theta
+        //inlet.theta = theta
         let arcLength = rr * theta;
         if (flag2 === 1) arcLength = 2 * rr * Math.PI - arcLength
         return +arcLength;
@@ -424,31 +301,6 @@ class ArcConverting {
         return pathData;
     }
 
-    convertAndCheck(a, b) {
-        let ini = `M${a * 2} ${b} A${a} ${b} 0 0 0 0 ${b} A ${a} ${b} 0 0 0 ${a * 2} ${b}z`
-        let popopo = document.querySelector(`.inlet[data-cid="0"] path`)
-        popopo.setAttribute('d', ini)
-        popopo.setAttribute('id', 'ini')
-        popopo.setAttribute('stroke', 'aliceblue')
-        popopo.setAttribute('stroke-width', 0.01)
-        let newArc = this.arcConvert(a, b, a, b, false)
-        let popopop = document.querySelector(`.contour[data-cid="0"] path`)
-        popopop.setAttribute('d', newArc)
-        popopop.setAttribute('id', 'arc')
-        this.check(ini, newArc)
-        //this.findMaxDeviationPoint(ini, newArc, 1000)
-    }
-
-    cutStringAtFirstA(str) {
-        const index = str.indexOf('A');
-        if (index !== -1) {
-            return str.substring(index);
-        } else {
-            // Если "A" не найдено, можно вернуть пустую строку или исходную строку
-            return ''; // или return str;
-        }
-    }
-
     converting (path) {
         let pathArc = SVGPathCommander.normalizePath(path)
         let rx, ry, x1, y1, x2, y2, flag1, flag2, flag3 ;
@@ -478,7 +330,6 @@ class ArcConverting {
         let res = this.svgArcToCenterParam(x1, y1, rx, ry, flag1, flag2, flag3, x2, y2)
         let arc = this.arcConvert(rx, ry, res.cx, res.cy, res.clockwise, res.startAngle, res.endAngle, res.deltaAngle) 
         return arc
-        // return  without M this.cutStringAtFirstA(arc)
     }
 }
 

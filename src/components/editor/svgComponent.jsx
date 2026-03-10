@@ -6,10 +6,10 @@ import SimpleReturnComponent from './simpleReturnComponent'
 //import Guides from './guides.js'
 //import editorStore from '../../store/editorStore';
 import svgStore from './../../store/svgStore';
-import macrosStore from './../../store/macrosStore';
+//import macrosStore from './../../store/macrosStore';
 import { observer } from 'mobx-react-lite';
-import laserStore from './../../store/laserStore';
-import { transform } from 'svgpath';
+//import laserStore from './../../store/laserStore';
+//import { transform } from 'svgpath';
 //import Joints from './joints.js';
 ///import HighLighted from './highlighted.js';
 //import LaserShow from './laserShow.js';
