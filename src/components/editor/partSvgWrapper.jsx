@@ -456,7 +456,7 @@ const PartSvgWrapper = observer(() => {
 	[editorStore.mode])
 
 	const calculateRectAttributes = () => {
-		//debugger
+		
 		const widthSVG = svgParams.width
 		const heightSVG = svgParams.height
 	

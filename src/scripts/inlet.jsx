@@ -757,7 +757,6 @@ class Inlet {
         oldInletPath,
         contourType='inner',
         params=false) {
-        //debugger
         if ('move' === action && !endPoint.hasOwnProperty('x')) return false;
         console.log (arguments)
         let centers, checkPoint;
@@ -1077,7 +1076,6 @@ class Inlet {
     }
 
     setOutletType (newOutleType, endPoint=false, action='set', contourPath, oldOutletPath, contourType='inner'){
-        //debugger
         //console.log (arguments)
         if ('move' === action && !endPoint.hasOwnProperty('x')) return false;
 

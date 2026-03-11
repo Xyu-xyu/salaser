@@ -112,7 +112,7 @@ const SheetPanel = observer(() => {
               </td>
 
               <td className="align-middle">
-                <div>{t("width")}:</div>
+                <div>{t("height")}:</div>
               </td>
               <td>
                 <input
