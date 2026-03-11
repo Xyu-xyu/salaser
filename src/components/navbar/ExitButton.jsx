@@ -36,6 +36,11 @@ const ExitButton = observer(() => {
 	
 		// 1) получаем joints из jointStore
 		const updatedJoints = jointStore.exportForCurrentPart();
+		let box  = svgStore.findBox (svgData.code)
+		svgData.width = box.width
+		svgData.height = box.height
+		svgData.x = box.x
+		svgData.y = box.y
 	
 		// 2) формируем объект для svgStore:
 		const updatedPart = {
