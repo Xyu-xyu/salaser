@@ -1,9 +1,8 @@
 import { observer } from "mobx-react-lite";
+import SVGPathCommander from "svg-path-commander";
+
 import svgStore from "./../../store/svgStore.jsx";
 import editorStore from "./../../store/editorStore.jsx";
-//import jointStore from "./../../store/jointStore.jsx";
-//import { toJS } from "mobx";
-  
 
 const SimpleReturnComponent = observer(() => {
 
@@ -48,23 +47,38 @@ const SimpleReturnComponent = observer(() => {
 		}
 	}
 
+	// крестик joint
+	const getJointPath = (x, y) => {
+		return `M${x} ${y} l2 2 -4 -4 2 2 2 -2 -4 4`;
+	};
 
+
+	// сбор compound paths
 	const buildCompoundPath = (code) => {
+
 		const outer = [];
 		const inner = [];
 		const inletOutlet = [];
 		const engraving = [];
 
 		for (const el of code) {
+
 			if (!el.path) continue;
 
 			if (el.class.includes("macro2")) {
+
 				engraving.push(el.path.trim());
+
 			} else if (el.class.includes("outer") && el.class.includes("contour")) {
+
 				outer.push(el.path.trim());
+
 			} else if (el.class.includes("inner") && el.class.includes("contour")) {
+
 				inner.push(el.path.trim());
+
 			} else if (el.class.includes("inlet") || el.class.includes("outlet")) {
+
 				inletOutlet.push(el.path.trim());
 			}
 		}
@@ -72,77 +86,84 @@ const SimpleReturnComponent = observer(() => {
 		return {
 			contours: [...outer, ...inner].join(" z "),
 			inletOutlet,
-			engraving,
+			engraving
 		};
 	};
 
-	const getJointPath = (x, y, height) => {
-		return `M${x} ${height-y} l2 2 -4 -4 2 2 2 -2 -4 4`;
-	};
 
-	// Собираем все уникальные part_code в defs
+	// defs
 	const defs = svgStore.svgData.part_code.map(part => {
-	const { contours, inletOutlet, engraving } = buildCompoundPath(part.code);
-	const { joints } = part;	
+
+		const { contours, inletOutlet, engraving } = buildCompoundPath(part.code);
 
 		return (
 			<g key={`defs_part_${part.id}`} id={`part_${part.id}`}>
-				{/* Контуры outer + inner */}
+
+				{/* контуры */}
 				<path
 					d={contours}
 					fillRule="evenodd"
 					stroke="currentColor"
 					strokeWidth={0.2}
-					strokeLinecap={'round'}
+					strokeLinecap="round"
 					vectorEffect="non-scaling-stroke"
-					pointerEvents="visiblePainted"
 				/>
 
-				{/* Врезки inlet/outlet */}
+				{/* inlet outlet */}
 				<path
 					d={inletOutlet.join(" ")}
 					fill="none"
 					stroke="currentColor"
 					strokeWidth={2}
-					strokeLinecap={'round'}
+					strokeLinecap="round"
 					vectorEffect="non-scaling-stroke"
-					pointerEvents="visiblePainted"
 				/>
 
-				{/* Гравировки */}
+				{/* engraving */}
 				<path
 					d={engraving.join(" ")}
 					fill="none"
 					stroke="limegreen"
 					strokeWidth={1}
-					strokeLinecap={'round'}
-					pointerEvents="visiblePainted"
-				/> 
+					strokeLinecap="round"
+				/>
 
+				{/* JOINTS */}
 				{
-				joints.length && joints.map((item, i) => {
-					const element = Object.values(item)[0]; // берём внутренний объект
+					part.code.map((el, i) => {
 
-					return (
-					<g
-						key={i}
-						className="joint"
-						fill="none"
-						stroke="red"
-						strokeWidth={0.5}
-					>
-						<path d={getJointPath(element.x, element.y, element.partHeight)} />
-					</g>
-					);
-				})
+						if (!el.joints?.length || !el.path) return null;
+
+						return el.joints.map((len, j) => {
+
+							const p = SVGPathCommander.getPointAtLength(el.path, len);
+
+							return (
+								<g
+									key={`joint_${part.id}_${i}_${j}`}
+									className="joint"
+									fill="none"
+									stroke="red"
+									strokeWidth={0.5}
+									vectorEffect="non-scaling-stroke"
+								>
+									<path d={getJointPath(p.x, p.y)} />
+								</g>
+							);
+						});
+
+					})
 				}
+
 			</g>
-			
 		);
 	});
 
+
 	const renderPos = (pos, posIndex) => {
+
 		const { a, b, c, d, e, f } = pos.positions;
+
 		const fillColor = pos.selected
 			? "var(--violetTransparent)"
 			: "var(--grey-nav)";
@@ -163,12 +184,14 @@ const SimpleReturnComponent = observer(() => {
 					editorStore.setMode("dragging");
 				}}
 			>
+
 				<use
 					href={`#part_${pos.part_code_id}`}
 					fill={fillColor}
 					stroke={fillColor}
 					pointerEvents="visiblePainted"
 				/>
+
 			</g>
 		);
 	};

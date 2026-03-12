@@ -79,138 +79,141 @@ class JointStore {
 	}
 
 	loadJoints(loaded) {
+	
 
-		let jointMap = {};
-	
-		// 1️⃣ группировка по cid
-		loaded.forEach(elm => {
-			for (let key in elm) {
-				if (!jointMap[key]) jointMap[key] = [];
-				jointMap[key].push(elm[key]);
+		loaded?.code?.forEach(el => {
+
+			if (!el.joints || !el.joints.length || !el.path) {
+				return;
 			}
-		});
-	
-		// 2️⃣ обработка каждого cid
-		Object.keys(jointMap).forEach(cid => {
-	
-			cid = Number(cid);
-	
-			let path = partStore.getElementByCidAndClass(cid, 'contour', 'path');
-			if (!path) return;
-	
+
+			let path = el.path;
 			let pathLength = SVGPathCommander.getTotalLength(path);
-	
+
 			let rawD = [];
 			let atEnd = false;
-	
+
 			// --- сбор расстояний ---
-			jointMap[cid].forEach(j => {
-	
-				let d = Math.round(j.d * 100) / 100;
-	
+			el.joints.forEach(dVal => {
+
+				let d = Math.round(dVal * 100) / 100;
+
 				if (Math.abs(d - pathLength) < 0.01) {
 					atEnd = true;
 				} else {
 					rawD.push(d);
 				}
+
 			});
-	
-			this.updJointVal(cid, 'atEnd', atEnd);
-	
+
+			this.updJointVal(el.cid, 'atEnd', atEnd);
+
 			if (!rawD.length) {
-				this.updJointVal(cid, 'distance', false);
-				this.updJointVal(cid, 'quantity', false);
-				this.updJointVal(cid, 'manual', []);
+
+				this.updJointVal(el.cid, 'distance', false);
+				this.updJointVal(el.cid, 'quantity', false);
+				this.updJointVal(el.cid, 'manual', []);
+
 				return;
 			}
-	
-			// Убираем дубли
+
+			// убираем дубли
 			rawD = [...new Set(rawD)].sort((a, b) => a - b);
-	
+
 			let remaining = [...rawD];
-	
+
 			// =====================================================
-			// 3️⃣ SEARCH DISTANCE
+			// SEARCH QUANTITY
 			// =====================================================
-	
-			let distance = false;
-	
-			if (remaining.length > 1) {
-	
-				for (let base of remaining) {
-	
-					let multiples = [];
-					let i = 1;
-	
-					while (i * base <= remaining[remaining.length - 1] + 0.01) {
-						multiples.push(Math.round(i * base * 100) / 100);
-						i++;
-					}
-	
-					if (multiples.length > 1 &&
-						multiples.every(v => remaining.includes(v))) {
-	
-						distance = base;
-	
-						// удаляем использованные точки
-						remaining = remaining.filter(d => !multiples.includes(d));
-	
-						break;
-					}
-				}
-			}
-	
-			this.updJointVal(cid, 'distance', distance || false);
-	
-			// =====================================================
-			// 4️⃣ SEARCH QUANTITY
-			// =====================================================
-	
+
 			let quantity = false;
-	
+
 			if (remaining.length > 0) {
-	
+
 				let dpValues = remaining.map(d =>
 					Math.round((d / pathLength * 100) * 100) / 100
 				);
-	
+
 				for (let step = 50; step >= 2; step--) {
-	
+
 					let expected = Array.from(
 						{ length: step - 1 },
-						(_, i) => Math.round(((i + 1) * (100 / step)) * 100) / 100
+						(_, i) =>
+							Math.round(((i + 1) * (100 / step)) * 100) / 100
 					);
-	
-					if (expected.length &&
-						expected.every(v => dpValues.includes(v))) {
-	
+
+					if (
+						expected.length &&
+						expected.every(v => dpValues.includes(v))
+					) {
+
 						quantity = step - 1;
-	
-						remaining = []; // всё использовано
+
+						remaining = [];
 						break;
 					}
 				}
 			}
-	
-			this.updJointVal(cid, 'quantity', quantity || false);
-	
+
+			this.updJointVal(el.cid, 'quantity', quantity || false);
+
 			// =====================================================
-			// 5️⃣ MANUAL (процент)
+			// SEARCH DISTANCE
 			// =====================================================
-	
+
+			let distance = false;
+
+			if (remaining.length > 1) {
+
+				for (let base of remaining) {
+
+					let multiples = [];
+					let i = 1;
+
+					while (i * base <= remaining[remaining.length - 1] + 0.01) {
+
+						multiples.push(Math.round(i * base * 100) / 100);
+						i++;
+
+					}
+
+					if (
+						multiples.length > 1 &&
+						multiples.every(v => remaining.includes(v))
+					) {
+
+						distance = base;
+
+						remaining = remaining.filter(d => !multiples.includes(d));
+
+						break;
+					}
+				}
+			}
+
+			this.updJointVal(el.cid, 'distance', distance || false);
+
+
+			// =====================================================
+			// MANUAL
+			// =====================================================
+
 			if (remaining.length > 0) {
-	
+
 				let manual = remaining.map(d =>
 					Math.round((d / pathLength * 100) * 100) / 100
 				);
-	
-				this.updJointVal(cid, 'manual', manual);
-	
+
+				this.updJointVal(el.cid, 'manual', manual);
+
 			} else {
-				this.updJointVal(cid, 'manual', []);
+
+				this.updJointVal(el.cid, 'manual', []);
+
 			}
-	
+
 		});
+	
 	}
 	
 	updJointVal(cid, param, val) {
@@ -247,37 +250,84 @@ class JointStore {
 	}
 
 	exportForCurrentPart() {
-		const jointsArray = [];
-		const partHeight = partStore.svgData?.height || 0;
-		const pathCache = new Map();
 
-		// подготовим длины контуров по cid
-		const getLength = (cid) => {
-			if (pathCache.has(cid)) return pathCache.get(cid);
-			const path = partStore.getElementByCidAndClass(cid, 'contour', 'path');
-			if (!path) return null;
-			const len = SVGPathCommander.getTotalLength(path);
-			pathCache.set(cid, len);
-			return len;
-		};
+		const part = partStore.svgData;
+		partStore.svgData.code.forEach(el => {
+	
+			if (!el.path || !el.class.includes("contour")) return;
 
-		this.jointPositions.forEach(({ x, y, percent, cid }) => {
-			const totalLength = getLength(cid);
-			if (!totalLength) return;
-			const d = totalLength * (percent / 100);
+			const joint = this.joints[`${el.cid}`] || []
+	
+			if (!joint) {
+				el.joints = [];
+				return;
+			}
+	
+			const pathLength = SVGPathCommander.getTotalLength(el.path);
+	
+			let result = [];
+	
 
-			jointsArray.push({
-				[String(cid)]: {
-					length: CONSTANTS.defaultJointSize,
-					x,
-					y: partHeight - y,
-					d,
-					partHeight: partHeight,
-				},
-			});
+			// -------------------------
+			// quantity
+			// -------------------------
+	
+			if (joint.quantity) {
+	
+				let step = pathLength / (joint.quantity + 1);
+	
+				for (let i = 1; i <= joint.quantity; i++) {
+					result.push(Math.round((i * step) * 100) / 100);
+				}
+	
+			}
+
+			// -------------------------
+			// distance
+			// -------------------------
+	
+			if (joint.distance) {
+	
+				let d = joint.distance;
+	
+				for (let v = d; v < pathLength; v += d) {
+					result.push(Math.round(v * 100) / 100);
+				}
+	
+			}
+		
+			// -------------------------
+			// manual %
+			// -------------------------
+	
+			if (joint.manual?.length) {
+	
+				joint.manual.forEach(p => {
+	
+					let d = (p / 100) * pathLength;
+	
+					result.push(Math.round(d * 100) / 100);
+	
+				});
+	
+			}
+	
+			// -------------------------
+			// конец пути
+			// -------------------------
+	
+			if (joint.atEnd) {
+				result.push(Math.round(pathLength * 100) / 100);
+			}
+	
+			// удаляем дубли и сортируем
+			result = [...new Set(result)].sort((a, b) => a - b);
+	
+			el.joints = result;
+	
 		});
 
-		return jointsArray;
+		return part;
 	}
 	
 

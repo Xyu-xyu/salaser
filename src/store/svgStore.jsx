@@ -53,7 +53,8 @@ class SvgStore {
 						"path": "M8 27.5 L8 51 A4 4 0 0 0 12 55 L109 55 A4 4 0 0 0 113 51 L113 4 A4 4 0 0 0 109 0 L12 0 A4 4 0 0 0 8 4 L8 27.5",
 						"stroke": "red",
 						"strokeWidth": 0.2,
-						"selected": false
+						"selected": false,
+						"joints":[- значения длины от начала пути -]
 					},
 					{
 						"cid": 0,
@@ -62,6 +63,7 @@ class SvgStore {
 						"stroke": "red",
 						"strokeWidth": 0.2,
 						"selected": false
+						"joints":[] - тут будет пусто
 					},
 					{
 						"cid": 0,
@@ -70,9 +72,10 @@ class SvgStore {
 						"stroke": "red",
 						"strokeWidth": 0.2,
 						"selected": false
+						"joints":[] - тут будет пусто иоб нет смысла 
 					}
 				],
-
+				// такое будем делать уже в Джойнтсторе
 				"joints": 
 				[
 					{
@@ -356,8 +359,7 @@ class SvgStore {
 				width: part.width,
 				height: part.height,
 				code: part.code,
-				joints:part.joints
-			});
+ 			});
 		}
 		let progNum = 1
 
@@ -1058,10 +1060,9 @@ class SvgStore {
 		return res
 	}
 
-	generateSinglePart(code, progNum, joints) {
+	generateSinglePart(code, progNum ) {
 		let res = []
-		//if (joints && joints.length) debugger;
-		let commonPath = ''
+ 		let commonPath = ''
 		code.forEach(a => commonPath += a.path || ' ')
 		const box = SVGPathCommander.getPathBBox(commonPath)
 		res.push(`N${0}G28X${utils.smartRound(box.width)}Y${utils.smartRound(box.height)}L${progNum}P1`)
@@ -1079,7 +1080,6 @@ class SvgStore {
 			const inlet = this.findByCidAndClass(code, item.cid, 'inlet')
 			const outlet = this.findByCidAndClass(code, item.cid, 'outlet')
 			const contour = item
-			const filteredJoints = joints.filter(i => Number(Object.keys(i)[0]) === item.cid);
 			let CP = SVGPathCommander.normalizePath(contour.path)
 
 			let rx, ry, x1, y1, x2, y2, flag1, flag2, flag3;
@@ -1360,7 +1360,7 @@ class SvgStore {
 		let HW = [0]
 		let partHeight = 0		
 		let partWidth = 0
-		let joints = [] // массив джойнтов
+		
 
 		for (const c of cmds) {
 			//console.log(JSON.stringify(c))
@@ -1381,7 +1381,6 @@ class SvgStore {
 					joints:[],
 				};
 				res = []
-				joints = []
 
 				partOpen = true
 				continue;
@@ -1428,7 +1427,6 @@ class SvgStore {
 				});
 
 				res.map(a => currentPart.code.push(a))
-				joints.map(a => currentPart.joints.push(a))
 				result.part_code.push(currentPart)
 				continue;
 
@@ -1450,7 +1448,8 @@ class SvgStore {
 					"path": "",
 					"stroke": "red",
 					"strokeWidth": 0.2,
-					"selected": false
+					"selected": false,
+					"joints":[]
 				})
 
 				res[res.length - 1].path = this.start(cx, cy, c, partHeight);
@@ -1469,7 +1468,8 @@ class SvgStore {
 					"path": "",
 					"stroke": "red",
 					"strokeWidth": 0.2,
-					"selected": false
+					"selected": false,
+					"joints":[]
 				})
 				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c, partHeight);
 				continue;
@@ -1512,25 +1512,7 @@ class SvgStore {
 
 			if (typeof c.g === 'number') {
 				const g = Math.floor(c.g);
-				if (g === 4) {
-					let pathLength = SVGPathCommander.getTotalLength(
-						res[res.length - 1].path
-					);
-
-					// ищем существующий контейнер
-					let current = {
-						[String(cid)]: {
-							length: constants.defaultJointSize,
-							x: cx,
-							y: cy,
-							d: pathLength,
-							partHeight:partHeight
-						}
-					};
-					joints.push(current)
-					continue;
-
-				} else if (g === 0) {
+				if (g === 0) {
 
 					const tx = (c.params.X !== undefined) ? (c.params.X) : cx;
 					const ty = (c.params.Y !== undefined) ? (c.params.Y) : cy;
@@ -1543,7 +1525,8 @@ class SvgStore {
 							"path": "",
 							"stroke": "red",
 							"strokeWidth": 0.2,
-							"selected": false
+							"selected": false,
+							"joints":[]
 						})
 					}
 
@@ -1581,14 +1564,15 @@ class SvgStore {
 					res[res.length - 1].path += this.arcPath(tx, ty, r, large, sweep, c, partHeight);
 
 					cx = tx; cy = ty;
+				} else if (g === 4) {
+					let pathLength = SVGPathCommander.getTotalLength(
+						res[res.length - 1].path
+					);
+					res[res.length - 1].joints.push( pathLength )
+					continue;
+
 				} else if (g === 10) {
 					macros = ' macro' + c.params.S + ' '
-					/*try {
-						res[res.length - 1].class += macros
-					} catch (error) {
-						console.log("catch in macros")
-					}*/
-
 					try {
 
 						 res[res.length - 1].class = (
@@ -1602,17 +1586,12 @@ class SvgStore {
 					}
  
 				} else if (g === 29) {
-
-					//console.log('g === 29')
-
-
 				} else if (g === 28) {
 					partHeight = c.params.Y
 					partWidth = c.params.X
 					HW.push([partHeight, partWidth])
 
 				} else if (g === 52) {
-					// // console.log('g === 52')					
 				}
 
 			}

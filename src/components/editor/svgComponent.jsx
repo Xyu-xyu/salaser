@@ -10,7 +10,6 @@ import svgStore from './../../store/svgStore';
 import { observer } from 'mobx-react-lite';
 //import laserStore from './../../store/laserStore';
 //import { transform } from 'svgpath';
-//import Joints from './joints.js';
 ///import HighLighted from './highlighted.js';
 //import LaserShow from './laserShow.js';
 
@@ -62,7 +61,6 @@ const SvgComponent = observer (() => {
                       {/*  <Selector />
                        <Guides />
                        <SelectedPointOnEdge/>
-                       <Joints />
                        <SelectedPointOnPath/>
                        <SelectedEdge/>
                        <HighLighted />

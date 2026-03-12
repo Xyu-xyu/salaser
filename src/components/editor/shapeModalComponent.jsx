@@ -63,7 +63,8 @@ const ShapeModalComponent = observer(() => {
 				path: transformed,
 				stroke: "red",
 				strokeWidth: 0.2,
-				selected:false
+				selected:false,
+				joints:[]
 			},
 			{
 				cid: 1,
@@ -71,7 +72,8 @@ const ShapeModalComponent = observer(() => {
 				path: "",
 				stroke: 'red',
 				strokeWidth: 0.2,
-				selected:false
+				selected:false,
+				joints:[]
 			},
 			{
 				cid: 1,
@@ -79,7 +81,8 @@ const ShapeModalComponent = observer(() => {
 				path: "",
 				stroke: 'lime',
 				strokeWidth: 0.2,
-				selected:false
+				selected:false,
+				joints:[]
 			}
 		]
 
@@ -97,8 +100,7 @@ const ShapeModalComponent = observer(() => {
 				id: part_code_id,
 				uuid: part_code_id,
 				name: uuid, // можно тоже генерить по code, если хочешь
-				code: newForm,
-				joints:[]
+				code: newForm,				
 			});
 			console.log("Создана новая форма с именем:", uuid);
 		}

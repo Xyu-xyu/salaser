@@ -76,7 +76,7 @@ const PartSimpleReturnComponent = observer(() => {
 	} 
 
 	useEffect(() => {
-		jointStore.loadJoints(partStore.svgData['joints'])
+		jointStore.loadJoints(partStore.svgData)
 	}, [])
 
 	return (

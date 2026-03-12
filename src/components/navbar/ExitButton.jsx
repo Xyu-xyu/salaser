@@ -23,29 +23,25 @@ const ExitButton = observer(() => {
 		partStore.setToDefault()
 	};
 
-/* 	const handleSubmit = () => {
-		setShow(false)
-		laserStore.setVal("centralBarMode", "planEditor")
-		svgStore.updateForm( partInEdit, svgData) 
-		partStore.setToDefault()			
-	}
- */
 	const handleSubmit = () => {
 		setShow(false)
 		laserStore.setVal("centralBarMode", "planEditor")
 	
+	
 		// 1) получаем joints из jointStore
-		const updatedJoints = jointStore.exportForCurrentPart();
 		let box  = svgStore.findBox (svgData.code)
-		svgData.width = box.width
-		svgData.height = box.height
-		svgData.x = box.x
-		svgData.y = box.y
+		const currentPart = jointStore.exportForCurrentPart();
+		currentPart.width = box.width
+		currentPart.height = box.height
+		currentPart.x = box.x
+		currentPart.y = box.y
+		
+		// обновляем в partStore
+		partStore.setSvgData(currentPart)
 	
 		// 2) формируем объект для svgStore:
 		const updatedPart = {
-			...svgData,
-			joints: updatedJoints,
+			...currentPart
 		};
 	
 		// 3) сохраняем в svgStore
