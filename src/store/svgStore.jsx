@@ -193,6 +193,8 @@ class SvgStore {
 		if (box) {
 			form.width = box.width
 			form.height = box.height
+			form.x = box.x
+			form.y = box.y 
 		}
 
 		console.log(form)
@@ -441,6 +443,7 @@ class SvgStore {
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
+				needG40 =true
 				g = 'G1'
 				let line = ''
 
@@ -562,8 +565,8 @@ class SvgStore {
 		if (contour.class.includes("contour") && 
 			!contour.class.includes("engraving") &&
 			c?.segments.length > 2 && 
-			i.segments.length !== 0) { 
-				
+			i.segments.length !== 0 ) { 
+				// есть врезка
 				res.push('(<Contour>)');
 		}
 
@@ -615,64 +618,6 @@ class SvgStore {
 				res.push(neededComp);
 			}
 
-/* 			if (cmd === 'L') {
-
-				const [, x, y] = seg
-				g = 'G1'
-				let line = ''
-
-				for (const joint of joints) {
-
-					const path = `M${X} ${Y} ` + seg.join(" ")
-					let j = joint[Object.keys(joint)[0]]
-					let jx = j.x
-					let jy = height - j.y 
-				
-					const nearest = utils.findNearestPointOnPath(
-						path,
-						{ x: jx, y: jy }
-					)
-
-					if (nearest)  {
-						let dist = utils.distance ( nearest.x, nearest.y, jx, jy )
-						if (dist < 0.01) {
-							console.log ("NEAREST SEG", nearest.x, nearest.y, seg)
-							if (G !== "G1") line+= "G1"
-							if (nearest.x !== X) line += "X" + utils.smartRound (nearest.x)
-							if (nearest.y !== Y) line += "Y" + utils.smartRound (height - nearest.y)
-							res.push(line)
-							res.push(`G4M80`)
-							G = "G4"
-							X = nearest.x
-							Y = nearest.y
-							line=""
-						}					
-					}			
-					
-				}
-
-				if (g !== G) line += g
-				if (x !== X) line += "X" + utils.smartRound (x)
-				if (y !== Y) line += "Y" + utils.smartRound (height- y)
-
-				
-				if (needLaserOn && c.segments.length == 2 ){ 
-					line +="M14M4M5M15";
-					needLaserOn = true
-				}
-				if (needLaserOn && c.segments.length > 2){
-					line +="M4"
-					needLaserOn = false
-				} 
- 
-				G = g
-				X = x
-				Y = y
-				line.length ? res.push(line) : false
-
-			}
- */			
-
 			if (cmd === 'L') {
 
 				const [, x2, y2] = seg
@@ -689,7 +634,7 @@ class SvgStore {
 					let j = joint[Object.keys(joint)[0]]
 			
 					let jx = j.x
-					let jy = height - j.y
+					let jy = /*height -*/ j.y
 			
 					const path = `M${X} ${Y} ` + seg.join(" ")
 			
@@ -708,7 +653,7 @@ class SvgStore {
 			
 						// начало сегмента
 						if (partLen < 0.01) {
-							startJoint = true
+							//startJoint = true
 							continue
 						}
 			
@@ -753,16 +698,19 @@ class SvgStore {
 					if (line) res.push(line)
 			
 					res.push("G4M80")
-			
+					G = "G4"
 					px = j.x
 					py = j.y
-					G = "G4"
+					
 				}
 			
 				// конец сегмента
 				let line = ""
 			
-				if (g !== G) line += g
+				if (G !== "G1") {
+					line += "G1"
+					G = 'G1'
+				}
 			
 				if (px !== x2)
 					line += "X" + utils.smartRound(x2)
@@ -783,20 +731,20 @@ class SvgStore {
 				G = g
 			}
 
- 			if (cmd === 'A') {
+			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
 				needG40 =true
-				// старт и конец в координатах станка
+
 				const x1 = X
 				const y1 = height - Y
+			
 				const x2 = x
 				const y2 = height - y
-
- 
-				const r = rx // у тебя всегда rx === ry
 			
-				// восстановление центра дуги
+				const r = rx
+			
+				// --- центр дуги ---
 				const mx = (x1 + x2) / 2
 				const my = (y1 + y2) / 2
 			
@@ -804,56 +752,126 @@ class SvgStore {
 				const dy = y2 - y1
 				const q = Math.hypot(dx, dy)
 			
-				const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
+				const h = Math.sqrt(Math.max(0, r*r - (q*q)/4))
 			
 				const nx = -dy / q
 				const ny = dx / q
 			
-				// ВАЖНО: инверсия sweep → G2 / G3
-				const isCCW = sweep === 0   // ← это ключ
+				const isCCW = sweep === 0
 				const sign = isCCW ? 1 : -1
 			
 				const cx = mx + sign * nx * h
 				const cy = my + sign * ny * h
 			
-				// ❗ I / J — АБСОЛЮТНЫЕ
-				const i = utils.smartRound (cx)
-				const j = utils.smartRound (cy)
+				const i = utils.smartRound(cx)
+				const j = utils.smartRound(cy)
 			
-				g = isCCW ? 'G3' : 'G2'
-				let line = ''
+				g = isCCW ? "G3" : "G2"
+			
+				// --- углы ---
+				let startAngle = Math.atan2(y1 - cy, x1 - cx)
+				let endAngle   = Math.atan2(y2 - cy, x2 - cx)
+			
+				if (isCCW && endAngle < startAngle) endAngle += Math.PI * 2
+				if (!isCCW && endAngle > startAngle) endAngle -= Math.PI * 2
+			
+				let arcJoints = []
+				let endJoint = false
+			
+				for (const joint of joints) {
+			
+					let jnt = joint[Object.keys(joint)[0]]
+			
+					let jx = jnt.x
+					let jy = height - jnt.y
+			
+					let angle = Math.atan2(jy - cy, jx - cx)
+			
+					let a = angle
+			
+					if (isCCW && a < startAngle) a += Math.PI * 2
+					if (!isCCW && a > startAngle) a -= Math.PI * 2
+			
+					// проверка попадания на дугу
+					if (isCCW) {
+						if (a <= startAngle || a >= endAngle) continue
+					} else {
+						if (a >= startAngle || a <= endAngle) continue
+					}
+			
+					// проверка радиуса
+					let dist = utils.distance(cx,cy,jx,jy)
+					if (Math.abs(dist - r) > 0.01) continue
+			
+					// проверка конца дуги
+					if (Math.abs(jx - x2) < 0.01 && Math.abs(jy - y2) < 0.01) {
+						endJoint = true
+						continue
+					}
+			
+					arcJoints.push({
+						x: jx,
+						y: jy,
+						a: a
+					})
+				}
+			
+				arcJoints.sort((a,b)=>a.a-b.a)
+			
+				let px = x1
+				let py = y1
+			
+				for (const p of arcJoints) {
+			
+					let line = ""
+			
+					/*if (g !== G)*/ line += g
+			
+					line += "X" + utils.smartRound(p.x)
+					line += "Y" + utils.smartRound(p.y)
+					line += "I" + i
+					line += "J" + j
 
+					if (needLaserOn) {
+						line += 'M4'
+						needLaserOn = false			  
+					}
+
+					res.push(line)
+					res.push("G4M80")
+					G = "G4"
+							
+					
+					X = p.x
+					Y = height - p.y
+					I = i
+					J = j
+			
+					px = p.x
+					py = p.y
+				}
+			
+				let line = ""
+			
 				if (g !== G) line += g
 				if (x !== X) line += "X" + utils.smartRound(x2)
 				if (y !== Y) line += "Y" + utils.smartRound(y2)
 				if (i !== I) line += "I" + i
 				if (j !== J) line += "J" + j
-
-				if (needLaserOn && c.segments.length == 2 ) {
-					line +="M14M4M5M15";
-					needLaserOn = true
+			
+				
+				if (needLaserOn) {
+					line += 'M4'
+					needLaserOn = false			  
 				}
-				if (needLaserOn && c.segments.length > 2) {
-					line +="M4"
-					needLaserOn = false
-				}
-
-
+				res.push(line)			
+		
 				G = g
 				X = x
 				Y = y
 				I = i
 				J = j
-
-			
-				if (needLaserOn) {
-					line += 'M4'
-					needLaserOn = false			  
-				}
-				res.push(line)
-
-			}  
-							  
+			}			  
 
 			if (i.segments.length === 0 && ind === 0) {
 				const macro = this.getMacro(contour.class)
@@ -864,10 +882,13 @@ class SvgStore {
 				}
 			}
 
-
 			if (i.segments.length === 0	&& 
 				ind === 1 &&
 				c?.segments.length > 2 ) {
+				// нет врезки
+				res[res.length-1]+= "M4"	
+				needLaserOn = false
+				needLaserOff = true
 				res.push('(<Contour>)');
 			}
 		})
@@ -1197,7 +1218,8 @@ class SvgStore {
 			let sheetHeight = this.svgData.height
 			let L = pos.part_code_id
 			let G = 52
-			let partHeight = svgStore.svgData.part_code.filter(a => a.id == L)[0].height
+			let part = svgStore.svgData.part_code.filter(a => a.id == L)[0].code
+			let partHeight = svgStore.findBox(part).height
 			let XYC = this.matrixToG52(matrix, sheetHeight, partHeight, pos.cx, pos.cy)
 			let X = utils.smartRound(XYC.X)
 			let Y = utils.smartRound(XYC.Y)
@@ -1389,6 +1411,8 @@ class SvgStore {
 				let box = SVGPathCommander.getPathBBox(commonPath)
 				currentPart.width = box.width
 				currentPart.height = box.height
+				currentPart.x = box.x
+				currentPart.y = box.y
  
 				const order = ['outer', 'contour', 'engraving', 'inlet', 'outlet', 'joint'].reverse();
 				res = res.sort((a, b) => {
@@ -1875,8 +1899,6 @@ class SvgStore {
 		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
 		ncp = this.renumberNLines (ncp, 1)
 
-		//ncp.forEach((item) => { console.log(item) });
-		//return
 		if (selectedId ==='newSheet' ) {
 			jobStore.saveNcpAsNewSheet(ncp)
 		} else {
