@@ -2269,7 +2269,6 @@ class Utils {
 		};
 	}
 
-	
 	smartRound(num, p = 3) {
 		const factor = 10 ** p;
 
@@ -2287,6 +2286,123 @@ class Utils {
 
 		return res;
 	}
+
+	splitPathByJointPoints(pathString, joints, tol = 0.01) {
+
+		const segments = new SVGPathCommander(pathString).toAbsolute().segments;
+	
+		// 1️⃣ joints → координаты
+		const jointPoints = joints
+			.map(len => SVGPathCommander.getPointAtLength(pathString, len))
+			.filter(p => p && Number.isFinite(p.x) && Number.isFinite(p.y));
+	
+		// 2️⃣ missingPoints — точки которые не совпадают с концами сегментов
+		const missingPoints = [];
+		for (const p of jointPoints) {
+			let minDist = Infinity;
+			for (const seg of segments) {
+				const x = seg[seg.length - 2];
+				const y = seg[seg.length - 1];
+				const dist = this.distance(x, y, p.x, p.y);
+				if (dist < minDist) minDist = dist;
+			}
+			if (minDist > tol) missingPoints.push(p);
+		}
+	
+		// 3️⃣ начинаем строить новый путь
+		const res = [];
+		let X = segments[0][1];
+		let Y = segments[0][2];
+		res.push(["M", X, Y]);
+	
+		for (let i = 1; i < segments.length; i++) {
+			let seg = segments[i];
+			const cmd = seg[0];
+			const x2 = seg[seg.length - 2];
+			const y2 = seg[seg.length - 1];
+	
+			const segPath = `M${X} ${Y} ${seg.join(" ")}`;
+			const segLen = SVGPathCommander.getTotalLength(segPath);
+	
+			// 4️⃣ ищем missingPoints на текущем сегменте
+			const pointsOnSeg = [];
+			for (const p of missingPoints) {
+				const nearest = this.findNearestPointOnPath(segPath, p);
+				if (!nearest || nearest.x == null || nearest.y == null) continue;
+	
+				const dist = this.distance(nearest.x, nearest.y, p.x, p.y);
+				if (dist > tol) continue;
+	
+				const partLen = this.distance(X, Y, nearest.x, nearest.y);
+				if (partLen < tol) continue;
+				if (Math.abs(partLen - segLen) < tol) continue;
+	
+				pointsOnSeg.push({ x: nearest.x, y: nearest.y, t: partLen });
+			}
+	
+			// сортируем точки по расстоянию от начала сегмента
+			pointsOnSeg.sort((a, b) => a.t - b.t);
+	
+			// 5️⃣ делим сегмент на части
+			let px = X;
+			let py = Y;
+	
+			for (const p of pointsOnSeg) {
+				if (cmd === "L") {
+					res.push(["L", p.x, p.y]);
+				} else if (cmd === "A") {
+					// делим дугу через svgArcToCenterParam
+					const arcs = this.splitArc(px, py, seg, p.x, p.y);
+					res.push(arcs[0]);
+					seg = arcs[1]; // оставшийся сегмент для следующих split
+				}
+				px = p.x;
+				py = p.y;
+			}
+	
+			// 6️⃣ последний кусок сегмента
+			if (cmd === "L") {
+				res.push(["L", x2, y2]);
+			} else if (cmd === "A") {
+				const [_, rx, ry, rot, laf, sweep] = seg;
+				res.push(["A", rx, ry, rot, laf, sweep, x2, y2]);
+			}
+	
+			X = x2;
+			Y = y2;
+		}
+	
+		return res;
+	}
+
+	splitArc(LX, LY, seg, px, py) {
+		const [_, rx, ry, rot, laf, sweep, EX, EY] = seg;
+		const arc = this.svgArcToCenterParam(LX, LY, rx, ry, rot, laf, sweep, EX, EY, true);
+	
+		const cx = arc.x;
+		const cy = arc.y;
+		let startAngle = arc.startAngle;
+		let endAngle = arc.endAngle;
+	
+		let angle = Math.atan2(py - cy, px - cx);
+		if (sweep && angle < startAngle) angle += Math.PI * 2;
+		if (!sweep && angle > startAngle) angle -= Math.PI * 2;
+	
+		let delta1 = angle - startAngle;
+		let delta2 = endAngle - angle;
+		if (!sweep) { delta1 = -delta1; delta2 = -delta2; }
+	
+		const large1 = Math.abs(delta1) > Math.PI ? 1 : 0;
+		const large2 = Math.abs(delta2) > Math.PI ? 1 : 0;
+	
+		return [
+			["A", rx, ry, rot, large1, sweep, px, py],
+			["A", rx, ry, rot, large2, sweep, EX, EY]
+		];
+	}
+
+	
+
 } 
 
 

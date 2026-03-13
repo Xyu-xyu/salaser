@@ -75,7 +75,7 @@ class SvgStore {
 						"joints":[] - тут будет пусто иоб нет смысла 
 					}
 				],
-				// такое будем делать уже в Джойнтсторе
+				// такое будем делать уже только в Джойнтсторе
 				"joints": 
 				[
 					{
@@ -369,7 +369,7 @@ class SvgStore {
 			res.push(`(<Part PartCode="${name}" Debit="${instancesCount}">)`);
 			//res.push(`ПРОГРАММА №` + progNum);
 
-			const contours = this.generateSinglePart(code, progNum, partInfo.joints)
+			const contours = this.generateSinglePart(code, progNum)
 			res.push(contours);
 
 			progNum++
@@ -403,13 +403,20 @@ class SvgStore {
 		const m = cls.match(/macro(\d+)/)
 		return m ? Number(m[1]) : null
 	}
-	// adding joints in ncp
-	svgToGcode(contour, inlet, outlet, height, outer, joints) {
+	
+	svgToGcode(contour, inlet, outlet, height) {
 		const res = []
+		const tol = 0.01
 		const c = contour?.path.length ? new SVGPathCommander(contour.path).toAbsolute() : {segments:[]}
 		const i = inlet?.path.length ? new SVGPathCommander(inlet.path).toAbsolute() : {segments:[]}
 		const o = outlet?.path.length ? new SVGPathCommander(outlet.path).toAbsolute() : {segments:[]}
 		const direction = SVGPathCommander.getDrawDirection(contour.path)//true G41 false 42
+		const joints = contour?.joints || []
+		const jointPoints = joints
+		.map(len => SVGPathCommander.getPointAtLength( contour.path, len))
+		.filter(p => p && Number.isFinite(p.x) && Number.isFinite(p.y));
+
+		const splittedPath = utils.splitPathByJointPoints( contour.path, joints);
 
 		let currentMacro = false
 		let currentCompensation = false
@@ -461,7 +468,7 @@ class SvgStore {
 						G = 'G10'
 					}
 
-					line +="M4"
+					if (!line.endsWith("M4")) line +="M4"
 					needLaserOn = false
 					needLaserOff = true
 				}
@@ -538,7 +545,7 @@ class SvgStore {
 						G = 'G10'
 					}
 
-					line +="M4"
+					if (!line.endsWith("M4")) line +="M4"
 					needLaserOn = false
 					needLaserOff = true
 				}
@@ -566,13 +573,13 @@ class SvgStore {
 
 		if (contour.class.includes("contour") && 
 			!contour.class.includes("engraving") &&
-			c?.segments.length > 2 && 
+			splittedPath.length > 2 && 
 			i.segments.length !== 0 ) { 
 				// есть врезка
 				res.push('(<Contour>)');
 		}
 
-		c?.segments.forEach((seg, ind) => {
+ 		splittedPath.forEach((seg, ind) => {
 			const cmd = seg[0]
 			if (cmd === 'M') {
 
@@ -593,7 +600,7 @@ class SvgStore {
 
 			}
 
-			if (needLaserOn && c.segments.length === 2) {
+			if (needLaserOn && splittedPath === 2) {
 				const macro = this.getMacro(contour.class)
 				if (macro !== null && macro !== currentMacro) {
 					res.push(`G10S${macro}`)
@@ -625,88 +632,7 @@ class SvgStore {
 				const [, x2, y2] = seg
 				g = 'G1'
 			
-				const segLen = utils.distance(X, Y, x2, y2)
 			
-				let midJoints = []
-				let startJoint = false
-				let endJoint = false
-			
-				for (const joint of joints) {
-			
-					let j = joint[Object.keys(joint)[0]]
-			
-					let jx = j.x
-					let jy = /*height -*/ j.y
-			
-					const path = `M${X} ${Y} ` + seg.join(" ")
-			
-					const nearest = utils.findNearestPointOnPath(
-						path,
-						{ x: jx, y: jy }
-					)
-			
-					if (!nearest) continue
-			
-					let dist = utils.distance(nearest.x, nearest.y, jx, jy)
-			
-					if (dist < 0.01) {
-			
-						let partLen = utils.distance(X, Y, nearest.x, nearest.y)
-			
-						// начало сегмента
-						if (partLen < 0.01) {
-							//startJoint = true
-							continue
-						}
-			
-						// конец сегмента
-						if (Math.abs(partLen - segLen) < 0.01) {
-							endJoint = true
-							continue
-						}
-			
-						// середина
-						midJoints.push({
-							x: nearest.x,
-							y: nearest.y,
-							t: partLen / segLen
-						})
-					}
-				}
-			
-				midJoints.sort((a,b)=>a.t-b.t)
-			
-				let px = X
-				let py = Y
-			
-				// joint в начале
-				if (startJoint) {
-					//res.push("G4M80")
-				}
-			
-				// joints в середине
-				for (const j of midJoints) {
-			
-					let line = ""
-			
-					if (G !== "G1") line += "G1"
-			
-					if (px !== j.x)
-						line += "X" + utils.smartRound(j.x)
-			
-					if (py !== j.y)
-						line += "Y" + utils.smartRound(height - j.y)
-			
-					if (line) res.push(line)
-			
-					res.push("G4M80")
-					G = "G4"
-					px = j.x
-					py = j.y
-					
-				}
-			
-				// конец сегмента
 				let line = ""
 			
 				if (G !== "G1") {
@@ -714,19 +640,13 @@ class SvgStore {
 					G = 'G1'
 				}
 			
-				if (px !== x2)
+				if (X !== x2)
 					line += "X" + utils.smartRound(x2)
 			
-				if (py !== y2)
+				if (Y !== y2)
 					line += "Y" + utils.smartRound(height - y2)
 			
 				if (line) res.push(line)
-			
-				// joint в конце
-				if (endJoint) {
-					res.push("G4M80")
-					g = "G4"
-				}
 			
 				X = x2
 				Y = y2
@@ -777,82 +697,7 @@ class SvgStore {
 				if (isCCW && endAngle < startAngle) endAngle += Math.PI * 2
 				if (!isCCW && endAngle > startAngle) endAngle -= Math.PI * 2
 			
-				let arcJoints = []
-				let endJoint = false
-			
-				for (const joint of joints) {
-			
-					let jnt = joint[Object.keys(joint)[0]]
-			
-					let jx = jnt.x
-					let jy = height - jnt.y
-			
-					let angle = Math.atan2(jy - cy, jx - cx)
-			
-					let a = angle
-			
-					if (isCCW && a < startAngle) a += Math.PI * 2
-					if (!isCCW && a > startAngle) a -= Math.PI * 2
-			
-					// проверка попадания на дугу
-					if (isCCW) {
-						if (a <= startAngle || a >= endAngle) continue
-					} else {
-						if (a >= startAngle || a <= endAngle) continue
-					}
-			
-					// проверка радиуса
-					let dist = utils.distance(cx,cy,jx,jy)
-					if (Math.abs(dist - r) > 0.01) continue
-			
-					// проверка конца дуги
-					if (Math.abs(jx - x2) < 0.01 && Math.abs(jy - y2) < 0.01) {
-						endJoint = true
-						continue
-					}
-			
-					arcJoints.push({
-						x: jx,
-						y: jy,
-						a: a
-					})
-				}
-			
-				arcJoints.sort((a,b)=>a.a-b.a)
-			
-				let px = x1
-				let py = y1
-			
-				for (const p of arcJoints) {
-			
-					let line = ""
-			
-					/*if (g !== G)*/ line += g
-			
-					line += "X" + utils.smartRound(p.x)
-					line += "Y" + utils.smartRound(p.y)
-					line += "I" + i
-					line += "J" + j
-
-					if (needLaserOn) {
-						line += 'M4'
-						needLaserOn = false			  
-					}
-
-					res.push(line)
-					res.push("G4M80")
-					G = "G4"
-							
-					
-					X = p.x
-					Y = height - p.y
-					I = i
-					J = j
-			
-					px = p.x
-					py = p.y
-				}
-			
+						
 				let line = ""
 			
 				if (g !== G) line += g
@@ -862,7 +707,7 @@ class SvgStore {
 				if (j !== J) line += "J" + j
 			
 				
-				if (needLaserOn) {
+				if (needLaserOn && !line.endsWith("M4")) {
 					line += 'M4'
 					needLaserOn = false			  
 				}
@@ -873,8 +718,8 @@ class SvgStore {
 				Y = y
 				I = i
 				J = j
-			}			  
-
+			}	
+						
 			if (i.segments.length === 0 && ind === 0) {
 				const macro = this.getMacro(contour.class)
 				if (macro !== null && macro !== currentMacro) {
@@ -886,16 +731,26 @@ class SvgStore {
 
 			if (i.segments.length === 0	&& 
 				ind === 1 &&
-				c?.segments.length > 2 ) {
+				splittedPath.length > 2 ) {
 				// нет врезки
-				res[res.length-1]+= "M4"	
+				if(!res[res.length-1].endsWith("M4")) res[res.length-1]+= "M4"	
 				needLaserOn = false
 				needLaserOff = true
 				res.push('(<Contour>)');
 			}
+
+			for (let j of jointPoints) {
+				if(cmd === 'A' || cmd === 'L') {
+					let dist = utils.distance(j.x, j.y, X, Y)
+					if (dist < tol) {
+						res.push(`G4M80`)
+						G = "G4"
+					}
+				}
+			}
 		})
 
-		if (needLaserOff && (!outlet ||o.segments.length ===0 ) && c.segments.length > 2) {
+		if (needLaserOff && (!outlet ||o.segments.length ===0 ) && splittedPath.length > 2) {
 			res[res.length-1]+="M5"
 			needLaserOff = false
 		}
@@ -909,7 +764,7 @@ class SvgStore {
 
 		if (contour.class.includes("contour") 
 			&& !contour.class.includes("engraving")
-			&& c?.segments.length > 2
+			&& splittedPath.length > 2
 
 		) {
 			res.push('(</Contour>)');
@@ -952,7 +807,7 @@ class SvgStore {
 						currentMacro = macro
 				}
 
-				if (needLaserOn) {
+				if (needLaserOn && !line.endsWith("M4")) {
 					line +="M4"
 					needLaserOn = false
 				}
@@ -1042,7 +897,7 @@ class SvgStore {
 					res.push(neededComp);
 				}
 
-				if (needLaserOn) {
+				if (needLaserOn && !line.endsWith("M4")) {
 					line += 'M4'
 					needLaserOn = false			  
 				}
@@ -1125,8 +980,7 @@ class SvgStore {
 					inlet,
 					outlet, 
 					box.height, 
-					outer,
-					filteredJoints)
+					)
 					.forEach(cmd =>
 					res.push(`N${0}${cmd}`)
 				)
@@ -1378,7 +1232,6 @@ class SvgStore {
 					code: [],
 					height: 0,
 					width: 0,
-					joints:[],
 				};
 				res = []
 
@@ -1569,7 +1422,7 @@ class SvgStore {
 						res[res.length - 1].path
 					);
 					res[res.length - 1].joints.push( pathLength )
-					continue;
+					//continue;
 
 				} else if (g === 10) {
 					macros = ' macro' + c.params.S + ' '
@@ -1657,8 +1510,6 @@ class SvgStore {
 		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		let result1 = this.defineInlets (result)
-		// adding joints
-		
 		svgStore.svgData = Object.assign({}, result1)
 
 	}
@@ -1720,6 +1571,7 @@ class SvgStore {
 		  // ✅ normalize обязателен
 		  const contourCmd = new SVGPathCommander(contour.path).normalize()
 		  const inletCmd   = new SVGPathCommander(inlet.path).normalize()
+
 	
 		  const contourSeg = contourCmd.segments
 		  const inletSeg   = inletCmd.segments
@@ -1757,9 +1609,15 @@ class SvgStore {
 	
 		  // ✅ ПРАВИЛЬНАЯ сборка пути
 		  contour.path = new SVGPathCommander(mergedSegments).toString()
+		  // а вот тут мы фиксим начало пути для джойнтов так как при подсчете g === 4 не был в длине пути учтен инлет
+		  // который мы сейча ссюда смержили .... ёёё
+		  contour.joints.forEach((j, i, arr)=>{
+			arr[i]+= SVGPathCommander.getTotalLength( inlet.path )||0
+		  })
 	
 		  // очищаем inlet
 		  inlet.path = ''
+
 		}
 	  }
 	

@@ -381,7 +381,7 @@ const ru = {
     "Cut speed": "Скорость резки",
     "Copy contour": "Копировать контур",
     "Round edges at selected point": "Скругленные края в выбранной точке",
-    "Remove joint": "Удалить сустав",
+    "Remove joint": "Удалить перемычка",
     "Icon size": "Размер значка",
     "Font size": "Размер шрифта",
     "Drag mode": "Режим перетаскивания",
@@ -465,11 +465,11 @@ const ru = {
     "Follow the path": "Следуйте по пути",
     "Joint": "Перемычка",
     "Distance ": "Расстояние",
-    "toEnd": "до конца",
-    "Add joint": "Добавить сустав",
-    "Updated joints": "Обновлены суставы",
-    "Added joint": "Добавлен сустав",
-    "Removed joint": "Удаленный сустав",
+    "toEnd": "на выходе",
+    "Add joint": "Добавить перемычка",
+    "Updated joints": "Обновлены перемычки",
+    "Added joint": "Добавлена перемычка",
+    "Removed joint": "Удаленные перемычки",
     "Thickness must be a positive integer": "Толщина должна быть положительным целым числом."
 }
 export default ru;

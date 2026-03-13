@@ -38,7 +38,7 @@ const LogPanel = observer(() => {
 			const data = await log.load(tpoint);	
  			console.log('Loaded data:', data);
 			let parsed = JSON.parse(data.svg)
-			//let joints = JSON.parse(data.joints)
+			let joints = JSON.parse(data.joints)
 			if (parsed ) {
 				const newSvgData = {
 					width: parsed.width,

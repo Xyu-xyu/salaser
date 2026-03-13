@@ -96,7 +96,7 @@ class JobStore {
 
 	async loadJobs() {
 		try {
-			let resp = await fetch(`${constants.SERVER_URL}/jdb/get_jobs?limit=10`, {
+			let resp = await fetch(`${constants.SERVER_URL}/jdb/get_jobs?limit=20`, {
 				method: "GET",
 				headers: {
 					// Если нужно, добавляй заголовки
