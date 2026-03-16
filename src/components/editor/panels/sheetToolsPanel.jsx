@@ -1,13 +1,13 @@
 import Panel from './panel.jsx';
 import { observer } from 'mobx-react-lite';
-import partStore from "../../../store/partStore.jsx";
-import editorStore from "../../../store/editorStore.jsx";;
-import inlet from '../../../scripts/inlet.jsx'
+//import partStore from "../../../store/partStore.jsx";
+//import editorStore from "../../../store/editorStore.jsx";;
 import ShapeModalComponent from '../shapeModalComponent.jsx';
-import { addToLog } from '../../../scripts/addToLog.jsx';
-import util from '../../../scripts/util.jsx';
+//import { addToLog } from '../../../scripts/addToLog.jsx';
+//import util from '../../../scripts/util.jsx';
 import CustomIcon from '../../../icons/customIcon.jsx';
 import svgStore from '../../../store/svgStore.jsx';
+import editorStore from '../../../store/editorStore.jsx';
 
 
 const SheetToolsPanel = observer(() => {
@@ -40,6 +40,87 @@ const SheetToolsPanel = observer(() => {
 			),
 			content: (
 				<div className="d-flex align-items-center btn_block flex-wrap">
+
+					<button
+						type="button"
+						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
+						onMouseDown={() => { 
+							editorStore.setMode("resize")
+							svgStore.deselect()
+						}}
+					>
+
+						<CustomIcon
+							icon="fa-arrow-pointer"
+							width="24"
+							height="24"
+							color="white"
+							fill="black"
+							strokeWidth={10}
+							viewBox='0 0 640 640'
+						/>
+					</button>
+
+					<button
+						type="button"
+						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
+						onMouseDown={() => { 
+							svgStore.inverSelection()
+							editorStore.setMode("resize")
+						}}
+					>
+						<CustomIcon
+							icon="fa-arrow-pointer"
+							width="24"
+							height="24"
+							color="white"
+							fill="var(--violet)"
+							strokeWidth={10}
+							viewBox='0 0 640 640'
+						/>
+					</button>
+					
+
+					<button
+						type="button"
+						className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+						onMouseDown={() => {
+							editorStore.setMode("selectionPlus")
+						}}							>
+						<div className="d-flex flex-row align-items-center justify-content-center">
+							<CustomIcon
+								icon="fa-arrow-pointer"
+								width="24"
+								height="24"
+								color="white"
+								fill="black"
+								strokeWidth={10}
+								viewBox='0 0 640 640'
+							/>
+							<div style={{ marginLeft: -4, marginTop: 11, color: "black" }}>+</div>
+						</div>
+					</button>
+
+
+					<button
+						type="button"
+						className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+						onMouseDown={() => {
+							editorStore.setMode("selectionMinus")}
+							}							>
+						<div className="d-flex flex-row align-items-center justify-content-center">
+							<CustomIcon
+								icon="fa-arrow-pointer"
+								width="24"
+								height="24"
+								color="white"
+								fill="black"
+								strokeWidth={10}
+								viewBox='0 0 640 640'
+							/>
+							<div style={{ marginLeft: -4, marginTop: 11, color: "black" }}>-</div>
+						</div>
+					</button>
 
 					<button 
 						type="button"

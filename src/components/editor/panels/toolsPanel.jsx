@@ -97,9 +97,8 @@ const ToolsPanel = observer(() => {
 						type="button"
 						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
 						onMouseDown={() => {
-							setMode('resize')
-							//partStore.deselect ()
-						}
+							setMode('resize')							
+							}
 						}
 					>
 

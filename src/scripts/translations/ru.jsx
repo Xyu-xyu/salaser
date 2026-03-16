@@ -381,7 +381,7 @@ const ru = {
     "Cut speed": "Скорость резки",
     "Copy contour": "Копировать контур",
     "Round edges at selected point": "Скругленные края в выбранной точке",
-    "Remove joint": "Удалить перемычка",
+    "Remove joint": "Удалить перемычку",
     "Icon size": "Размер значка",
     "Font size": "Размер шрифта",
     "Drag mode": "Режим перетаскивания",
@@ -466,10 +466,12 @@ const ru = {
     "Joint": "Перемычка",
     "Distance ": "Расстояние",
     "toEnd": "на выходе",
-    "Add joint": "Добавить перемычка",
+    "Add joint": "Добавить перемычку",
     "Updated joints": "Обновлены перемычки",
     "Added joint": "Добавлена перемычка",
     "Removed joint": "Удаленные перемычки",
-    "Thickness must be a positive integer": "Толщина должна быть положительным целым числом."
+    "Thickness must be a positive integer": "Толщина должна быть положительным целым числом.",
+    "Avto": "Aвто",
+    "Manual": "Вручную",
 }
 export default ru;

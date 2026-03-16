@@ -209,11 +209,50 @@ class SvgStore {
 		code.map(a => commonPath += a.path)
 		return SVGPathCommander.getPathBBox(commonPath)
 	}
+	
+	selectPlus = (partId) => {
+		runInAction(() => {
+			this.svgData.positions.forEach(pos => {
+				if (pos.part_id === partId) {
+					pos.selected = true;
+				}
+			});
+		});
+	};
+	
+	selectMinus = (partId) => {
+		runInAction(() => {
+			this.svgData.positions.forEach(pos => {
+				if (pos.part_id === partId) {
+					pos.selected = false;
+				}
+			});
+		});
+	};
+
+	selectDeselect = (partId) => {
+		runInAction(() => {
+			this.svgData.positions.forEach(pos => {
+				if (pos.part_id === partId) {
+					pos.selected = !pos.selected;
+				}
+			});
+		});
+	};
+
 
 	selectOnly = (partId) => {
 		runInAction(() => {
 			this.svgData.positions.forEach(pos => {
 				pos.selected = pos.part_id === partId;
+			});
+		});
+	};
+
+	inverSelection = () => {
+		runInAction(() => {
+			this.svgData.positions.forEach(pos => {
+				pos.selected = !pos.selected
 			});
 		});
 	};
@@ -640,11 +679,19 @@ class SvgStore {
 					G = 'G1'
 				}
 			
-				if (X !== x2)
-					line += "X" + utils.smartRound(x2)
-			
-				if (Y !== y2)
-					line += "Y" + utils.smartRound(height - y2)
+				if (X !== x2) line += "X" + utils.smartRound(x2)
+				if (Y !== y2) line += "Y" + utils.smartRound(height - y2)
+
+				if (needLaserOn && c.segments.length == 2 ) line +="M14M4M5M15";
+				if (needLaserOn && c.segments.length > 2) {
+					line +="M4"
+					needLaserOn = false
+				}
+
+				if (needLaserOn && !line.endsWith("M4")) {
+					line += 'M4'
+					needLaserOn = false			  
+				}
 			
 				if (line) res.push(line)
 			
@@ -705,8 +752,13 @@ class SvgStore {
 				if (y !== Y) line += "Y" + utils.smartRound(y2)
 				if (i !== I) line += "I" + i
 				if (j !== J) line += "J" + j
-			
-				
+
+				if (needLaserOn && c.segments.length == 2 ) line +="M14M4M5M15";
+				if (needLaserOn && c.segments.length > 2) {
+					line +="M4"
+					needLaserOn = false
+				}
+							
 				if (needLaserOn && !line.endsWith("M4")) {
 					line += 'M4'
 					needLaserOn = false			  

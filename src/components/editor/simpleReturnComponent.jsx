@@ -1,50 +1,35 @@
 import { observer } from "mobx-react-lite";
 import SVGPathCommander from "svg-path-commander";
-
 import svgStore from "./../../store/svgStore.jsx";
 import editorStore from "./../../store/editorStore.jsx";
 
 const SimpleReturnComponent = observer(() => {
 
+	const { mode } = editorStore
+
 	const setSelected = (e, part_id) => {
-		console.log(part_id)
-		svgStore.selectOnly(part_id)
-		if (e.button === 0 && editorStore.mode === 'resize') {
-			/*let cid = Number(e.currentTarget.getAttribute('data-cid'));
-			if (typeof cid === 'number') {
-				if (cid !== selectedCid) {
-					svgStore.setContourSelected(cid)
-				} else {
-					//console.log (e)
-					let inlet = e.currentTarget.classList.contains('inlet')
-					let outlet = e.currentTarget.classList.contains('outlet')
-					if ((inlet || outlet) && editorStore.inletMode === 'move') {
-						editorStore.setInletMode('inletInMoving')
-						//console.log ('setSelected and start in mode  ' + editorStore.inlrtMode)						
-					}
-				}
-			}*/
-		} else if (e.button === 0 && editorStore.mode === 'text') {
+		console.log ("setSelected ", mode)		
+		if (/*e.button === 0 &&*/ mode === 'resize') {
 
-			//console.log ('пиу пиу')
-
-			/*if (e.currentTarget.classList.contains('skeletonText')) {
-				let cid = Number(e.currentTarget.getAttribute('data-cid'));
-				if (typeof cid === 'number') {
-					svgStore.setTextFocus(false)
-					let text = svgStore.getElementByCidAndClass(cid, 'contour')
-					let newClass = text.class + ' selectedText'
-					svgStore.updateElementValue(cid, 'contour', 'class', newClass)
-					svgStore.setTextFocus(true)
-				}
-
-			} else {
-				console.log('Create text element')
-				let coords = { x: e.clientX, y: e.clientY }
-				svgStore.addTextElement(coords)
-				svgStore.setTextFocus(true)
-			}*/
+			let pos = svgStore.svgData.positions.filter(pos => part_id === pos.part_id)[0];
+			if (pos &&  pos?.selected && pos?.selected) return;
+			svgStore.selectOnly(part_id)
+			
+		} else if (/*e.button === 0 &&*/ mode === 'selectionPlus') {
+			svgStore.selectPlus(part_id)
+		}  else if (/*e.button === 0 &&*/ mode === 'selectionMinus') {
+			svgStore.selectMinus(part_id)			
 		}
+	}
+
+	const setMoving = (e, part_id) => {		
+
+		let pos = svgStore.svgData.positions.filter(pos => part_id === pos.part_id)[0];
+	 	if (e.buttons === 1 && pos &&  pos?.selected && pos?.selected) {
+			if (mode !== "dragging") {
+				editorStore.setMode("dragging");
+			}
+		}	 	
 	}
 
 	// крестик joint
@@ -174,15 +159,15 @@ const SimpleReturnComponent = observer(() => {
 				transform={`matrix(${a} ${b} ${c} ${d} ${e} ${f})`}
 				data-part-id={pos.part_id}
 				onMouseDown={(e) => setSelected(e, pos.part_id)}
-				onMouseMove={() => {
-					if (editorStore.mode !== "dragging") {
-						editorStore.setMode("dragging");
-					}
+				onMouseMove={(e) => {
+					setMoving(e, pos.part_id);
 				}}
-				onTouchStart={(e) => {
+
+				 onTouchStart={(e) => {
 					setSelected(e, pos.part_id);
+					setMoving(e, pos.part_id);
 					editorStore.setMode("dragging");
-				}}
+				}} 
 			>
 
 				<use

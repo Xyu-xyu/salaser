@@ -139,7 +139,7 @@ const Panel = observer(({ element }) => {
 	const findHighestZIndex = () => {
 		let inx = [...Object.values(panelStore.positions).filter(a => typeof a !== 'number').map(popup => popup.style.zIndex)]
 		let maxZIndex = Math.max(...inx);
-		console.log('maxZIndex' + maxZIndex)
+		//console.log('maxZIndex' + maxZIndex)
 		if (typeof maxZIndex !== "number") debugger;
 		return maxZIndex + 1;
 	};

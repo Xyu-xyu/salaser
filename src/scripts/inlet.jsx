@@ -3,7 +3,6 @@ import SVGPathCommander from 'svg-path-commander';
 import arc from './arc.jsx';
 import CONSTANTS from './../store/constants.jsx';
 import partStore from './../store/partStore.jsx';
-//import editorStore from './../store/editorStore.jsx';
 import { addToLog } from './../scripts/addToLog';
 import PathAnalyzer from "./pathAnalyzer.jsx"
 
@@ -2132,7 +2131,6 @@ class Inlet {
             selectedOutletPath    
         } = partStore;
     
-		//editorStore.setInletMode('inletInMoving')
 		let nearest = util.findNearestPointOnPath (selectedPath, { x: coords.x, y: coords.y })
 		let inletType = this.detectInletType (selectedInletPath)
 		let classes = partStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
