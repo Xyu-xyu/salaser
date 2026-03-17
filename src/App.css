@@ -2195,8 +2195,8 @@ g.macro5 {
     fill:url(#grid);
     stroke-width: var(--widthUsual);
     marker-start: url(#dotRed);
-    marker-end: url(#dotRed);
-    marker-mid: url(#dotRed);  
+/*     marker-end: url(#dotRed);
+    marker-mid: url(#dotRed);   */
 } 
 
 g.macro5 {
@@ -2352,7 +2352,7 @@ top:var(--hEdge);
 
 .containerTable {
   width: 100%;
-  height: 900px;
+  height: 700px;
   overflow-x:hidden;
   overflow-y:auto ;
 }
@@ -2562,4 +2562,12 @@ cursor: url('./images//cursor_plus.cur'), auto !important;
 
 .black-range::-moz-range-track {
   background-color: var(--violet);
+}
+
+
+.btn_tool {
+  width: 50px;
+  height: 50px;
+  margin-left: 5px;
+
 }

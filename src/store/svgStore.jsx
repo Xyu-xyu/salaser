@@ -1050,82 +1050,115 @@ class SvgStore {
 
 	rotateSelectedPosition(angle = 45) {
 		runInAction(() => {
-	  
-		  const rad = angle * Math.PI / 180;
-		  const cos = Math.cos(rad);
-		  const sin = Math.sin(rad);
-	  
-		  const multiply = (m1, m2) => ([
-			[
-			  m1[0][0]*m2[0][0] + m1[0][1]*m2[1][0],
-			  m1[0][0]*m2[0][1] + m1[0][1]*m2[1][1],
-			  m1[0][0]*m2[0][2] + m1[0][1]*m2[1][2] + m1[0][2]
-			],
-			[
-			  m1[1][0]*m2[0][0] + m1[1][1]*m2[1][0],
-			  m1[1][0]*m2[0][1] + m1[1][1]*m2[1][1],
-			  m1[1][0]*m2[0][2] + m1[1][1]*m2[1][2] + m1[1][2]
-			],
-			[0,0,1]
-		  ]);
-	  
-		  this.svgData.positions.forEach(pos => {
-			if (!pos.selected) return;
-	  
-			const part = this.svgData.part_code.find(p => p.id === pos.part_code_id);
-			if (!part) return;
-	  
-			let px = part?.width ? part.width / 2 : 0;
-			let py = part?.height ? part.height / 2 : 0;
-
-			try {
-				const outer = Array.isArray(part?.code)
-					? part.code.find(a =>
-						typeof a?.class === "string" &&
-						a.class.includes("contour") &&
-						a.class.includes("outer")
-					)
-					: null;
-
-				if (outer?.path) {
+			const rad = angle * Math.PI / 180;
+			const cos = Math.cos(rad);
+			const sin = Math.sin(rad);
+	
+			const multiply = (m1, m2) => ([
+				[
+					m1[0][0] * m2[0][0] + m1[0][1] * m2[1][0],
+					m1[0][0] * m2[0][1] + m1[0][1] * m2[1][1],
+					m1[0][0] * m2[0][2] + m1[0][1] * m2[1][2] + m1[0][2]
+				],
+				[
+					m1[1][0] * m2[0][0] + m1[1][1] * m2[1][0],
+					m1[1][0] * m2[0][1] + m1[1][1] * m2[1][1],
+					m1[1][0] * m2[0][2] + m1[1][1] * m2[1][2] + m1[1][2]
+				],
+				[0, 0, 1]
+			]);
+	
+			// =========================
+			// 1. Вычисляем общий bbox выделенных объектов
+			// =========================
+			let minX = Infinity, minY = Infinity;
+			let maxX = -Infinity, maxY = -Infinity;
+	
+			this.svgData.positions.forEach(pos => {
+				if (!pos.selected) return;
+				const part = this.svgData.part_code.find(p => p.id === pos.part_code_id);
+				if (!part) return;
+	
+				const { a, b, c, d, e, f } = pos.positions;
+	
+				try {
+					const outer = Array.isArray(part?.code)
+						? part.code.find(a => typeof a?.class === "string" && a.class.includes("contour") && a.class.includes("outer"))
+						: null;
+					if (!outer?.path) return;
+	
 					const box = SVGPathCommander.getPathBBox(outer.path);
-
-					if (box && typeof box.width === "number" && typeof box.height === "number") {
-						px = box.width / 2;
-						py = box.height / 2; // ✅ исправлено
-					}
+					if (!box) return;
+	
+					// трансформируем 4 угла bbox через матрицу объекта
+					const points = [
+						[box.x, box.y],
+						[box.x + box.width, box.y],
+						[box.x + box.width, box.y + box.height],
+						[box.x, box.y + box.height]
+					];
+	
+					points.forEach(([x, y]) => {
+						const tx = a * x + c * y + e;
+						const ty = b * x + d * y + f;
+						minX = Math.min(minX, tx);
+						minY = Math.min(minY, ty);
+						maxX = Math.max(maxX, tx);
+						maxY = Math.max(maxY, ty);
+					});
+				} catch (err) {
+					console.warn("BBox error:", err);
 				}
-			} catch (e) {
-				console.warn("BBox error:", e);
-			}
-
-	  
-			const { a, b, c, d, e, f } = pos.positions;
-	  
-			const oldM = [
-			  [a, c, e],
-			  [b, d, f],
-			  [0, 0, 1]
-			];
-	  
-			// 🔥 точно как в твоём рабочем коде
-			const rotM = [
-			  [cos, -sin, px*(1-cos) + py*sin],
-			  [sin,  cos, py*(1-cos) - px*sin],
-			  [0, 0, 1]
-			];
-	  
-			const m = multiply(oldM, rotM); // ← КЛЮЧ
-	  
-			pos.positions = {
-			  a: m[0][0],
-			  b: m[1][0],
-			  c: m[0][1],
-			  d: m[1][1],
-			  e: m[0][2],
-			  f: m[1][2],
-			};
-		  });
+			});
+	
+			if (!isFinite(minX) || !isFinite(minY)) return;
+	
+			const px = (minX + maxX) / 2; // глобальный центр группы
+			const py = (minY + maxY) / 2;
+	
+			// =========================
+			// 2. Вращаем каждый объект вокруг общего центра
+			// =========================
+			this.svgData.positions.forEach(pos => {
+				if (!pos.selected) return;
+				const { a, b, c, d, e, f } = pos.positions;
+	
+				const oldM = [
+					[a, c, e],
+					[b, d, f],
+					[0, 0, 1]
+				];
+	
+				// создаём матрицы: смещение к центру → поворот → смещение обратно
+				const translateToCenter = [
+					[1, 0, px],
+					[0, 1, py],
+					[0, 0, 1]
+				];
+				const rotate = [
+					[cos, -sin, 0],
+					[sin,  cos, 0],
+					[0, 0, 1]
+				];
+				const translateBack = [
+					[1, 0, -px],
+					[0, 1, -py],
+					[0, 0, 1]
+				];
+	
+				const rotM = multiply(multiply(translateToCenter, rotate), translateBack);
+	
+				const m = multiply(rotM, oldM); // применяем глобальный поворот
+	
+				pos.positions = {
+					a: m[0][0],
+					b: m[1][0],
+					c: m[0][1],
+					d: m[1][1],
+					e: m[0][2],
+					f: m[1][2]
+				};
+			});
 		});
 	}
 
