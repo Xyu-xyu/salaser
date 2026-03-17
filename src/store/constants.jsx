@@ -42,6 +42,7 @@ const constants = {
 	`(</Contour part_id="4" contour_id="0" c_contour_id="0" >)`, 
 	`(</Part id="4" part_id="4">)`],
 	fontSize:11.88,
+	defaultAngle:10,
 	kerning:1,
 	defaultIntend:10,
 	defaultInletIntend: 0.2,

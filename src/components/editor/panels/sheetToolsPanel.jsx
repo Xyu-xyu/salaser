@@ -8,17 +8,43 @@ import ShapeModalComponent from '../shapeModalComponent.jsx';
 import CustomIcon from '../../../icons/customIcon.jsx';
 import svgStore from '../../../store/svgStore.jsx';
 import editorStore from '../../../store/editorStore.jsx';
+import { useState } from "react";
+import constants from '../../../store/constants.jsx';
 
 
 const SheetToolsPanel = observer(() => {
-	
+
+	const [angle, setAngle] = useState(constants.defaultAngle);
+
 	const deleteSelectedPosition = () => {
 		svgStore.deleteSelectedPosition()
 	}
 
-	const rotateSelectedPosition = () => {
-		svgStore.rotateSelectedPosition()
-	}
+	const rotateSelectedPosition = (n = 0) => {
+		if (angle === "" || isNaN(angle)) return;
+		svgStore.rotateSelectedPosition(n);
+	};
+
+	const handleAngleChange = (e) => {
+		let value = e.target.value;
+	
+		// разрешаем пустое значение (чтобы можно было редактировать)
+		if (value === "") {
+			setAngle("");
+			return;
+		}
+	
+		// только целые числа (с минусом)
+		if (!/^-?\d+$/.test(value)) return;
+	
+		let num = parseInt(value, 10);
+	
+		// ограничение диапазона
+		if (num > 360) num = 360;
+		if (num < -360) num = -360;
+	
+		setAngle(num);
+	};
 
 
 
@@ -43,7 +69,7 @@ const SheetToolsPanel = observer(() => {
 
 					<button
 						type="button"
-						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
+						className="btn text-white btn_tool btn_resize_mode"
 						onMouseDown={() => { 
 							editorStore.setMode("resize")
 							svgStore.deselect()
@@ -52,8 +78,8 @@ const SheetToolsPanel = observer(() => {
 
 						<CustomIcon
 							icon="fa-arrow-pointer"
-							width="24"
-							height="24"
+							width="20"
+							height="20"
 							color="white"
 							fill="black"
 							strokeWidth={10}
@@ -63,7 +89,7 @@ const SheetToolsPanel = observer(() => {
 
 					<button
 						type="button"
-						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
+						className="btn text-white btn_tool btn_resize_mode"
 						onMouseDown={() => { 
 							svgStore.inverSelection()
 							editorStore.setMode("resize")
@@ -71,8 +97,8 @@ const SheetToolsPanel = observer(() => {
 					>
 						<CustomIcon
 							icon="fa-arrow-pointer"
-							width="24"
-							height="24"
+							width="20"
+							height="20"
 							color="white"
 							fill="var(--violet)"
 							strokeWidth={10}
@@ -83,15 +109,15 @@ const SheetToolsPanel = observer(() => {
 
 					<button
 						type="button"
-						className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+						className="btn text-white btn_mode btn_tool btn_add_point"
 						onMouseDown={() => {
 							editorStore.setMode("selectionPlus")
 						}}							>
 						<div className="d-flex flex-row align-items-center justify-content-center">
 							<CustomIcon
 								icon="fa-arrow-pointer"
-								width="24"
-								height="24"
+								width="20"
+								height="20"
 								color="white"
 								fill="black"
 								strokeWidth={10}
@@ -104,15 +130,15 @@ const SheetToolsPanel = observer(() => {
 
 					<button
 						type="button"
-						className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+						className="btn text-white btn_mode btn_tool btn_add_point"
 						onMouseDown={() => {
 							editorStore.setMode("selectionMinus")}
 							}							>
 						<div className="d-flex flex-row align-items-center justify-content-center">
 							<CustomIcon
 								icon="fa-arrow-pointer"
-								width="24"
-								height="24"
+								width="20"
+								height="20"
 								color="white"
 								fill="black"
 								strokeWidth={10}
@@ -124,8 +150,8 @@ const SheetToolsPanel = observer(() => {
 
 					<button 
 						type="button"
-						className="btn text-white mt-1 ms-2 btn_tool"
-						onMouseDown={rotateSelectedPosition}
+						className="btn text-white btn_tool"
+						onMouseDown={ ()=>rotateSelectedPosition (-angle)}
 					>
 
 						<CustomIcon
@@ -137,12 +163,45 @@ const SheetToolsPanel = observer(() => {
 							viewBox='0 0 1536 1536'
 						/>
 					</button>
+
+					<button 
+						type="button"
+						className="btn text-white btn_tool"
+						onMouseDown={ ()=>rotateSelectedPosition (angle)}
+					>
+
+						<CustomIcon
+							icon="fa-rotateR"
+							width="20"
+							height="20"
+							fill={"black"}
+							strokeWidth={0}
+							viewBox='0 0 1536 1536'
+						/>
+					</button>
+					<input
+						type="number"
+						step="1"
+						min={-360}
+						max={360}
+						value={angle}
+						onChange={handleAngleChange}
+						style={{
+							width: "100px",
+							height: "40px",
+							textAlign: "center",
+							fontSize: "16px",
+							marginLeft: "10px"
+						}}
+						className="form-control"
+					/>
+
 					<ShapeModalComponent />
  
 
 					<button 
 						type="button"
-						className="btn text-white mt-1 ms-2 btn_delete btn_tool" onMouseDown={deleteSelectedPosition}
+						className="btn text-white btn_delete btn_tool" onMouseDown={deleteSelectedPosition}
 					>
 						<CustomIcon
 							icon="ic:twotone-delete-outline"

@@ -117,10 +117,8 @@ const ShapeModalComponent = observer(() => {
 
 	return (
 	<>
-		<Button variant="" onClick={handleShow} className='mt-1 ms-2'>
-			<div
-				className="text-white btn_shapes btn_tool"
-			>
+		<Button variant="" onClick={handleShow} className='btn text-white btn_tool'>
+			
 				<CustomIcon
 					icon="fa-shapes"
 					width="20"
@@ -129,7 +127,6 @@ const ShapeModalComponent = observer(() => {
 					strokeWidth={0}
 					viewBox='0 0 512 512'
 				/>
-			</div>
 		</Button>
 
 		<Modal variant="" show={show} onHide={handleClose}>

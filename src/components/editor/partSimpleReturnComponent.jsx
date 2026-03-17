@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import partStore from "../../store/partStore.jsx";
 import editorStore from "../../store/editorStore.jsx";
 //import Part from "../../scripts/part.jsx";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect/*, useId, useRef*/  } from 'react';
 import jointStore from "../../store/jointStore.jsx";
 //import constants from "../../store/constants.jsx";
 //import svgStore from "../../store/svgStore.jsx";
@@ -83,7 +83,7 @@ const PartSimpleReturnComponent = observer(() => {
 		<>
 			{partStore.svgData['code'].map((element, i) => (
 				<g
-					key={"psr"+i+ element.cid}
+					key={"psr"+i+"_"+element.cid}
 					data-cid={element.cid}
 					className={element.class}
 					onMouseDown={setSelected}
