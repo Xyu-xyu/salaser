@@ -1075,8 +1075,30 @@ class SvgStore {
 			const part = this.svgData.part_code.find(p => p.id === pos.part_code_id);
 			if (!part) return;
 	  
-			const px = part.width  / 2;
-			const py = part.height / 2;
+			let px = part?.width ? part.width / 2 : 0;
+			let py = part?.height ? part.height / 2 : 0;
+
+			try {
+				const outer = Array.isArray(part?.code)
+					? part.code.find(a =>
+						typeof a?.class === "string" &&
+						a.class.includes("contour") &&
+						a.class.includes("outer")
+					)
+					: null;
+
+				if (outer?.path) {
+					const box = SVGPathCommander.getPathBBox(outer.path);
+
+					if (box && typeof box.width === "number" && typeof box.height === "number") {
+						px = box.width / 2;
+						py = box.height / 2; // ✅ исправлено
+					}
+				}
+			} catch (e) {
+				console.warn("BBox error:", e);
+			}
+
 	  
 			const { a, b, c, d, e, f } = pos.positions;
 	  
