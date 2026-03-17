@@ -89,6 +89,16 @@ const constants = {
 				zIndex:1
 			}
 		},
+		sheetAlignPopup: {
+			mini: false,
+			style: {
+				top: 200,
+				left: 300,
+				width: 125,
+				height: 380,
+				zIndex:1
+			}
+		},
 		sheetPopup: {
 			mini: false,
 			style: {

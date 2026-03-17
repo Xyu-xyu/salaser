@@ -473,5 +473,6 @@ const ru = {
     "Thickness must be a positive integer": "Толщина должна быть положительным целым числом.",
     "Avto": "Aвто",
     "Manual": "Вручную",
+    "Transform": "Трансформировать"
 }
 export default ru;
