@@ -6,22 +6,32 @@ import laserStore from "../../store/laserStore";
 import { useTranslation } from 'react-i18next';
 import partStore from "../../store/partStore";
 import svgStore from "../../store/svgStore";
+import sheetLog from "../../scripts/sheetLog.jsx";
+import sheetLogStore from "../../store/sheetLogStore.jsx";
 
 
 const ExitButtonSheetEditor = observer(() => {
 
 	const [show, setShow] = useState(false);
 	const { t } = useTranslation()
+	const resetSheetHistory = () => {
+		sheetLog.clearBase().catch((error) => {
+			console.error('Error clearing sheet history:', error);
+		});
+		sheetLogStore.reset();
+	};
 	const showModal = () => {
 		setShow(true);
 	};
 
 	const handleClose = () => {
+		resetSheetHistory();
 		setShow(false)
 		laserStore.setVal("centralBarMode", "plans")
 	};
 
 	const handleSubmit = () => {
+		resetSheetHistory();
 		setShow(false)
 		laserStore.setVal("centralBarMode", "plans")
 		svgStore.saveNcpFile()

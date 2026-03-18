@@ -7,6 +7,7 @@ import SVGPathCommander from 'svg-path-commander';
 import svgPath from 'svgpath';
 import constants from '../../../store/constants.jsx';
 import { useState } from "react";
+import { addToSheetLog } from '../../../scripts/addToSheetLog.jsx';
 
 
 
@@ -152,6 +153,8 @@ const SheetAlignPanel = observer(() => {
 				f: f + dy
 			};
 		});
+
+		addToSheetLog('Selected parts aligned');
 	};
 
 	const spreadItems = (direction, indent = 10) => {
@@ -220,6 +223,8 @@ const SheetAlignPanel = observer(() => {
 	
 			prev = current;
 		}
+
+		addToSheetLog('Selected parts spread');
 	};
 
 	const panelInfo = 

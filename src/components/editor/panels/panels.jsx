@@ -4,6 +4,7 @@ import SheetPanel from './sheetPanel.jsx'
 import FormsPanel from './formsPanel.jsx'
 import ExitButtonSheetEditor from '../../navbar/ExitButtonSheetEditor.jsx';
 import SheetAlignPanel from './sheetAlignPanel.jsx';
+import SheetLogPanel from './sheetLogPanel.jsx';
  
 
 const Panels = () => {
@@ -13,6 +14,7 @@ const Panels = () => {
 			<SheetPanel />	
 			<FormsPanel />
 			<SheetAlignPanel />
+			<SheetLogPanel />
 			<ExitButtonSheetEditor />			
  		</>
 	);

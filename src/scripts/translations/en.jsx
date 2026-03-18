@@ -498,6 +498,12 @@ const en = {
     "Removed joint": "Removed joint",
     "Thickness must be a positive integer": "Thickness must be a positive integer",
     "Transform": "Transform",
-    "Spread": "Spread"
+    "Spread": "Spread",
+    "Part position updated": "Part position updated",
+    "Selected parts rotated": "Selected parts rotated",
+    "Selected parts aligned": "Selected parts aligned",
+    "Selected parts spread": "Selected parts spread",
+    "Shape added": "Shape added",
+    "Part added": "Part added"
 }
 export default en;

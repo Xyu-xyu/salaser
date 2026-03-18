@@ -4,6 +4,9 @@ import { runInAction } from 'mobx';
 import coordsStore from './../../store/coordStore.jsx';
 import editorStore from './../../store/editorStore.jsx';
 import svgStore from './../../store/svgStore.jsx';
+import sheetLog from './../../scripts/sheetLog.jsx';
+import sheetLogStore from './../../store/sheetLogStore.jsx';
+import { addToSheetLog } from './../../scripts/addToSheetLog.jsx';
 import util from './../../scripts/util.jsx';
 import SvgComponent from './svgComponent.jsx';
 
@@ -18,6 +21,7 @@ const SvgWrapper = observer(() => {
 		startX: 0,
 		startY: 0,
 		initialMatrices: new Map(), // part_id → { e, f }
+		hasMoved: false,
 	});
 
 	// Touch state
@@ -119,7 +123,8 @@ const SvgWrapper = observer(() => {
 						part.part_id,
 						{ e: part.positions.e, f: part.positions.f }
 					])
-				)
+				),
+				hasMoved: false,
 			};
 			e.stopPropagation();
 			//e.preventDefault()			
@@ -176,6 +181,7 @@ const SvgWrapper = observer(() => {
 			const currentSvg = util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
 			const dx = currentSvg.x - dragState.current.startSvgX;
 			const dy = currentSvg.y - dragState.current.startSvgY;
+			dragState.current.hasMoved = dragState.current.hasMoved || dx !== 0 || dy !== 0;
 
 			runInAction(() => {
 				svgStore.svgData.positions.forEach(part => {
@@ -235,7 +241,8 @@ const SvgWrapper = observer(() => {
 						part.part_id,
 						{ e: part.positions.e, f: part.positions.f }
 					])
-				)
+				),
+				hasMoved: false,
 			};
 			e.stopPropagation();
 		};
@@ -265,6 +272,7 @@ const SvgWrapper = observer(() => {
 
 			const dx = currentSvg.x - dragState.current.startSvgX;
 			const dy = currentSvg.y - dragState.current.startSvgY;
+			dragState.current.hasMoved = dragState.current.hasMoved || dx !== 0 || dy !== 0;
 
 			runInAction(() => {
 				svgStore.svgData.positions.forEach(part => {
@@ -283,14 +291,19 @@ const SvgWrapper = observer(() => {
 	const endDrag = () => {
 		inMoveRef.current = false;
 		console.log ("END DRAG")
+		const shouldLogMove = dragState.current.isDragging && dragState.current.hasMoved;
 		if (editorStore.mode === 'dragging') {
 			editorStore.setMode('resize');
 			svgStore.deleteOutParts()
 		}
 		if (dragState.current.isDragging) {
 			dragState.current.isDragging = false;
+			dragState.current.hasMoved = false;
 			dragState.current.initialMatrices.clear();
 			//editorStore.setMode('resize');
+		}
+		if (shouldLogMove) {
+			addToSheetLog('Part position updated');
 		}
 	};
 
@@ -326,6 +339,32 @@ const SvgWrapper = observer(() => {
 			svgStore.fitToPage();
 		}
 	}, [coordsStore.needToFit]);
+
+	useEffect(() => {
+		const handleKeyDown = (e) => {
+			const tagName = e.target?.tagName?.toLowerCase();
+			const isEditable = e.target?.isContentEditable || ['input', 'textarea', 'select'].includes(tagName);
+			if (isEditable) return;
+
+			const key = e.key.toLowerCase();
+
+			if (e.ctrlKey && e.shiftKey && (key === 'z' || key === 'я')) {
+				e.preventDefault();
+				sheetLogStore.setNext();
+				sheetLog.restorePoint();
+			} else if (e.ctrlKey && (key === 'z' || key === 'я')) {
+				e.preventDefault();
+				sheetLogStore.setPrev();
+				sheetLog.restorePoint();
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	}, []);
 
 	useEffect(() => {
 		const mode = editorStore.mode;

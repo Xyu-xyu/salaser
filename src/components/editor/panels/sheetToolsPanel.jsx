@@ -10,6 +10,7 @@ import svgStore from '../../../store/svgStore.jsx';
 import editorStore from '../../../store/editorStore.jsx';
 import { useState } from "react";
 import constants from '../../../store/constants.jsx';
+import { addToSheetLog } from '../../../scripts/addToSheetLog.jsx';
 
 
 const SheetToolsPanel = observer(() => {
@@ -17,12 +18,20 @@ const SheetToolsPanel = observer(() => {
 	const [angle, setAngle] = useState(constants.defaultAngle);
 
 	const deleteSelectedPosition = () => {
+		const selectedCount = svgStore.svgData.positions.filter(pos => pos.selected).length;
+		if (!selectedCount) return;
+
 		svgStore.deleteSelectedPosition()
+		addToSheetLog('Selected parts deleted');
 	}
 
 	const rotateSelectedPosition = (n = 0) => {
 		if (angle === "" || isNaN(angle)) return;
+		const selectedCount = svgStore.svgData.positions.filter(pos => pos.selected).length;
+		if (!selectedCount) return;
+
 		svgStore.rotateSelectedPosition(n);
+		addToSheetLog('Selected parts rotated');
 	};
 
 	const handleAngleChange = (e) => {

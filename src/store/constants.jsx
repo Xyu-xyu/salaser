@@ -59,6 +59,16 @@ const constants = {
 		"M4.86 9.27 L 1.78 9.27 L 0 3.54 L 4.86 0 L 9.72 3.54 L 7.94 9.27 L 4.86 9.27",
 		"M9.41 5 9.41 7.5 5.08 10 .75 7.5.75 2.5 5.08 0 9.41 2.5 9.41 5"],
     panelPostions:	{
+		sheetLogPopup: {
+			mini: true,
+			style: {
+				top: 40,
+				left: 12,
+				width: 350,
+				height: 300,
+				zIndex:1
+			}
+		},
 		logPopup: {
 			mini: true,
 			style: {

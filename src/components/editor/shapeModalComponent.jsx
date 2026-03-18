@@ -3,13 +3,13 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { observer } from 'mobx-react-lite';
-import { addToLog } from './../../scripts/addToLog';
 import svgStore from './../../store/svgStore';
 import util from './../../scripts/util';
 import SVGPathCommander from 'svg-path-commander';
 import { useTranslation } from 'react-i18next';
 import CustomIcon from '../../icons/customIcon';
 import constants from '../../store/constants';
+import { addToSheetLog } from './../../scripts/addToSheetLog.jsx';
 
 
 const ShapeModalComponent = observer(() => {
@@ -113,6 +113,8 @@ const ShapeModalComponent = observer(() => {
 		selected: false,
 		positions: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },		
 	});
+
+	addToSheetLog('Shape added');
 }
 
 	return (

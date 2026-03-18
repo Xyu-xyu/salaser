@@ -6,23 +6,36 @@ import laserStore from "../../../store/laserStore.jsx";
 import CustomIcon from '../../../icons/customIcon.jsx';
 import { useTranslation } from 'react-i18next';
 import partStore from "../../../store/partStore.jsx"
+import { addToSheetLog } from '../../../scripts/addToSheetLog.jsx';
 
 
 const FormsPanel = observer(() => {
 
 	const { t } = useTranslation()
-	const add = (uuid, x, y)=> {
+	const add = (part) => {
 		let id = svgStore.nextPosId
+		const x = -(Number(part?.x) || 0);
+		const y = svgStore.svgData.height - ((Number(part?.y) || 0) + (Number(part?.height) || 0));
 
 		svgStore.addPosition (
 			{
 				"part_id": id,
-				"part_code_id": uuid,
+				"part_code_id": part.uuid,
 				"selected":false,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": x, "f": y},				
 			}
 		)
+
+		addToSheetLog('Part added');
 	}
+
+	const deleteAllWithLog = (uuid) => {
+		const before = svgStore.svgData.positions.length;
+		svgStore.deleteAll(uuid);
+		if (svgStore.svgData.positions.length !== before) {
+			addToSheetLog('All parts of this type deleted');
+		}
+	};
 
 	const deleteAll = (uuid) => {
 		macrosStore.setModalProps({
@@ -30,7 +43,7 @@ const FormsPanel = observer(() => {
 			modalBody: 'Do you want to delete all parts of this type?',
 			confirmText: 'Delete',
 			cancelText: 'Cancel',
-			func: svgStore.deleteAll,
+			func: deleteAllWithLog,
 			args: [uuid]
 		})
 
@@ -125,7 +138,7 @@ const FormsPanel = observer(() => {
 													<div className='d-flex'>
 														<button
 															className={`white_button navbar_button small_button40 me-2`} 
-															onPointerDown={ () => {add ( a.uuid, 0, 0)}}>
+															onPointerDown={ () => {add(a)}}>
 															<div className="d-flex align-items-center justify-content-center">
 																<CustomIcon icon="plus"
 																	width="24"
