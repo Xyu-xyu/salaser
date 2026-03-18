@@ -451,6 +451,7 @@ const zh = {
     "Added joint": "添加关节",
     "Removed joint": "移除关节",
     "Thickness must be a positive integer": "厚度必须是正整数",
-    "Transform": "转换"
+    "Transform": "转换",
+    "Spread": "传播"
 }
 export default zh;

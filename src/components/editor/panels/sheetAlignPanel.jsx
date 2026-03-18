@@ -1,75 +1,116 @@
 import Panel from './panel.jsx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomIcon from '../../../icons/customIcon.jsx';
 import svgStore from '../../../store/svgStore.jsx';
 import SVGPathCommander from 'svg-path-commander';
+import svgPath from 'svgpath';
+import constants from '../../../store/constants.jsx';
+import { useState } from "react";
+
 
 
 const SheetAlignPanel = observer(() => {
 	const { t } = useTranslation();
+	const [intend, setIntend] = useState(constants.defaultIntend);
+	const max = 60;
 
-	useEffect(() => {
- 	}, [])
+	const handleIntendChange = (e) => {
+		let value = e.target.value;
+	
+		// разрешаем пустое значение (чтобы можно было редактировать)
+		if (value === "") {
+			setIntend("");
+			return;
+		}
+	
+		// только целые числа (с минусом)
+		if (!/^-?\d+$/.test(value)) return;
+	
+		let num = parseInt(value, 10);
+	
+		// ограничение диапазона
+		if (0 <= num ) num = num;
+		if (num > max) num = max;
+	
+		setIntend(num);
+	};
 
+	const getMeasuredPaths = (part) => {
+		if (!Array.isArray(part?.code)) return [];
+
+		const outerCids = new Set(
+			part.code
+				.filter(item =>
+					typeof item?.class === "string" &&
+					item.class.includes("contour") &&
+					item.class.includes("outer") &&
+					typeof item?.cid === "number"
+				)
+				.map(item => item.cid)
+		);
+
+		if (!outerCids.size) return [];
+
+		return part.code.filter(item =>
+			typeof item?.path === "string" &&
+			item.path.trim().length > 0 &&
+			typeof item?.class === "string" &&
+			typeof item?.cid === "number" &&
+			outerCids.has(item.cid) &&
+			(
+				item.class.includes("contour") ||
+				item.class.includes("inlet") ||
+				item.class.includes("outlet")
+			)
+		);
+	};
+
+	const getPositionBBox = (pos) => {
+		const part = svgStore.svgData.part_code.find(p => p.id === pos.part_code_id);
+		if (!part) return null;
+
+		const { a, b, c, d, e, f } = pos.positions;
+		const paths = getMeasuredPaths(part);
+		if (!paths.length) return null;
+
+		let minX = Infinity, minY = Infinity;
+		let maxX = -Infinity, maxY = -Infinity;
+
+		try {
+			paths.forEach(({ path }) => {
+				const transformedPath = svgPath(path)
+					.matrix([a, b, c, d, e, f])
+					.toString();
+				const box = SVGPathCommander.getPathBBox(transformedPath);
+				if (!box) return;
+
+				minX = Math.min(minX, box.x);
+				minY = Math.min(minY, box.y);
+				maxX = Math.max(maxX, box.x + box.width);
+				maxY = Math.max(maxY, box.y + box.height);
+			});
+		} catch (err) {
+			console.warn("BBox error:", err);
+			return null;
+		}
+
+		if (!isFinite(minX)) return null;
+
+		return { pos, minX, minY, maxX, maxY };
+	};
  
 	const alignItems = (direction) => {
 		const selected = svgStore.svgData.positions.filter(pos => pos.selected);
 		if (!selected.length) return;
-	
-		// =========================
-		// 🔥 1. Общий bbox группы
-		// =========================
-		let minX = Infinity, minY = Infinity;
-		let maxX = -Infinity, maxY = -Infinity;
-	
-		selected.forEach(pos => {
-			const part = svgStore.svgData.part_code.find(p => p.id === pos.part_code_id);
-			if (!part) return;
-	
-			const { a, b, c, d, e, f } = pos.positions;
-	
-			try {
-				// 🔥 находим outer
-				const outer = part.code?.find(a =>
-					typeof a?.class === "string" &&
-					a.class.includes("contour") &&
-					a.class.includes("outer")
-				);
-				if (typeof outer.cid !== "number")  return;
-	
-				// 🔥 собираем ВСЕ пути этого контура (commonPath)
-				const paths = part.code.filter(p => p.cid === outer.cid && p.path);
-	
-				paths.forEach(p => {
-					const box = SVGPathCommander.getPathBBox(p.path);
-					if (!box) return;
-	
-					const points = [
-						[box.x, box.y],
-						[box.x + box.width, box.y],
-						[box.x + box.width, box.y + box.height],
-						[box.x, box.y + box.height]
-					];
-	
-					points.forEach(([x, y]) => {
-						const tx = a * x + c * y + e;
-						const ty = b * x + d * y + f;
-	
-						minX = Math.min(minX, tx);
-						minY = Math.min(minY, ty);
-						maxX = Math.max(maxX, tx);
-						maxY = Math.max(maxY, ty);
-					});
-				});
-	
-			} catch (err) {
-				console.warn("BBox error:", err);
-			}
-		});
-	
-		if (!isFinite(minX)) return;
+
+		const items = selected.map(getPositionBBox).filter(Boolean);
+		if (!items.length) return;
+
+		const minX = Math.min(...items.map(item => item.minX));
+		const minY = Math.min(...items.map(item => item.minY));
+		const maxX = Math.max(...items.map(item => item.maxX));
+		const maxY = Math.max(...items.map(item => item.maxY));
 	
 		// =========================
 		// 🔥 2. целевая точка
@@ -87,52 +128,9 @@ const SheetAlignPanel = observer(() => {
 		// =========================
 		// 🔥 3. выравнивание каждого объекта
 		// =========================
-		selected.forEach(pos => {
-			const part = svgStore.svgData.part_code.find(p => p.id === pos.part_code_id);
-			if (!part) return;
-	
+		items.forEach(item => {
+			const { pos, minX: localMinX, minY: localMinY, maxX: localMaxX, maxY: localMaxY } = item;
 			const { a, b, c, d, e, f } = pos.positions;
-	
-			let localMinX = Infinity, localMinY = Infinity;
-			let localMaxX = -Infinity, localMaxY = -Infinity;
-	
-			try {
-				const outer = part.code?.find(a =>
-					typeof a?.class === "string" &&
-					a.class.includes("contour") &&
-					a.class.includes("outer")
-				);
-				if (typeof outer.cid !== "number")  return;
-	
-				const paths = part.code.filter(p => p.cid === outer.cid && p.path);
-	
-				paths.forEach(p => {
-					const box = SVGPathCommander.getPathBBox(p.path);
-					if (!box) return;
-	
-					const points = [
-						[box.x, box.y],
-						[box.x + box.width, box.y],
-						[box.x + box.width, box.y + box.height],
-						[box.x, box.y + box.height]
-					];
-	
-					points.forEach(([x, y]) => {
-						const tx = a * x + c * y + e;
-						const ty = b * x + d * y + f;
-	
-						localMinX = Math.min(localMinX, tx);
-						localMinY = Math.min(localMinY, ty);
-						localMaxX = Math.max(localMaxX, tx);
-						localMaxY = Math.max(localMaxY, ty);
-					});
-				});
-	
-			} catch (err) {
-				console.warn("BBox error:", err);
-			}
-	
-			if (!isFinite(localMinX)) return;
 	
 			let dx = 0, dy = 0;
 	
@@ -154,6 +152,74 @@ const SheetAlignPanel = observer(() => {
 				f: f + dy
 			};
 		});
+	};
+
+	const spreadItems = (direction, indent = 10) => {
+		const selected = svgStore.svgData.positions.filter(pos => pos.selected);
+		if (selected.length < 2) return;
+
+		const items = selected.map(getPositionBBox).filter(Boolean);
+	
+		if (items.length < 2) return;
+	
+		// =========================
+		// 🔥 2. сортировка
+		// =========================
+		if (direction === "right") {
+			items.sort((a, b) => a.minX - b.minX);
+		} else if (direction === "left") {
+			items.sort((a, b) => b.maxX - a.maxX);
+		} else if (direction === "down") {
+			items.sort((a, b) => a.minY - b.minY);
+		} else if (direction === "up") {
+			items.sort((a, b) => b.maxY - a.maxY);
+		}
+	
+		// =========================
+		// 🔥 3. раскладка
+		// =========================
+		let prev = items[0];
+	
+		for (let i = 1; i < items.length; i++) {
+			const current = items[i];
+	
+			let dx = 0, dy = 0;
+	
+			if (direction === "right") {
+				const target = prev.maxX + indent;
+				dx = target - current.minX;
+			}
+	
+			if (direction === "left") {
+				const target = prev.minX - indent;
+				dx = target - current.maxX;
+			}
+	
+			if (direction === "down") {
+				const target = prev.maxY + indent;
+				dy = target - current.minY;
+			}
+	
+			if (direction === "up") {
+				const target = prev.minY - indent;
+				dy = target - current.maxY;
+			}
+	
+			// применяем только translate
+			current.pos.positions = {
+				...current.pos.positions,
+				e: current.pos.positions.e + dx,
+				f: current.pos.positions.f + dy
+			};
+	
+			// обновляем bbox после сдвига (ВАЖНО)
+			current.minX += dx;
+			current.maxX += dx;
+			current.minY += dy;
+			current.maxY += dy;
+	
+			prev = current;
+		}
 	};
 
 	const panelInfo = 
@@ -277,6 +343,100 @@ const SheetAlignPanel = observer(() => {
 											strokeWidth={1.5}
 										/>
 									</button>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<table className="table">
+					<thead className="table-dark">
+						<tr>
+							<th colSpan={5}>{t('Spread')}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<div className="d-flex align-items-center justify-content-around">
+									<button
+										type="button"
+										onMouseDown={() => spreadItems('down', intend)}
+										className="btn text-white mt-1 btn_align btn_align-left"
+									>
+										<CustomIcon
+											icon="sort-right"
+											width="30"
+											height="30"
+											viewBox='0 0 24 24'
+											color='black'
+											fill='none'
+											strokeWidth={1.25}
+										/>
+									</button>
+ 
+									<button
+										type="button"
+										onMouseDown={() => spreadItems('up', intend)}
+										className="btn text-white mt-1 btn_align btn_align-right"
+									>
+										<CustomIcon
+											icon="sort-left"
+											width="30"
+											height="30"
+											viewBox='0 0 24 24'
+											color='black'
+											fill='none'
+											strokeWidth={1.25}
+										/>
+									</button>
+									<button
+										type="button"
+										onMouseDown={() => spreadItems('right', intend)}
+										className="btn text-white mt-1 btn_align btn_align-top"
+									>
+										<CustomIcon
+											icon="sort-up"
+											width="30"
+											height="30"
+											viewBox='0 0 24 24'
+											color='black'
+											fill='none'
+											strokeWidth={1.25}
+										/>
+
+									</button>
+									 
+									<button
+										type="button"
+										onMouseDown={() => spreadItems('left', intend)}
+										className="btn text-white mt-1 btn_align btn_align-bottom"
+									>
+										<CustomIcon
+											icon="sort-down"
+											width="30"
+											height="30"
+											viewBox='0 0 24 24'
+											color='black'
+											fill='none'
+											strokeWidth={1.25}
+										/>
+									</button>
+									<input
+										type="number"
+										step="1"
+										min={0}
+										max={max}
+										value={intend}
+										onChange={handleIntendChange}
+										style={{
+											width: "75px",
+											height: "40px",
+											textAlign: "center",
+											fontSize: "16px",
+											marginLeft: "10px"
+										}}
+										className="form-control"
+									/>
 								</div>
 							</td>
 						</tr>
