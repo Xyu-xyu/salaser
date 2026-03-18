@@ -12,15 +12,57 @@ import { addToSheetLog } from '../../../scripts/addToSheetLog.jsx';
 const FormsPanel = observer(() => {
 
 	const { t } = useTranslation()
+	const getPartBounds = (part) => {
+		const numericBounds = {
+			x: Number(part?.x),
+			y: Number(part?.y),
+			width: Number(part?.width),
+			height: Number(part?.height),
+		};
+
+		const hasStoredBounds = Object.values(numericBounds).every(Number.isFinite) &&
+			numericBounds.width > 0 &&
+			numericBounds.height > 0;
+
+		if (hasStoredBounds) {
+			return numericBounds;
+		}
+
+		const sourcePart = Array.isArray(part?.code)
+			? part
+			: svgStore.svgData.part_code.find(item =>
+				item?.uuid === part?.uuid ||
+				item?.id === part?.id
+			);
+
+		if (Array.isArray(sourcePart?.code)) {
+			const box = svgStore.findBox(sourcePart.code);
+			if (box) {
+				return {
+					x: Number(box.x) || 0,
+					y: Number(box.y) || 0,
+					width: Number(box.width) || 0,
+					height: Number(box.height) || 0,
+				};
+			}
+		}
+
+		return { x: 0, y: 0, width: 0, height: 0 };
+	};
+
 	const add = (part) => {
 		let id = svgStore.nextPosId
-		const x = -(Number(part?.x) || 0);
-		const y = svgStore.svgData.height - ((Number(part?.y) || 0) + (Number(part?.height) || 0));
+		const partCodeId = part?.uuid ?? part?.id;
+		if (partCodeId === undefined || partCodeId === null) return;
+
+		const bounds = getPartBounds(part);
+		const x = -bounds.x;
+		const y = svgStore.svgData.height - (bounds.y + bounds.height);
 
 		svgStore.addPosition (
 			{
 				"part_id": id,
-				"part_code_id": part.uuid,
+				"part_code_id": partCodeId,
 				"selected":false,
 				"positions": { "a": 1, "b": 0, "c": 0, "d": 1, "e": x, "f": y},				
 			}

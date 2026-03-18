@@ -504,6 +504,7 @@ const en = {
     "Selected parts aligned": "Selected parts aligned",
     "Selected parts spread": "Selected parts spread",
     "Shape added": "Shape added",
-    "Part added": "Part added"
+    "Part added": "Part added",
+    "Selected parts deleted": "Selected parts deleted"
 }
 export default en;

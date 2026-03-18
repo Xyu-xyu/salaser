@@ -22,10 +22,30 @@ const ShapeModalComponent = observer(() => {
 	const [partYPosition, setPartYPosition] = useState(0)
 	const [partWidth, setPartWidth] = useState(150)
 	const [partHeight, setPartHeight] = useState(150)
-	const [partCenterXPosition, setPartCenterXPosition] = useState(true)
-	const [partCenterYPosition, setPartCenterYPosition] = useState(true)
+	const [partCenterXPosition, setPartCenterXPosition] = useState(false)
+	const [partCenterYPosition, setPartCenterYPosition] = useState(false)
 
 	let shapes = constants.shapes
+
+	const getCodeBounds = (code) => {
+		if (!Array.isArray(code) || !code.length) {
+			return { x: 0, y: 0, width: 0, height: 0, cx: 0, cy: 0 };
+		}
+
+		const box = svgStore.findBox(code);
+		if (!box) {
+			return { x: 0, y: 0, width: 0, height: 0, cx: 0, cy: 0 };
+		}
+
+		return {
+			x: Number(box.x) || 0,
+			y: Number(box.y) || 0,
+			width: Number(box.width) || 0,
+			height: Number(box.height) || 0,
+			cx: Number(box.cx ?? (box.x + box.width / 2)) || 0,
+			cy: Number(box.cy ?? (box.y + box.height / 2)) || 0,
+		};
+	};
 
 	const addContour = () => {
 		let d = shapes[selected]
@@ -85,6 +105,7 @@ const ShapeModalComponent = observer(() => {
 				joints:[]
 			}
 		]
+		const bounds = getCodeBounds(newForm);
 
 		// 1. Сначала ищем — вдруг такая форма уже есть
 		let existingForm = findExistingFormByCode(newForm);
@@ -92,7 +113,7 @@ const ShapeModalComponent = observer(() => {
 
 		if (existingForm) {
 			// Форма уже существует — используем её uuid!
-			part_code_id = existingForm.id;
+			part_code_id = existingForm.uuid ?? existingForm.id;
 			console.log("Форма уже существует, используем:", part_code_id);
 		} else {
 			// Создаём новую форму с новым uuid
@@ -105,13 +126,18 @@ const ShapeModalComponent = observer(() => {
 			console.log("Создана новая форма с именем:", uuid);
 		}
 
+		const positionY = partCenterYPosition
+			? svgStore.svgData.height / 2 - bounds.cx
+			: (partYPosition > 0
+				? partYPosition - bounds.cx
+				: svgStore.svgData.height - (bounds.x + bounds.height));
 
 	// В любом случае — добавляем позицию с правильным part_code_id
 	svgStore.addPosition({
-		part_id: svgStore.nextPosId, // или как у тебя правильно
+		part_id: id,
 		part_code_id: part_code_id,           // вот здесь критично — правильный uuid!
 		selected: false,
-		positions: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },		
+		positions: { a: 1, b: 0, c: 0, d: 1, e: 0, f: positionY },		
 	});
 
 	addToSheetLog('Shape added');

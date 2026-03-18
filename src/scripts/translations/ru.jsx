@@ -474,6 +474,13 @@ const ru = {
     "Avto": "Aвто",
     "Manual": "Вручную",
     "Transform": "Трансформировать",
-    "Spread": "Распространение"
+    "Spread": "Распространение",
+    "Part position updated": "Положение детали обновлено",
+    "Selected parts rotated": "Выбранные детали повернуты",
+    "Selected parts aligned": "Выбранные детали выровнены",
+    "Selected parts spread": "Разворот выбранных частей",
+    "Shape added": "Фигура добавлена",
+    "Part added": "Часть добавлена",
+    "Selected parts deleted": "Выбранные части удалены"
 }
 export default ru;

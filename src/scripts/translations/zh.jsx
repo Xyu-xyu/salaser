@@ -458,6 +458,7 @@ const zh = {
     "Selected parts aligned": "选定的部分对齐",
     "Selected parts spread": "精选部分展开",
     "Shape added": "添加形状",
-    "Part added": "添加部分"
+    "Part added": "添加部分",
+    "Selected parts deleted": "选定的部分已删除"
 }
 export default zh;
