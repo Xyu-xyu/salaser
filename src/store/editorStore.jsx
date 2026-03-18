@@ -8,7 +8,11 @@ import { makeAutoObservable } from "mobx";
   | "selectPoint"
   | "text"
   | "addJoint"
-  | "removeJoint"; */
+  | "removeJoint"; 
+  | "selectionPlus"  
+  | "selectionMinus"  
+
+  */
 
 /* type InletMode = "" | "inletInMoving" | string; // extend as needed */
 
@@ -22,7 +26,7 @@ class EditorStore {
 
   setMode = (newMode )=> {
     if (newMode !== this.mode  ) {
-      //console.log ("WAS " + this.mode +" WE SET NEW MODE :" + newMode)
+      console.log ("WAS " + this.mode +" WE SET NEW MODE :" + newMode)
       this.mode = newMode
       
     } else {

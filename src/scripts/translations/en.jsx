@@ -505,6 +505,7 @@ const en = {
     "Selected parts spread": "Selected parts spread",
     "Shape added": "Shape added",
     "Part added": "Part added",
-    "Selected parts deleted": "Selected parts deleted"
+    "Selected parts deleted": "Selected parts deleted",
+    "Sheet size updated": "Sheet size updated"
 }
 export default en;

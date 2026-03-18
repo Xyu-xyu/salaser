@@ -3,7 +3,8 @@ import { observer } from 'mobx-react-lite';
 import CustomIcon from '../../../icons/customIcon.jsx';
 import svgStore from '../../../store/svgStore.jsx';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { addToSheetLog } from '../../../scripts/addToSheetLog.jsx';
 
 const MIN = 50;
 const MAX = 3000;
@@ -11,6 +12,10 @@ const MAX = 3000;
 const SheetPanel = observer(() => {
   const { t } = useTranslation();
   const { svgData } = svgStore;
+  const initialValuesRef = useRef({
+    width: svgData.width ?? '',
+    height: svgData.height ?? '',
+  });
 
   // Локальное состояние для инпутов
   const [values, setValues] = useState({
@@ -49,6 +54,10 @@ const SheetPanel = observer(() => {
     }
   };
 
+  const handleFocus = (key) => () => {
+    initialValuesRef.current[key] = svgData[key];
+  };
+
   // Нормализация при выходе из поля
   const handleBlur = (key) => () => {
     let num = parseFloat(values[key]);
@@ -71,6 +80,11 @@ const SheetPanel = observer(() => {
     }));
 
     svgStore.setVal('svgData', key, num);
+
+    if (Number(initialValuesRef.current[key]) !== num) {
+      addToSheetLog('Sheet size updated');
+      initialValuesRef.current[key] = num;
+    }
   };
 
   const panelInfo = {
@@ -106,6 +120,7 @@ const SheetPanel = observer(() => {
                   max={MAX}
                   value={values.height}
                   onChange={handleChange('height')}
+                  onFocus={handleFocus('height')}
                   onBlur={handleBlur('height')}
                   className="form-control"
                 />
@@ -122,6 +137,7 @@ const SheetPanel = observer(() => {
                   max={MAX}
                   value={values.width}
                   onChange={handleChange('width')}
+                  onFocus={handleFocus('width')}
                   onBlur={handleBlur('width')}
                   className="form-control"
                 />

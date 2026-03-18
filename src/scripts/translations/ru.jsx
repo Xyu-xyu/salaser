@@ -481,6 +481,7 @@ const ru = {
     "Selected parts spread": "Разворот выбранных частей",
     "Shape added": "Фигура добавлена",
     "Part added": "Часть добавлена",
-    "Selected parts deleted": "Выбранные части удалены"
+    "Selected parts deleted": "Выбранные части удалены",
+    "Sheet size updated": "Размер листа обновлен."
 }
 export default ru;

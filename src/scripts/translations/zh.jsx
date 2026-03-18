@@ -459,6 +459,7 @@ const zh = {
     "Selected parts spread": "精选部分展开",
     "Shape added": "添加形状",
     "Part added": "添加部分",
-    "Selected parts deleted": "选定的部分已删除"
+    "Selected parts deleted": "选定的部分已删除",
+    "Sheet size updated": "纸张尺寸已更新"
 }
 export default zh;
