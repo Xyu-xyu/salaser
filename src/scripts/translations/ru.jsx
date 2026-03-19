@@ -486,6 +486,7 @@ const ru = {
     "All parts of this type deleted": "Все части этого типа удалены",
     "Fill": "Заполнить",
     "Sheet filled with selected part": "Лист заполнен",
-    "Sheet cut order was changed": "Порядок резки изменен."
+    "Sheet cut order was changed": "Порядок резки изменен.",
+    "No previous log entry found.": "Предыдущая запись журнала не найдена."
 }
 export default ru;

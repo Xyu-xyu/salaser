@@ -5,6 +5,15 @@ import utils from "../scripts/util";
 import arc from "../scripts/arc";
 import constants from "./constants";
 import jobStore from "./jobStore";
+import {
+	SHEET_CUT_DEFAULT_SECTOR_SIZE,
+	SHEET_CUT_ORDER_MODES,
+	clampSheetCutSectorSize,
+	getMaxSheetCutSectorSize,
+} from "../scripts/sheetCutUtils.jsx";
+
+const sameIdOrder = (left = [], right = []) =>
+	left.length === right.length && left.every((item, index) => item === right[index]);
 
 
 class SvgStore {
@@ -106,7 +115,16 @@ class SvgStore {
 					
 				]
 			} */      
-		]
+		],
+		"cutOrder": {
+			"mode": "current",
+			"sectorSize": SHEET_CUT_DEFAULT_SECTOR_SIZE,
+			"orders": {
+				"current": [],
+				"auto": [],
+				"manual": [],
+			},
+		},
 	}
 
 	matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
@@ -170,6 +188,142 @@ class SvgStore {
 
 	setLaserShow(val) {
 		Object.assign(this.laserShow, val);
+	}
+
+	getPositionIds() {
+		return Array.isArray(this.svgData?.positions)
+			? this.svgData.positions.map(pos => pos?.part_id)
+			: [];
+	}
+
+	getSheetCutMode() {
+		const mode = this.svgData?.cutOrder?.mode;
+		return SHEET_CUT_ORDER_MODES.includes(mode) ? mode : "current";
+	}
+
+	getSheetCutSectorMax() {
+		return getMaxSheetCutSectorSize(this.svgData);
+	}
+
+	getSheetCutSectorSize() {
+		return clampSheetCutSectorSize(
+			this.svgData,
+			this.svgData?.cutOrder?.sectorSize
+		);
+	}
+
+	normalizeSheetCutOrderIds(orderIds, fallbackIds = this.getPositionIds()) {
+		const currentIds = Array.isArray(fallbackIds) ? fallbackIds : this.getPositionIds();
+		const validIds = new Set(currentIds);
+		const seen = new Set();
+		const normalized = Array.isArray(orderIds)
+			? orderIds.filter(partId => {
+				if (!validIds.has(partId) || seen.has(partId)) return false;
+				seen.add(partId);
+				return true;
+			})
+			: [];
+
+		currentIds.forEach(partId => {
+			if (!seen.has(partId)) {
+				normalized.push(partId);
+			}
+		});
+
+		return normalized;
+	}
+
+	getSheetCutOrderIds(mode = this.getSheetCutMode()) {
+		const orders = this.svgData?.cutOrder?.orders;
+		return this.normalizeSheetCutOrderIds(orders?.[mode]);
+	}
+
+	getPositionsByPartIds(orderIds) {
+		const normalizedIds = this.normalizeSheetCutOrderIds(orderIds);
+		const positionMap = new Map(
+			(Array.isArray(this.svgData?.positions) ? this.svgData.positions : [])
+				.map(pos => [pos?.part_id, pos])
+		);
+
+		return normalizedIds
+			.map(partId => positionMap.get(partId))
+			.filter(Boolean);
+	}
+
+	ensureSheetCutState() {
+		const positionIds = this.getPositionIds();
+		const previousState = this.svgData?.cutOrder || {};
+		const previousOrders = previousState.orders || {};
+		const nextState = {
+			mode: this.getSheetCutMode(),
+			sectorSize: this.getSheetCutSectorSize(),
+			orders: {
+				current: this.normalizeSheetCutOrderIds(previousOrders.current, positionIds),
+				auto: this.normalizeSheetCutOrderIds(previousOrders.auto, positionIds),
+				manual: this.normalizeSheetCutOrderIds(previousOrders.manual, positionIds),
+			},
+		};
+		const hasChanged = (
+			previousState.mode !== nextState.mode ||
+			previousState.sectorSize !== nextState.sectorSize ||
+			!sameIdOrder(previousOrders.current, nextState.orders.current) ||
+			!sameIdOrder(previousOrders.auto, nextState.orders.auto) ||
+			!sameIdOrder(previousOrders.manual, nextState.orders.manual)
+		);
+
+		if (hasChanged) {
+			runInAction(() => {
+				this.svgData.cutOrder = nextState;
+			});
+		}
+
+		return nextState;
+	}
+
+	setSheetCutMode(mode) {
+		if (!SHEET_CUT_ORDER_MODES.includes(mode)) {
+			return this.getSheetCutMode();
+		}
+
+		this.ensureSheetCutState();
+
+		if (this.svgData.cutOrder.mode !== mode) {
+			runInAction(() => {
+				this.svgData.cutOrder.mode = mode;
+			});
+		}
+
+		return this.svgData.cutOrder.mode;
+	}
+
+	setSheetCutSectorSize(sectorSize) {
+		this.ensureSheetCutState();
+		const nextSectorSize = clampSheetCutSectorSize(this.svgData, sectorSize);
+
+		if (this.svgData.cutOrder.sectorSize !== nextSectorSize) {
+			runInAction(() => {
+				this.svgData.cutOrder.sectorSize = nextSectorSize;
+			});
+		}
+
+		return this.svgData.cutOrder.sectorSize;
+	}
+
+	setSheetCutOrderIds(mode, orderIds) {
+		if (!SHEET_CUT_ORDER_MODES.includes(mode)) {
+			return [];
+		}
+
+		this.ensureSheetCutState();
+		const nextIds = this.normalizeSheetCutOrderIds(orderIds);
+
+		if (!sameIdOrder(this.svgData.cutOrder.orders[mode], nextIds)) {
+			runInAction(() => {
+				this.svgData.cutOrder.orders[mode] = nextIds;
+			});
+		}
+
+		return nextIds;
 	}
 
 	reorderPositions(newOrder) {
@@ -1640,6 +1794,20 @@ class SvgStore {
 		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		let result1 = this.defineInlets (result)
+		const positionIds = Array.isArray(result1?.positions)
+			? result1.positions.map(pos => pos?.part_id)
+			: [];
+
+		result1.cutOrder = {
+			mode: "current",
+			sectorSize: clampSheetCutSectorSize(result1, SHEET_CUT_DEFAULT_SECTOR_SIZE),
+			orders: {
+				current: [...positionIds],
+				auto: [...positionIds],
+				manual: [...positionIds],
+			},
+		};
+
 		svgStore.svgData = Object.assign({}, result1)
 
 	}

@@ -510,6 +510,7 @@ const en = {
     "All parts of this type deleted": "All parts of this type deleted",
     "Fill": "Fill",
     "Sheet filled with selected part": "Sheet filled with selected part",
-    "Sheet cut order was changed": "Sheet cut order was changed"
+    "Sheet cut order was changed": "Sheet cut order was changed",
+    "No previous log entry found.": "No previous log entry found."
 }
 export default en;

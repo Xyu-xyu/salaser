@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Panel from "./panel.jsx";
 import svgStore from "./../../../store/svgStore.jsx";
@@ -7,7 +7,10 @@ import { useTranslation } from "react-i18next";
 import CustomIcon from "./../../../icons/customIcon.jsx";
 import { ReactSortable } from "react-sortablejs";
 import TooltipCreator from "./tooltipCreator";
-import { getPositionPreviewData } from "./../../../scripts/sheetCutUtils.jsx";
+import {
+	getAutoSheetCutOrder,
+	getPositionPreviewData,
+} from "./../../../scripts/sheetCutUtils.jsx";
 import panelStore from "./../../../store/panelStore.jsx";
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -18,6 +21,10 @@ const SheetCutPanel = observer(() => {
 	const [miniSvg, setMiniSvg] = useState({ sizeX: 50, sizeY: 50 });
 	const isMini = panelStore.positions.sheetCutPopup?.mini ?? true;
 	const positions = isMini ? [] : svgStore.svgData.positions.slice();
+	const activeCutOrderMode = svgStore.getSheetCutMode();
+	const sectorSize = svgStore.getSheetCutSectorSize();
+	const maxSectorSize = svgStore.getSheetCutSectorMax();
+	const positionIdsSignature = positions.map(position => position.part_id).join("|");
 	const speed = Number(svgStore.laserShow.speed) || 50;
 	const progress = clamp(Number(svgStore.laserShow.progress) || 0, 0, 100);
 	const isPlaying = Boolean(svgStore.laserShow.on && !svgStore.laserShow.paused);
@@ -34,6 +41,10 @@ const SheetCutPanel = observer(() => {
 			.slice(0, Math.max(currentOrder - 1, 0))
 			.map(pos => pos.part_id)
 	);
+
+	useEffect(() => {
+		svgStore.ensureSheetCutState();
+	}, [maxSectorSize, positionIdsSignature]);
 
 	const runCutQue = () => {
 		const shouldRestart = progress >= 100;
@@ -104,7 +115,58 @@ const SheetCutPanel = observer(() => {
 		svgStore.setLaserShow({ hoverPartId: partId });
 	};
 
+	const applyCutOrder = (mode, nextPositions) => {
+		if (!Array.isArray(nextPositions)) return;
+		if (nextPositions.length !== svgStore.svgData.positions.length) return;
+
+		const currentIds = svgStore.svgData.positions.map(pos => pos.part_id);
+		const nextIds = nextPositions.map(pos => pos.part_id);
+		const hasOrderChanged = nextIds.some((partId, index) => partId !== currentIds[index]);
+		const previousMode = svgStore.getSheetCutMode();
+		const hasModeChanged = previousMode !== mode;
+
+		svgStore.setSheetCutOrderIds(mode, nextIds);
+		svgStore.setSheetCutMode(mode);
+
+		if (hasOrderChanged) {
+			stopCutQue();
+			setHoveredPart(null);
+			svgStore.reorderPositions(nextPositions);
+		}
+
+		if (hasOrderChanged || hasModeChanged) {
+			addToSheetLog("Sheet cut order was changed");
+		}
+	};
+
+	const showSavedOrder = (mode) => {
+		svgStore.ensureSheetCutState();
+		applyCutOrder(
+			mode,
+			svgStore.getPositionsByPartIds(svgStore.getSheetCutOrderIds(mode))
+		);
+	};
+
+	const setAutoOrder = () => {
+		svgStore.ensureSheetCutState();
+		applyCutOrder(
+			"auto",
+			getAutoSheetCutOrder(svgStore.svgData, sectorSize)
+		);
+	};
+
+	const setSectorSize = (e) => {
+		const nextSectorSize = svgStore.setSheetCutSectorSize(e.currentTarget.value);
+		if (svgStore.getSheetCutMode() === "auto") {
+			applyCutOrder(
+				"auto",
+				getAutoSheetCutOrder(svgStore.svgData, nextSectorSize)
+			);
+		}
+	};
+
 	const setList = (nextPositions) => {
+		if (activeCutOrderMode !== "manual") return;
 		if (!nextPositions.length || nextPositions.length !== svgStore.svgData.positions.length) {
 			return;
 		}
@@ -115,11 +177,15 @@ const SheetCutPanel = observer(() => {
 
 		if (!hasOrderChanged) return;
 
-		stopCutQue();
-		setHoveredPart(null);
-		svgStore.reorderPositions(nextPositions);
-		addToSheetLog("Sheet cut order was changed");
+		applyCutOrder("manual", nextPositions);
 	};
+
+	const getCutOrderButtonStyle = (mode) => ({
+		opacity: activeCutOrderMode === mode ? 1 : 0.55,
+		boxShadow: activeCutOrderMode === mode
+			? "0 0 0 1px rgba(111, 66, 193, 0.35)"
+			: "none",
+	});
 
 	const createCenteredSVGPath = (position, index) => {
 		const preview = getPositionPreviewData(svgStore.svgData, position);
@@ -410,6 +476,60 @@ const SheetCutPanel = observer(() => {
 							</button>
 						</div>
 					</div>
+					<div
+						className="d-flex align-items-center justify-content-between flex-wrap px-2 pt-2"
+						style={{ gap: "8px" }}
+					>
+						<div className="btn-group btn-group-sm" role="group" aria-label="sheet cut order mode">
+							<button
+								type="button"
+								className="btn btn-sm violet_button text-white"
+								style={getCutOrderButtonStyle("current")}
+								onMouseDown={() => showSavedOrder("current")}
+							>
+								current
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm violet_button text-white"
+								style={getCutOrderButtonStyle("auto")}
+								onMouseDown={setAutoOrder}
+							>
+								auto
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm violet_button text-white"
+								style={getCutOrderButtonStyle("manual")}
+								onMouseDown={() => showSavedOrder("manual")}
+							>
+								manual
+							</button>
+						</div>
+						<div className="d-flex align-items-center">
+							<label
+								htmlFor="sheetCutSectorSize"
+								className="me-2 mb-0 text-nowrap"
+								style={{ fontSize: "12px" }}
+							>
+								sectorSize
+							</label>
+							<input
+								id="sheetCutSectorSize"
+								type="number"
+								className="form-control form-control-sm"
+								style={{ width: "96px" }}
+								step={1}
+								min={1}
+								max={maxSectorSize}
+								value={sectorSize}
+								onChange={setSectorSize}
+							/>
+						</div>
+						<div className="text-nowrap" style={{ fontSize: "12px" }}>
+							order: <strong>{activeCutOrderMode}</strong>
+						</div>
+					</div>
 					<div className="d-flex align-items-center px-2 pt-2">
 						<input
 							type="range"
@@ -438,6 +558,7 @@ const SheetCutPanel = observer(() => {
 								filter=".addImageButtonContainer"
 								list={positions}
 								setList={setList}
+								disabled={activeCutOrderMode !== "manual"}
 								animation={75}
 								easing="ease-out"
 								className="d-flex flex-row flex-wrap"

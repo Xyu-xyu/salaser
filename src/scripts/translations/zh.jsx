@@ -464,6 +464,7 @@ const zh = {
     "All parts of this type deleted": "该类型的所有部分均已删除",
     "Fill": "充满",
     "Sheet filled with selected part": "填充了选定部分的工作表",
-    "Sheet cut order was changed": "裁切顺序已更改"
+    "Sheet cut order was changed": "裁切顺序已更改",
+    "No previous log entry found.": "未找到以前的日志条目。"
 }
 export default zh;

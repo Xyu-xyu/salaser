@@ -5,6 +5,8 @@ const partPreviewCache = new WeakMap();
 const partCutItemCache = new WeakMap();
 const sheetQueueCache = new WeakMap();
 const EPSILON = 0.0001;
+export const SHEET_CUT_DEFAULT_SECTOR_SIZE = 100;
+export const SHEET_CUT_ORDER_MODES = ["current", "auto", "manual"];
 
 const hasPath = (item) => typeof item?.path === "string" && item.path.trim().length > 0;
 const hasClass = (item, className) =>
@@ -12,6 +14,28 @@ const hasClass = (item, className) =>
 const getPathSize = (path) => (typeof path === "string" ? path.length : 0);
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+export const getMaxSheetCutSectorSize = (svgData) => {
+	const width = Number(svgData?.width);
+	const height = Number(svgData?.height);
+
+	if (!Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0) {
+		return SHEET_CUT_DEFAULT_SECTOR_SIZE;
+	}
+
+	return Math.max(1, Math.min(width, height));
+};
+
+export const clampSheetCutSectorSize = (
+	svgData,
+	sectorSize = SHEET_CUT_DEFAULT_SECTOR_SIZE
+) => {
+	return clamp(
+		Number(sectorSize) || SHEET_CUT_DEFAULT_SECTOR_SIZE,
+		1,
+		getMaxSheetCutSectorSize(svgData)
+	);
+};
 
 const getPartCodeSignature = (part) => {
 	const partId = part?.id ?? part?.uuid ?? "unknown";
@@ -222,6 +246,90 @@ export const getPositionPreviewData = (svgData, pos) => {
 		...previewData,
 		bbox: transformBBox(previewData.bbox, pos),
 	};
+};
+
+const getSectorRowFromBottom = (centerY, sheetHeight, sectorSize) => {
+	const distanceFromBottom = Math.max(0, sheetHeight - centerY - EPSILON);
+	return Math.max(0, Math.floor(distanceFromBottom / sectorSize));
+};
+
+const sortSectorItems = (items) => [...items].sort((left, right) => {
+	if (Math.abs(right.centerY - left.centerY) > EPSILON) {
+		return right.centerY - left.centerY;
+	}
+
+	if (Math.abs(left.centerX - right.centerX) > EPSILON) {
+		return left.centerX - right.centerX;
+	}
+
+	return (left.partId ?? 0) - (right.partId ?? 0);
+});
+
+const sortCheckerboardSectors = (sectors) => {
+	const compareByGridPosition = (left, right) => {
+		if (left.col !== right.col) return left.col - right.col;
+		if (left.row !== right.row) return left.row - right.row;
+		return 0;
+	};
+
+	const firstPhase = [...sectors]
+		.filter(sector => (sector.row + sector.col) % 2 === 0)
+		.sort(compareByGridPosition);
+	const secondPhase = [...sectors]
+		.filter(sector => (sector.row + sector.col) % 2 !== 0)
+		.sort(compareByGridPosition);
+
+	return [...firstPhase, ...secondPhase];
+};
+
+export const getAutoSheetCutOrder = (
+	svgData,
+	sectorSize = SHEET_CUT_DEFAULT_SECTOR_SIZE
+) => {
+	if (!svgData || !Array.isArray(svgData.positions) || !svgData.positions.length) {
+		return [];
+	}
+
+	const safeSectorSize = clampSheetCutSectorSize(svgData, sectorSize);
+	const sheetHeight = Number(svgData?.height) || 0;
+	const sectorMap = new Map();
+
+	svgData.positions.forEach((pos, index) => {
+		const preview = getPositionPreviewData(svgData, pos);
+		const bbox = preview?.bbox;
+		const centerX = bbox ? bbox.x + bbox.width / 2 : Number(pos?.cx) || 0;
+		const centerY = bbox ? bbox.y + bbox.height / 2 : Number(pos?.cy) || 0;
+		const col = Math.max(0, Math.floor(Math.max(0, centerX) / safeSectorSize));
+		const row = getSectorRowFromBottom(centerY, sheetHeight, safeSectorSize);
+		const key = `${col}:${row}`;
+
+		if (!sectorMap.has(key)) {
+			sectorMap.set(key, {
+				key,
+				col,
+				row,
+				items: [],
+			});
+		}
+
+		sectorMap.get(key).items.push({
+			index,
+			partId: pos?.part_id ?? index,
+			centerX,
+			centerY,
+			pos,
+		});
+	});
+
+	const sectors = [...sectorMap.values()].map(sector => ({
+		...sector,
+		items: sortSectorItems(sector.items),
+	}));
+
+	// Phase 1 starts from the bottom-left checkerboard sector, then moves vertically.
+	return sortCheckerboardSectors(sectors).flatMap(sector =>
+		sector.items.map(item => item.pos).filter(Boolean)
+	);
 };
 
 export const getSheetCutQueue = (
