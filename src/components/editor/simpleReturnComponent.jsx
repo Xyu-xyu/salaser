@@ -6,6 +6,15 @@ import editorStore from "./../../store/editorStore.jsx";
 const SimpleReturnComponent = observer(() => {
 
 	const { mode } = editorStore
+	const activePartId = svgStore.laserShow.activePartId ?? null;
+	const hoverPartId = svgStore.laserShow.hoverPartId ?? null;
+	const currentOrder = Math.max(0, Number(svgStore.laserShow.currentOrder) || 0);
+	const completedPartIds = new Set(
+		svgStore.svgData.positions
+			.slice(0, Math.max(currentOrder - 1, 0))
+			.map(pos => pos.part_id)
+	);
+	const focusedPartId = hoverPartId ?? activePartId;
 
 	const setSelected = (e, part_id) => {
 		console.log ("setSelected ", mode)		
@@ -148,10 +157,38 @@ const SimpleReturnComponent = observer(() => {
 	const renderPos = (pos, posIndex) => {
 
 		const { a, b, c, d, e, f } = pos.positions;
+		const isActive = activePartId === pos.part_id;
+		const isHovered = hoverPartId === pos.part_id;
+		const isFocused = focusedPartId === pos.part_id;
+		const isCompleted = completedPartIds.has(pos.part_id);
+		const isDimmed = hoverPartId !== null && !isHovered;
 
-		const fillColor = pos.selected
-			? "var(--violetTransparent)"
-			: "var(--grey-nav)";
+		const fillColor = isActive
+			? "rgba(255, 106, 0, 0.42)"
+			: isCompleted
+				? "rgba(253, 126, 20, 0.28)"
+				: pos.selected
+					? "var(--violetTransparent)"
+					: "var(--grey-nav)";
+		const strokeColor = isActive
+			? "#ff5a00"
+			: isCompleted
+				? "#fd7e14"
+				: pos.selected
+					? "var(--violetTransparent)"
+					: "var(--grey-nav)";
+		const strokeWidth = isActive
+			? 3
+			: isFocused || isCompleted
+				? 2.5
+				: undefined;
+		const opacity = isDimmed
+			? 0.35
+			: isActive
+				? 1
+				: isCompleted
+					? 0.95
+					: 1;
 
 		return (
 			<g
@@ -173,7 +210,9 @@ const SimpleReturnComponent = observer(() => {
 				<use
 					href={`#part_${pos.part_code_id}`}
 					fill={fillColor}
-					stroke={fillColor}
+					stroke={strokeColor}
+					strokeWidth={strokeWidth}
+					opacity={opacity}
 					pointerEvents="visiblePainted"
 				/>
 
@@ -189,12 +228,19 @@ const SimpleReturnComponent = observer(() => {
 
 			{/* сначала НЕ выбранные */}
 			{svgStore.svgData.positions
+				.filter(pos => pos.part_id !== focusedPartId)
 				.filter(pos => !pos.selected)
 				.map((pos, posIndex) => renderPos(pos, posIndex))}
 
 			{/* потом выбранные — будут поверх */}
 			{svgStore.svgData.positions
+				.filter(pos => pos.part_id !== focusedPartId)
 				.filter(pos => pos.selected)
+				.map((pos, posIndex) => renderPos(pos, posIndex))}
+
+			{/* активная/наведенная деталь — всегда поверх */}
+			{svgStore.svgData.positions
+				.filter(pos => pos.part_id === focusedPartId)
 				.map((pos, posIndex) => renderPos(pos, posIndex))}
 		</>
 	);

@@ -6,6 +6,8 @@ import { toJS } from "mobx";
 
 const Panel = observer(({ element }) => {
 	const id = element.id
+	const contentDragDisabledIds = new Set(['cutPopup', 'sheetCutPopup']);
+	const isContentDragDisabled = contentDragDisabledIds.has(id);
 
 	useEffect(() => {
 		panelStore.getInitialPositions()
@@ -205,9 +207,9 @@ const Panel = observer(({ element }) => {
 				</div>
 			</div>
 			<div className={`window-content ${panelStore.positions[id].mini ? "mini" : ""}`}
-			 onMouseDown={handleMouseDown}
-			 onTouchStart={handleMouseDown} 
-			
+			 onMouseDown={isContentDragDisabled ? undefined : handleMouseDown}
+			 onTouchStart={isContentDragDisabled ? undefined : handleMouseDown}
+			 style={isContentDragDisabled ? { overflow: "hidden" } : undefined}
 			>
 				{element.content}
 			</div>

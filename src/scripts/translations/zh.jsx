@@ -463,6 +463,7 @@ const zh = {
     "Sheet size updated": "纸张尺寸已更新",
     "All parts of this type deleted": "该类型的所有部分均已删除",
     "Fill": "充满",
-    "Sheet filled with selected part": "填充了选定部分的工作表"
+    "Sheet filled with selected part": "填充了选定部分的工作表",
+    "Sheet cut order was changed": "裁切顺序已更改"
 }
 export default zh;

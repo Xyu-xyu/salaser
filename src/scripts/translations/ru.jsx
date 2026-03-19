@@ -485,6 +485,7 @@ const ru = {
     "Sheet size updated": "Размер листа обновлен.",
     "All parts of this type deleted": "Все части этого типа удалены",
     "Fill": "Заполнить",
-    "Sheet filled with selected part": "Лист, заполненный выбранной деталью"
+    "Sheet filled with selected part": "Лист заполнен",
+    "Sheet cut order was changed": "Порядок резки изменен."
 }
 export default ru;

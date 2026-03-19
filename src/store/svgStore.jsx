@@ -9,7 +9,18 @@ import jobStore from "./jobStore";
 
 class SvgStore {
 	tooltips = false;
-	laserShow = {};
+	laserShow = {
+		on: false,
+		paused: false,
+		speed: 50,
+		progress: 0,
+		seek: 0,
+		seekVersion: 0,
+		totalLength: 0,
+		activePartId: null,
+		hoverPartId: null,
+		currentOrder: 0,
+	};
 	highLighted = false;
 
 	svgData = {
@@ -155,6 +166,18 @@ class SvgStore {
 	}
 	setTooltips(val) {
 		this.tooltips = val
+	}
+
+	setLaserShow(val) {
+		Object.assign(this.laserShow, val);
+	}
+
+	reorderPositions(newOrder) {
+		if (!Array.isArray(newOrder)) return;
+
+		runInAction(() => {
+			this.svgData.positions = [...newOrder];
+		});
 	}
 
 	setVal(objectKey, pathOrKey, newValue) {

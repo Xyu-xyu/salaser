@@ -190,215 +190,137 @@ const CutPanel = observer(() => {
 				<div>{t('Cutting order')}</div>
 			</>),
 		content: (
-			<div className="d-flex flex-column">
-				<table className="table">
-					<tbody>
-						<tr>
-							<td>
-								<div className="d-flex align-items-center justify-content-evenly">
-									<TooltipCreator
-										element={{
-											id: 'speedPartShow',
-											info: (
-												<div className="ms-2 w-25">
-													<input
-														type="range"
-														className="form-range black-range"
-														id="speedPartShow"
-														step={1}
-														min={1}
-														max={100}
-														value={speed}
-														onChange={setShowSpeed}													
-													/>
-												</div>
-											)
-										}}
-									/>
- 									<div className="ms-2">
-										<TooltipCreator
-											element={
-												{
-													id: 'playCutPartOrder',
-													info:
-														(<button
-															type="button"
-															className="btn btn-sm violet_button"
-															id="playCutPartOrder"
-															onMouseDown={runCutQue}
-														>
-															<CustomIcon
-																icon="play"
-																width="24"
-																height="24"
-																color="white"
-																fill="white"
-																strokeWidth={0}
-															/>
-														</button>
-														)
-												}
-											}
+			<div className="d-flex flex-column h-100" style={{ overflow: "hidden" }}>
+				<div className="px-2 pt-2 pb-1">
+					<div className="d-flex align-items-center justify-content-evenly">
+						<TooltipCreator
+							element={{
+								id: 'speedPartShow',
+								info: (
+									<div className="ms-2 w-25">
+										<input
+											type="range"
+											className="form-range black-range"
+											id="speedPartShow"
+											step={1}
+											min={1}
+											max={100}
+											value={speed}
+											onChange={setShowSpeed}
 										/>
+									</div>
+								)
+							}}
+						/>
+						<div className="ms-2">
+							<TooltipCreator
+								element={{
+									id: 'playCutPartOrder',
+									info: (
 										<button
 											type="button"
-											className="btn btn-sm violet_button ms-1"
-											id="stopCutQue"
-											onMouseDown={stopCutQue}
+											className="btn btn-sm violet_button"
+											id="playCutPartOrder"
+											onMouseDown={runCutQue}
 										>
 											<CustomIcon
-												icon="stop"
+												icon="play"
 												width="24"
 												height="24"
 												color="white"
 												fill="white"
 												strokeWidth={0}
- 											/>
+											/>
 										</button>
-									</div>
-									<div className="ms-2">
-										<button
-											type="button"
-											className="btn btn-sm btn-primary w50 resizeCutItem violet_button"
-											onMouseDown={resizeCutItem}
-										>
-											<CustomIcon
-												icon="9"
-												width="24"
-												height="24"
-												color="white"
-												fill="white"
-												strokeWidth={0}
- 											/>
-										</button>
-										<button
-											type="button"
-											className="btn btn-sm btn-primary mx-1 w100 resizeCutItem violet_button"
-											onMouseDown={resizeCutItem}
-										>
-											<CustomIcon
-												icon="4"
-												width="24"
-												height="24"
-												color="white"
-												fill="white"
-												strokeWidth={0}
- 											/>
-										</button>
-										<button
-											type="button"
-											className="btn btn-sm btn-primary resizeCutItem violet_button"
-											onMouseDown={resizeCutItem}
-										>
-											<CustomIcon
-												icon="list"
-												width="24"
-												height="24"
-												color="white"
-												fill="white"
-												strokeWidth={1}
- 											/>
-										</button>
-									</div>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<div className="d-flex flex-column" id="editCutPartSquare" />
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<div className="d-flex flex-column" id="cutPartModel" />
-								{/* <div className="">
-									<nav>
-										<div className="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-											<button
-												className="nav-link "
-												id="nav-engraving-tab"
-												data-bs-toggle="tab"
-												data-bs-target="#nav-engraving"
-												type="button"
-												role="tab"
-												aria-controls="nav-engraving"
-												aria-selected="false"
-												tabIndex={-1}
-											>
-												{t('Engraving')}
-											</button>
-											<button
-												className="nav-link active"
-												id="nav-inner-tab"
-												data-bs-toggle="tab"
-												data-bs-target="#nav-inner"
-												type="button"
-												role="tab"
-												aria-controls="nav-inner"
-												aria-selected="false"
-												tabIndex={-1}
-											>
-												{t('Inner')}
-											</button>
-										</div>
-									</nav>
-									<div className="tab-content p-3" id="nav-tabContent">
-										<div
-											className="tab-pane fade"
-											id="nav-engraving"
-											role="tabpanel"
-											aria-labelledby="nav-engraving-tab"
-										>
-											<div className="gridWrapper">
-												<div id="engravingSort" ref={engSort}>
-													{engs.map((item, index) => (
-														createCenteredSVGPath(item)
-													))}
-												</div>
-											</div>
-										</div>
-										<div
-											className="tab-pane active show "
-											id="nav-inner"
-											role="tabpanel"
-											aria-labelledby="nav-inner-tab"
-										>
-											<div className="gridWrapper">
-												<div id="innerSort" ref={innerSort}>
-													{inners.map((item, index) => (
-														createCenteredSVGPath(item)
-													))}
-												</div>
-											</div>
-										</div>
-									</div>
-
-
-
-								</div> */}
-								<div className="gridWrapperCommon">
-									<div id="innerSort">
-										<ReactSortable
-											dragClass="sortableDrag"
-											filter=".addImageButtonContainer"
-											list={inners}
-											setList={setList}
-											animation={75}
-											easing="ease-out"
-											className='d-flex flex-row flex-wrap'
-											>
-											{inners.map((item, index) => (
-												
-												createCenteredSVGPath(item, index)
-												
-											))}
-										</ReactSortable>
-									</div> 
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+									)
+								}}
+							/>
+							<button
+								type="button"
+								className="btn btn-sm violet_button ms-1"
+								id="stopCutQue"
+								onMouseDown={stopCutQue}
+							>
+								<CustomIcon
+									icon="stop"
+									width="24"
+									height="24"
+									color="white"
+									fill="white"
+									strokeWidth={0}
+								/>
+							</button>
+						</div>
+						<div className="ms-2">
+							<button
+								type="button"
+								className="btn btn-sm btn-primary w50 resizeCutItem violet_button"
+								onMouseDown={resizeCutItem}
+							>
+								<CustomIcon
+									icon="9"
+									width="24"
+									height="24"
+									color="white"
+									fill="white"
+									strokeWidth={0}
+								/>
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm btn-primary mx-1 w100 resizeCutItem violet_button"
+								onMouseDown={resizeCutItem}
+							>
+								<CustomIcon
+									icon="4"
+									width="24"
+									height="24"
+									color="white"
+									fill="white"
+									strokeWidth={0}
+								/>
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm btn-primary resizeCutItem violet_button"
+								onMouseDown={resizeCutItem}
+							>
+								<CustomIcon
+									icon="list"
+									width="24"
+									height="24"
+									color="white"
+									fill="white"
+									strokeWidth={1}
+								/>
+							</button>
+						</div>
+					</div>
+					<div className="d-flex flex-column" id="editCutPartSquare" />
+					<div className="d-flex flex-column" id="cutPartModel" />
+				</div>
+				<div
+					className="px-2 pb-2"
+					style={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden" }}
+				>
+					<div className="gridWrapperCommon">
+						<div id="innerSort">
+							<ReactSortable
+								dragClass="sortableDrag"
+								filter=".addImageButtonContainer"
+								list={inners}
+								setList={setList}
+								animation={75}
+								easing="ease-out"
+								className='d-flex flex-row flex-wrap'
+							>
+								{inners.map((item, index) => (
+									createCenteredSVGPath(item, index)
+								))}
+							</ReactSortable>
+						</div>
+					</div>
+				</div>
 			</div>)
 	}
 

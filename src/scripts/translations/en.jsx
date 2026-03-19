@@ -509,6 +509,7 @@ const en = {
     "Sheet size updated": "Sheet size updated",
     "All parts of this type deleted": "All parts of this type deleted",
     "Fill": "Fill",
-    "Sheet filled with selected part": "Sheet filled with selected part"
+    "Sheet filled with selected part": "Sheet filled with selected part",
+    "Sheet cut order was changed": "Sheet cut order was changed"
 }
 export default en;
