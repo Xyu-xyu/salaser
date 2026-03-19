@@ -482,6 +482,9 @@ const ru = {
     "Shape added": "Фигура добавлена",
     "Part added": "Часть добавлена",
     "Selected parts deleted": "Выбранные части удалены",
-    "Sheet size updated": "Размер листа обновлен."
+    "Sheet size updated": "Размер листа обновлен.",
+    "All parts of this type deleted": "Все части этого типа удалены",
+    "Fill": "Заполнить",
+    "Sheet filled with selected part": "Лист, заполненный выбранной деталью"
 }
 export default ru;

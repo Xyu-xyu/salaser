@@ -37,6 +37,12 @@ const SheetAlignPanel = observer(() => {
 		setIntend(num);
 	};
 
+	const getPartByCodeId = (partCodeId) => {
+		return svgStore.svgData.part_code.find(part =>
+			part?.id === partCodeId || part?.uuid === partCodeId
+		);
+	};
+
 	const getMeasuredPaths = (part) => {
 		if (!Array.isArray(part?.code)) return [];
 
@@ -68,7 +74,7 @@ const SheetAlignPanel = observer(() => {
 	};
 
 	const getPositionBBox = (pos) => {
-		const part = svgStore.svgData.part_code.find(p => p.id === pos.part_code_id);
+		const part = getPartByCodeId(pos.part_code_id);
 		if (!part) return null;
 
 		const { a, b, c, d, e, f } = pos.positions;
@@ -99,6 +105,70 @@ const SheetAlignPanel = observer(() => {
 		if (!isFinite(minX)) return null;
 
 		return { pos, minX, minY, maxX, maxY };
+	};
+
+	const fill = () => {
+		const selected = svgStore.svgData.positions.filter(pos => pos.selected);
+		if (selected.length !== 1) return;
+
+		const templatePos = selected[0];
+		const templateBox = getPositionBBox(templatePos);
+		if (!templateBox) return;
+
+		const partWidth = templateBox.maxX - templateBox.minX;
+		const partHeight = templateBox.maxY - templateBox.minY;
+		if (partWidth <= 0 || partHeight <= 0) return;
+
+		const { a, b, c, d, e, f } = templatePos.positions;
+		const offsetMinX = templateBox.minX - e;
+		const offsetMinY = templateBox.minY - f;
+		const gap = Math.max(0, Number(intend) || 0);
+		const EPS = 0.0001;
+		const sheetWidth = svgStore.svgData.width;
+		const sheetHeight = svgStore.svgData.height;
+
+		const remainingPositions = svgStore.svgData.positions.filter(
+			pos => pos.part_id !== templatePos.part_id
+		);
+
+		let nextPartId = remainingPositions.length
+			? Math.max(...remainingPositions.map(pos => pos.part_id || 0)) + 1
+			: 1;
+
+		const { positions: _positions, selected: _selected, part_id: _partId, ...templateRest } = templatePos;
+		const filledPositions = [];
+
+		// Контейнер выше SVG повернут на -90deg, поэтому для SVG стартуем
+		// из левого нижнего угла и учитываем отступ из этого компонента.
+		for (let col = 0; ; col++) {
+			const targetMinX = gap + col * (partWidth + gap);
+			const targetMaxX = targetMinX + partWidth;
+			if (targetMaxX > sheetWidth - gap + EPS) break;
+
+			for (let row = 0; ; row++) {
+				const targetMinY = sheetHeight - gap - partHeight - row * (partHeight + gap);
+				if (targetMinY < gap - EPS) break;
+
+				filledPositions.push({
+					...templateRest,
+					part_id: nextPartId++,
+					selected: false,
+					positions: {
+						a,
+						b,
+						c,
+						d,
+						e: targetMinX - offsetMinX,
+						f: targetMinY - offsetMinY,
+					},
+				});
+			}
+		}
+
+		if (!filledPositions.length) return;
+
+		svgStore.svgData.positions = [...remainingPositions, ...filledPositions];
+		addToSheetLog('Sheet filled with selected part');
 	};
  
 	const alignItems = (direction) => {
@@ -438,10 +508,29 @@ const SheetAlignPanel = observer(() => {
 											height: "40px",
 											textAlign: "center",
 											fontSize: "16px",
-											marginLeft: "10px"
 										}}
 										className="form-control"
 									/>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<table className="table">
+					<thead className="table-dark">
+						<tr>
+							<th colSpan={5}>{t('Clone')}</th>
+						</tr> 
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<div className="d-flex align-items-center justify-content-around">
+								<div className="me-4">
+									<button type="button" className="btn btn-sm mt-1 ms-2 btn-secondary violet_button"								
+									onMouseDown={fill}>{t('Fill')}
+									</button>
+								</div>									
 								</div>
 							</td>
 						</tr>

@@ -460,6 +460,9 @@ const zh = {
     "Shape added": "添加形状",
     "Part added": "添加部分",
     "Selected parts deleted": "选定的部分已删除",
-    "Sheet size updated": "纸张尺寸已更新"
+    "Sheet size updated": "纸张尺寸已更新",
+    "All parts of this type deleted": "该类型的所有部分均已删除",
+    "Fill": "充满",
+    "Sheet filled with selected part": "填充了选定部分的工作表"
 }
 export default zh;

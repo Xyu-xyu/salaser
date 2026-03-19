@@ -506,6 +506,9 @@ const en = {
     "Shape added": "Shape added",
     "Part added": "Part added",
     "Selected parts deleted": "Selected parts deleted",
-    "Sheet size updated": "Sheet size updated"
+    "Sheet size updated": "Sheet size updated",
+    "All parts of this type deleted": "All parts of this type deleted",
+    "Fill": "Fill",
+    "Sheet filled with selected part": "Sheet filled with selected part"
 }
 export default en;
