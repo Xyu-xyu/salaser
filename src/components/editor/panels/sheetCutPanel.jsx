@@ -605,7 +605,6 @@ const SheetCutPanel = observer(() => {
 							>
 								{t("auto")}
 							</button>
-							
 						</div>
 						<div className="d-flex align-items-center">
 							<label

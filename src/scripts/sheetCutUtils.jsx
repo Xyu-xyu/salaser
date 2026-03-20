@@ -1,5 +1,6 @@
 import SVGPathCommander from "svg-path-commander";
 import svgPath from "svgpath";
+import util from "./util.jsx";
 
 const partPreviewCache = new WeakMap();
 const partCutItemCache = new WeakMap();
@@ -174,6 +175,8 @@ const getPartPreviewData = (part) => {
 	if (cached?.signature === signature) return cached.result;
 
 	const contourPaths = [];
+	const outerContourPaths = [];
+	const innerContourPaths = [];
 	const inletOutletPaths = [];
 
 	part.code.forEach(item => {
@@ -181,6 +184,11 @@ const getPartPreviewData = (part) => {
 
 		if (hasClass(item, "contour")) {
 			contourPaths.push(item.path);
+			if (hasClass(item, "outer")) {
+				outerContourPaths.push(item.path);
+			} else if (hasClass(item, "inner")) {
+				innerContourPaths.push(item.path);
+			}
 		}
 
 		if (hasClass(item, "inlet") || hasClass(item, "outlet")) {
@@ -189,10 +197,21 @@ const getPartPreviewData = (part) => {
 	});
 
 	const contourPath = contourPaths.join(" z ");
+	const outerContourPath = (outerContourPaths.length ? outerContourPaths : contourPaths).join(" z ");
+	const innerContourPath = innerContourPaths.join(" z ");
 	const inletOutletPath = inletOutletPaths.join(" ");
 	const bbox = getPartBaseBBox(part, `${contourPath} ${inletOutletPath}`);
 	const result = bbox
-		? { bbox, contourPath, inletOutletPath, part }
+		? {
+			bbox,
+			contourPath,
+			outerContourPath,
+			outerContourPaths: [...(outerContourPaths.length ? outerContourPaths : contourPaths)],
+			innerContourPath,
+			innerContourPaths: [...innerContourPaths],
+			inletOutletPath,
+			part,
+		}
 		: null;
 
 	partPreviewCache.set(part, {
@@ -221,6 +240,17 @@ export const getPositionPreviewData = (svgData, pos) => {
 	return {
 		...previewData,
 		bbox: transformBBox(previewData.bbox, pos),
+		outerContourPaths: (previewData.outerContourPaths || [])
+			.map(path => transformPositionPath(path, pos))
+			.filter(Boolean),
+		innerContourPath: transformPositionPath(previewData.innerContourPath, pos),
+		innerContourPaths: (previewData.innerContourPaths || [])
+			.map(path => transformPositionPath(path, pos))
+			.filter(Boolean),
+		outerContourPath: transformPositionPath(
+			previewData.outerContourPath || previewData.contourPath,
+			pos
+		),
 	};
 };
 
@@ -258,25 +288,224 @@ const sortCheckerboardSectors = (sectors) => {
 	return [...firstPhase, ...secondPhase];
 };
 
-export const getAutoSheetCutOrder = (
-	svgData,
-	sectorSize = SHEET_CUT_DEFAULT_SECTOR_SIZE
-) => {
-	if (!svgData || !Array.isArray(svgData.positions) || !svgData.positions.length) {
+const getBBoxArea = (bbox) => Math.max(0, (bbox?.width || 0) * (bbox?.height || 0));
+
+const getPathVertices = (path) => {
+	if (!path?.trim()) {
 		return [];
 	}
 
-	const safeSectorSize = clampSheetCutSectorSize(svgData, sectorSize);
-	const sheetHeight = Number(svgData?.height) || 0;
+	try {
+		const points = util.pathToPolyline(path, 1)
+			.split(";")
+			.map(point => point.split(",").map(Number))
+			.filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y))
+			.map(([x, y]) => ({ x, y }));
+		const vertices = [];
+
+		points.forEach(point => {
+			const previousPoint = vertices[vertices.length - 1];
+			if (
+				previousPoint &&
+				Math.abs(previousPoint.x - point.x) <= EPSILON &&
+				Math.abs(previousPoint.y - point.y) <= EPSILON
+			) {
+				return;
+			}
+
+			vertices.push(point);
+		});
+
+		if (vertices.length > 1) {
+			const firstPoint = vertices[0];
+			const lastPoint = vertices[vertices.length - 1];
+			if (
+				Math.abs(firstPoint.x - lastPoint.x) <= EPSILON &&
+				Math.abs(firstPoint.y - lastPoint.y) <= EPSILON
+			) {
+				vertices.pop();
+			}
+		}
+
+		return vertices;
+	} catch (error) {
+		console.warn("Path vertex detection error:", error);
+		return [];
+	}
+};
+
+const containsPointInVertices = (point, vertices) => {
+	if (!point || !Array.isArray(vertices) || vertices.length < 3) {
+		return false;
+	}
+
+	const x = Array.isArray(point) ? point[0] : point.x;
+	const y = Array.isArray(point) ? point[1] : point.y;
+	let inside = false;
+
+	for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+		const xi = vertices[i].x;
+		const yi = vertices[i].y;
+		const xj = vertices[j].x;
+		const yj = vertices[j].y;
+		const intersect = ((yi > y) !== (yj > y))
+			&& (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+
+		if (intersect) inside = !inside;
+	}
+
+	return inside;
+};
+
+const containsPointInAnyPolygon = (point, polygons = []) =>
+	polygons.some(vertices => containsPointInVertices(point, vertices));
+
+const createPathPointTester = (paths) => {
+	const pathList = Array.isArray(paths) ? paths : [paths];
+	const polygons = pathList
+		.filter(path => typeof path === "string" && path.trim().length > 0)
+		.map(path => getPathVertices(path))
+		.filter(vertices => vertices.length >= 3);
+
+	if (!polygons.length) {
+		return null;
+	}
+
+	return (point) => containsPointInAnyPolygon(point, polygons);
+};
+
+const getRepresentativePoint = (bbox, containsPoint) => {
+	if (!bbox) {
+		return { x: 0, y: 0 };
+	}
+
+	const candidates = [
+		{ x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 },
+		{ x: bbox.x + bbox.width * 0.25, y: bbox.y + bbox.height * 0.25 },
+		{ x: bbox.x + bbox.width * 0.75, y: bbox.y + bbox.height * 0.25 },
+		{ x: bbox.x + bbox.width * 0.25, y: bbox.y + bbox.height * 0.75 },
+		{ x: bbox.x + bbox.width * 0.75, y: bbox.y + bbox.height * 0.75 },
+	];
+
+	return candidates.find(point => !containsPoint || containsPoint(point)) || candidates[0];
+};
+
+const dedupePoints = (points) => {
+	const seen = new Set();
+
+	return points.filter(point => {
+		if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) {
+			return false;
+		}
+
+		const key = `${point.x.toFixed(4)}:${point.y.toFixed(4)}`;
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
+};
+
+const getFallbackExtremePoints = (bbox, containsPoint) => {
+	if (!bbox) {
+		return [{ x: 0, y: 0 }];
+	}
+
+	const points = [
+		{ x: bbox.x, y: bbox.y },
+		{ x: bbox.x + bbox.width, y: bbox.y },
+		{ x: bbox.x, y: bbox.y + bbox.height },
+		{ x: bbox.x + bbox.width, y: bbox.y + bbox.height },
+		{ x: bbox.x + bbox.width / 2, y: bbox.y },
+		{ x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height },
+		{ x: bbox.x, y: bbox.y + bbox.height / 2 },
+		{ x: bbox.x + bbox.width, y: bbox.y + bbox.height / 2 },
+		getRepresentativePoint(bbox, containsPoint),
+	];
+
+	return dedupePoints(points);
+};
+
+const getExtremePoints = (paths, bbox, containsPoint) => {
+	const pathList = Array.isArray(paths) ? paths : [paths];
+	if (!pathList.some(path => path?.trim())) {
+		return getFallbackExtremePoints(bbox, containsPoint);
+	}
+
+	try {
+		const contourPoints = pathList.flatMap(path => getPathVertices(path));
+
+		if (!contourPoints.length) {
+			return getFallbackExtremePoints(bbox, containsPoint);
+		}
+
+		const xs = contourPoints.map(point => point.x);
+		const ys = contourPoints.map(point => point.y);
+		const minX = Math.min(...xs);
+		const maxX = Math.max(...xs);
+		const minY = Math.min(...ys);
+		const maxY = Math.max(...ys);
+		const tolerance = Math.max(EPSILON, Math.max(maxX - minX, maxY - minY) * 0.005);
+		const extremePoints = contourPoints.filter(point =>
+			Math.abs(point.x - minX) <= tolerance ||
+			Math.abs(point.x - maxX) <= tolerance ||
+			Math.abs(point.y - minY) <= tolerance ||
+			Math.abs(point.y - maxY) <= tolerance
+		);
+
+		return dedupePoints([
+			...extremePoints,
+			getRepresentativePoint(bbox, containsPoint),
+		]);
+	} catch (error) {
+		console.warn("Extreme point detection error:", error);
+		return getFallbackExtremePoints(bbox, containsPoint);
+	}
+};
+
+const getSheetCutPositionItems = (svgData) =>
+	(Array.isArray(svgData?.positions) ? svgData.positions : [])
+		.map((pos, index) => {
+			const preview = getPositionPreviewData(svgData, pos);
+			const bbox = preview?.bbox;
+			const centerX = bbox ? bbox.x + bbox.width / 2 : Number(pos?.cx) || 0;
+			const centerY = bbox ? bbox.y + bbox.height / 2 : Number(pos?.cy) || 0;
+			const outerContourPath = preview?.outerContourPath || preview?.contourPath || "";
+			const outerContourPaths = preview?.outerContourPaths?.length
+				? preview.outerContourPaths
+				: [outerContourPath];
+			const containsPoint = createPathPointTester(outerContourPaths);
+			const extremePoints = getExtremePoints(outerContourPaths, bbox, containsPoint);
+
+			return {
+				index,
+				partId: pos?.part_id ?? index,
+				centerX,
+				centerY,
+				pos,
+				bbox,
+				bboxArea: getBBoxArea(bbox),
+				outerContourPath,
+				containsPoint,
+				extremePoints,
+				representativePoint: extremePoints[0] || { x: centerX, y: centerY },
+			};
+		})
+		.filter(item => item.pos);
+
+const isPointInsideBBox = (point, bbox, tolerance = 0) => (
+	Boolean(point && bbox) &&
+	point.x >= bbox.x - tolerance &&
+	point.x <= bbox.x + bbox.width + tolerance &&
+	point.y >= bbox.y - tolerance &&
+	point.y <= bbox.y + bbox.height + tolerance
+);
+
+const getSectorOrderedItems = (items, sheetHeight, sectorSize) => {
 	const sectorMap = new Map();
 
-	svgData.positions.forEach((pos, index) => {
-		const preview = getPositionPreviewData(svgData, pos);
-		const bbox = preview?.bbox;
-		const centerX = bbox ? bbox.x + bbox.width / 2 : Number(pos?.cx) || 0;
-		const centerY = bbox ? bbox.y + bbox.height / 2 : Number(pos?.cy) || 0;
-		const col = Math.max(0, Math.floor(Math.max(0, centerX) / safeSectorSize));
-		const row = getSectorRowFromBottom(centerY, sheetHeight, safeSectorSize);
+	items.forEach(item => {
+		const col = Math.max(0, Math.floor(Math.max(0, item.centerX) / sectorSize));
+		const row = getSectorRowFromBottom(item.centerY, sheetHeight, sectorSize);
 		const key = `${col}:${row}`;
 
 		if (!sectorMap.has(key)) {
@@ -288,13 +517,7 @@ export const getAutoSheetCutOrder = (
 			});
 		}
 
-		sectorMap.get(key).items.push({
-			index,
-			partId: pos?.part_id ?? index,
-			centerX,
-			centerY,
-			pos,
-		});
+		sectorMap.get(key).items.push(item);
 	});
 
 	const sectors = [...sectorMap.values()].map(sector => ({
@@ -302,8 +525,93 @@ export const getAutoSheetCutOrder = (
 		items: sortSectorItems(sector.items),
 	}));
 
-	// Phase 1 starts from the bottom-left checkerboard sector, then moves vertically.
-	return sortCheckerboardSectors(sectors).flatMap(sector =>
-		sector.items.map(item => item.pos).filter(Boolean)
+	return sortCheckerboardSectors(sectors).flatMap(sector => sector.items);
+};
+
+const isNestedInside = (outerItem, innerItem) => {
+	if (outerItem.partId === innerItem.partId) return false;
+	if (!outerItem.bbox || !Array.isArray(innerItem.extremePoints)) return false;
+	if (outerItem.bboxArea <= innerItem.bboxArea + EPSILON) return false;
+
+	const tolerance = Math.max(
+		EPSILON,
+		Math.min(outerItem.bbox.width || 0, outerItem.bbox.height || 0) * 0.01
 	);
+	const nestedExtremePoints = (innerItem.extremePoints || [])
+		.filter(point => isPointInsideBBox(point, outerItem.bbox, tolerance));
+	const contourTester = outerItem.containsPoint;
+
+	if (!nestedExtremePoints.length || typeof contourTester !== "function") {
+		return false;
+	}
+
+	return nestedExtremePoints.some(point => contourTester(point));
+};
+
+const prioritizeNestedDetailOrder = (items) => {
+	const itemById = new Map(items.map(item => [item.partId, item]));
+	const baseOrderIndex = new Map(items.map((item, index) => [item.partId, index]));
+	const nestedPartIdsByOuterPartId = new Map(
+		items.map(item => [item.partId, []])
+	);
+
+	items.forEach(outerItem => {
+		const nestedPartIds = items
+			.filter(innerItem => isNestedInside(outerItem, innerItem))
+			.map(innerItem => innerItem.partId)
+			.sort(
+				(left, right) =>
+					(baseOrderIndex.get(left) ?? 0) - (baseOrderIndex.get(right) ?? 0)
+			);
+
+		nestedPartIdsByOuterPartId.set(outerItem.partId, nestedPartIds);
+	});
+
+	const orderedItems = [];
+	const emittedPartIds = new Set();
+	const activePartIds = new Set();
+
+	const appendItemWithNestedDetails = (item) => {
+		if (!item) return;
+		if (emittedPartIds.has(item.partId)) return;
+		if (activePartIds.has(item.partId)) return;
+
+		activePartIds.add(item.partId);
+
+		(nestedPartIdsByOuterPartId.get(item.partId) || []).forEach(nestedPartId => {
+			appendItemWithNestedDetails(itemById.get(nestedPartId));
+		});
+
+		activePartIds.delete(item.partId);
+
+		if (!emittedPartIds.has(item.partId)) {
+			emittedPartIds.add(item.partId);
+			orderedItems.push(item);
+		}
+	};
+
+	items.forEach(item => {
+		appendItemWithNestedDetails(item);
+	});
+
+	return orderedItems;
+};
+
+export const getAutoSheetCutOrder = (
+	svgData,
+	sectorSize = SHEET_CUT_DEFAULT_SECTOR_SIZE
+) => {
+	if (!svgData || !Array.isArray(svgData.positions) || !svgData.positions.length) {
+		return [];
+	}
+
+	const safeSectorSize = clampSheetCutSectorSize(svgData, sectorSize);
+	const sheetHeight = Number(svgData?.height) || 0;
+	const items = prioritizeNestedDetailOrder(
+		getSectorOrderedItems(getSheetCutPositionItems(svgData), sheetHeight, safeSectorSize)
+	);
+
+	// Phase 1 starts from the bottom-left checkerboard sector, then moves vertically.
+	return items.map(item => item.pos)
+		.filter(Boolean);
 };
