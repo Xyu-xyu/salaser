@@ -17,8 +17,8 @@ const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
 const SheetCutPanel = observer(() => {
 	const { t } = useTranslation();
-	const [WH, setWH] = useState({ w: 100, h: 100 });
-	const [miniSvg, setMiniSvg] = useState({ sizeX: 50, sizeY: 50 });
+	const [WH, setWH] = useState({ w: 50, h: 50 });
+	const [miniSvg, setMiniSvg] = useState({ sizeX: 25, sizeY: 25 });
 	const isMini = panelStore.positions.sheetCutPopup?.mini ?? true;
 	const positions = isMini ? [] : svgStore.svgData.positions.slice();
 	const activeCutOrderMode = svgStore.getSheetCutMode();
@@ -355,12 +355,12 @@ const SheetCutPanel = observer(() => {
 		content: isMini ? null : (
 			<div className="d-flex flex-column h-100" style={{ overflow: "hidden" }}>
 				<div className="px-2 pt-2 pb-1">
-					<div className="d-flex align-items-center justify-content-evenly">
+					<div className="d-flex align-items-center justify-content-between">
 						<TooltipCreator
 							element={{
 								id: "sheetSpeedPartShow",
 								info: (
-									<div className="ms-2 w-25">
+									<div className="ms-2 w-50">
 										<input
 											type="range"
 											className="form-range black-range"
@@ -382,7 +382,7 @@ const SheetCutPanel = observer(() => {
 									info: (
 										<button
 											type="button"
-											className="btn btn-sm violet_button"
+											className="btn btn-sm violet_button me-2"
 											id="playSheetCutPartOrder"
 											onMouseDown={runCutQue}
 											disabled={isPlaying}
@@ -401,7 +401,7 @@ const SheetCutPanel = observer(() => {
 							/>
 							<button
 								type="button"
-								className="btn btn-sm violet_button ms-1"
+								className="btn btn-sm violet_button ms-1 me-2"
 								id="pauseSheetCutQue"
 								onMouseDown={pauseCutQue}
 								disabled={!svgStore.laserShow.on || isPaused}
@@ -417,7 +417,7 @@ const SheetCutPanel = observer(() => {
 							</button>
 							<button
 								type="button"
-								className="btn btn-sm violet_button ms-1"
+								className="btn btn-sm violet_button ms-1 me-2"
 								id="stopSheetCutQue"
 								onMouseDown={stopCutQue}
 							>
@@ -428,50 +428,6 @@ const SheetCutPanel = observer(() => {
 									color="white"
 									fill="white"
 									strokeWidth={0}
-								/>
-							</button>
-						</div>
-						<div className="ms-2">
-							<button
-								type="button"
-								className="btn btn-sm btn-primary w50 resizeCutItem violet_button"
-								onMouseDown={resizeCutItem}
-							>
-								<CustomIcon
-									icon="9"
-									width="24"
-									height="24"
-									color="white"
-									fill="white"
-									strokeWidth={0}
-								/>
-							</button>
-							<button
-								type="button"
-								className="btn btn-sm btn-primary mx-1 w100 resizeCutItem violet_button"
-								onMouseDown={resizeCutItem}
-							>
-								<CustomIcon
-									icon="4"
-									width="24"
-									height="24"
-									color="white"
-									fill="white"
-									strokeWidth={0}
-								/>
-							</button>
-							<button
-								type="button"
-								className="btn btn-sm btn-primary resizeCutItem violet_button"
-								onMouseDown={resizeCutItem}
-							>
-								<CustomIcon
-									icon="list"
-									width="24"
-									height="24"
-									color="white"
-									fill="white"
-									strokeWidth={1}
 								/>
 							</button>
 						</div>
@@ -487,7 +443,7 @@ const SheetCutPanel = observer(() => {
 								style={getCutOrderButtonStyle("current")}
 								onMouseDown={() => showSavedOrder("current")}
 							>
-								current
+								{t("current")}
 							</button>
 							<button
 								type="button"
@@ -495,16 +451,9 @@ const SheetCutPanel = observer(() => {
 								style={getCutOrderButtonStyle("auto")}
 								onMouseDown={setAutoOrder}
 							>
-								auto
+								{t("auto")}
 							</button>
-							<button
-								type="button"
-								className="btn btn-sm violet_button text-white"
-								style={getCutOrderButtonStyle("manual")}
-								onMouseDown={() => showSavedOrder("manual")}
-							>
-								manual
-							</button>
+							
 						</div>
 						<div className="d-flex align-items-center">
 							<label

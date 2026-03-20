@@ -8,9 +8,47 @@ import {
 } from "./../../scripts/sheetCutUtils.jsx";
 
 const VISIBILITY_CHECK_INTERVAL = 250;
-const TAIL_POINT_LIMIT = 36;
+const TAIL_LENGTH = 20;
+const TAIL_MIN_VISIBLE_LENGTH = 0.01;
 const STORE_SYNC_INTERVAL = 100;
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const formatTailValue = (value) => Number(value.toFixed(3));
+
+const getFixedTailSegments = (queue, requestedLength) => {
+	if (!queue?.segments?.length || !Number.isFinite(queue.totalLength) || queue.totalLength <= 0) {
+		return [];
+	}
+
+	const currentLength = clamp(requestedLength, 0, queue.totalLength);
+	if (currentLength <= 0) return [];
+
+	const tailStart = Math.max(0, currentLength - TAIL_LENGTH);
+
+	return queue.segments.reduce((segments, segment) => {
+		const visibleStart = Math.max(segment.start, tailStart);
+		const visibleEnd = Math.min(segment.end, currentLength);
+		const visibleLength = visibleEnd - visibleStart;
+
+		if (!Number.isFinite(visibleLength) || visibleLength <= TAIL_MIN_VISIBLE_LENGTH) {
+			return segments;
+		}
+
+		const localStart = clamp(visibleStart - segment.start, 0, segment.length);
+		segments.push({
+			id: `${segment.id}_${formatTailValue(localStart)}_${formatTailValue(visibleLength)}`,
+			d: segment.d,
+			length: formatTailValue(segment.length),
+			dasharray: [
+				formatTailValue(localStart),
+				formatTailValue(visibleLength),
+				formatTailValue(segment.length),
+			].join(" "),
+		});
+
+		return segments;
+	}, []);
+};
 
 const SheetLaserShow = observer(() => {
 	const { laserShow, svgData } = svgStore;
@@ -27,7 +65,6 @@ const SheetLaserShow = observer(() => {
 	const lastFrameRef = useRef(null);
 	const lastStoreSyncRef = useRef(0);
 	const progressLengthRef = useRef(0);
-	const tailPointsRef = useRef([]);
 	const queueRef = useRef({
 		signature: "",
 		segments: [],
@@ -50,10 +87,8 @@ const SheetLaserShow = observer(() => {
 	}, []);
 
 	const clearVisuals = useCallback(() => {
-		tailPointsRef.current = [];
-
 		if (tailRef.current) {
-			tailRef.current.setAttribute("d", "");
+			tailRef.current.replaceChildren();
 			tailRef.current.style.display = "none";
 		}
 
@@ -129,44 +164,37 @@ const SheetLaserShow = observer(() => {
 		markerRef.current.setAttribute("cy", `${point.y}`);
 	}, []);
 
-	const updateTail = useCallback((point, resetTail = false) => {
+	const updateTail = useCallback((queue, progressLength) => {
 		if (!tailRef.current) return;
 
-		const nextPoint = {
-			x: Number(point.x.toFixed(3)),
-			y: Number(point.y.toFixed(3)),
-		};
+		const tailSegments = getFixedTailSegments(queue, progressLength);
+		tailRef.current.replaceChildren();
 
-		if (resetTail || !tailPointsRef.current.length) {
-			tailPointsRef.current = [nextPoint];
-		} else {
-			const lastPoint = tailPointsRef.current[tailPointsRef.current.length - 1];
-			if (!lastPoint || lastPoint.x !== nextPoint.x || lastPoint.y !== nextPoint.y) {
-				tailPointsRef.current.push(nextPoint);
-			}
-			if (tailPointsRef.current.length > TAIL_POINT_LIMIT) {
-				tailPointsRef.current.shift();
-			}
-		}
-
-		if (tailPointsRef.current.length < 2) {
-			tailRef.current.setAttribute("d", "");
+		if (!tailSegments.length) {
 			tailRef.current.style.display = "none";
 			return;
 		}
 
-		const tailPath = tailPointsRef.current.map((tailPoint, index) => (
-			index === 0
-				? `M ${tailPoint.x} ${tailPoint.y}`
-				: `L ${tailPoint.x} ${tailPoint.y}`
-		)).join(" ");
+		const svgNS = "http://www.w3.org/2000/svg";
+		tailSegments.forEach(segment => {
+			const pathElement = document.createElementNS(svgNS, "path");
+			pathElement.setAttribute("d", segment.d);
+			pathElement.setAttribute("fill", "none");
+			pathElement.setAttribute("stroke", "red");
+			pathElement.setAttribute("stroke-width", "1");
+			pathElement.setAttribute("stroke-linecap", "round");
+			pathElement.setAttribute("stroke-linejoin", "round");
+			pathElement.setAttribute("vector-effect", "non-scaling-stroke");
+			pathElement.setAttribute("pathLength", `${segment.length}`);
+			pathElement.setAttribute("stroke-dasharray", segment.dasharray);
+			tailRef.current.appendChild(pathElement);
+		});
 
 		tailRef.current.style.display = "block";
-		tailRef.current.setAttribute("d", tailPath);
 	}, []);
 
 	const renderAtLength = useCallback((requestedLength, options = {}) => {
-		const { resetTail = false, forceSync = false } = options;
+		const { forceSync = false } = options;
 		const queue = ensureQueue();
 
 		if (!queue.totalLength || !queue.segments.length) {
@@ -196,7 +224,7 @@ const SheetLaserShow = observer(() => {
 
 		progressLengthRef.current = pointInfo.progressLength;
 		updateMarker(pointInfo.point);
-		updateTail(pointInfo.point, resetTail);
+		updateTail(queue, pointInfo.progressLength);
 		syncLaserShowState({
 			progress: pointInfo.progressPercent,
 			activePartId: pointInfo.partId,
@@ -325,10 +353,8 @@ const SheetLaserShow = observer(() => {
 		const progressToRender = !isPaused && requestedProgress >= 100
 			? 0
 			: requestedProgress;
-		const resetTail = !tailPointsRef.current.length || progressToRender <= 0;
 
 		renderAtPercent(progressToRender, {
-			resetTail,
 			forceSync: true,
 		});
 
@@ -374,7 +400,6 @@ const SheetLaserShow = observer(() => {
 		stopAnimation();
 		startVisibilityWatch();
 		renderAtPercent(requestedProgress, {
-			resetTail: true,
 			forceSync: true,
 		});
 
@@ -432,13 +457,10 @@ const SheetLaserShow = observer(() => {
 
 	return (
 		<>
-			<path
+			<g
 				ref={tailRef}
 				id="sheetLaserShowTail"
 				className="cutDot"
-				fill="none"
-				stroke="red"
-				strokeWidth="1"
 				pointerEvents="none"
 				style={{ display: "none", opacity: 0.55 }}
 			/>

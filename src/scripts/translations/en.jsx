@@ -511,6 +511,8 @@ const en = {
     "Fill": "Fill",
     "Sheet filled with selected part": "Sheet filled with selected part",
     "Sheet cut order was changed": "Sheet cut order was changed",
-    "No previous log entry found.": "No previous log entry found."
+    "No previous log entry found.": "No previous log entry found.",
+    "current": "current",
+    "auto": "auto"
 }
 export default en;

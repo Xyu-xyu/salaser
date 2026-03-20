@@ -487,6 +487,7 @@ const ru = {
     "Fill": "Заполнить",
     "Sheet filled with selected part": "Лист заполнен",
     "Sheet cut order was changed": "Порядок резки изменен.",
-    "No previous log entry found.": "Предыдущая запись журнала не найдена."
+    "No previous log entry found.": "Предыдущая запись журнала не найдена.",
+    "auto": "авто"
 }
 export default ru;

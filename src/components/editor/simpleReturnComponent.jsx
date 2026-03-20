@@ -163,8 +163,10 @@ const SimpleReturnComponent = observer(() => {
 		const isCompleted = completedPartIds.has(pos.part_id);
 		const isDimmed = hoverPartId !== null && !isHovered;
 
-		const fillColor = isActive
-			? "rgba(255, 106, 0, 0.42)"
+		const fillColor = isHovered
+			? "var(--violet)"
+			: isActive
+				? "rgba(255, 106, 0, 0.42)"
 			: isCompleted
 				? "rgba(253, 126, 20, 0.28)"
 				: pos.selected
@@ -182,13 +184,15 @@ const SimpleReturnComponent = observer(() => {
 			: isFocused || isCompleted
 				? 2.5
 				: undefined;
-		const opacity = isDimmed
+		const opacity = /*isDimmed
 			? 0.35
-			: isActive
-				? 1
-				: isCompleted
-					? 0.95
-					: 1;
+			: */isHovered
+				? 0.8
+				: isActive
+					? 1
+					: isCompleted
+						? 0.95
+						: 1;
 
 		return (
 			<g

@@ -65,7 +65,6 @@ const SvgComponent = observer (() => {
                        <SelectedPointOnEdge/>
                        <SelectedPointOnPath/>
                        <SelectedEdge/>
-                       <HighLighted />
                        <LaserShow /> */}
                     </g>
                 </g>
