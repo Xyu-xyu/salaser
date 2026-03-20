@@ -8,10 +8,14 @@ const SimpleReturnComponent = observer(() => {
 	const { mode } = editorStore
 	const activePartId = svgStore.laserShow.activePartId ?? null;
 	const hoverPartId = svgStore.laserShow.hoverPartId ?? null;
-	const currentOrder = Math.max(0, Number(svgStore.laserShow.currentOrder) || 0);
+	const positions = svgStore.svgData.positions;
+	const rawCurrentOrder = Math.max(0, Number(svgStore.laserShow.currentOrder) || 0);
+	const completedCount = activePartId === null && rawCurrentOrder > positions.length
+		? positions.length
+		: Math.max(Math.min(rawCurrentOrder - 1, positions.length), 0);
 	const completedPartIds = new Set(
-		svgStore.svgData.positions
-			.slice(0, Math.max(currentOrder - 1, 0))
+		positions
+			.slice(0, completedCount)
 			.map(pos => pos.part_id)
 	);
 	const focusedPartId = hoverPartId ?? activePartId;
@@ -231,19 +235,19 @@ const SimpleReturnComponent = observer(() => {
 			</defs>
 
 			{/* сначала НЕ выбранные */}
-			{svgStore.svgData.positions
+			{positions
 				.filter(pos => pos.part_id !== focusedPartId)
 				.filter(pos => !pos.selected)
 				.map((pos, posIndex) => renderPos(pos, posIndex))}
 
 			{/* потом выбранные — будут поверх */}
-			{svgStore.svgData.positions
+			{positions
 				.filter(pos => pos.part_id !== focusedPartId)
 				.filter(pos => pos.selected)
 				.map((pos, posIndex) => renderPos(pos, posIndex))}
 
 			{/* активная/наведенная деталь — всегда поверх */}
-			{svgStore.svgData.positions
+			{positions
 				.filter(pos => pos.part_id === focusedPartId)
 				.map((pos, posIndex) => renderPos(pos, posIndex))}
 		</>

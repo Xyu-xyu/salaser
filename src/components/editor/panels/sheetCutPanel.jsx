@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Panel from "./panel.jsx";
 import svgStore from "./../../../store/svgStore.jsx";
@@ -14,53 +14,216 @@ import {
 import panelStore from "./../../../store/panelStore.jsx";
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const PLAYBACK_PART_DURATION_FACTOR = 8;
+const PLAYBACK_PART_MIN_DURATION = 12;
+
+const getPlaybackPartDuration = (speed = 50) => {
+	const safeSpeed = clamp(Number(speed) || 50, 1, 100);
+	return Math.max(PLAYBACK_PART_MIN_DURATION, (101 - safeSpeed) * PLAYBACK_PART_DURATION_FACTOR);
+};
+
+const getPlaybackStateByProgress = (positions, progressPercent = 0) => {
+	const clampedProgress = clamp(Number(progressPercent) || 0, 0, 100);
+	const totalParts = positions.length;
+
+	if (!totalParts) {
+		return {
+			progress: 0,
+			seek: 0,
+			activePartId: null,
+			currentOrder: 0,
+		};
+	}
+
+	if (clampedProgress >= 100) {
+		return {
+			progress: 100,
+			seek: 100,
+			activePartId: null,
+			currentOrder: totalParts + 1,
+		};
+	}
+
+	const activeIndex = Math.min(
+		totalParts - 1,
+		Math.max(0, Math.floor((clampedProgress / 100) * totalParts))
+	);
+
+	return {
+		progress: clampedProgress,
+		seek: clampedProgress,
+		activePartId: positions[activeIndex]?.part_id ?? null,
+		currentOrder: activeIndex + 1,
+	};
+};
 
 const SheetCutPanel = observer(() => {
 	const { t } = useTranslation();
 	const [WH, setWH] = useState({ w: 50, h: 50 });
 	const [miniSvg, setMiniSvg] = useState({ sizeX: 25, sizeY: 25 });
 	const isMini = panelStore.positions.sheetCutPopup?.mini ?? true;
-	const positions = isMini ? [] : svgStore.svgData.positions.slice();
+	const orderedPositions = svgStore.svgData.positions.slice();
+	const positions = isMini ? [] : orderedPositions;
 	const activeCutOrderMode = svgStore.getSheetCutMode();
 	const sectorSize = svgStore.getSheetCutSectorSize();
 	const maxSectorSize = svgStore.getSheetCutSectorMax();
-	const positionIdsSignature = positions.map(position => position.part_id).join("|");
+	const positionIdsSignature = orderedPositions.map(position => position.part_id).join("|");
 	const speed = Number(svgStore.laserShow.speed) || 50;
 	const progress = clamp(Number(svgStore.laserShow.progress) || 0, 0, 100);
+	const requestedProgress = clamp(
+		Number(svgStore.laserShow.seek) || Number(svgStore.laserShow.progress) || 0,
+		0,
+		100
+	);
+	const isLaserOn = Boolean(svgStore.laserShow.on);
 	const isPlaying = Boolean(svgStore.laserShow.on && !svgStore.laserShow.paused);
 	const isPaused = Boolean(svgStore.laserShow.on && svgStore.laserShow.paused);
 	const activePartId = svgStore.laserShow.activePartId ?? null;
 	const hoverPartId = svgStore.laserShow.hoverPartId ?? null;
 	const highlightedPartId = hoverPartId ?? activePartId;
-	const currentOrder = Math.min(
-		positions.length,
+	const rawCurrentOrder = Math.max(
+		0,
 		Number(svgStore.laserShow.currentOrder) || 0
 	);
+	const currentOrder = Math.min(orderedPositions.length, rawCurrentOrder);
+	const completedCount = activePartId === null && rawCurrentOrder > orderedPositions.length
+		? orderedPositions.length
+		: Math.max(Math.min(rawCurrentOrder - 1, orderedPositions.length), 0);
 	const completedPartIds = new Set(
-		positions
-			.slice(0, Math.max(currentOrder - 1, 0))
+		orderedPositions
+			.slice(0, completedCount)
 			.map(pos => pos.part_id)
 	);
+	const playbackTimeoutRef = useRef(null);
 
 	useEffect(() => {
 		svgStore.ensureSheetCutState();
 	}, [maxSectorSize, positionIdsSignature]);
 
+	const stopPlaybackSimulation = useCallback(() => {
+		if (playbackTimeoutRef.current !== null) {
+			clearTimeout(playbackTimeoutRef.current);
+			playbackTimeoutRef.current = null;
+		}
+	}, []);
+
+	const deactivateCutSimulation = useCallback(() => {
+		stopPlaybackSimulation();
+		svgStore.setLaserShow({
+			on: false,
+			paused: false,
+			progress: 0,
+			seek: 0,
+			activePartId: null,
+			hoverPartId: null,
+			currentOrder: 0,
+		});
+	}, [stopPlaybackSimulation]);
+
+	useEffect(() => {
+		return () => {
+			deactivateCutSimulation();
+		};
+	}, [deactivateCutSimulation]);
+
+	useEffect(() => {
+		if (!isLaserOn) return undefined;
+
+		const stopOnWindowHide = () => {
+			deactivateCutSimulation();
+		};
+
+		const stopOnVisibilityChange = () => {
+			if (document.visibilityState !== "visible") {
+				deactivateCutSimulation();
+			}
+		};
+
+		window.addEventListener("blur", stopOnWindowHide);
+		window.addEventListener("beforeunload", stopOnWindowHide);
+		window.addEventListener("pagehide", stopOnWindowHide);
+		document.addEventListener("visibilitychange", stopOnVisibilityChange);
+
+		return () => {
+			window.removeEventListener("blur", stopOnWindowHide);
+			window.removeEventListener("beforeunload", stopOnWindowHide);
+			window.removeEventListener("pagehide", stopOnWindowHide);
+			document.removeEventListener("visibilitychange", stopOnVisibilityChange);
+		};
+	}, [deactivateCutSimulation, isLaserOn]);
+
+	useEffect(() => {
+		stopPlaybackSimulation();
+
+		if (!isLaserOn) {
+			return undefined;
+		}
+
+		if (!orderedPositions.length) {
+			deactivateCutSimulation();
+			return undefined;
+		}
+
+		const playbackState = getPlaybackStateByProgress(orderedPositions, requestedProgress);
+		const hasPlaybackStateChanged = (
+			playbackState.progress !== progress ||
+			playbackState.seek !== clamp(Number(svgStore.laserShow.seek) || 0, 0, 100) ||
+			playbackState.activePartId !== activePartId ||
+			playbackState.currentOrder !== rawCurrentOrder
+		);
+
+		if (hasPlaybackStateChanged) {
+			svgStore.setLaserShow(playbackState);
+		}
+
+		if (isPaused || playbackState.progress >= 100) {
+			return undefined;
+		}
+
+		const nextProgress = playbackState.progress + 100 / orderedPositions.length;
+		playbackTimeoutRef.current = window.setTimeout(() => {
+			if (nextProgress >= 100) {
+				svgStore.setLaserShow({
+					on: true,
+					paused: true,
+					speed,
+					...getPlaybackStateByProgress(orderedPositions, 100),
+				});
+				return;
+			}
+
+			svgStore.setLaserShow({
+				on: true,
+				paused: false,
+				speed,
+				...getPlaybackStateByProgress(orderedPositions, nextProgress),
+			});
+		}, getPlaybackPartDuration(speed));
+
+		return () => {
+			stopPlaybackSimulation();
+		};
+	}, [
+		activePartId,
+		isLaserOn,
+		isPaused,
+		progress,
+		positionIdsSignature,
+		rawCurrentOrder,
+		requestedProgress,
+		speed,
+		stopPlaybackSimulation,
+	]);
+
 	const runCutQue = () => {
 		const shouldRestart = progress >= 100;
-		const seekVersion = Number(svgStore.laserShow.seekVersion) || 0;
+		const nextProgress = shouldRestart ? 0 : requestedProgress;
 
 		svgStore.setLaserShow({
 			on: true,
 			paused: false,
 			speed,
-			...(shouldRestart
-				? {
-					progress: 0,
-					seek: 0,
-					seekVersion: seekVersion + 1,
-				}
-				: {}),
+			...getPlaybackStateByProgress(orderedPositions, nextProgress),
 		});
 	};
 
@@ -71,20 +234,12 @@ const SheetCutPanel = observer(() => {
 			on: true,
 			paused: true,
 			speed,
-			seek: progress,
+			...getPlaybackStateByProgress(orderedPositions, requestedProgress),
 		});
 	};
 
 	const stopCutQue = () => {
-		svgStore.setLaserShow({
-			on: false,
-			paused: false,
-			speed,
-			progress: 0,
-			seek: 0,
-			activePartId: null,
-			currentOrder: 0,
-		});
+		deactivateCutSimulation();
 	};
 
 	const setShowSpeed = (e) => {
@@ -98,15 +253,12 @@ const SheetCutPanel = observer(() => {
 
 	const setSeekProgress = (e) => {
 		const value = clamp(+e.currentTarget.value, 0, 100);
-		const seekVersion = (Number(svgStore.laserShow.seekVersion) || 0) + 1;
 
 		svgStore.setLaserShow({
 			on: true,
 			paused: true,
 			speed,
-			progress: value,
-			seek: value,
-			seekVersion,
+			...getPlaybackStateByProgress(orderedPositions, value),
 		});
 	};
 

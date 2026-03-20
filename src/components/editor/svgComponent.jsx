@@ -1,5 +1,4 @@
 import SimpleReturnComponent from './simpleReturnComponent'
-import SheetLaserShow from './sheetLaserShow.jsx';
 //import Selector from './selector.js'
 //import SelectedPointOnEdge from './selectedPointOnEdge.js';
 //import SelectedPointOnPath from './selectedPointOnPath.js';
@@ -59,7 +58,6 @@ const SvgComponent = observer (() => {
                             < SimpleReturnComponent />
                             </>
                        </g>
-                       <SheetLaserShow /> 
                       {/*  <Selector />
                        <Guides />
                        <SelectedPointOnEdge/>

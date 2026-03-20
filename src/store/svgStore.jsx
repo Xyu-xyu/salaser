@@ -24,8 +24,6 @@ class SvgStore {
 		speed: 50,
 		progress: 0,
 		seek: 0,
-		seekVersion: 0,
-		totalLength: 0,
 		activePartId: null,
 		hoverPartId: null,
 		currentOrder: 0,

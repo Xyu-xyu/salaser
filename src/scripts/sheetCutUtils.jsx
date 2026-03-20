@@ -3,7 +3,6 @@ import svgPath from "svgpath";
 
 const partPreviewCache = new WeakMap();
 const partCutItemCache = new WeakMap();
-const sheetQueueCache = new WeakMap();
 const EPSILON = 0.0001;
 export const SHEET_CUT_DEFAULT_SECTOR_SIZE = 100;
 export const SHEET_CUT_ORDER_MODES = ["current", "auto", "manual"];
@@ -44,23 +43,6 @@ const getPartCodeSignature = (part) => {
 	return `${partId}:${part.code.length}:${part.code
 		.map(item => `${item?.cid ?? ""}:${item?.class ?? ""}:${getPathSize(item?.path)}`)
 		.join("|")}`;
-};
-
-export const getSheetCutQueueSignature = (svgData) => {
-	if (!svgData) return "sheet-cut-empty";
-
-	const positionsSignature = Array.isArray(svgData.positions)
-		? svgData.positions.map(pos => {
-			const { a = 1, b = 0, c = 0, d = 1, e = 0, f = 0 } = pos?.positions || {};
-			return `${pos?.part_id ?? ""}:${pos?.part_code_id ?? ""}:${a}:${b}:${c}:${d}:${e}:${f}`;
-		}).join("||")
-		: "";
-
-	const partsSignature = Array.isArray(svgData.part_code)
-		? svgData.part_code.map(getPartCodeSignature).join("||")
-		: "";
-
-	return `${positionsSignature}##${partsSignature}`;
 };
 
 export const getPartByCodeId = (svgData, partCodeId) => {
@@ -231,12 +213,6 @@ export const getPositionCutPath = (svgData, pos) => {
 		.join(" ");
 };
 
-export const getSheetCutPath = (svgData) => {
-	return getSheetCutQueue(svgData).segments
-		.map(segment => segment.d)
-		.join(" ");
-};
-
 export const getPositionPreviewData = (svgData, pos) => {
 	const part = getPartByCodeId(svgData, pos?.part_code_id);
 	const previewData = getPartPreviewData(part);
@@ -330,122 +306,4 @@ export const getAutoSheetCutOrder = (
 	return sortCheckerboardSectors(sectors).flatMap(sector =>
 		sector.items.map(item => item.pos).filter(Boolean)
 	);
-};
-
-export const getSheetCutQueue = (
-	svgData,
-	signature = getSheetCutQueueSignature(svgData)
-) => {
-	if (!svgData || !Array.isArray(svgData.positions)) {
-		return {
-			signature,
-			segments: [],
-			totalLength: 0,
-		};
-	}
-
-	const cached = sheetQueueCache.get(svgData);
-	if (cached?.signature === signature) {
-		return cached.queue;
-	}
-
-	let totalLength = 0;
-	const segments = [];
-
-	svgData.positions.forEach((pos, orderIndex) => {
-		const part = getPartByCodeId(svgData, pos?.part_code_id);
-		if (!part) return;
-
-		getCutItemsForPart(part).forEach((item, segmentIndex) => {
-			const d = transformPositionPath(item.path, pos);
-			if (!d) return;
-
-			let length = 0;
-			try {
-				length = SVGPathCommander.getTotalLength(d);
-			} catch (error) {
-				console.warn("Queue segment length error:", error);
-				return;
-			}
-
-			if (!Number.isFinite(length) || length <= 0) return;
-
-			const start = totalLength;
-			totalLength += length;
-
-			segments.push({
-				id: `${pos.part_id}_${segmentIndex}`,
-				partId: pos.part_id,
-				partCodeId: pos.part_code_id,
-				partName: part?.name || `Part ${pos.part_id}`,
-				orderIndex,
-				segmentIndex,
-				cid: item.cid,
-				className: item.class,
-				d,
-				length,
-				start,
-				end: totalLength,
-			});
-		});
-	});
-
-	const queue = {
-		signature,
-		segments,
-		totalLength,
-	};
-
-	sheetQueueCache.set(svgData, {
-		signature,
-		queue,
-	});
-
-	return queue;
-};
-
-export const getSheetCutPointAtProgress = (queue, requestedLength = 0) => {
-	if (!queue?.segments?.length || !Number.isFinite(queue.totalLength) || queue.totalLength <= 0) {
-		return null;
-	}
-
-	const progressLength = clamp(requestedLength, 0, queue.totalLength);
-	const isAtStart = progressLength <= EPSILON;
-
-	let left = 0;
-	let right = queue.segments.length - 1;
-
-	while (left < right) {
-		const middle = Math.floor((left + right) / 2);
-		if (progressLength <= queue.segments[middle].end + EPSILON) {
-			right = middle;
-		} else {
-			left = middle + 1;
-		}
-	}
-
-	const activeSegment = queue.segments[isAtStart ? 0 : left] || queue.segments[0];
-	if (!activeSegment) return null;
-
-	const localLength = clamp(
-		progressLength - activeSegment.start,
-		0,
-		activeSegment.length
-	);
-
-	try {
-		const point = SVGPathCommander.getPointAtLength(activeSegment.d, localLength);
-		return {
-			...activeSegment,
-			localLength,
-			point,
-			progressLength,
-			progressPercent: queue.totalLength > 0
-				? (progressLength / queue.totalLength) * 100
-				: 0,
-		};
-	} catch (error) {
-		console.warn("Queue point read error:", error);
-		return null;
-	}
 };
