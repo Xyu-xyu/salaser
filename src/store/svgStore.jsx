@@ -21,6 +21,15 @@ export const LASER_SHOW_PART_HOVERED = 1 << 2;
 
 export const getLaserShowCompletedCount = (laserShow, totalParts = 0) => {
 	const safeTotalParts = Math.max(0, Number(totalParts) || 0);
+	const explicitCompletedCount = Number(laserShow?.completedCount);
+
+	if (Number.isFinite(explicitCompletedCount)) {
+		return Math.max(
+			0,
+			Math.min(Math.trunc(explicitCompletedCount), safeTotalParts)
+		);
+	}
+
 	const rawCurrentOrder = Math.max(0, Number(laserShow?.currentOrder) || 0);
 	const activePartId = laserShow?.activePartId ?? null;
 
@@ -36,15 +45,20 @@ export const getLaserShowCompletedCount = (laserShow, totalParts = 0) => {
 
 class SvgStore {
 	tooltips = false;
-	laserShow = {
+	laserShowPlayback = {
 		on: false,
 		paused: false,
 		speed: 50,
+	};
+	laserShowTimeline = {
 		progress: 0,
 		seek: 0,
+		currentOrder: 0,
+	};
+	laserShowVisual = {
 		activePartId: null,
 		hoverPartId: null,
-		currentOrder: 0,
+		completedCount: 0,
 	};
 	laserShowPartFlags = new Map();
 	laserShowOrderIndexById = new Map();
@@ -208,7 +222,40 @@ class SvgStore {
 	}
 
 	setLaserShow(val) {
-		Object.assign(this.laserShow, val);
+		if (!val || typeof val !== "object") {
+			return;
+		}
+
+		if ("on" in val) {
+			this.laserShowPlayback.on = Boolean(val.on);
+		}
+		if ("paused" in val) {
+			this.laserShowPlayback.paused = Boolean(val.paused);
+		}
+		if ("speed" in val) {
+			this.laserShowPlayback.speed = Number(val.speed) || 50;
+		}
+		if ("progress" in val) {
+			this.laserShowTimeline.progress = Number(val.progress) || 0;
+		}
+		if ("seek" in val) {
+			this.laserShowTimeline.seek = Number(val.seek) || 0;
+		}
+		if ("currentOrder" in val) {
+			this.laserShowTimeline.currentOrder = Number(val.currentOrder) || 0;
+		}
+		if ("activePartId" in val) {
+			this.laserShowVisual.activePartId = val.activePartId ?? null;
+		}
+		if ("hoverPartId" in val) {
+			this.laserShowVisual.hoverPartId = val.hoverPartId ?? null;
+		}
+		if ("completedCount" in val) {
+			this.laserShowVisual.completedCount = Math.max(
+				0,
+				Number(val.completedCount) || 0
+			);
+		}
 	}
 
 	markLaserShowOrderDirty() {
@@ -241,16 +288,16 @@ class SvgStore {
 		const totalParts = Array.isArray(this.svgData?.positions)
 			? this.svgData.positions.length
 			: 0;
-		const completedCount = getLaserShowCompletedCount(this.laserShow, totalParts);
+		const completedCount = getLaserShowCompletedCount(this.laserShowVisual, totalParts);
 		let flags = 0;
 
 		if (orderIndex < completedCount) {
 			flags |= LASER_SHOW_PART_COMPLETED;
 		}
-		if (this.laserShow.activePartId === partId) {
+		if (this.laserShowVisual.activePartId === partId) {
 			flags |= LASER_SHOW_PART_ACTIVE;
 		}
-		if (this.laserShow.hoverPartId === partId) {
+		if (this.laserShowVisual.hoverPartId === partId) {
 			flags |= LASER_SHOW_PART_HOVERED;
 		}
 
@@ -273,7 +320,10 @@ class SvgStore {
 		this.laserShowPartFlags.delete(partId);
 	}
 
-	syncLaserShowPartFlags(previousState = {}, nextState = this.laserShow) {
+	syncLaserShowPartFlags(
+		previousState = {},
+		nextState = { ...this.laserShowTimeline, ...this.laserShowVisual }
+	) {
 		const positions = Array.isArray(this.svgData?.positions) ? this.svgData.positions : [];
 		const totalParts = positions.length;
 
@@ -1959,6 +2009,7 @@ class SvgStore {
 			activePartId: null,
 			hoverPartId: null,
 			currentOrder: 0,
+			completedCount: 0,
 		});
 
 	}

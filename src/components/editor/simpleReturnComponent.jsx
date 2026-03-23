@@ -1,11 +1,7 @@
 import { memo } from "react";
 import { observer } from "mobx-react-lite";
 import SVGPathCommander from "svg-path-commander";
-import svgStore, {
-	LASER_SHOW_PART_ACTIVE,
-	LASER_SHOW_PART_COMPLETED,
-	LASER_SHOW_PART_HOVERED,
-} from "./../../store/svgStore.jsx";
+import svgStore from "./../../store/svgStore.jsx";
 import editorStore from "./../../store/editorStore.jsx";
 
 const getJointPath = (x, y) => `M${x} ${y} l2 2 -4 -4 2 2 2 -2 -4 4`;
@@ -116,16 +112,13 @@ const handlePartSelection = (partId) => {
 	}
 };
 
-const handlePartMove = (event, position) => {
-	if (event.buttons === 1 && position?.selected && editorStore.mode !== "dragging") {
+const handlePartMove = (event, selected) => {
+	if (event.buttons === 1 && selected && editorStore.mode !== "dragging") {
 		editorStore.setMode("dragging");
 	}
 };
 
-const getOverlayPartIds = () => {
-	const activePartId = svgStore.laserShow.activePartId ?? null;
-	const hoverPartId = svgStore.laserShow.hoverPartId ?? null;
-
+const getOverlayPartIds = (activePartId = null, hoverPartId = null) => {
 	if (activePartId === null && hoverPartId === null) {
 		return [];
 	}
@@ -198,32 +191,30 @@ const StaticPartDefinitions = observer(() => {
 	);
 });
 
-const SheetPositionInstance = observer(({ pos, suppressFocused = false }) => {
-	const { a = 1, b = 0, c = 0, d = 1, e = 0, f = 0 } = pos.positions || {};
-	const flags = svgStore.getLaserShowPartFlags(pos.part_id);
-	const isActive = Boolean(flags & LASER_SHOW_PART_ACTIVE);
-	const isHovered = Boolean(flags & LASER_SHOW_PART_HOVERED);
-	const isCompleted = Boolean(flags & LASER_SHOW_PART_COMPLETED);
+const SheetPositionInstance = memo(({
+	partId,
+	partCodeId,
+	transform,
+	selected,
+	isActive,
+	isHovered,
+	isCompleted,
+}) => {
 	const isFocused = isHovered || isActive;
-
-	if (suppressFocused && isFocused) {
-		return null;
-	}
-
 	const fillColor = isHovered
 		? "var(--violet)"
 		: isActive
 			? "rgba(255, 106, 0, 0.42)"
 			: isCompleted
-				? "rgba(253, 126, 20, 0.28)"
-				: pos.selected
+				? "rgba(253, 126, 20, 0.8)"
+				: selected
 					? "var(--violetTransparent)"
 					: "var(--grey-nav)";
 	const strokeColor = isActive
 		? "#ff5a00"
 		: isCompleted
 			? "#fd7e14"
-			: pos.selected
+			: selected
 				? "var(--violetTransparent)"
 				: "var(--grey-nav)";
 	const strokeWidth = isActive
@@ -241,18 +232,18 @@ const SheetPositionInstance = observer(({ pos, suppressFocused = false }) => {
 
 	return (
 		<g
-			transform={`matrix(${a} ${b} ${c} ${d} ${e} ${f})`}
-			data-part-id={pos.part_id}
-			onMouseDown={() => handlePartSelection(pos.part_id)}
-			onMouseMove={(event) => handlePartMove(event, pos)}
+			transform={transform}
+			data-part-id={partId}
+			onMouseDown={() => handlePartSelection(partId)}
+			onMouseMove={(event) => handlePartMove(event, selected)}
 			onTouchStart={(event) => {
-				handlePartSelection(pos.part_id);
-				handlePartMove(event, pos);
+				handlePartSelection(partId);
+				handlePartMove(event, selected);
 				editorStore.setMode("dragging");
 			}}
 		>
 			<use
-				href={`#part_${pos.part_code_id}`}
+				href={`#part_${partCodeId}`}
 				fill={fillColor}
 				stroke={strokeColor}
 				strokeWidth={strokeWidth}
@@ -263,60 +254,91 @@ const SheetPositionInstance = observer(({ pos, suppressFocused = false }) => {
 	);
 });
 
-const FocusedPositionOverlay = observer(() => {
-	const overlayPartIds = getOverlayPartIds();
-	if (!overlayPartIds.length) return null;
-
-	return (
-		<>
-			{overlayPartIds.map(partId => {
-				const overlayPosition = svgStore.svgData.positions.find(
-					pos => pos.part_id === partId
-				);
-				if (!overlayPosition) return null;
-
-				return (
-					<SheetPositionInstance
-						key={`form_focused_${partId}`}
-						pos={overlayPosition}
-					/>
-				);
-			})}
-		</>
-	);
-});
-
 const PositionInstancesLayer = observer(() => {
 	const positions = svgStore.svgData.positions;
+	const activePartId = svgStore.laserShowVisual.activePartId ?? null;
+	const hoverPartId = svgStore.laserShowVisual.hoverPartId ?? null;
+	const completedCount = Math.max(
+		0,
+		Math.min(
+			Number(svgStore.laserShowVisual.completedCount) || 0,
+			positions.length
+		)
+	);
+	const overlayPartIds = getOverlayPartIds(activePartId, hoverPartId);
+	const overlayPartIdSet = new Set(overlayPartIds);
+	const overlayItemsById = new Map();
 	const unselectedPositions = [];
 	const selectedPositions = [];
 
-	positions.forEach(pos => {
-		if (pos.selected) {
-			selectedPositions.push(pos);
+	positions.forEach((pos, index) => {
+		const isActive = activePartId === pos.part_id;
+		const isHovered = hoverPartId === pos.part_id;
+		const itemProps = {
+			partId: pos.part_id,
+			partCodeId: pos.part_code_id,
+			transform: `matrix(${pos.positions?.a ?? 1} ${pos.positions?.b ?? 0} ${pos.positions?.c ?? 0} ${pos.positions?.d ?? 1} ${pos.positions?.e ?? 0} ${pos.positions?.f ?? 0})`,
+			selected: Boolean(pos.selected),
+			isActive,
+			isHovered,
+			isCompleted: index < completedCount,
+		};
+
+		if (overlayPartIdSet.has(pos.part_id)) {
+			overlayItemsById.set(pos.part_id, itemProps);
 			return;
 		}
 
-		unselectedPositions.push(pos);
+		if (itemProps.selected) {
+			selectedPositions.push(itemProps);
+			return;
+		}
+
+		unselectedPositions.push(itemProps);
 	});
+
+	const overlayPositions = overlayPartIds
+		.map(partId => overlayItemsById.get(partId))
+		.filter(Boolean);
 
 	return (
 		<>
 			{unselectedPositions.map(pos => (
 				<SheetPositionInstance
-					key={`form_${pos.part_id}`}
-					pos={pos}
-					suppressFocused
+					key={`form_${pos.partId}`}
+					partId={pos.partId}
+					partCodeId={pos.partCodeId}
+					transform={pos.transform}
+					selected={pos.selected}
+					isActive={pos.isActive}
+					isHovered={pos.isHovered}
+					isCompleted={pos.isCompleted}
 				/>
 			))}
 			{selectedPositions.map(pos => (
 				<SheetPositionInstance
-					key={`form_selected_${pos.part_id}`}
-					pos={pos}
-					suppressFocused
+					key={`form_selected_${pos.partId}`}
+					partId={pos.partId}
+					partCodeId={pos.partCodeId}
+					transform={pos.transform}
+					selected={pos.selected}
+					isActive={pos.isActive}
+					isHovered={pos.isHovered}
+					isCompleted={pos.isCompleted}
 				/>
 			))}
-			<FocusedPositionOverlay />
+			{overlayPositions.map(pos => (
+				<SheetPositionInstance
+					key={`form_focused_${pos.partId}`}
+					partId={pos.partId}
+					partCodeId={pos.partCodeId}
+					transform={pos.transform}
+					selected={pos.selected}
+					isActive={pos.isActive}
+					isHovered={pos.isHovered}
+					isCompleted={pos.isCompleted}
+				/>
+			))}
 		</>
 	);
 });
