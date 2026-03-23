@@ -15,6 +15,24 @@ import {
 const sameIdOrder = (left = [], right = []) =>
 	left.length === right.length && left.every((item, index) => item === right[index]);
 
+export const LASER_SHOW_PART_COMPLETED = 1;
+export const LASER_SHOW_PART_ACTIVE = 1 << 1;
+export const LASER_SHOW_PART_HOVERED = 1 << 2;
+
+export const getLaserShowCompletedCount = (laserShow, totalParts = 0) => {
+	const safeTotalParts = Math.max(0, Number(totalParts) || 0);
+	const rawCurrentOrder = Math.max(0, Number(laserShow?.currentOrder) || 0);
+	const activePartId = laserShow?.activePartId ?? null;
+
+	if (!safeTotalParts) {
+		return 0;
+	}
+
+	return activePartId === null && rawCurrentOrder > safeTotalParts
+		? safeTotalParts
+		: Math.max(Math.min(rawCurrentOrder - 1, safeTotalParts), 0);
+};
+
 
 class SvgStore {
 	tooltips = false;
@@ -28,6 +46,9 @@ class SvgStore {
 		hoverPartId: null,
 		currentOrder: 0,
 	};
+	laserShowPartFlags = new Map();
+	laserShowOrderIndexById = new Map();
+	laserShowOrderDirty = true;
 	highLighted = false;
 
 	svgData = {
@@ -146,6 +167,8 @@ class SvgStore {
 
 	constructor() {
 		makeAutoObservable(this, {
+			laserShowOrderIndexById: false,
+			laserShowOrderDirty: false,
 		});
 	}
 
@@ -186,6 +209,120 @@ class SvgStore {
 
 	setLaserShow(val) {
 		Object.assign(this.laserShow, val);
+	}
+
+	markLaserShowOrderDirty() {
+		this.laserShowOrderDirty = true;
+	}
+
+	ensureLaserShowOrderIndex() {
+		if (!this.laserShowOrderDirty) {
+			return this.laserShowOrderIndexById;
+		}
+
+		this.laserShowOrderIndexById = new Map(
+			(Array.isArray(this.svgData?.positions) ? this.svgData.positions : [])
+				.map((pos, index) => [pos?.part_id, index])
+		);
+		this.laserShowOrderDirty = false;
+		return this.laserShowOrderIndexById;
+	}
+
+	getLaserShowPartFlags(partId) {
+		if (partId === null || partId === undefined) {
+			return 0;
+		}
+
+		const orderIndex = this.ensureLaserShowOrderIndex().get(partId);
+		if (orderIndex === undefined) {
+			return 0;
+		}
+
+		const totalParts = Array.isArray(this.svgData?.positions)
+			? this.svgData.positions.length
+			: 0;
+		const completedCount = getLaserShowCompletedCount(this.laserShow, totalParts);
+		let flags = 0;
+
+		if (orderIndex < completedCount) {
+			flags |= LASER_SHOW_PART_COMPLETED;
+		}
+		if (this.laserShow.activePartId === partId) {
+			flags |= LASER_SHOW_PART_ACTIVE;
+		}
+		if (this.laserShow.hoverPartId === partId) {
+			flags |= LASER_SHOW_PART_HOVERED;
+		}
+
+		return flags;
+	}
+
+	setLaserShowPartFlag(partId, flag, enabled) {
+		if (partId === null || partId === undefined) return;
+
+		const currentFlags = this.getLaserShowPartFlags(partId);
+		const nextFlags = enabled
+			? currentFlags | flag
+			: currentFlags & ~flag;
+
+		if (nextFlags) {
+			this.laserShowPartFlags.set(partId, nextFlags);
+			return;
+		}
+
+		this.laserShowPartFlags.delete(partId);
+	}
+
+	syncLaserShowPartFlags(previousState = {}, nextState = this.laserShow) {
+		const positions = Array.isArray(this.svgData?.positions) ? this.svgData.positions : [];
+		const totalParts = positions.length;
+
+		if (this.laserShowOrderDirty) {
+			this.laserShowPartFlags.clear();
+		}
+
+		this.ensureLaserShowOrderIndex();
+
+		const previousCompletedCount = getLaserShowCompletedCount(previousState, totalParts);
+		const nextCompletedCount = getLaserShowCompletedCount(nextState, totalParts);
+
+		if (nextCompletedCount > previousCompletedCount) {
+			for (let index = previousCompletedCount; index < nextCompletedCount; index += 1) {
+				const partId = positions[index]?.part_id;
+				this.setLaserShowPartFlag(partId, LASER_SHOW_PART_COMPLETED, true);
+			}
+		} else if (nextCompletedCount < previousCompletedCount) {
+			for (let index = nextCompletedCount; index < previousCompletedCount; index += 1) {
+				const partId = positions[index]?.part_id;
+				this.setLaserShowPartFlag(partId, LASER_SHOW_PART_COMPLETED, false);
+			}
+		}
+
+		if (previousState.activePartId !== nextState.activePartId) {
+			this.setLaserShowPartFlag(
+				previousState.activePartId,
+				LASER_SHOW_PART_ACTIVE,
+				false
+			);
+			this.setLaserShowPartFlag(
+				nextState.activePartId,
+				LASER_SHOW_PART_ACTIVE,
+				true
+			);
+		}
+
+		if (previousState.hoverPartId !== nextState.hoverPartId) {
+			this.setLaserShowPartFlag(
+				previousState.hoverPartId,
+				LASER_SHOW_PART_HOVERED,
+				false
+			);
+			this.setLaserShowPartFlag(
+				nextState.hoverPartId,
+				LASER_SHOW_PART_HOVERED,
+				true
+			);
+		}
 	}
 
 	getPositionIds() {
@@ -330,6 +467,7 @@ class SvgStore {
 		runInAction(() => {
 			this.svgData.positions = [...newOrder];
 		});
+		this.markLaserShowOrderDirty();
 	}
 
 	setVal(objectKey, pathOrKey, newValue) {
@@ -361,6 +499,7 @@ class SvgStore {
 
 	addPosition(position) {
 		this.svgData.positions = [...this.svgData.positions, position]
+		this.markLaserShowOrderDirty();
 	}
 
 	addForm(form) {
@@ -460,6 +599,7 @@ class SvgStore {
 				(part) => part.part_code_id !== uuid
 			);
 		});
+		this.markLaserShowOrderDirty();
 	};
 
 	isOutOfRect(bbox, rect) {
@@ -535,6 +675,7 @@ class SvgStore {
 				return !this.isOutOfRect(worldBBox, rect);
 			});
 		});
+		this.markLaserShowOrderDirty();
 	};
 
 	updateForm(uuid, newPartCodeObject) {
@@ -1220,7 +1361,8 @@ class SvgStore {
 	deleteSelectedPosition () {		
 		runInAction(() => {
 			this.svgData.positions = this.svgData.positions.filter(pos => !pos.selected);
-		})	
+		})
+		this.markLaserShowOrderDirty();
 	}
 
 	rotateSelectedPosition(angle = 45) {
@@ -1807,6 +1949,17 @@ class SvgStore {
 		};
 
 		svgStore.svgData = Object.assign({}, result1)
+		this.markLaserShowOrderDirty();
+		this.laserShowPartFlags.clear();
+		this.setLaserShow({
+			on: false,
+			paused: false,
+			progress: 0,
+			seek: 0,
+			activePartId: null,
+			hoverPartId: null,
+			currentOrder: 0,
+		});
 
 	}
 

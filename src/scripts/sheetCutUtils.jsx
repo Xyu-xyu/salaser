@@ -4,6 +4,8 @@ import util from "./util.jsx";
 
 const partPreviewCache = new WeakMap();
 const partCutItemCache = new WeakMap();
+const positionPreviewCache = new WeakMap();
+const sheetCutPositionItemCache = new WeakMap();
 const EPSILON = 0.0001;
 export const SHEET_CUT_DEFAULT_SECTOR_SIZE = 100;
 export const SHEET_CUT_ORDER_MODES = ["current", "auto", "manual"];
@@ -60,6 +62,10 @@ const getMatrix = (pos) => {
 	const { a = 1, b = 0, c = 0, d = 1, e = 0, f = 0 } = pos?.positions || {};
 	return [a, b, c, d, e, f];
 };
+
+const getMatrixSignature = (pos) => getMatrix(pos)
+	.map(value => Number(value) || 0)
+	.join(":");
 
 const getMatrixObject = (pos) => {
 	const { a = 1, b = 0, c = 0, d = 1, e = 0, f = 0 } = pos?.positions || {};
@@ -237,7 +243,13 @@ export const getPositionPreviewData = (svgData, pos) => {
 	const previewData = getPartPreviewData(part);
 	if (!previewData?.bbox) return null;
 
-	return {
+	const signature = `${getPartCodeSignature(part)}:${getMatrixSignature(pos)}`;
+	const cached = positionPreviewCache.get(pos);
+	if (cached?.signature === signature) {
+		return cached.result;
+	}
+
+	const result = {
 		...previewData,
 		bbox: transformBBox(previewData.bbox, pos),
 		outerContourPaths: (previewData.outerContourPaths || [])
@@ -252,6 +264,13 @@ export const getPositionPreviewData = (svgData, pos) => {
 			pos
 		),
 	};
+
+	positionPreviewCache.set(pos, {
+		signature,
+		result,
+	});
+
+	return result;
 };
 
 const getSectorRowFromBottom = (centerY, sheetHeight, sectorSize) => {
@@ -462,35 +481,53 @@ const getExtremePoints = (paths, bbox, containsPoint) => {
 	}
 };
 
+const getSheetCutPositionItemSignature = (svgData, pos) => {
+	const part = getPartByCodeId(svgData, pos?.part_code_id);
+	return `${getPartCodeSignature(part)}:${getMatrixSignature(pos)}`;
+};
+
+const getSheetCutPositionItem = (svgData, pos, index) => {
+	const signature = getSheetCutPositionItemSignature(svgData, pos);
+	const cached = sheetCutPositionItemCache.get(pos);
+	if (cached?.signature === signature) {
+		return cached.result;
+	}
+
+	const preview = getPositionPreviewData(svgData, pos);
+	const bbox = preview?.bbox;
+	const centerX = bbox ? bbox.x + bbox.width / 2 : Number(pos?.cx) || 0;
+	const centerY = bbox ? bbox.y + bbox.height / 2 : Number(pos?.cy) || 0;
+	const outerContourPath = preview?.outerContourPath || preview?.contourPath || "";
+	const outerContourPaths = preview?.outerContourPaths?.length
+		? preview.outerContourPaths
+		: [outerContourPath];
+	const containsPoint = createPathPointTester(outerContourPaths);
+	const extremePoints = getExtremePoints(outerContourPaths, bbox, containsPoint);
+	const result = {
+		partId: pos?.part_id ?? index,
+		centerX,
+		centerY,
+		pos,
+		bbox,
+		bboxArea: getBBoxArea(bbox),
+		outerContourPath,
+		containsPoint,
+		extremePoints,
+		representativePoint: extremePoints[0] || { x: centerX, y: centerY },
+	};
+
+	sheetCutPositionItemCache.set(pos, {
+		signature,
+		result,
+	});
+
+	return result;
+};
+
 const getSheetCutPositionItems = (svgData) =>
 	(Array.isArray(svgData?.positions) ? svgData.positions : [])
-		.map((pos, index) => {
-			const preview = getPositionPreviewData(svgData, pos);
-			const bbox = preview?.bbox;
-			const centerX = bbox ? bbox.x + bbox.width / 2 : Number(pos?.cx) || 0;
-			const centerY = bbox ? bbox.y + bbox.height / 2 : Number(pos?.cy) || 0;
-			const outerContourPath = preview?.outerContourPath || preview?.contourPath || "";
-			const outerContourPaths = preview?.outerContourPaths?.length
-				? preview.outerContourPaths
-				: [outerContourPath];
-			const containsPoint = createPathPointTester(outerContourPaths);
-			const extremePoints = getExtremePoints(outerContourPaths, bbox, containsPoint);
-
-			return {
-				index,
-				partId: pos?.part_id ?? index,
-				centerX,
-				centerY,
-				pos,
-				bbox,
-				bboxArea: getBBoxArea(bbox),
-				outerContourPath,
-				containsPoint,
-				extremePoints,
-				representativePoint: extremePoints[0] || { x: centerX, y: centerY },
-			};
-		})
-		.filter(item => item.pos);
+		.map((pos, index) => getSheetCutPositionItem(svgData, pos, index))
+		.filter(item => item?.pos);
 
 const isPointInsideBBox = (point, bbox, tolerance = 0) => (
 	Boolean(point && bbox) &&
