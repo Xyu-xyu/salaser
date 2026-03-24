@@ -1941,6 +1941,8 @@ class SvgStore {
 		let HW = [0]
 		let partHeight = 0		
 		let partWidth = 0
+		const hasMCode = (cmd, ...codes) =>
+			Array.isArray(cmd?.m) && codes.some(code => cmd.m.includes(code))
 		
 
 		for (const c of cmds) {
@@ -1950,6 +1952,9 @@ class SvgStore {
 				//console.log('Part code start')
 				cx = 0;
 				cy = 0;
+				laserOn = false;
+				contourOpen = "before";
+				macros = '';
 				const name = c.comment.match(/PartCode="([^"]+)"/)[1];
 
 				currentPart = {
@@ -1969,7 +1974,9 @@ class SvgStore {
 
 				//console.log('Part End')
 				partOpen = false
-				res[res.length - 1].class += " groupEnd "
+				if (res.length) {
+					res[res.length - 1].class += " groupEnd "
+				}
 
 				for (let i = res.length - 1; i >= 0; i--) {
 					const item = res[i];
@@ -2052,6 +2059,10 @@ class SvgStore {
 					"joints":[]
 				})
 				if (laserOn) res[res.length - 1].path = this.start(cx, cy, c, partHeight);
+				if (hasMCode(c, 5, 15)) {
+					laserOn = false;
+					contourOpen = "before"
+				}
 				continue;
 			}
 
@@ -2110,6 +2121,18 @@ class SvgStore {
 						})
 					}
 
+					if (!res.length) {
+						cid += 1
+						res.push({
+							"cid": cid,
+							"class": " inlet inner" + macros + " ",
+							"path": "",
+							"stroke": "red",
+							"strokeWidth": 0.2,
+							"selected": false,
+							"joints":[]
+						})
+					}
 
 					res[res.length - 1].path = this.start(cx, cy, c, partHeight);
 					cx = tx; cy = ty;

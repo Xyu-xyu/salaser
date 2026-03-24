@@ -40,6 +40,11 @@ const matrixToString = (matrix) => (
 	`matrix(${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f})`
 );
 
+const isTouchLikeEvent = (event) => {
+	const eventType = event?.type || event?.nativeEvent?.type || '';
+	return String(eventType).startsWith('touch');
+};
+
 
 const FormsPanel = observer(() => {
 
@@ -226,7 +231,9 @@ const FormsPanel = observer(() => {
 	};
 
 	const startPartDrag = (event, part) => {
-		event.preventDefault();
+		if (!isTouchLikeEvent(event)) {
+			event.preventDefault();
+		}
 		event.stopPropagation();
 
 		const point = getEventClientPoint(event);
