@@ -8,12 +8,129 @@ import jobStore from "./jobStore";
 import {
 	SHEET_CUT_DEFAULT_SECTOR_SIZE,
 	SHEET_CUT_ORDER_MODES,
+	SHEET_SAFETY_DEFAULT_CLEARANCE,
 	clampSheetCutSectorSize,
+	getSheetSafetyEvaluation,
 	getMaxSheetCutSectorSize,
+	normalizeSheetSafetyClearance,
 } from "../scripts/sheetCutUtils.jsx";
 
 const sameIdOrder = (left = [], right = []) =>
 	left.length === right.length && left.every((item, index) => item === right[index]);
+
+const sortNumericIds = (values = []) => (
+	[...new Set(values.map(value => Number(value)).filter(Number.isFinite))]
+		.sort((left, right) => left - right)
+);
+
+const normalizeSheetSafetyPairs = (pairs = []) => {
+	const pairKeySet = new Set();
+	const normalizedPairs = [];
+
+	(Array.isArray(pairs) ? pairs : []).forEach(pair => {
+		if (!Array.isArray(pair) || pair.length < 2) return;
+
+		const leftPartId = Number(pair[0]);
+		const rightPartId = Number(pair[1]);
+		if (!Number.isFinite(leftPartId) || !Number.isFinite(rightPartId)) return;
+		if (leftPartId === rightPartId) return;
+
+		const normalizedPair = [
+			Math.min(leftPartId, rightPartId),
+			Math.max(leftPartId, rightPartId),
+		];
+		const pairKey = normalizedPair.join(":");
+		if (pairKeySet.has(pairKey)) return;
+
+		pairKeySet.add(pairKey);
+		normalizedPairs.push(normalizedPair);
+	});
+
+	return normalizedPairs.sort((left, right) => (
+		left[0] !== right[0]
+			? left[0] - right[0]
+			: left[1] - right[1]
+	));
+};
+
+const buildSheetSafetyReasonsById = (edgePartIds = [], collisionPairs = []) => {
+	const reasonsById = {};
+
+	sortNumericIds(edgePartIds).forEach(partId => {
+		reasonsById[partId] = {
+			edge: true,
+			collisionIds: [],
+		};
+	});
+
+	normalizeSheetSafetyPairs(collisionPairs).forEach(([leftPartId, rightPartId]) => {
+		if (!reasonsById[leftPartId]) {
+			reasonsById[leftPartId] = {
+				edge: false,
+				collisionIds: [],
+			};
+		}
+		if (!reasonsById[rightPartId]) {
+			reasonsById[rightPartId] = {
+				edge: false,
+				collisionIds: [],
+			};
+		}
+
+		reasonsById[leftPartId].collisionIds.push(rightPartId);
+		reasonsById[rightPartId].collisionIds.push(leftPartId);
+	});
+
+	Object.values(reasonsById).forEach(reason => {
+		reason.collisionIds = sortNumericIds(reason.collisionIds);
+	});
+
+	return reasonsById;
+};
+
+const buildSheetSafetyState = (state = {}) => {
+	const edgePartIds = sortNumericIds(state.edgePartIds || []);
+	const collisionPairs = normalizeSheetSafetyPairs(state.collisionPairs || []);
+
+	return {
+		dangerPartIds: sortNumericIds([
+			...edgePartIds,
+			...collisionPairs.flat(),
+		]),
+		edgePartIds,
+		collisionPairs,
+		reasonsById: buildSheetSafetyReasonsById(edgePartIds, collisionPairs),
+		candidatePairsCount: Math.max(0, Number(state.candidatePairsCount) || 0),
+		candidateCellSize: Math.max(0, Number(state.candidateCellSize) || 0),
+	};
+};
+
+const createEmptySheetSafetyState = () => buildSheetSafetyState();
+
+const mergeSheetSafetyState = (currentState = {}, evaluation = {}) => {
+	const scopedPartIds = sortNumericIds(evaluation?.partIds || []);
+	const nextState = buildSheetSafetyState(evaluation);
+
+	if (!scopedPartIds.length) {
+		return nextState;
+	}
+
+	const scopedIdSet = new Set(scopedPartIds);
+	const keptEdgePartIds = (Array.isArray(currentState?.edgePartIds) ? currentState.edgePartIds : [])
+		.filter(partId => !scopedIdSet.has(partId));
+	const keptCollisionPairs = (Array.isArray(currentState?.collisionPairs) ? currentState.collisionPairs : [])
+		.filter(([leftPartId, rightPartId]) => (
+			!scopedIdSet.has(leftPartId) &&
+			!scopedIdSet.has(rightPartId)
+		));
+
+	return buildSheetSafetyState({
+		edgePartIds: [...keptEdgePartIds, ...nextState.edgePartIds],
+		collisionPairs: [...keptCollisionPairs, ...nextState.collisionPairs],
+		candidatePairsCount: nextState.candidatePairsCount,
+		candidateCellSize: nextState.candidateCellSize,
+	});
+};
 
 export const LASER_SHOW_PART_COMPLETED = 1;
 export const LASER_SHOW_PART_ACTIVE = 1 << 1;
@@ -45,6 +162,7 @@ export const getLaserShowCompletedCount = (laserShow, totalParts = 0) => {
 
 class SvgStore {
 	tooltips = false;
+	Show_dangers = true;
 	laserShowPlayback = {
 		on: false,
 		paused: false,
@@ -64,6 +182,13 @@ class SvgStore {
 	laserShowOrderIndexById = new Map();
 	laserShowOrderDirty = true;
 	highLighted = false;
+	sheetSafetySettings = {
+		clearance: normalizeSheetSafetyClearance(
+			constants.defaultIntend ?? SHEET_SAFETY_DEFAULT_CLEARANCE
+		),
+		allowPartInPart: true,
+	};
+	sheetSafetyState = createEmptySheetSafetyState();
 
 	svgData = {
 		"file":"",
@@ -375,6 +500,120 @@ class SvgStore {
 		}
 	}
 
+	getSheetSafetyClearance() {
+		return normalizeSheetSafetyClearance(this.sheetSafetySettings.clearance);
+	}
+
+	isSheetPartInPartEnabled() {
+		return this.sheetSafetySettings.allowPartInPart !== false;
+	}
+
+	getSheetSafetyDangerCount() {
+		return Array.isArray(this.sheetSafetyState.dangerPartIds)
+			? this.sheetSafetyState.dangerPartIds.length
+			: 0;
+	}
+
+	getSheetSafetyCollisionCount() {
+		return Array.isArray(this.sheetSafetyState.collisionPairs)
+			? this.sheetSafetyState.collisionPairs.length
+			: 0;
+	}
+
+	isSheetDangerPart(partId) {
+		return Array.isArray(this.sheetSafetyState.dangerPartIds) &&
+			this.sheetSafetyState.dangerPartIds.includes(partId);
+	}
+
+	resetSheetSafetyState() {
+		runInAction(() => {
+			this.sheetSafetyState = createEmptySheetSafetyState();
+		});
+	}
+
+	getShowDangersDefaultValue(totalParts = Array.isArray(this.svgData?.positions)
+		? this.svgData.positions.length
+		: 0) {
+		return totalParts <= 500;
+	}
+
+	isShowDangersEnabled() {
+		return this.Show_dangers !== false;
+	}
+
+	initializeShowDangersByPositionsCount() {
+		const nextValue = this.getShowDangersDefaultValue();
+		if (this.Show_dangers !== nextValue) {
+			runInAction(() => {
+				this.Show_dangers = nextValue;
+			});
+		}
+
+		return this.Show_dangers;
+	}
+
+	setShowDangers(enabled) {
+		const nextValue = Boolean(enabled);
+		if (this.Show_dangers !== nextValue) {
+			runInAction(() => {
+				this.Show_dangers = nextValue;
+			});
+		}
+
+		this.recalculateSheetSafety();
+		return this.Show_dangers;
+	}
+
+	setSheetSafetyClearance(clearance) {
+		const nextClearance = normalizeSheetSafetyClearance(clearance);
+		if (this.sheetSafetySettings.clearance !== nextClearance) {
+			runInAction(() => {
+				this.sheetSafetySettings.clearance = nextClearance;
+			});
+			this.recalculateSheetSafety();
+		}
+
+		return this.sheetSafetySettings.clearance;
+	}
+
+	setSheetPartInPart(enabled) {
+		const nextEnabled = Boolean(enabled);
+		if (this.sheetSafetySettings.allowPartInPart !== nextEnabled) {
+			runInAction(() => {
+				this.sheetSafetySettings.allowPartInPart = nextEnabled;
+			});
+			this.recalculateSheetSafety();
+		}
+
+		return this.sheetSafetySettings.allowPartInPart;
+	}
+
+	recalculateSheetSafety(options = {}) {
+		if (!this.isShowDangersEnabled()) {
+			const nextState = createEmptySheetSafetyState();
+			runInAction(() => {
+				this.sheetSafetyState = nextState;
+			});
+
+			return nextState;
+		}
+
+		const evaluation = getSheetSafetyEvaluation(this.svgData, {
+			partIds: Array.isArray(options.partIds) && options.partIds.length
+				? options.partIds
+				: null,
+			clearance: options.clearance ?? this.getSheetSafetyClearance(),
+			allowPartInPart: options.allowPartInPart ?? this.isSheetPartInPartEnabled(),
+		});
+		const nextState = mergeSheetSafetyState(this.sheetSafetyState, evaluation);
+
+		runInAction(() => {
+			this.sheetSafetyState = nextState;
+		});
+
+		return nextState;
+	}
+
 	getPositionIds() {
 		return Array.isArray(this.svgData?.positions)
 			? this.svgData.positions.map(pos => pos?.part_id)
@@ -518,6 +757,7 @@ class SvgStore {
 			this.svgData.positions = [...newOrder];
 		});
 		this.markLaserShowOrderDirty();
+		this.recalculateSheetSafety();
 	}
 
 	setVal(objectKey, pathOrKey, newValue) {
@@ -541,6 +781,10 @@ class SvgStore {
 		}
 
 		current[lastKey] = newValue;
+
+		if (objectKey === "svgData" && (lastKey === "width" || lastKey === "height")) {
+			this.recalculateSheetSafety();
+		}
 	}
 
 	fitToPage() {
@@ -550,6 +794,7 @@ class SvgStore {
 	addPosition(position) {
 		this.svgData.positions = [...this.svgData.positions, position]
 		this.markLaserShowOrderDirty();
+		this.recalculateSheetSafety();
 	}
 
 	addForm(form) {
@@ -566,6 +811,7 @@ class SvgStore {
 
 		console.log(form)
 		this.svgData.part_code.push(form)
+		this.recalculateSheetSafety();
 	}
 
 	findBox(code) {
@@ -650,6 +896,7 @@ class SvgStore {
 			);
 		});
 		this.markLaserShowOrderDirty();
+		this.recalculateSheetSafety();
 	};
 
 	isOutOfRect(bbox, rect) {
@@ -697,7 +944,7 @@ class SvgStore {
 	}
 
 
-	deleteOutParts = () => {
+	deleteOutParts = ({ recalculate = true } = {}) => {
 		
 		const rect = { x: 0, y: 0, width: this.svgData.width, height: this.svgData.height };
 
@@ -726,6 +973,9 @@ class SvgStore {
 			});
 		});
 		this.markLaserShowOrderDirty();
+		if (recalculate) {
+			this.recalculateSheetSafety();
+		}
 	};
 
 	updateForm(uuid, newPartCodeObject) {
@@ -746,6 +996,7 @@ class SvgStore {
 		this.svgData.part_code[index] = Object.assign({}, newPartCodeObject);
 		//console.log(`Объект с uuid "${uuid}" успешно обновлён`);
 		//console.log (JSON.stringify(this.svgData))
+		this.recalculateSheetSafety();
 	};
 
 	generateParts() {
@@ -1413,6 +1664,7 @@ class SvgStore {
 			this.svgData.positions = this.svgData.positions.filter(pos => !pos.selected);
 		})
 		this.markLaserShowOrderDirty();
+		this.recalculateSheetSafety();
 	}
 
 	rotateSelectedPosition(angle = 45) {
@@ -1527,6 +1779,7 @@ class SvgStore {
 				};
 			});
 		});
+		this.recalculateSheetSafety();
 	}
 
 	generatePositions() {
@@ -2001,6 +2254,8 @@ class SvgStore {
 		svgStore.svgData = Object.assign({}, result1)
 		this.markLaserShowOrderDirty();
 		this.laserShowPartFlags.clear();
+		this.resetSheetSafetyState();
+		this.initializeShowDangersByPositionsCount();
 		this.setLaserShow({
 			on: false,
 			paused: false,
@@ -2011,6 +2266,7 @@ class SvgStore {
 			currentOrder: 0,
 			completedCount: 0,
 		});
+		this.recalculateSheetSafety();
 
 	}
 

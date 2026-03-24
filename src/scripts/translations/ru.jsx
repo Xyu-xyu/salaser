@@ -455,6 +455,11 @@ const ru = {
     " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "Превышено максимальное количество повторов с URL-адресом.",
     "file": "файл",
     "Sheet data": "Данные листа",
+    "Parts collide": "Опасные детали",
+    "Part intend": "Безопасный зазор",
+    "Part in part": "Деталь в детали",
+    "Show collisions": "Показывать столкновения",
+    "Hide collisions": "Не показывать столкновения",
     "thickness": "толщина",
     "Move with inner part": "Переместить внутреннюю часть",
     "Time for cut": "Время резать",
@@ -488,6 +493,7 @@ const ru = {
     "Sheet filled with selected part": "Лист заполнен",
     "Sheet cut order was changed": "Порядок резки изменен.",
     "No previous log entry found.": "Предыдущая запись журнала не найдена.",
-    "auto": "авто"
+    "auto": "авто",
+    "Sheet clearance updated": "Зазор листа обновлен."
 }
 export default ru;

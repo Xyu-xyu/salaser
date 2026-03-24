@@ -118,20 +118,37 @@ const handlePartMove = (event, selected) => {
 	}
 };
 
-const getOverlayPartIds = (activePartId = null, hoverPartId = null) => {
-	if (activePartId === null && hoverPartId === null) {
-		return [];
-	}
+const getUniquePartIds = (values = []) => (
+	[...new Set(values.map(value => Number(value)).filter(Number.isFinite))]
+		.sort((left, right) => left - right)
+);
 
-	if (hoverPartId === null || hoverPartId === activePartId) {
-		return activePartId === null ? [] : [activePartId];
-	}
+const getOverlayPartIds = (
+	activePartId = null,
+	hoverPartId = null,
+	dangerPartIds = []
+) => {
+	const overlayPartIds = getUniquePartIds(
+		(Array.isArray(dangerPartIds) ? dangerPartIds : [])
+			.filter(partId => partId !== null && partId !== undefined)
+	);
+	const prioritizePartId = (partId) => {
+		if (partId === null || partId === undefined) {
+			return;
+		}
 
-	if (activePartId === null) {
-		return [hoverPartId];
-	}
+		const existingIndex = overlayPartIds.indexOf(partId);
+		if (existingIndex >= 0) {
+			overlayPartIds.splice(existingIndex, 1);
+		}
 
-	return [activePartId, hoverPartId];
+		overlayPartIds.push(partId);
+	};
+
+	prioritizePartId(activePartId);
+	prioritizePartId(hoverPartId);
+
+	return overlayPartIds;
 };
 
 const StaticPartDefinitions = observer(() => {
@@ -199,36 +216,53 @@ const SheetPositionInstance = memo(({
 	isActive,
 	isHovered,
 	isCompleted,
+	isDangerous,
 }) => {
 	const isFocused = isHovered || isActive;
-	const fillColor = isHovered
-		? "var(--violet)"
+	const fillColor = isDangerous
+		? isActive
+			? "rgba(220, 53, 69, 0.38)"
+			: isHovered
+				? "rgba(220, 53, 69, 0.32)"
+				: selected
+					? "rgba(220, 53, 69, 0.24)"
+					: "rgba(220, 53, 69, 0.18)"
+		: isHovered
+			? "var(--violet)"
+			: isActive
+				? "rgba(255, 106, 0, 0.42)"
+				: isCompleted
+					? "rgba(253, 126, 20, 0.8)"
+					: selected
+						? "var(--violetTransparent)"
+						: "var(--grey-nav)";
+	const strokeColor = isDangerous
+		? "#dc3545"
 		: isActive
-			? "rgba(255, 106, 0, 0.42)"
+			? "#ff5a00"
 			: isCompleted
-				? "rgba(253, 126, 20, 0.8)"
+				? "#fd7e14"
 				: selected
 					? "var(--violetTransparent)"
 					: "var(--grey-nav)";
-	const strokeColor = isActive
-		? "#ff5a00"
-		: isCompleted
-			? "#fd7e14"
-			: selected
-				? "var(--violetTransparent)"
-				: "var(--grey-nav)";
-	const strokeWidth = isActive
-		? 3
-		: isFocused || isCompleted
-			? 2.5
-			: undefined;
-	const opacity = isHovered
-		? 0.8
+	const strokeWidth = isDangerous
+		? isFocused
+			? 3
+			: 2.5
 		: isActive
-			? 1
-			: isCompleted
-				? 0.95
-				: 1;
+			? 3
+			: isFocused || isCompleted
+				? 2.5
+				: undefined;
+	const opacity = isDangerous
+		? 1
+		: isHovered
+			? 0.8
+			: isActive
+				? 1
+				: isCompleted
+					? 0.95
+					: 1;
 
 	return (
 		<g
@@ -258,6 +292,10 @@ const PositionInstancesLayer = observer(() => {
 	const positions = svgStore.svgData.positions;
 	const activePartId = svgStore.laserShowVisual.activePartId ?? null;
 	const hoverPartId = svgStore.laserShowVisual.hoverPartId ?? null;
+	const dangerPartIds = Array.isArray(svgStore.sheetSafetyState?.dangerPartIds)
+		? svgStore.sheetSafetyState.dangerPartIds
+		: [];
+	const dangerPartIdSet = new Set(dangerPartIds);
 	const completedCount = Math.max(
 		0,
 		Math.min(
@@ -265,7 +303,7 @@ const PositionInstancesLayer = observer(() => {
 			positions.length
 		)
 	);
-	const overlayPartIds = getOverlayPartIds(activePartId, hoverPartId);
+	const overlayPartIds = getOverlayPartIds(activePartId, hoverPartId, dangerPartIds);
 	const overlayPartIdSet = new Set(overlayPartIds);
 	const overlayItemsById = new Map();
 	const unselectedPositions = [];
@@ -282,6 +320,7 @@ const PositionInstancesLayer = observer(() => {
 			isActive,
 			isHovered,
 			isCompleted: index < completedCount,
+			isDangerous: dangerPartIdSet.has(pos.part_id),
 		};
 
 		if (overlayPartIdSet.has(pos.part_id)) {
@@ -313,6 +352,7 @@ const PositionInstancesLayer = observer(() => {
 					isActive={pos.isActive}
 					isHovered={pos.isHovered}
 					isCompleted={pos.isCompleted}
+					isDangerous={pos.isDangerous}
 				/>
 			))}
 			{selectedPositions.map(pos => (
@@ -325,6 +365,7 @@ const PositionInstancesLayer = observer(() => {
 					isActive={pos.isActive}
 					isHovered={pos.isHovered}
 					isCompleted={pos.isCompleted}
+					isDangerous={pos.isDangerous}
 				/>
 			))}
 			{overlayPositions.map(pos => (
@@ -337,6 +378,7 @@ const PositionInstancesLayer = observer(() => {
 					isActive={pos.isActive}
 					isHovered={pos.isHovered}
 					isCompleted={pos.isCompleted}
+					isDangerous={pos.isDangerous}
 				/>
 			))}
 		</>

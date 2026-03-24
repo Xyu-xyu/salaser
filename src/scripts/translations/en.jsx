@@ -477,6 +477,8 @@ const en = {
     "Parts collide": "Parts collide",
     "Part intend": "Part intend",
     "Part in part": "Part in part",
+    "Show collisions": "Show collisions",
+    "Hide collisions": "Hide collisions",
     "Move with inner part": "Move with inner part",
     "Rotate sheet": "Rotate sheet",
     "Intends": "Intends",
@@ -513,6 +515,7 @@ const en = {
     "Sheet cut order was changed": "Sheet cut order was changed",
     "No previous log entry found.": "No previous log entry found.",
     "current": "current",
-    "auto": "auto"
+    "auto": "auto",
+    "Sheet clearance updated": "Sheet clearance updated"
 }
 export default en;

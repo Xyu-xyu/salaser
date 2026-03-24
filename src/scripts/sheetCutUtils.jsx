@@ -1,14 +1,22 @@
 import SVGPathCommander from "svg-path-commander";
 import svgPath from "svgpath";
+import ClipperLib from "clipper-lib";
 import util from "./util.jsx";
 
 const partPreviewCache = new WeakMap();
 const partCutItemCache = new WeakMap();
 const positionPreviewCache = new WeakMap();
 const sheetCutPositionItemCache = new WeakMap();
+const partSafetyGeometryCache = new WeakMap();
+const positionSafetyGeometryCache = new WeakMap();
 const EPSILON = 0.0001;
+const SHEET_SAFETY_CLIPPER_SCALE = 1000;
+const SHEET_SAFETY_AREA_EPSILON = 0.01;
+const SHEET_SAFETY_MIN_CELL_SIZE = 25;
+const SHEET_SAFETY_MIN_OPEN_PATH_RADIUS = 0.001;
 export const SHEET_CUT_DEFAULT_SECTOR_SIZE = 100;
 export const SHEET_CUT_ORDER_MODES = ["current", "auto", "manual"];
+export const SHEET_SAFETY_DEFAULT_CLEARANCE = 10;
 
 const hasPath = (item) => typeof item?.path === "string" && item.path.trim().length > 0;
 const hasClass = (item, className) =>
@@ -72,6 +80,32 @@ const getMatrixObject = (pos) => {
 	return { a, b, c, d, e, f };
 };
 
+const getContourGroupsForPart = (part) => {
+	if (!Array.isArray(part?.code)) return [];
+
+	const items = part.code.filter(item => hasPath(item) && !hasClass(item, "macro5"));
+	const contours = items.filter(item => hasClass(item, "contour"));
+	const orderedContours = [
+		...contours.filter(item => hasClass(item, "inner") && !hasClass(item, "outer")),
+		...contours.filter(item => hasClass(item, "outer")),
+	];
+
+	return orderedContours.map(contour => {
+		const linkedItems = items.filter(item => (
+			item !== contour &&
+			item?.cid === contour?.cid &&
+			(hasClass(item, "inlet") || hasClass(item, "outlet"))
+		));
+
+		return {
+			contour,
+			isOuter: hasClass(contour, "outer"),
+			isInner: hasClass(contour, "inner") && !hasClass(contour, "outer"),
+			linkedItems,
+		};
+	});
+};
+
 export const transformPositionPath = (path, pos) => {
 	if (!path || !pos?.positions) return "";
 
@@ -92,21 +126,10 @@ const getCutItemsForPart = (part) => {
 		return cached.items;
 	}
 
-	const items = part.code.filter(item => hasPath(item) && !hasClass(item, "macro5"));
-	const contours = items.filter(item => hasClass(item, "contour"));
-	const innerContours = contours.filter(
-		item => hasClass(item, "inner") && !hasClass(item, "outer")
-	);
-	const outerContours = contours.filter(item => hasClass(item, "outer"));
-
-	const getByCidAndClass = (cid, className) =>
-		items.find(item => item?.cid === cid && hasClass(item, className));
-
-	const cutItems = [...innerContours, ...outerContours].flatMap(contour => {
-		const inlet = getByCidAndClass(contour.cid, "inlet");
-		const outlet = getByCidAndClass(contour.cid, "outlet");
-
-		return [inlet, contour, outlet].filter(Boolean);
+	const cutItems = getContourGroupsForPart(part).flatMap(({ contour, linkedItems }) => {
+		const inletItems = linkedItems.filter(item => hasClass(item, "inlet"));
+		const outletItems = linkedItems.filter(item => hasClass(item, "outlet"));
+		return [...inletItems, contour, ...outletItems].filter(Boolean);
 	});
 
 	partCutItemCache.set(part, {
@@ -309,7 +332,686 @@ const sortCheckerboardSectors = (sectors) => {
 
 const getBBoxArea = (bbox) => Math.max(0, (bbox?.width || 0) * (bbox?.height || 0));
 
-const getPathVertices = (path) => {
+export const normalizeSheetSafetyClearance = (clearance = SHEET_SAFETY_DEFAULT_CLEARANCE) => {
+	const numericClearance = Number(clearance);
+	return Math.max(
+		0,
+		Number.isFinite(numericClearance) ? numericClearance : SHEET_SAFETY_DEFAULT_CLEARANCE
+	);
+};
+
+const getSheetSafetyRadius = (clearance) => normalizeSheetSafetyClearance(clearance) / 2;
+
+const cloneClipperPath = (path = []) => path.map(point => ({
+	X: Number(point?.X) || 0,
+	Y: Number(point?.Y) || 0,
+}));
+
+const cloneClipperPaths = (paths = []) => paths.map(path => cloneClipperPath(path));
+
+const hasMeaningfulClipperOpenPath = (path = []) => (
+	Array.isArray(path) &&
+	path.length >= 2 &&
+	path.some((point, index) => {
+		if (index === 0) return false;
+
+		const previousPoint = path[index - 1];
+		return Math.hypot(
+			(Number(point?.X) || 0) - (Number(previousPoint?.X) || 0),
+			(Number(point?.Y) || 0) - (Number(previousPoint?.Y) || 0)
+		) > EPSILON;
+	})
+);
+
+const filterMeaningfulClipperOpenPaths = (paths = []) =>
+	(Array.isArray(paths) ? paths : [])
+		.map(path => cloneClipperPath(path))
+		.filter(hasMeaningfulClipperOpenPath);
+
+const getClipperPathArea = (path = []) => {
+	if (!Array.isArray(path) || path.length < 3) {
+		return 0;
+	}
+
+	let area = 0;
+
+	for (let index = 0; index < path.length; index += 1) {
+		const currentPoint = path[index];
+		const nextPoint = path[(index + 1) % path.length];
+		area += (Number(currentPoint?.X) || 0) * (Number(nextPoint?.Y) || 0);
+		area -= (Number(nextPoint?.X) || 0) * (Number(currentPoint?.Y) || 0);
+	}
+
+	return area / 2;
+};
+
+const hasMeaningfulClipperPath = (path = []) =>
+	Array.isArray(path) &&
+	path.length >= 3 &&
+	Math.abs(getClipperPathArea(path)) > SHEET_SAFETY_AREA_EPSILON;
+
+const filterMeaningfulClipperPaths = (paths = []) =>
+	(Array.isArray(paths) ? paths : [])
+		.map(path => cloneClipperPath(path))
+		.filter(hasMeaningfulClipperPath);
+
+const scaleClipperValue = (value) => Math.round((Number(value) || 0) * SHEET_SAFETY_CLIPPER_SCALE);
+
+const scaleUpClipperPaths = (paths = []) =>
+	filterMeaningfulClipperPaths(paths)
+		.map(path => path.map(point => ({
+			X: scaleClipperValue(point.X),
+			Y: scaleClipperValue(point.Y),
+		})));
+
+const scaleUpClipperOpenPaths = (paths = []) =>
+	filterMeaningfulClipperOpenPaths(paths)
+		.map(path => path.map(point => ({
+			X: scaleClipperValue(point.X),
+			Y: scaleClipperValue(point.Y),
+		})));
+
+const scaleDownClipperPaths = (paths = []) =>
+	(Array.isArray(paths) ? paths : [])
+		.map(path => path.map(point => ({
+			X: (Number(point?.X) || 0) / SHEET_SAFETY_CLIPPER_SCALE,
+			Y: (Number(point?.Y) || 0) / SHEET_SAFETY_CLIPPER_SCALE,
+		})));
+
+const executeClipper = (
+	subjectPaths = [],
+	clipPaths = [],
+	clipType = ClipperLib.ClipType.ctUnion
+) => {
+	const scaledSubjectPaths = scaleUpClipperPaths(subjectPaths);
+	if (!scaledSubjectPaths.length) {
+		return [];
+	}
+
+	const clipper = new ClipperLib.Clipper();
+	clipper.StrictlySimple = true;
+	clipper.AddPaths(scaledSubjectPaths, ClipperLib.PolyType.ptSubject, true);
+
+	const scaledClipPaths = scaleUpClipperPaths(clipPaths);
+	if (scaledClipPaths.length) {
+		clipper.AddPaths(scaledClipPaths, ClipperLib.PolyType.ptClip, true);
+	}
+
+	const solution = new ClipperLib.Paths();
+	clipper.Execute(
+		clipType,
+		solution,
+		ClipperLib.PolyFillType.pftNonZero,
+		ClipperLib.PolyFillType.pftNonZero
+	);
+
+	return filterMeaningfulClipperPaths(scaleDownClipperPaths(solution));
+};
+
+const unionClipperPaths = (paths = []) => executeClipper(paths, [], ClipperLib.ClipType.ctUnion);
+
+const differenceClipperPaths = (subjectPaths = [], clipPaths = []) => (
+	Array.isArray(clipPaths) && clipPaths.length
+		? executeClipper(subjectPaths, clipPaths, ClipperLib.ClipType.ctDifference)
+		: cloneClipperPaths(subjectPaths)
+);
+
+const intersectClipperPaths = (subjectPaths = [], clipPaths = []) => {
+	const intersectedPaths = executeClipper(
+		subjectPaths,
+		clipPaths,
+		ClipperLib.ClipType.ctIntersection
+	);
+
+	return intersectedPaths.some(hasMeaningfulClipperPath);
+};
+
+const offsetClipperPaths = (paths = [], delta = 0) => {
+	const filteredPaths = filterMeaningfulClipperPaths(paths);
+	if (!filteredPaths.length) {
+		return [];
+	}
+
+	if (Math.abs(delta) <= EPSILON) {
+		return filteredPaths;
+	}
+
+	const clipperOffset = new ClipperLib.ClipperOffset(
+		2,
+		scaleClipperValue(0.25)
+	);
+	const scaledPaths = scaleUpClipperPaths(filteredPaths);
+	const solution = new ClipperLib.Paths();
+
+	clipperOffset.AddPaths(
+		scaledPaths,
+		ClipperLib.JoinType.jtRound,
+		ClipperLib.EndType.etClosedPolygon
+	);
+	clipperOffset.Execute(solution, scaleClipperValue(delta));
+
+	return filterMeaningfulClipperPaths(scaleDownClipperPaths(solution));
+};
+
+const offsetOpenClipperPaths = (paths = [], delta = 0) => {
+	const filteredPaths = filterMeaningfulClipperOpenPaths(paths);
+	if (!filteredPaths.length) {
+		return [];
+	}
+
+	const safeDelta = Math.max(
+		Math.abs(Number(delta) || 0),
+		SHEET_SAFETY_MIN_OPEN_PATH_RADIUS
+	);
+	const clipperOffset = new ClipperLib.ClipperOffset(
+		2,
+		scaleClipperValue(0.25)
+	);
+	const scaledPaths = scaleUpClipperOpenPaths(filteredPaths);
+	const solution = new ClipperLib.Paths();
+
+	clipperOffset.AddPaths(
+		scaledPaths,
+		ClipperLib.JoinType.jtRound,
+		ClipperLib.EndType.etOpenRound
+	);
+	clipperOffset.Execute(solution, scaleClipperValue(safeDelta));
+
+	return filterMeaningfulClipperPaths(scaleDownClipperPaths(solution));
+};
+
+const getClipperPathsBBox = (paths = []) => {
+	if (!Array.isArray(paths) || !paths.length) {
+		return null;
+	}
+
+	let minX = Infinity;
+	let minY = Infinity;
+	let maxX = -Infinity;
+	let maxY = -Infinity;
+
+	paths.forEach(path => {
+		path.forEach(point => {
+			const x = Number(point?.X);
+			const y = Number(point?.Y);
+			if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+
+			minX = Math.min(minX, x);
+			minY = Math.min(minY, y);
+			maxX = Math.max(maxX, x);
+			maxY = Math.max(maxY, y);
+		});
+	});
+
+	if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+		return null;
+	}
+
+	return {
+		x: minX,
+		y: minY,
+		width: Math.max(0, maxX - minX),
+		height: Math.max(0, maxY - minY),
+	};
+};
+
+const doBBoxesOverlap = (leftBBox, rightBBox, tolerance = 0) => (
+	Boolean(leftBBox && rightBBox) &&
+	leftBBox.x <= rightBBox.x + rightBBox.width + tolerance &&
+	leftBBox.x + leftBBox.width + tolerance >= rightBBox.x &&
+	leftBBox.y <= rightBBox.y + rightBBox.height + tolerance &&
+	leftBBox.y + leftBBox.height + tolerance >= rightBBox.y
+);
+
+const isBBoxInsideRect = (bbox, rect, tolerance = EPSILON) => (
+	Boolean(bbox && rect) &&
+	rect.width >= 0 &&
+	rect.height >= 0 &&
+	bbox.x >= rect.x - tolerance &&
+	bbox.y >= rect.y - tolerance &&
+	bbox.x + bbox.width <= rect.x + rect.width + tolerance &&
+	bbox.y + bbox.height <= rect.y + rect.height + tolerance
+);
+
+const pathToClipperPath = (path) => {
+	const vertices = getPathVertices(path);
+	if (vertices.length < 3) {
+		return null;
+	}
+
+	return vertices.map(point => ({
+		X: point.x,
+		Y: point.y,
+	}));
+};
+
+const pathToClipperOpenPath = (path) => {
+	const vertices = getPathVertices(path);
+	if (vertices.length < 2) {
+		return null;
+	}
+
+	return vertices.map(point => ({
+		X: point.x,
+		Y: point.y,
+	}));
+};
+
+const pathsToClipperPaths = (paths = []) => (
+	(Array.isArray(paths) ? paths : [paths])
+		.filter(path => typeof path === "string" && path.trim().length > 0)
+		.map(pathToClipperPath)
+		.filter(hasMeaningfulClipperPath)
+);
+
+const pathsToClipperOpenPaths = (paths = []) => (
+	(Array.isArray(paths) ? paths : [paths])
+		.filter(path => typeof path === "string" && path.trim().length > 0)
+		.map(pathToClipperOpenPath)
+		.filter(hasMeaningfulClipperOpenPath)
+);
+
+const getPartSafetyGeometry = (part) => {
+	if (!part) {
+		return {
+			outerPaths: [],
+			innerPaths: [],
+			openPaths: [],
+		};
+	}
+
+	const signature = getPartCodeSignature(part);
+	const cached = partSafetyGeometryCache.get(part);
+	if (cached?.signature === signature) {
+		return cached.result;
+	}
+
+	const contourGroups = getContourGroupsForPart(part);
+	const result = contourGroups.reduce((geometry, group) => {
+		const contourPath = pathToClipperPath(group.contour?.path);
+		if (group.isOuter && contourPath) {
+			geometry.outerPaths.push(contourPath);
+		}
+		if (group.isInner && contourPath) {
+			geometry.innerPaths.push(contourPath);
+		}
+		if (group.linkedItems.length) {
+			geometry.openPaths.push(
+				...pathsToClipperOpenPaths(group.linkedItems.map(item => item.path))
+			);
+		}
+
+		return geometry;
+	}, {
+		outerPaths: [],
+		innerPaths: [],
+		openPaths: [],
+	});
+
+	partSafetyGeometryCache.set(part, {
+		signature,
+		result,
+	});
+
+	return result;
+};
+
+const transformClipperPaths = (paths = [], pos) => {
+	const matrix = getMatrixObject(pos);
+
+	return filterMeaningfulClipperPaths(paths)
+		.map(path => path.map(point => ({
+			X: matrix.a * point.X + matrix.c * point.Y + matrix.e,
+			Y: matrix.b * point.X + matrix.d * point.Y + matrix.f,
+		})))
+		.filter(hasMeaningfulClipperPath);
+};
+
+const transformClipperOpenPaths = (paths = [], pos) => {
+	const matrix = getMatrixObject(pos);
+
+	return filterMeaningfulClipperOpenPaths(paths)
+		.map(path => path.map(point => ({
+			X: matrix.a * point.X + matrix.c * point.Y + matrix.e,
+			Y: matrix.b * point.X + matrix.d * point.Y + matrix.f,
+		})))
+		.filter(hasMeaningfulClipperOpenPath);
+};
+
+const getPositionSafetyGeometry = (
+	svgData,
+	pos,
+	clearance = SHEET_SAFETY_DEFAULT_CLEARANCE
+) => {
+	const part = getPartByCodeId(svgData, pos?.part_code_id);
+	if (!part) {
+		return null;
+	}
+
+	const normalizedClearance = normalizeSheetSafetyClearance(clearance);
+	const signature = `${getSheetCutPositionItemSignature(svgData, pos)}:${normalizedClearance}`;
+	const cached = positionSafetyGeometryCache.get(pos);
+	if (cached?.signature === signature) {
+		return cached.result;
+	}
+
+	const radius = getSheetSafetyRadius(normalizedClearance);
+	const partGeometry = getPartSafetyGeometry(part);
+	const worldOuterPaths = transformClipperPaths(partGeometry.outerPaths, pos);
+	const worldInnerPaths = transformClipperPaths(partGeometry.innerPaths, pos);
+	const worldOpenPaths = transformClipperOpenPaths(partGeometry.openPaths, pos);
+	const safeOuterSourcePaths = radius > EPSILON
+		? offsetClipperPaths(worldOuterPaths, radius)
+		: cloneClipperPaths(worldOuterPaths);
+	const safeOuterPaths = unionClipperPaths(safeOuterSourcePaths);
+	const safeHoleSourcePaths = !worldInnerPaths.length
+		? []
+		: radius > EPSILON
+			? offsetClipperPaths(worldInnerPaths, -radius)
+			: cloneClipperPaths(worldInnerPaths);
+	const safeHolePaths = unionClipperPaths(safeHoleSourcePaths);
+	const safeOpenPaths = worldOpenPaths.length
+		? unionClipperPaths(offsetOpenClipperPaths(worldOpenPaths, radius))
+		: [];
+	const safeSolidBasePaths = safeHolePaths.length
+		? differenceClipperPaths(safeOuterPaths, safeHolePaths)
+		: cloneClipperPaths(safeOuterPaths);
+	const safeSolidPaths = safeOpenPaths.length
+		? unionClipperPaths([...safeSolidBasePaths, ...safeOpenPaths])
+		: safeSolidBasePaths;
+	const safeOuterCollisionPaths = safeOpenPaths.length
+		? unionClipperPaths([...safeOuterPaths, ...safeOpenPaths])
+		: safeOuterPaths;
+	const safeOuterBBox = getClipperPathsBBox(safeOuterCollisionPaths) || getClipperPathsBBox(safeOuterPaths);
+	const safeSolidBBox = getClipperPathsBBox(safeSolidPaths) || safeOuterBBox;
+	const result = {
+		partId: pos?.part_id ?? null,
+		pos,
+		part,
+		clearance: normalizedClearance,
+		radius,
+		safeOpenPaths,
+		safeOuterPaths: safeOuterCollisionPaths.length
+			? safeOuterCollisionPaths
+			: cloneClipperPaths(safeOuterPaths),
+		safeSolidPaths: safeSolidPaths.length
+			? safeSolidPaths
+			: cloneClipperPaths(safeOuterCollisionPaths.length ? safeOuterCollisionPaths : safeOuterPaths),
+		safeOuterBBox,
+		safeSolidBBox,
+	};
+
+	positionSafetyGeometryCache.set(pos, {
+		signature,
+		result,
+	});
+
+	return result;
+};
+
+const getSheetSafetyItems = (
+	svgData,
+	clearance = SHEET_SAFETY_DEFAULT_CLEARANCE
+) => (
+	(Array.isArray(svgData?.positions) ? svgData.positions : [])
+		.map(pos => getPositionSafetyGeometry(svgData, pos, clearance))
+		.filter(item => item?.partId !== null && item?.safeOuterBBox)
+);
+
+const getSpatialHashCellSize = (items = [], clearance = SHEET_SAFETY_DEFAULT_CLEARANCE) => {
+	const fallbackSize = Math.max(
+		SHEET_SAFETY_MIN_CELL_SIZE,
+		normalizeSheetSafetyClearance(clearance)
+	);
+	const dominantSizes = items
+		.map(item => Math.max(item?.safeOuterBBox?.width || 0, item?.safeOuterBBox?.height || 0))
+		.filter(size => Number.isFinite(size) && size > 0);
+
+	if (!dominantSizes.length) {
+		return fallbackSize;
+	}
+
+	const averageSize = dominantSizes.reduce((total, size) => total + size, 0) / dominantSizes.length;
+	return Math.max(fallbackSize, Math.min(averageSize, 250));
+};
+
+const getBBoxCellRange = (bbox, cellSize) => {
+	if (!bbox || !Number.isFinite(cellSize) || cellSize <= 0) {
+		return null;
+	}
+
+	return {
+		minCol: Math.floor(bbox.x / cellSize),
+		maxCol: Math.floor((bbox.x + bbox.width) / cellSize),
+		minRow: Math.floor(bbox.y / cellSize),
+		maxRow: Math.floor((bbox.y + bbox.height) / cellSize),
+	};
+};
+
+const buildSpatialHash = (items = [], cellSize = SHEET_SAFETY_MIN_CELL_SIZE) => {
+	const hash = new Map();
+
+	items.forEach(item => {
+		const range = getBBoxCellRange(item.safeOuterBBox, cellSize);
+		if (!range) return;
+
+		for (let col = range.minCol; col <= range.maxCol; col += 1) {
+			for (let row = range.minRow; row <= range.maxRow; row += 1) {
+				const key = `${col}:${row}`;
+				if (!hash.has(key)) {
+					hash.set(key, []);
+				}
+
+				hash.get(key).push(item.partId);
+			}
+		}
+	});
+
+	return hash;
+};
+
+const getCandidatePairItems = (
+	items = [],
+	movingPartIds = [],
+	clearance = SHEET_SAFETY_DEFAULT_CLEARANCE
+) => {
+	const itemById = new Map(items.map(item => [item.partId, item]));
+	const movingIdSet = new Set(
+		(Array.isArray(movingPartIds) ? movingPartIds : [])
+			.filter(partId => itemById.has(partId))
+	);
+	const sourceItems = movingIdSet.size
+		? items.filter(item => movingIdSet.has(item.partId))
+		: items;
+	const cellSize = getSpatialHashCellSize(items, clearance);
+	const spatialHash = buildSpatialHash(items, cellSize);
+	const pairKeySet = new Set();
+	const pairs = [];
+
+	sourceItems.forEach(item => {
+		const range = getBBoxCellRange(item.safeOuterBBox, cellSize);
+		if (!range) return;
+
+		const candidateIds = new Set();
+		for (let col = range.minCol; col <= range.maxCol; col += 1) {
+			for (let row = range.minRow; row <= range.maxRow; row += 1) {
+				const bucket = spatialHash.get(`${col}:${row}`) || [];
+				bucket.forEach(partId => {
+					candidateIds.add(partId);
+				});
+			}
+		}
+
+		candidateIds.forEach(candidateId => {
+			if (candidateId === item.partId) return;
+
+			const candidateItem = itemById.get(candidateId);
+			if (!candidateItem) return;
+			if (!doBBoxesOverlap(item.safeOuterBBox, candidateItem.safeOuterBBox)) return;
+
+			const leftId = Math.min(item.partId, candidateId);
+			const rightId = Math.max(item.partId, candidateId);
+			const pairKey = `${leftId}:${rightId}`;
+			if (pairKeySet.has(pairKey)) return;
+
+			pairKeySet.add(pairKey);
+			pairs.push([itemById.get(leftId), itemById.get(rightId)]);
+		});
+	});
+
+	return {
+		cellSize,
+		pairs,
+	};
+};
+
+const getSheetSafetyRect = (svgData, radius = 0) => {
+	const width = Number(svgData?.width);
+	const height = Number(svgData?.height);
+	if (!Number.isFinite(width) || !Number.isFinite(height)) {
+		return null;
+	}
+
+	return {
+		x: radius,
+		y: radius,
+		width: width - radius * 2,
+		height: height - radius * 2,
+	};
+};
+
+const createDangerEntry = (dangerById, partId) => {
+	if (!dangerById[partId]) {
+		dangerById[partId] = {
+			partId,
+			edge: false,
+			collisionIds: [],
+		};
+	}
+
+	return dangerById[partId];
+};
+
+const addCollisionDanger = (dangerById, leftPartId, rightPartId) => {
+	const leftEntry = createDangerEntry(dangerById, leftPartId);
+	const rightEntry = createDangerEntry(dangerById, rightPartId);
+
+	if (!leftEntry.collisionIds.includes(rightPartId)) {
+		leftEntry.collisionIds.push(rightPartId);
+	}
+
+	if (!rightEntry.collisionIds.includes(leftPartId)) {
+		rightEntry.collisionIds.push(leftPartId);
+	}
+};
+
+const addEdgeDanger = (dangerById, partId) => {
+	createDangerEntry(dangerById, partId).edge = true;
+};
+
+const sortNumericIds = (values = []) => (
+	[...new Set(values.map(value => Number(value)).filter(Number.isFinite))]
+		.sort((left, right) => left - right)
+);
+
+export const getSheetSafetyEvaluation = (
+	svgData,
+	{
+		partIds = null,
+		clearance = SHEET_SAFETY_DEFAULT_CLEARANCE,
+		allowPartInPart = true,
+	} = {}
+) => {
+	const normalizedClearance = normalizeSheetSafetyClearance(clearance);
+	const movingPartIds = sortNumericIds(Array.isArray(partIds) ? partIds : []);
+	const movingIdSet = new Set(movingPartIds);
+	const items = getSheetSafetyItems(svgData, normalizedClearance);
+	const dangerById = {};
+	const collisionPairs = [];
+	const edgePartIds = [];
+
+	if (!items.length) {
+		return {
+			partIds: movingPartIds,
+			clearance: normalizedClearance,
+			candidateCellSize: getSpatialHashCellSize([], normalizedClearance),
+			candidatePairsCount: 0,
+			dangerPartIds: [],
+			edgePartIds: [],
+			collisionPairs: [],
+			reasonsById: {},
+		};
+	}
+
+	const { cellSize, pairs } = getCandidatePairItems(items, movingPartIds, normalizedClearance);
+
+	pairs.forEach(([leftItem, rightItem]) => {
+		if (!leftItem || !rightItem) return;
+
+		const leftPaths = allowPartInPart ? leftItem.safeSolidPaths : leftItem.safeOuterPaths;
+		const rightPaths = allowPartInPart ? rightItem.safeSolidPaths : rightItem.safeOuterPaths;
+		const leftBBox = allowPartInPart ? leftItem.safeSolidBBox : leftItem.safeOuterBBox;
+		const rightBBox = allowPartInPart ? rightItem.safeSolidBBox : rightItem.safeOuterBBox;
+
+		if (!doBBoxesOverlap(leftBBox, rightBBox)) {
+			return;
+		}
+
+		if (!intersectClipperPaths(leftPaths, rightPaths)) {
+			return;
+		}
+
+		collisionPairs.push([leftItem.partId, rightItem.partId]);
+		addCollisionDanger(dangerById, leftItem.partId, rightItem.partId);
+	});
+
+	const sheetSafetyRect = getSheetSafetyRect(svgData, getSheetSafetyRadius(normalizedClearance));
+	items.forEach(item => {
+		if (movingIdSet.size && !movingIdSet.has(item.partId)) {
+			return;
+		}
+
+		if (!isBBoxInsideRect(item.safeOuterBBox, sheetSafetyRect)) {
+			edgePartIds.push(item.partId);
+			addEdgeDanger(dangerById, item.partId);
+		}
+	});
+
+	const reasonsById = Object.fromEntries(
+		Object.entries(dangerById).map(([partId, reason]) => [
+			partId,
+			{
+				edge: Boolean(reason.edge),
+				collisionIds: sortNumericIds(reason.collisionIds),
+			},
+		])
+	);
+
+	return {
+		partIds: movingPartIds,
+		clearance: normalizedClearance,
+		candidateCellSize: cellSize,
+		candidatePairsCount: pairs.length,
+		dangerPartIds: sortNumericIds([
+			...edgePartIds,
+			...collisionPairs.flat(),
+		]),
+		edgePartIds: sortNumericIds(edgePartIds),
+		collisionPairs: collisionPairs
+			.map(([leftPartId, rightPartId]) => [
+				Math.min(leftPartId, rightPartId),
+				Math.max(leftPartId, rightPartId),
+			])
+			.sort((left, right) => (
+				left[0] !== right[0]
+					? left[0] - right[0]
+					: left[1] - right[1]
+			)),
+		reasonsById,
+	};
+};
+
+function getPathVertices(path) {
 	if (!path?.trim()) {
 		return [];
 	}
@@ -351,7 +1053,7 @@ const getPathVertices = (path) => {
 		console.warn("Path vertex detection error:", error);
 		return [];
 	}
-};
+}
 
 const containsPointInVertices = (point, vertices) => {
 	if (!point || !Array.isArray(vertices) || vertices.length < 3) {

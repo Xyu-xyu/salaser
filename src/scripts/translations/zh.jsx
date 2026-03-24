@@ -439,6 +439,10 @@ const zh = {
     "Apply params for all": "将参数应用于所有",
     " Max retries exceeded with url. /cut_settings/settings?gcore=0 (Caused by NewConnectionError(`<urllib3.connection.HTTPConnection object at 0x7f530af770d0>. Failed to establish a new connection. [Errno 113] EHOSTUNREACH`))": "url 超出最大重试次数。",
     "Parts collide": "零件碰撞",
+    "Part intend": "安全间距",
+    "Part in part": "零件套零件",
+    "Show collisions": "显示碰撞",
+    "Hide collisions": "不显示碰撞",
     "Intends": "打算",
     "Sheet size": "板材尺寸",
     "width": "宽度",
@@ -466,6 +470,7 @@ const zh = {
     "Sheet filled with selected part": "填充了选定部分的工作表",
     "Sheet cut order was changed": "裁切顺序已更改",
     "No previous log entry found.": "未找到以前的日志条目。",
-    "auto": "汽车"
+    "auto": "汽车",
+    "Sheet clearance updated": "已更新板材间隙"
 }
 export default zh;

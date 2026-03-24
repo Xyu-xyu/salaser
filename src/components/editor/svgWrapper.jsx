@@ -23,12 +23,45 @@ const SvgWrapper = observer(() => {
 		initialMatrices: new Map(), // part_id → { e, f }
 		hasMoved: false,
 	});
+	const safetyPreviewFrameRef = useRef(null);
 
 	// Touch state
 	const evCache = useRef([]);                         // массив Touch
 	const prevDiff = useRef(-1);                        // расстояние между пальцами
 
 	const [wrapperClass, setWrapperClass] = useState('');
+
+	const getSelectedPartIds = () => (
+		svgStore.svgData.positions
+			.filter(part => part.selected)
+			.map(part => part.part_id)
+	);
+
+	const cancelSheetSafetyPreview = () => {
+		if (safetyPreviewFrameRef.current !== null) {
+			window.cancelAnimationFrame(safetyPreviewFrameRef.current);
+			safetyPreviewFrameRef.current = null;
+		}
+	};
+
+	const runSheetSafetyPreview = () => {
+		cancelSheetSafetyPreview();
+		const selectedPartIds = getSelectedPartIds();
+		svgStore.recalculateSheetSafety({
+			partIds: selectedPartIds.length ? selectedPartIds : null,
+		});
+	};
+
+	const scheduleSheetSafetyPreview = () => {
+		if (safetyPreviewFrameRef.current !== null) {
+			return;
+		}
+
+		safetyPreviewFrameRef.current = window.requestAnimationFrame(() => {
+			safetyPreviewFrameRef.current = null;
+			runSheetSafetyPreview();
+		});
+	};
 
 	// =============== WHEEL ZOOM ===============
 	const handleMouseWheel = (e) => {
@@ -194,6 +227,7 @@ const SvgWrapper = observer(() => {
 					}
 				});
 			});
+			scheduleSheetSafetyPreview();
 
 		}
 
@@ -285,17 +319,20 @@ const SvgWrapper = observer(() => {
 					}
 				});
 			});
+			scheduleSheetSafetyPreview();
 		}
 	};
 
 	const endDrag = () => {
 		inMoveRef.current = false;
+		cancelSheetSafetyPreview();
 		console.log ("END DRAG")
 		const shouldLogMove = dragState.current.isDragging && dragState.current.hasMoved;
 		if (editorStore.mode === 'dragging') {
 			editorStore.setMode('resize');
-			svgStore.deleteOutParts()
+			svgStore.deleteOutParts({ recalculate: false })
 		}
+		svgStore.recalculateSheetSafety();
 		if (dragState.current.isDragging) {
 			dragState.current.isDragging = false;
 			dragState.current.hasMoved = false;
@@ -331,6 +368,13 @@ const SvgWrapper = observer(() => {
 		return () => {
 			wrapper.removeEventListener('touchmove', handleTouchMove);
 			wrapper.removeEventListener('wheel', handleWheel);
+		};
+	}, []);
+
+	useEffect(() => {
+		svgStore.recalculateSheetSafety();
+		return () => {
+			cancelSheetSafetyPreview();
 		};
 	}, []);
 

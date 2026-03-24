@@ -16,12 +16,19 @@ const SheetPanel = observer(() => {
     width: svgData.width ?? '',
     height: svgData.height ?? '',
   });
+  const initialSafetyRef = useRef({
+    clearance: svgStore.getSheetSafetyClearance(),
+    allowPartInPart: svgStore.isSheetPartInPartEnabled(),
+  });
 
   // Локальное состояние для инпутов
   const [values, setValues] = useState({
     width: svgData.width ?? '',
     height: svgData.height ?? '',
   });
+  const [clearanceInput, setClearanceInput] = useState(
+    () => String(svgStore.getSheetSafetyClearance())
+  );
 
   // Синхронизация если store изменился извне
   useEffect(() => {
@@ -30,6 +37,10 @@ const SheetPanel = observer(() => {
       height: svgData.height ?? '',
     });
   }, [svgData.width, svgData.height]);
+
+  useEffect(() => {
+    setClearanceInput(String(svgStore.getSheetSafetyClearance()));
+  }, [svgStore.sheetSafetySettings.clearance]);
 
   // Изменение поля (без агрессивной валидации)
   const handleChange = (key) => (e) => {
@@ -87,6 +98,57 @@ const SheetPanel = observer(() => {
     }
   };
 
+  const handleClearanceChange = (e) => {
+    const rawValue = e.target.value;
+
+    if (rawValue === '') {
+      setClearanceInput('');
+      return;
+    }
+
+    if (!/^\d*\.?\d*$/.test(rawValue)) return;
+
+    setClearanceInput(rawValue);
+
+    const num = parseFloat(rawValue);
+    if (!isNaN(num) && num >= 0) {
+      svgStore.setSheetSafetyClearance(num);
+    }
+  };
+
+  const handleClearanceFocus = () => {
+    initialSafetyRef.current.clearance = svgStore.getSheetSafetyClearance();
+  };
+
+  const handleClearanceBlur = () => {
+    const nextClearance = svgStore.setSheetSafetyClearance(clearanceInput);
+    setClearanceInput(String(nextClearance));
+
+    if (Number(initialSafetyRef.current.clearance) !== nextClearance) {
+      addToSheetLog('Sheet clearance updated');
+      initialSafetyRef.current.clearance = nextClearance;
+    }
+  };
+
+  const handlePartInPartChange = (e) => {
+    const nextValue = e.target.checked;
+    const previousValue = svgStore.isSheetPartInPartEnabled();
+    svgStore.setSheetPartInPart(nextValue);
+
+    if (previousValue !== nextValue) {
+      addToSheetLog('Part in part setting updated');
+      initialSafetyRef.current.allowPartInPart = nextValue;
+    }
+  };
+
+  const dangerPartCount = svgStore.getSheetSafetyDangerCount();
+  const showDangersEnabled = svgStore.isShowDangersEnabled();
+  const dangerPartCountLabel = showDangersEnabled ? dangerPartCount : '-';
+
+  const handleShowDangersToggle = (e) => {
+    svgStore.setShowDangers(e.target.checked);
+  };
+
   const panelInfo = {
     id: "sheetPopup",
     fa: (
@@ -125,6 +187,10 @@ const SheetPanel = observer(() => {
                   className="form-control"
                 />
               </td>
+            </tr>
+            <tr>
+
+
 
               <td className="align-middle">
                 <div>{t("height")}:</div>
@@ -142,6 +208,65 @@ const SheetPanel = observer(() => {
                   className="form-control"
                 />
               </td>
+
+            </tr>
+
+            <tr>
+              <td className="align-middle">
+                <div>{t("Part intend")}:</div>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  step="0.01"
+                  min={0}
+                  value={clearanceInput}
+                  onChange={handleClearanceChange}
+                  onFocus={handleClearanceFocus}
+                  onBlur={handleClearanceBlur}
+                  className="form-control"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="align-middle">
+                <div>{t("Parts collide")}:</div>
+              </td>
+              <td className="align-middle">
+                <strong>{dangerPartCountLabel}</strong>
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={4}>
+                <div className="form-check ms-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="sheetShowDangers"
+                    checked={showDangersEnabled}
+                    onChange={handleShowDangersToggle}
+                  />
+                  <label className="form-check-label" htmlFor="sheetShowDangers">
+                    {t("Show collisions")}
+                  </label>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={4}>
+                <div className="form-check ms-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="sheetPartInPart"
+                    checked={svgStore.isSheetPartInPartEnabled()}
+                    onChange={handlePartInPartChange}
+                  />
+                  <label className="form-check-label" htmlFor="sheetPartInPart">
+                    {t("Part in part")}
+                  </label>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -153,136 +278,3 @@ const SheetPanel = observer(() => {
 });
 
 export default SheetPanel;
-
-{/* 
-								<tr>
-									<td>
-										<div className="d-flex">
-											<div><p>{t("Time for cut")}:</p></div>
-											<div><p id="info_cutTime"></p></div>											
-										</div>
-									</td>									 
-								</tr>
-								
-								<tr>
-									<td>
-										<div className="d-flex">
-											<div><p>{t("thickness")}:</p></div>
-											<div><p id="info_thickness"></p></div>
-										</div>
-									</td>
-								</tr>
-
-
-								<tr>
-									<td>
-										<p>{t("Material")}:</p>									 
-										<p id="info_materialCode"></p>								 
-										<p id="info_MaterialInfoLabel"></p>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<div className="d-flex">
-											<div><p>{t("Parts collide")}:</p></div>
-											<div><p id="info_collision">0</p></div>
-										</div>
-									</td>
-									<td>
-										<div className="d-flex partIntendPanel">
-											<div><p>{t("Part intend")}:</p></div>
-											<div>
-												<input 
-													style={{width:"50px"}} 
-													type="number" 
-													min={5} placeholder={0} 
-													id="partIntend" 
-												/>
-											</div>
-										</div>
-									</td>
-									<td>
-										<div className="form-check ms-2" id="partInPartPanel">
-											<input 
-												className="form-check-input" 
-												type="checkbox" 
-												value="" 
-												id="partInPart" checked />
-											<label className="form-check-label" htmlFor="partInPart">
-												{t("Part in part")}
-											</label>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td colSpan='3'>
-										<div className="form-check ms-2 moveInnerPartsPanel">
-											<input 
-												className="form-check-input" 
-												type="checkbox" 
-												value="" 
-												id="moveInnerParts" checked />
-											<label className="form-check-label" htmlFor="moveInnerParts">
-												{t("Move with inner part")}
-											</label>
-										</div>
-										<button type="button" className="btn text-white mt-1 ms-2 btn_rotate_sheet" onMouseDown={ ()=>{}}>
-											{t('Rotate sheet')} 180°
-										</button>
-									</td>
-								</tr>
-								<tr>
-									<td colSpan="3" id="intednsPanel">
-										<div><p>{t('Intends')}:</p></div>
-										<div>
-											<div className="d-flex justify-content-center align-items-center">
-												<div>
-													<input 
-														style={{width:"50px"}} 
-														className="inputIntend" 
-														type="number" min={0} 
-														placeholder={0} 
-														id="intendBottom" 
-														value={CONSTANTS.defaultIntend} 
-													/>
-												</div>
-											</div>
-											<div className="d-flex justify-content-center align-items-center">
-												<div>
-													<input 
-														style={{width:"50px"}} 
-														className="inputIntend" 
-														type="number" 
-														min={0} placeholder={0} 
-														id="intendRight" 
-														value={CONSTANTS.defaultIntend} />
-												</div>
-												<div id="sheetModel">
-													<div id="intendModel">
-													</div>
-												</div>
-												<div>
-													<input 
-														style={{width:"50px"}} 
-														className="inputIntend" 
-														type="number" min={0} 
-														placeholder={0} id="intendLeft" 
-														value={CONSTANTS.defaultIntend} 
-													/>
-												</div>
-											</div>
-											<div className="d-flex justify-content-center align-items-center">
-												<div>
-													<input 
-														style={{width:"50px"}} 
-														className="inputIntend" 
-														type="number" min={0} 
-														placeholder={0} 
-														id="intendTop" 
-														value={CONSTANTS.defaultIntend} 
-													/>
-												</div>
-											</div>
-										</div>
-									</td>
-								</tr> */}

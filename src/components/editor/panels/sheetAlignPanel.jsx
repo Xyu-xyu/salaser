@@ -168,6 +168,7 @@ const SheetAlignPanel = observer(() => {
 		if (!filledPositions.length) return;
 
 		svgStore.svgData.positions = [...remainingPositions, ...filledPositions];
+		svgStore.recalculateSheetSafety();
 		addToSheetLog('Sheet filled with selected part');
 	};
  
@@ -224,6 +225,7 @@ const SheetAlignPanel = observer(() => {
 			};
 		});
 
+		svgStore.recalculateSheetSafety();
 		addToSheetLog('Selected parts aligned');
 	};
 
@@ -294,6 +296,7 @@ const SheetAlignPanel = observer(() => {
 			prev = current;
 		}
 
+		svgStore.recalculateSheetSafety();
 		addToSheetLog('Selected parts spread');
 	};
 
