@@ -1,19 +1,54 @@
 import { observer } from "mobx-react-lite";
-import React, { useState, useRef, useEffect } from "react";
+import { isValidElement, useRef, useEffect } from "react";
 import panelStore from "./../../../store/panelStore";
-import { toJS } from "mobx";
+import CustomIcon from "./../../../icons/customIcon.jsx";
 
+const extractTextContent = (node) => {
+	if (node === null || node === undefined || typeof node === "boolean") {
+		return "";
+	}
+
+	if (typeof node === "string" || typeof node === "number") {
+		return String(node);
+	}
+
+	if (Array.isArray(node)) {
+		return node.map(extractTextContent).join(" ");
+	}
+
+	if (isValidElement(node)) {
+		return extractTextContent(node.props.children);
+	}
+
+	return "";
+};
+
+const getPanelTitleFromId = (panelId) => (
+	panelId
+		.replace(/Popup$/, "")
+		.replace(/([a-z])([A-Z])/g, "$1 $2")
+		.replace(/^./, letter => letter.toUpperCase())
+);
 
 const Panel = observer(({ element }) => {
 	const id = element.id
 	const contentDragDisabledIds = new Set(['cutPopup', 'sheetCutPopup']);
+	const dockExcludedIds = new Set(['toolsPopup', 'sheetToolsPopup']);
 	const isContentDragDisabled = contentDragDisabledIds.has(id);
+	const isDocked = panelStore.dockMode && !dockExcludedIds.has(id);
+	const isMini = panelStore.positions[id]?.mini ?? true;
+	const dockTitle = (
+		extractTextContent(element.dockTitle ?? element.fa)
+			.replace(/\s+/g, " ")
+			.trim() || getPanelTitleFromId(id)
+	);
 
 	useEffect(() => {
 		panelStore.getInitialPositions()
 	}, [])
 
 	const panelRef = useRef(null);
+	const dockPanelRef = useRef(null);
 	const startPos = useRef({ x: 0, y: 0 });
 	const startWidth = useRef(0);
 	const startHeight = useRef(0);
@@ -22,18 +57,30 @@ const Panel = observer(({ element }) => {
 	const move = useRef(0);
 
 	const toggleMinified = () => {
-		handleIncreaseZIndex()
+		if (!panelStore.positions[id]) return;
+		const nextMini = !Boolean(panelStore.positions[id].mini);
+
+		if (!isDocked) {
+			handleIncreaseZIndex()
+		}
+
 		let positions = {
 			style: {
 				width: panelStore.positions[id].style.width,
 				height: panelStore.positions[id].style.height,
 				top: panelStore.positions[id].style.top,
 				left: panelStore.positions[id].style.left,
-				zIndex: panelStore.maxZindex
+				zIndex: isDocked ? panelStore.positions[id].style.zIndex : panelStore.maxZindex
 			}
 		}
-		positions.mini = Boolean(!Number(panelStore.positions[id].mini))
+		positions.mini = nextMini
 		panelStore.setPosition(id, positions)
+		
+		if (isDocked && !nextMini) {
+			panelStore.collapsePanels([id, ...Array.from(dockExcludedIds)]);
+			return;
+		}
+
 		savePanelPosition()
 	};
 
@@ -151,7 +198,7 @@ const Panel = observer(({ element }) => {
 		panelStore.setMaxZindex(currentMaxZIndex)
 	};
 
-	const savePanelPosition = (id) => {
+	const savePanelPosition = () => {
 		//console.log(toJS(panelStore.positions)); // если используешь mobx
 		const entries = Object.entries(panelStore.positions);
 		const sortedEntries = entries.sort(([, a], [, b]) => a.style.zIndex - b.style.zIndex);
@@ -166,22 +213,60 @@ const Panel = observer(({ element }) => {
 			};
 		});
 
-		panelStore.positions = updatedPositions;
-		localStorage.setItem('ppp', JSON.stringify(updatedPositions));
+		panelStore.setPositions(updatedPositions);
 	};
 
 	return (
+		isDocked ? (
+			<div ref={dockPanelRef} className={`editor-dock-panel ${isMini ? "mini" : "open"}`}>
+				<button
+					type="button"
+					className={`editor-dock-header ${isMini ? "functionItem" : "functionItemPlanOpen"} list-group-item`}
+					onClick={toggleMinified}
+					aria-expanded={!isMini}
+					aria-controls={`${id}-dock-content`}
+				>
+					<div className="editor-dock-header-inner">
+						<div className="editor-dock-chevron">
+							<CustomIcon
+								icon="si:expand-more-alt-fill"
+								width="24"
+								height="24"
+								color="black"
+								fill="black"
+								strokeWidth={0}
+								style={{
+									transform: `rotate(${isMini ? 0 : 180}deg)`,
+									transition: "transform 0.5s ease-in-out",
+								}}
+							/>
+						</div>
+						<div className="editor-dock-title">
+							<h6 className="p-0 m-0">{dockTitle}</h6>
+						</div>
+					</div>
+				</button>
+				{!isMini && (
+					<div
+						id={`${id}-dock-content`}
+						className="editor-dock-content"
+					>
+						{element.content}
+					</div>
+				)}
+			</div>
+		) : (
 		<div>
 		<div
 			ref={panelRef}
 			id={element.id}
-			className={`window popup ${panelStore.positions[id].mini ? " mini h45" : ""}`}
+			className={`window popup ${isMini ? " mini h45" : ""}`}
 			style={{
 				zIndex: `${panelStore.positions[id].style.zIndex}`,
 				top: `${panelStore.positions[id].style.top}px`,
 				left: `${panelStore.positions[id].style.left}px`,
 				width: `${panelStore.positions[id].style.width}px`,
-				height: `${panelStore.positions[id].mini ? 45 : panelStore.positions[id].style.height}px`,
+				height: `${isMini ? 45 : panelStore.positions[id].style.height}px`,
 			}}
 			
 		>
@@ -197,7 +282,7 @@ const Panel = observer(({ element }) => {
 					</div>
 					<div className="minify_wrapper d-flex align-items-center justify-content-center">
 						<div
-							className={`minify ${panelStore.positions[id].mini ? "minified" : ""}`}
+							className={`minify ${isMini ? "minified" : ""}`}
 							onClick={(e) => {
 								e.stopPropagation();
 								toggleMinified();
@@ -206,7 +291,7 @@ const Panel = observer(({ element }) => {
 					</div>
 				</div>
 			</div>
-			<div className={`window-content ${panelStore.positions[id].mini ? "mini" : ""}`}
+			<div className={`window-content ${isMini ? "mini" : ""}`}
 			 onMouseDown={isContentDragDisabled ? undefined : handleMouseDown}
 			 onTouchStart={isContentDragDisabled ? undefined : handleMouseDown}
 			 style={isContentDragDisabled ? { overflow: "hidden" } : undefined}
@@ -214,17 +299,17 @@ const Panel = observer(({ element }) => {
 				{element.content}
 			</div>
 			<div
-				className={`resizer-right ${panelStore.positions[id].mini ? "mini" : ""}`}
+				className={`resizer-right ${isMini ? "mini" : ""}`}
 				onMouseDown={initDrag}
 				onMouseUp={handleMouseUp}
 			></div>
 			<div
-				className={`resizer-bottom ${panelStore.positions[id].mini ? "mini" : ""}`}
+				className={`resizer-bottom ${isMini ? "mini" : ""}`}
 				onMouseDown={initDrag}
 				onMouseUp={handleMouseUp}
 			></div>
 			<div
-				className={`resizer-both ${panelStore.positions[id].mini ? "mini" : ""}`}
+				className={`resizer-both ${isMini ? "mini" : ""}`}
 				onMouseDown={initDrag}
 				onMouseUp={handleMouseUp}
 				onTouchStart={initDrag}
@@ -233,6 +318,7 @@ const Panel = observer(({ element }) => {
 			</div>
 		</div>		
 		</div>
+		)
 	);
 });
 

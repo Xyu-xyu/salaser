@@ -1893,6 +1893,123 @@ height: fit-content;}
   background-color: var(--darkBg);
 }
 
+.editor-mode-layout {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.editor-canvas-shell {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+}
+
+.editor-panels-root {
+  flex: 0 0 0;
+  width: 0;
+  min-width: 0;
+  height: 100%;
+  overflow: visible;
+}
+
+.editor-panels-root-docked {
+  flex-basis: clamp(320px, 28vw, 420px);
+  width: clamp(320px, 28vw, 420px);
+  min-width: 280px;
+  height: calc(100% - 8px);
+  margin-top: 8px;
+  background-color: var(--white);
+  border-top-left-radius: 10px;
+  overflow: hidden;
+}
+
+.editor-dock-sidebar-scroll {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 12px 12px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editor-dock-panel {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.editor-dock-panel.open {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-dock-header {
+  width: 100%;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  border: none;
+  box-shadow: none;
+}
+
+.editor-dock-header.functionItemPlanOpen {
+  border: 1px solid var(--grey-progress) !important;
+  border-bottom: none !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.editor-dock-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.editor-dock-title {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.editor-dock-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 0;
+  border: none;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.editor-dock-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: var(--grey-main);
+  border: 1px solid var(--grey-progress);
+  border-top: none;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
 
 .btn-shape-selected svg path,
 .btn-figure-selected svg path{
@@ -2335,6 +2452,17 @@ top:var(--hEdge);
 }
 /*         конец          */
 
+.formsPanelContent {
+  width: 100%;
+}
+
+.formsPanelContentDocked {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
 #partListContainer tr td.longText{
   max-width: 6rem !important; /* Максимальная ширина ячейки */
   white-space: nowrap !important; /* Текст не переносится на новую строку */
@@ -2346,9 +2474,11 @@ top:var(--hEdge);
   max-width: 5rem !important; /* Максимальная ширина ячейки */ 
 }
 
-.header {
+.formsPanelHeaderCell {
   position: sticky;
   top: 0;
+  z-index: 2;
+  background-color: var(--white) !important;
 }
 
 .containerTable {
@@ -2356,6 +2486,13 @@ top:var(--hEdge);
   height: 700px;
   overflow-x:hidden;
   overflow-y:auto ;
+}
+
+.containerTableDocked {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  overflow: visible;
 }
 
 
@@ -2520,7 +2657,7 @@ cursor: url('./images//cursor_plus.cur'), auto !important;
   background-color: var(--mainBg1);
   border: solid 1px var(--paleColor);
   padding: 10px;
-  margin: 12px;
+  margin: 5px;
   color: black;
   display: flex;
   align-items: center;

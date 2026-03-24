@@ -149,10 +149,12 @@ const Main = observer(() => {
 							backgroundColor: "var(--mainBg)"							
 						}}
 					>
-						
-							{centralBarMode === "planEditor" && <SvgWrapper />}
+						<div className="editor-mode-layout">
+							<div className="editor-canvas-shell">
+								{centralBarMode === "planEditor" && <SvgWrapper />}
+							</div>
 							{centralBarMode === "planEditor" && <Panels />}
-						
+						</div>
 					</motion.div>
 					{/* PartEditor */}
 					<motion.div
@@ -172,9 +174,11 @@ const Main = observer(() => {
 							backgroundColor: "var(--mainBg)"													
 						}}
 					>
-						<div>
+						<div className="editor-mode-layout">
+							<div className="editor-canvas-shell">
+								{centralBarMode === "partEditor" && <PartSvgWrapper />}
+							</div>
 							{centralBarMode === "partEditor" && <PartPanels />}
-							{centralBarMode === "partEditor" && <PartSvgWrapper />}
 						</div>
 					</motion.div>
 				</div>

@@ -62,7 +62,7 @@ const ExitButton = observer(() => {
 
 		<div className="ms-2" >
 			<div className="ms-2 position-absolute"
-				style={{ top: "7px", right: "15px" }}
+				style={{ top: "10px", left: "0px" }}
 			>
 				<button	className={`navbar_button me-1 violet_button`} onClick={showModal}>
 					<div className="d-flex align-items-center justify-content-center">

@@ -44,7 +44,7 @@ const constants = {
 	fontSize:11.88,
 	defaultAngle:90,
 	kerning:1,
-	defaultIntend:10,
+	defaultIntend:1,
 	defaultInletIntend: 0.2,
 	defaultInletLength: 6,
 	defaultStringInterval:18,

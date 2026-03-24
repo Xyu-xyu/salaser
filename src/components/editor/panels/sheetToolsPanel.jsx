@@ -11,6 +11,7 @@ import editorStore from '../../../store/editorStore.jsx';
 import { useState } from "react";
 import constants from '../../../store/constants.jsx';
 import { addToSheetLog } from '../../../scripts/addToSheetLog.jsx';
+import panelStore from '../../../store/panelStore.jsx';
 
 
 const SheetToolsPanel = observer(() => {
@@ -216,6 +217,21 @@ const SheetToolsPanel = observer(() => {
 							icon="ic:twotone-delete-outline"
 							width="24"
 							height="24"
+							fill={"black"}
+							strokeWidth={0.2}
+						/>
+					</button>
+					<button
+						type="button"
+						title={panelStore.dockMode ? "Floating panels" : "Dock panels"}
+						className={`btn text-white btn_tool`}
+						onMouseDown={() => panelStore.toggleDockMode()}
+					>
+						<CustomIcon
+							icon="panelSwitch"
+							width="24"
+							height="24"
+							color={"black"}
 							fill={"black"}
 							strokeWidth={0.2}
 						/>

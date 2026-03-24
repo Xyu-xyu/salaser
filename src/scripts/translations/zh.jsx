@@ -471,6 +471,7 @@ const zh = {
     "Sheet cut order was changed": "裁切顺序已更改",
     "No previous log entry found.": "未找到以前的日志条目。",
     "auto": "汽车",
-    "Sheet clearance updated": "已更新板材间隙"
+    "Sheet clearance updated": "已更新板材间隙",
+    "Part in part setting updated": "部分设置已更新"
 }
 export default zh;

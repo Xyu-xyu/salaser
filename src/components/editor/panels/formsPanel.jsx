@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import svgStore from "../../../store/svgStore.jsx";
 import macrosStore from "../../../store/macrosStore.jsx";
 import laserStore from "../../../store/laserStore.jsx";
+import panelStore from "../../../store/panelStore.jsx";
 import CustomIcon from '../../../icons/customIcon.jsx';
 import { useTranslation } from 'react-i18next';
 import partStore from "../../../store/partStore.jsx"
@@ -345,6 +346,7 @@ const FormsPanel = observer(() => {
 	}
 
 	const selectedPartCodeId = svgStore.selectedPosition?.part_code_id ?? null;
+	const isDocked = panelStore.dockMode;
 
 	const panelInfo =
 	{
@@ -364,31 +366,29 @@ const FormsPanel = observer(() => {
 			</>
 		),
 		content: (
-			<div className="d-flex align-items-center btn_block flex-wrap">
-				<div className="containerTable">
-					<table id="partListContainer" className="table">
-						<thead style={{ position: "sticky", top: 0 }} className="table-white">
-							<tr>
-								<th className="header" scope="col">
-									#
-								</th>
-								<th className="header longText longText5" scope="col">
-									{t("id")}
-								</th>
-								<th className="header longText" scope="col">
-									{t("part")}
-								</th>
-								<th className="header" scope="col">
-									{t("amount")}
-								</th>
-								<th className="header" scope="col">
-									{t("pic")}
-								</th>
-								<th className="header" scope="col">
-									{t("action")}
-								</th>
-							</tr>
-						</thead>
+			<div className={`formsPanelContent ${isDocked ? "formsPanelContentDocked" : ""}`}>
+				<div className={`containerTable ${isDocked ? "containerTableDocked" : ""}`}>
+					<table id="partListContainer" className="table mb-0">
+					<thead className="table-white formsPanelStickyHead">
+						<tr>
+							<th className="formsPanelHeaderCell" scope="col" style={{ textAlign: "center" }}>
+								#
+							</th>
+							<th className="formsPanelHeaderCell longText longText5" scope="col" style={{ textAlign: "center" }}>
+								{t("id")}
+							</th>
+
+							<th className="formsPanelHeaderCell" scope="col" style={{ textAlign: "center" }}>
+								{t("amount")}
+							</th>
+							<th className="formsPanelHeaderCell" scope="col" style={{ textAlign: "center" }}>
+								{t("pic")}
+							</th>
+							<th className="formsPanelHeaderCell" scope="col" style={{ textAlign: "center" }}>
+								{t("action")}
+							</th>
+						</tr>
+					</thead>		
 						<tbody>
 							{
 								svgStore.svgData.part_code.map((a, index) => {
@@ -406,9 +406,6 @@ const FormsPanel = observer(() => {
 											</td>
 											<td className="  longText longText5 align-middle" scope="col">
 												Part_{Number(index + 1)}
-											</td>
-											<td className="  longText align-middle" scope="col">
-												{a.uuid}
 											</td>
 											<td className="  align-middle" scope="col">
 												{partCount}
@@ -504,9 +501,9 @@ const FormsPanel = observer(() => {
 							}
 							<tr key="final">
 								<td colSpan={1}>#</td>
-								<td  className="header" >{t("Total")}: </td>
+								<td>{t("Total")}: </td>
 								<td>{ svgStore.svgData.positions.length }</td>
-								<td colSpan={2}></td>
+								<td colSpan={1}></td>
 								<td colSpan={1}></td>
 							</tr>
 						</tbody>

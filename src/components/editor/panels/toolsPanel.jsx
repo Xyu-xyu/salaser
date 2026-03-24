@@ -7,6 +7,7 @@ import ContourModalComponent from './../contourModalComponent.jsx';
 import { addToLog } from './../../../scripts/addToLog.jsx';
 import util from './../../../scripts/util.jsx';
 import CustomIcon from './../../../icons/customIcon.jsx';
+import panelStore from './../../../store/panelStore.jsx';
 
 
 const ToolsPanel = observer(() => {
@@ -299,6 +300,21 @@ const ToolsPanel = observer(() => {
 							width="24"
 							height="24"
 							fill='black'
+							strokeWidth={0.2}
+						/>
+					</button>
+					<button
+						type="button"
+						title={panelStore.dockMode ? "Floating panels" : "Dock panels"}
+						className={`btn text-white mt-1 ms-2 btn_tool`}
+						onMouseDown={() => panelStore.toggleDockMode()}
+					>
+						<CustomIcon
+							icon="panelSwitch"
+							width="24"
+							height="24"
+							color={"black"}
+							fill={"black"}
 							strokeWidth={0.2}
 						/>
 					</button>

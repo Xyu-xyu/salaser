@@ -516,6 +516,7 @@ const en = {
     "No previous log entry found.": "No previous log entry found.",
     "current": "current",
     "auto": "auto",
-    "Sheet clearance updated": "Sheet clearance updated"
+    "Sheet clearance updated": "Sheet clearance updated",
+    "Part in part setting updated": "Part in part setting updated"
 }
 export default en;

@@ -629,7 +629,7 @@ const SheetCutPositionGrid = observer(({
 		<div
 			ref={scrollContainerRef}
 			onScroll={handleScroll}
-			style={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden" }}
+			style={{ flex: 1, height: "100%", minHeight: 0, overflowY: "auto", overflowX: "hidden" }}
 		>
 			<div className="gridWrapperCommon">
 				<div id="sheetCutSort" style={shouldVirtualize ? { width: "100%" } : undefined}>
@@ -1032,7 +1032,7 @@ const SheetCutPanel = observer(() => {
 					<div className="d-flex flex-column" id="sheetCutPartModel" />
 				</div>
 				<div
-					className="px-2 pb-2"
+					className="d-flex flex-column px-2 pb-2"
 					style={{ flex: 1, minHeight: 0, overflow: "hidden" }}
 				>
 					<SheetCutPositionGrid

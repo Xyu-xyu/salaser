@@ -338,9 +338,9 @@ const ru = {
     "In the center": "В центре",
     "Ooops, something is in cut 12301.ncp": "Ой, что-то вырезано 12301.ncp",
     "Contour": "Контур",
-    "pic": "картинка",
-    "part_code": "код детали",
-    "amount": "кол-во",
+    "pic": "вид",
+    "part_code": "код",
+    "amount": "к-во",
     "action": "действие",
     "Part": "Деталь",
     "Do you want to delete all parts of this type?": "Вы хотите удалить все детали этого типа?",
@@ -494,6 +494,7 @@ const ru = {
     "Sheet cut order was changed": "Порядок резки изменен.",
     "No previous log entry found.": "Предыдущая запись журнала не найдена.",
     "auto": "авто",
-    "Sheet clearance updated": "Зазор листа обновлен."
+    "Sheet clearance updated": "Зазор листа обновлен.",
+    "Part in part setting updated": "Настройка детали обновлена."
 }
 export default ru;
