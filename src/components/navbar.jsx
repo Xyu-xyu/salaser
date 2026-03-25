@@ -152,7 +152,7 @@ const NavBar = observer(() => {
 					</button>
 				</div>
 				<SettingsButton />
-				<LanguageButton />
+				<LanguageButton color={"black"}/>
 				<PowerButton />
 			</div>
 		</div>

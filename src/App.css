@@ -1337,101 +1337,370 @@ height: fit-content;}
 
 /*  LOGIN  */
 /* Общий контейнер */
+/* ========== LASER ANIMATED BACKGROUND ========== */
+
+.laser-bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(140deg, #07071a 0%, #0c0a2a 35%, #110820 70%, #07071a 100%);
+  z-index: 0;
+}
+
+.laser-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(93, 83, 247, 0.06) 0px,
+      transparent 1px,
+      transparent 70px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(93, 83, 247, 0.06) 0px,
+      transparent 1px,
+      transparent 70px
+    );
+  animation: laserGridPulse 6s ease-in-out infinite;
+}
+
+@keyframes laserGridPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.75; }
+}
+
+/* --- Scanning laser beams --- */
+
+.laser-scan {
+  position: absolute;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.laser-scan-h1 {
+  left: -100%;
+  top: 28%;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(71, 209, 204, 0.9) 40%, rgba(71, 209, 204, 0.9) 60%, transparent 100%);
+  box-shadow: 0 0 20px 4px rgba(71, 209, 204, 0.35), 0 0 60px 8px rgba(71, 209, 204, 0.12);
+  animation: laserScanH 7s linear infinite;
+}
+
+.laser-scan-h2 {
+  left: -100%;
+  top: 68%;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 51, 40, 0.8) 40%, rgba(255, 51, 40, 0.8) 60%, transparent 100%);
+  box-shadow: 0 0 20px 4px rgba(255, 51, 40, 0.3), 0 0 60px 8px rgba(255, 51, 40, 0.1);
+  animation: laserScanH 9s linear infinite;
+  animation-delay: 3s;
+}
+
+.laser-scan-h3 {
+  left: -100%;
+  top: 48%;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(93, 83, 247, 0.7) 40%, rgba(93, 83, 247, 0.7) 60%, transparent 100%);
+  box-shadow: 0 0 16px 3px rgba(93, 83, 247, 0.3), 0 0 50px 6px rgba(93, 83, 247, 0.1);
+  animation: laserScanH 11s linear infinite;
+  animation-delay: 6s;
+}
+
+.laser-scan-v1 {
+  top: -100%;
+  left: 42%;
+  height: 100%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 0%, rgba(93, 83, 247, 0.8) 40%, rgba(93, 83, 247, 0.8) 60%, transparent 100%);
+  box-shadow: 0 0 20px 4px rgba(93, 83, 247, 0.35), 0 0 60px 8px rgba(93, 83, 247, 0.12);
+  animation: laserScanV 8s linear infinite;
+  animation-delay: 1.5s;
+}
+
+@keyframes laserScanH {
+  0% { transform: translateX(0); opacity: 0; }
+  5% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateX(200vw); opacity: 0; }
+}
+
+@keyframes laserScanV {
+  0% { transform: translateY(0); opacity: 0; }
+  5% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(200vh); opacity: 0; }
+}
+
+/* --- SVG cut paths --- */
+
+.laser-paths {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.laser-cut {
+  fill: none;
+  stroke: rgba(71, 209, 204, 0.55);
+  stroke-width: 1.2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 5px rgba(71, 209, 204, 0.45));
+  animation: laserTrace 7s ease-in-out infinite;
+}
+
+.lc-1 { animation-delay: 0s; }
+.lc-2 { animation-delay: 0.8s; }
+.lc-3 {
+  animation-delay: 1.5s;
+  stroke: rgba(93, 83, 247, 0.55);
+  filter: drop-shadow(0 0 5px rgba(93, 83, 247, 0.45));
+}
+.lc-4 { animation-delay: 2.5s; }
+.lc-5 {
+  animation-delay: 2s;
+  stroke: rgba(93, 83, 247, 0.45);
+  filter: drop-shadow(0 0 4px rgba(93, 83, 247, 0.35));
+  stroke-width: 0.8;
+  animation-duration: 5s;
+}
+.lc-6 {
+  animation-delay: 3s;
+  stroke: rgba(93, 83, 247, 0.55);
+  filter: drop-shadow(0 0 5px rgba(93, 83, 247, 0.45));
+  animation-duration: 5s;
+}
+
+
+.lc-7 { 
+  animation-delay: 4s; 
+}
+
+.lc-accent {
+  stroke: rgba(255, 51, 40, 0.5);
+  filter: drop-shadow(0 0 6px rgba(255, 51, 40, 0.45));
+  animation-delay: 1.2s;
+  animation-duration: 5.5s;
+}
+
+@keyframes laserTrace {
+  0%   { stroke-dashoffset: 1; opacity: 0; }
+  8%   { opacity: 1; }
+  50%  { stroke-dashoffset: 0; opacity: 1; }
+  75%  { stroke-dashoffset: 0; opacity: 0.4; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* --- Crosshairs --- */
+
+.laser-xhair {
+  stroke: rgba(71, 209, 204, 0.25);
+  stroke-width: 1;
+}
+
+
+/* --- Spark particles --- */
+
+.laser-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.laser-spark {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  background: rgba(71, 209, 204, 0.9);
+  box-shadow: 0 0 6px 2px rgba(71, 209, 204, 0.5);
+  animation: laserSparkFloat 5s linear infinite;
+}
+
+.laser-spark:nth-child(odd) {
+  background: rgba(255, 210, 80, 0.9);
+  box-shadow: 0 0 6px 2px rgba(255, 210, 80, 0.5);
+}
+
+.laser-spark:nth-child(3n) {
+  background: rgba(93, 83, 247, 0.85);
+  box-shadow: 0 0 6px 2px rgba(93, 83, 247, 0.5);
+}
+
+.laser-spark:nth-child(5n) {
+  background: rgba(255, 51, 40, 0.85);
+  box-shadow: 0 0 5px 2px rgba(255, 51, 40, 0.4);
+}
+
+@keyframes laserSparkFloat {
+  0%   { transform: translateY(0) scale(1); opacity: 0; }
+  8%   { opacity: 1; }
+  70%  { opacity: 0.6; }
+  100% { transform: translateY(-100vh) scale(0.2); opacity: 0; }
+}
+
+/* --- Ambient glow --- */
+
+.laser-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+.laser-glow-1 {
+  top: 35%;
+  left: 30%;
+  width: 500px;
+  height: 500px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse, rgba(93, 83, 247, 0.1) 0%, transparent 70%);
+  animation: laserGlowPulse 6s ease-in-out infinite;
+}
+
+.laser-glow-2 {
+  top: 60%;
+  left: 70%;
+  width: 400px;
+  height: 400px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse, rgba(71, 209, 204, 0.07) 0%, transparent 70%);
+  animation: laserGlowPulse 8s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+@keyframes laserGlowPulse {
+  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(0.85); }
+  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
+}
+
+/* ========== LOGIN PAGE (over laser bg) ========== */
+
 .login-page {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
+  background-color: transparent;
   min-height: 100vh;
   padding: 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
-/* Карточка логина */
 .login-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.4),
+    0 0 80px rgba(93, 83, 247, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
   width: 100%;
   max-width: 400px;
 }
 
-/* Верхняя полоска (cyan) */
 .login-header {
-  height: 48px;
-  background-color: #4f46e5;
+  height: 4px;
+  background: linear-gradient(90deg, var(--violet), var(--blue), var(--violet));
+  background-size: 200% 100%;
+  animation: loginHeaderShimmer 4s ease-in-out infinite;
 }
 
-/* Тело карточки */
+@keyframes loginHeaderShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .login-body {
-  padding: 24px;
+  padding: 32px 28px 28px;
 }
 
-/* Заголовок */
 .login-title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 24px;
+  color: rgba(255, 255, 255, 0.92);
+  margin-bottom: 28px;
+  letter-spacing: 0.5px;
 }
 
-/* Поля ввода */
 .login-body input {
   width: 100%;
   padding: 12px 16px;
   margin-bottom: 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background-color: #f9fafb;
-  font-size: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-body input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .login-body input:focus {
   outline: none;
-  border-color: #22d3ee;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
+  border-color: rgba(71, 209, 204, 0.6);
+  box-shadow: 0 0 0 2px rgba(71, 209, 204, 0.15), 0 0 20px rgba(71, 209, 204, 0.08);
+  background-color: rgba(255, 255, 255, 0.07);
 }
 
-/* Кнопка */
 .login-body button {
   display: inline-block;
-  background-color: #4f46e5;
+  background: linear-gradient(135deg, var(--violet), rgba(71, 209, 204, 0.8));
   color: white;
   font-weight: 600;
-  padding: 12px 24px;
+  padding: 12px 28px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
   float: right;
+  box-shadow: 0 4px 20px rgba(93, 83, 247, 0.3);
+  letter-spacing: 0.3px;
 }
 
 .login-body button:hover {
-  background-color: #4338ca;
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(93, 83, 247, 0.4);
 }
 
 .login-body button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* Ошибка */
 .login-error {
-  color: #dc2626;
+  color: var(--red);
   font-size: 14px;
   margin-bottom: 10px;
 }
 
-/* Подсказка */
 .login-hint {
   margin-top: 24px;
   font-size: 14px;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 #LoginButton #LanguageButton button{
   background-color:transparent !important;
   border: none !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+#LoginButton #LanguageButton button:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 /*     LOGIN       */
 
