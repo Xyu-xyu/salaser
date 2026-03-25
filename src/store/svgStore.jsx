@@ -14,7 +14,37 @@ import {
 	getMaxSheetCutSectorSize,
 	normalizeSheetSafetyClearance,
 } from "../scripts/sheetCutUtils.jsx";
+import {
+	RESIDUAL_CUT_DEFAULT_STEP,
+	RESIDUAL_CUT_PART_CODE,
+	buildResidualCutGeometry,
+	buildResidualCutMetadataLines,
+	buildResidualCutPartLines,
+	buildResidualCutPlanLine,
+	clampResidualCutStep,
+	createEmptyResidualCutState,
+	normalizeResidualCutArea,
+	normalizeResidualCutPoint,
+	parseResidualCutMetadata,
+} from "../scripts/residualCutUtils.jsx";
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const roundResidualCoordinate = (value) => (
+	Math.round((Number(value) || 0) * 1000) / 1000
+);
+const normalizeResidualSimulationPoint = (point) => {
+	const x = Number(point?.x);
+	const y = Number(point?.y);
+
+	if (!Number.isFinite(x) || !Number.isFinite(y)) {
+		return null;
+	}
+
+	return {
+		x: roundResidualCoordinate(x),
+		y: roundResidualCoordinate(y),
+	};
+};
 const sameIdOrder = (left = [], right = []) =>
 	left.length === right.length && left.every((item, index) => item === right[index]);
 
@@ -178,6 +208,16 @@ class SvgStore {
 		hoverPartId: null,
 		completedCount: 0,
 	};
+	residualCutDraft = {
+		points: [],
+		cursorPoint: null,
+	};
+	residualCutSimulation = {
+		on: false,
+		sequence: [],
+		segmentIndex: 0,
+		segmentProgress: 0,
+	};
 	laserShowPartFlags = new Map();
 	laserShowOrderIndexById = new Map();
 	laserShowOrderDirty = true;
@@ -283,6 +323,7 @@ class SvgStore {
 				"manual": [],
 			},
 		},
+		"residualCut": createEmptyResidualCutState(RESIDUAL_CUT_DEFAULT_STEP),
 	}
 
 	matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
@@ -750,6 +791,155 @@ class SvgStore {
 		return nextIds;
 	}
 
+	ensureResidualCutState() {
+		const previousState = this.svgData?.residualCut || {};
+		const nextState = {
+			step: clampResidualCutStep(previousState.step),
+			areas: (Array.isArray(previousState.areas) ? previousState.areas : [])
+				.map(area => normalizeResidualCutArea(
+					area,
+					this.svgData?.width,
+					this.svgData?.height
+				))
+				.filter(Boolean),
+		};
+		const previousAreas = Array.isArray(previousState.areas) ? previousState.areas : [];
+		const hasChanged = (
+			previousState.step !== nextState.step ||
+			JSON.stringify(previousAreas) !== JSON.stringify(nextState.areas)
+		);
+
+		if (hasChanged) {
+			runInAction(() => {
+				this.svgData.residualCut = nextState;
+			});
+		}
+
+		return this.svgData.residualCut || nextState;
+	}
+
+	getResidualCutStep() {
+		return this.ensureResidualCutState().step;
+	}
+
+	getResidualCutAreas() {
+		return this.ensureResidualCutState().areas;
+	}
+
+	setResidualCutStep(step) {
+		this.ensureResidualCutState();
+		const nextStep = clampResidualCutStep(step);
+
+		if (this.svgData.residualCut.step !== nextStep) {
+			runInAction(() => {
+				this.svgData.residualCut.step = nextStep;
+			});
+		}
+
+		return this.svgData.residualCut.step;
+	}
+
+	setResidualCutAreas(areas = []) {
+		this.ensureResidualCutState();
+		const nextAreas = (Array.isArray(areas) ? areas : [])
+			.map(area => normalizeResidualCutArea(
+				area,
+				this.svgData?.width,
+				this.svgData?.height
+			))
+			.filter(Boolean);
+
+		runInAction(() => {
+			this.svgData.residualCut.areas = nextAreas;
+		});
+		this.stopResidualCutSimulation();
+
+		return this.svgData.residualCut.areas;
+	}
+
+	clearResidualCut() {
+		this.setResidualCutAreas([]);
+		this.resetResidualCutDraft();
+	}
+
+	setResidualCutDraftPoints(points = []) {
+		const nextPoints = (Array.isArray(points) ? points : [])
+			.map(point => normalizeResidualCutPoint(
+				point,
+				this.svgData?.width,
+				this.svgData?.height
+			))
+			.filter(Boolean);
+
+		runInAction(() => {
+			this.residualCutDraft.points = nextPoints;
+		});
+
+		return this.residualCutDraft.points;
+	}
+
+	setResidualCutCursor(point = null) {
+		runInAction(() => {
+			this.residualCutDraft.cursorPoint = normalizeResidualCutPoint(
+				point,
+				this.svgData?.width,
+				this.svgData?.height
+			);
+		});
+
+		return this.residualCutDraft.cursorPoint;
+	}
+
+	resetResidualCutDraft() {
+		runInAction(() => {
+			this.residualCutDraft.points = [];
+			this.residualCutDraft.cursorPoint = null;
+		});
+	}
+
+	setResidualCutSimulation(nextState = {}) {
+		const sequence = Array.isArray(nextState.sequence)
+			? nextState.sequence
+				.map(segment => ({
+					kind: segment?.kind === "move" ? "move" : "cut",
+					start: normalizeResidualSimulationPoint(segment?.start),
+					end: normalizeResidualSimulationPoint(segment?.end),
+				}))
+				.filter(segment => segment.start && segment.end)
+			: null;
+
+		runInAction(() => {
+			if ("on" in nextState) {
+				this.residualCutSimulation.on = Boolean(nextState.on);
+			}
+			if (sequence !== null) {
+				this.residualCutSimulation.sequence = sequence;
+			}
+			if ("segmentIndex" in nextState) {
+				this.residualCutSimulation.segmentIndex = Math.max(
+					0,
+					Math.trunc(Number(nextState.segmentIndex) || 0)
+				);
+			}
+			if ("segmentProgress" in nextState) {
+				this.residualCutSimulation.segmentProgress = clamp(
+					Number(nextState.segmentProgress) || 0,
+					0,
+					1
+				);
+			}
+		});
+	}
+
+	stopResidualCutSimulation() {
+		this.setResidualCutSimulation({
+			on: false,
+			sequence: [],
+			segmentIndex: 0,
+			segmentProgress: 0,
+		});
+	}
+
 	reorderPositions(newOrder) {
 		if (!Array.isArray(newOrder)) return;
 
@@ -783,6 +973,8 @@ class SvgStore {
 		current[lastKey] = newValue;
 
 		if (objectKey === "svgData" && (lastKey === "width" || lastKey === "height")) {
+			this.ensureResidualCutState();
+			this.stopResidualCutSimulation();
 			this.recalculateSheetSafety();
 		}
 	}
@@ -1035,6 +1227,34 @@ class SvgStore {
 			res.push(`N${lineNumber}G98`);
 			lineNumber++;
 			res.push('(</Part>)');
+		}
+
+		const residualCutGeometry = buildResidualCutGeometry(
+			this.getResidualCutAreas(),
+			this.svgData?.width,
+			this.svgData?.height
+		);
+		const residualProgramNumber = residualCutGeometry.displayPaths.length
+			? data.part_code.length + 1
+			: null;
+		const residualPart = buildResidualCutPartLines({
+			displayPaths: residualCutGeometry.displayPaths,
+			programNumber: residualProgramNumber,
+			sheetWidth: this.svgData?.width,
+			sheetHeight: this.svgData?.height,
+		});
+		const residualMetadata = buildResidualCutMetadataLines(
+			this.svgData?.residualCut,
+			this.svgData?.width,
+			this.svgData?.height
+		);
+
+		if (residualPart.length) {
+			res.push(residualPart);
+		}
+
+		if (residualMetadata.length) {
+			res.push(residualMetadata);
 		}
 
 		return res;
@@ -1819,6 +2039,21 @@ class SvgStore {
 
 		}
 
+		const residualCutGeometry = buildResidualCutGeometry(
+			this.getResidualCutAreas(),
+			this.svgData?.width,
+			this.svgData?.height
+		);
+		const residualProgramNumber = residualCutGeometry.displayPaths.length
+			? data.part_code.length + 1
+			: null;
+		const residualPlanLine = buildResidualCutPlanLine(residualProgramNumber);
+
+		if (residualPlanLine) {
+			res.push(`N${lineNumber}${residualPlanLine.slice(2)}`);
+			lineNumber++;
+		}
+
 		res.push(`N${lineNumber}G99`);
 		res.push('(</Plan>)');
 		return res;
@@ -1892,6 +2127,7 @@ class SvgStore {
 			presetName: "any_preset",
 			positions: [],
 			part_code: [],
+			residualCut: createEmptyResidualCutState(RESIDUAL_CUT_DEFAULT_STEP),
 		};
 
 
@@ -1913,6 +2149,13 @@ class SvgStore {
 			width = result.width;
 			height = result.height;
 		}
+
+		result.residualCut = parseResidualCutMetadata(
+			lines,
+			result.residualCut.step,
+			result.width,
+			result.height
+		);
 
 		const JobCodeLine = lines.find(l => l.includes("JobCode"));
  		if (dimLine) {
@@ -2257,6 +2500,13 @@ class SvgStore {
 			}
 		});
 
+		const residualPart = result.part_code.find(part => part?.name === RESIDUAL_CUT_PART_CODE);
+		if (residualPart) {
+			const residualPartId = residualPart.id ?? residualPart.uuid;
+			result.part_code = result.part_code.filter(part => part !== residualPart);
+			result.positions = result.positions.filter(pos => pos?.part_code_id !== residualPartId);
+		}
+
 		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		let result1 = this.defineInlets (result)
@@ -2277,6 +2527,8 @@ class SvgStore {
 		svgStore.svgData = Object.assign({}, result1)
 		this.markLaserShowOrderDirty();
 		this.laserShowPartFlags.clear();
+		this.resetResidualCutDraft();
+		this.stopResidualCutSimulation();
 		this.resetSheetSafetyState();
 		this.initializeShowDangersByPositionsCount();
 		this.setLaserShow({

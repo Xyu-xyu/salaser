@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import SVGPathCommander from "svg-path-commander";
 import svgStore from "./../../store/svgStore.jsx";
 import editorStore from "./../../store/editorStore.jsx";
+import ResidualCutLayer from "./residualCutLayer.jsx";
 
 const getJointPath = (x, y) => `M${x} ${y} l2 2 -4 -4 2 2 2 -2 -4 4`;
 const partDefinitionCache = new WeakMap();
@@ -387,6 +388,7 @@ const PositionInstancesLayer = observer(() => {
 
 const SimpleReturnComponent = memo(() => (
 	<>
+		<ResidualCutLayer />
 		<StaticPartDefinitions />
 		<PositionInstancesLayer />
 	</>

@@ -495,6 +495,15 @@ const ru = {
     "No previous log entry found.": "Предыдущая запись журнала не найдена.",
     "auto": "авто",
     "Sheet clearance updated": "Зазор листа обновлен.",
-    "Part in part setting updated": "Настройка детали обновлена."
+    "Part in part setting updated": "Настройка детали обновлена.",
+    "Save": "Сохранить",
+    "Step": "Шаг",
+    "Residual cut": "Остаточный рез",
+    "Residual cut updated": "Остаточный рез обновлен",
+    "Residual cut deleted": "Остаточный рез удален",
+    "Residual cut saved": "Остаточный рез сохранен",
+    "Create residual cut first": "Сначала создайте остаточный рез",
+    "No residual cut found": "Свободные зоны для остаточного реза не найдены",
+    "Residual cut overlaps parts": "Остаточный рез пересекается с деталями"
 }
 export default ru;

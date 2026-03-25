@@ -457,6 +457,7 @@ const zh = {
     "Thickness must be a positive integer": "厚度必须是正整数",
     "Transform": "转换",
     "Spread": "传播",
+    "Manual": "手动",
     "Part position updated": "零件位置已更新",
     "Selected parts rotated": "旋转选定的零件",
     "Selected parts aligned": "选定的部分对齐",
@@ -472,6 +473,15 @@ const zh = {
     "No previous log entry found.": "未找到以前的日志条目。",
     "auto": "汽车",
     "Sheet clearance updated": "已更新板材间隙",
-    "Part in part setting updated": "部分设置已更新"
+    "Part in part setting updated": "部分设置已更新",
+    "Save": "保存",
+    "Step": "步长",
+    "Residual cut": "余料切割",
+    "Residual cut updated": "余料切割已更新",
+    "Residual cut deleted": "余料切割已删除",
+    "Residual cut saved": "余料切割已保存",
+    "Create residual cut first": "请先创建余料切割",
+    "No residual cut found": "未找到可生成余料切割的空白区域",
+    "Residual cut overlaps parts": "余料切割与零件发生重叠"
 }
 export default zh;

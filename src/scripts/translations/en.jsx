@@ -517,6 +517,15 @@ const en = {
     "current": "current",
     "auto": "auto",
     "Sheet clearance updated": "Sheet clearance updated",
-    "Part in part setting updated": "Part in part setting updated"
+    "Part in part setting updated": "Part in part setting updated",
+    "Save": "Save",
+    "Step": "Step",
+    "Residual cut": "Residual cut",
+    "Residual cut updated": "Residual cut updated",
+    "Residual cut deleted": "Residual cut deleted",
+    "Residual cut saved": "Residual cut saved",
+    "Create residual cut first": "Create residual cut first",
+    "No residual cut found": "No residual cut found",
+    "Residual cut overlaps parts": "Residual cut overlaps parts"
 }
 export default en;

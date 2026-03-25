@@ -32,7 +32,7 @@ const getPanelTitleFromId = (panelId) => (
 
 const Panel = observer(({ element }) => {
 	const id = element.id
-	const contentDragDisabledIds = new Set(['cutPopup', 'sheetCutPopup']);
+	const contentDragDisabledIds = new Set(['cutPopup', 'sheetCutPopup', 'sheetResidualCutPopup']);
 	const dockExcludedIds = new Set(['toolsPopup', 'sheetToolsPopup']);
 	const isContentDragDisabled = contentDragDisabledIds.has(id);
 	const isDocked = panelStore.dockMode && !dockExcludedIds.has(id);

@@ -94,3 +94,18 @@ const LoginPage = () => {
 
 
 export default LoginPage
+
+/*
+
+
+Два варианта:
+Принять изменения (смержить в master):
+git checkout master
+git merge feature/laser-login-background
+Отбросить изменения (удалить ветку):
+git checkout master
+git branch -D feature/laser-login-background
+В обоих случаях вы сначала возвращаетесь на master, а потом либо вливаете ветку, либо удаляете её.
+
+
+*/ 

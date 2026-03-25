@@ -7,6 +7,7 @@ import ExitButtonSheetEditor from '../../navbar/ExitButtonSheetEditor.jsx';
 import SheetAlignPanel from './sheetAlignPanel.jsx';
 import SheetLogPanel from './sheetLogPanel.jsx';
 import SheetCutPanel from './sheetCutPanel.jsx';
+import SheetResidualCutPanel from './sheetResidualCutPanel.jsx';
 import panelStore from '../../../store/panelStore.jsx';
  
 
@@ -17,6 +18,7 @@ const Panels = observer(() => {
 			<FormsPanel />
 			<SheetAlignPanel />
 			<SheetCutPanel /> 
+			<SheetResidualCutPanel />
 			<SheetLogPanel />
 		</>
 	);

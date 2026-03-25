@@ -119,6 +119,16 @@ const constants = {
 				zIndex:1
 			}
 		},
+		sheetResidualCutPopup: {
+			mini: true,
+			style: {
+				top: 490,
+				left: 12,
+				width: 260,
+				height: 185,
+				zIndex: 1
+			}
+		},
 		sheetPopup: {
 			mini: false,
 			style: {
