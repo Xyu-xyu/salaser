@@ -137,6 +137,7 @@ const ResidualCutLayer = observer(() => {
 		sheetHeight,
 		sheetWidth,
 	]);
+	const activeDisplayPaths = geometry.displayPaths;
 	const isManualMode = editorStore.mode === "residualCut";
 	const draftPoints = Array.isArray(svgStore.residualCutDraft.points)
 		? svgStore.residualCutDraft.points
@@ -319,7 +320,7 @@ const ResidualCutLayer = observer(() => {
 				</g>
 			) : null}
 
-			{geometry.displayPaths.map((path, index) => (
+			{activeDisplayPaths.map((path, index) => (
 				<polyline
 					key={`residual_cut_${index}`}
 					points={toResidualCutPolylinePoints(path)}

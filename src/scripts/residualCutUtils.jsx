@@ -10,6 +10,9 @@ export const RESIDUAL_CUT_MIN_STEP = 10;
 export const RESIDUAL_CUT_MAX_STEP = 100;
 export const RESIDUAL_CUT_SNAP_DISTANCE = 19;
 export const RESIDUAL_CUT_DISPLAY_OFFSET = 10;
+export const RESIDUAL_CUT_SOURCE_NONE = "none";
+export const RESIDUAL_CUT_SOURCE_NCP = "ncp";
+export const RESIDUAL_CUT_SOURCE_USER = "user";
 
 const AUTO_MAX_RECTANGLES = 50;
 const CLIPPER_SCALE = 1000;
@@ -677,9 +680,22 @@ export const clampResidualCutStep = (value) => {
 	);
 };
 
+export const normalizeResidualCutSource = (source, hasAreas = false) => {
+	if (!hasAreas) {
+		return RESIDUAL_CUT_SOURCE_NONE;
+	}
+
+	if (source === RESIDUAL_CUT_SOURCE_NCP || source === RESIDUAL_CUT_SOURCE_USER) {
+		return source;
+	}
+
+	return RESIDUAL_CUT_SOURCE_USER;
+};
+
 export const createEmptyResidualCutState = (step = RESIDUAL_CUT_DEFAULT_STEP) => ({
 	step: clampResidualCutStep(step),
 	areas: [],
+	source: RESIDUAL_CUT_SOURCE_NONE,
 });
 
 export const normalizeResidualCutPoint = (point, sheetWidth, sheetHeight) => {
@@ -692,6 +708,30 @@ export const normalizeResidualCutPoint = (point, sheetWidth, sheetHeight) => {
 		y: roundCoord(clamp(sanitizeNumber(point.y), 0, sanitizeNumber(sheetHeight))),
 	};
 };
+
+const normalizeResidualCutDisplayPoint = (point) => {
+	const x = Number(point?.x);
+	const y = Number(point?.y);
+
+	if (!Number.isFinite(x) || !Number.isFinite(y)) {
+		return null;
+	}
+
+	return {
+		x: roundCoord(x),
+		y: roundCoord(y),
+	};
+};
+
+export const normalizeResidualCutDisplayPaths = (paths = []) => (
+	(Array.isArray(paths) ? paths : [])
+		.map(path => dedupePolyline(
+			(Array.isArray(path) ? path : [])
+				.map(normalizeResidualCutDisplayPoint)
+				.filter(Boolean)
+		))
+		.filter(path => path.length >= 2)
+);
 
 export const normalizeResidualCutArea = (area, sheetWidth, sheetHeight) => {
 	if (!area) {
@@ -899,6 +939,12 @@ export const generateAutoResidualCutAreas = (
 			break;
 		}
 
+		const areaWidth = sanitizeNumber(area.right) - sanitizeNumber(area.left);
+		const areaHeight = sanitizeNumber(area.bottom) - sanitizeNumber(area.top);
+		if (areaWidth + EPSILON < normalizedStep || areaHeight + EPSILON < normalizedStep) {
+			break;
+		}
+
 		nextAreas.push(area);
 
 		for (let rowIndex = rectangle.top; rowIndex <= rectangle.bottom; rowIndex += 1) {
@@ -931,6 +977,460 @@ export const doesResidualCutAreaCollideWithParts = (
 		getOuterContours(svgData),
 		safetyClearance
 	);
+};
+
+const getResidualCutPathRoleRank = (item) => {
+	const className = String(item?.class || "").toLowerCase();
+
+	if (className.includes("inlet")) {
+		return 0;
+	}
+
+	if (className.includes("contour")) {
+		return 1;
+	}
+
+	if (className.includes("outlet")) {
+		return 2;
+	}
+
+	return 3;
+};
+
+const normalizeLegacyResidualCutPolyline = (points = [], sheetWidth, sheetHeight) => (
+	dedupePolyline(
+		(Array.isArray(points) ? points : [])
+			.map(normalizeResidualCutDisplayPoint)
+			.filter(Boolean)
+	)
+);
+
+const tryAttachPolylineToEnd = (basePath = [], nextPath = []) => {
+	if (!basePath.length) {
+		return nextPath;
+	}
+
+	if (!nextPath.length) {
+		return basePath;
+	}
+
+	if (samePoint(basePath[basePath.length - 1], nextPath[0])) {
+		return [...basePath, ...nextPath.slice(1)];
+	}
+
+	if (samePoint(basePath[basePath.length - 1], nextPath[nextPath.length - 1])) {
+		return [...basePath, ...[...nextPath].reverse().slice(1)];
+	}
+
+	return null;
+};
+
+const tryAttachPolylineToStart = (basePath = [], nextPath = []) => {
+	if (!basePath.length) {
+		return nextPath;
+	}
+
+	if (!nextPath.length) {
+		return basePath;
+	}
+
+	if (samePoint(basePath[0], nextPath[nextPath.length - 1])) {
+		return [...nextPath.slice(0, -1), ...basePath];
+	}
+
+	if (samePoint(basePath[0], nextPath[0])) {
+		return [...[...nextPath].reverse().slice(0, -1), ...basePath];
+	}
+
+	return null;
+};
+
+const stitchResidualCutPolylines = (polylines = []) => {
+	const queue = (Array.isArray(polylines) ? polylines : [])
+		.map(path => dedupePolyline(path))
+		.filter(path => path.length >= 2);
+	const stitched = [];
+
+	while (queue.length) {
+		let currentPath = queue.shift();
+		let hasMerged = true;
+
+		while (hasMerged) {
+			hasMerged = false;
+
+			for (let index = 0; index < queue.length; index += 1) {
+				const nextPath = queue[index];
+				const mergedToEnd = tryAttachPolylineToEnd(currentPath, nextPath);
+				const mergedToStart = mergedToEnd
+					? null
+					: tryAttachPolylineToStart(currentPath, nextPath);
+				const mergedPath = mergedToEnd || mergedToStart;
+
+				if (!mergedPath) {
+					continue;
+				}
+
+				currentPath = dedupePolyline(mergedPath);
+				queue.splice(index, 1);
+				hasMerged = true;
+				break;
+			}
+		}
+
+		stitched.push(currentPath);
+	}
+
+	return stitched.filter(path => path.length >= 2);
+};
+
+const getResidualCutPolylinesFromPart = (part, position, sheetWidth, sheetHeight) => {
+	if (!part || !Array.isArray(part.code)) {
+		return [];
+	}
+
+	const groupedByCid = new Map();
+
+	part.code.forEach(item => {
+		if (!item?.path) {
+			return;
+		}
+
+		const className = String(item.class || "").toLowerCase();
+		if (
+			!className.includes("contour") &&
+			!className.includes("inlet") &&
+			!className.includes("outlet")
+		) {
+			return;
+		}
+
+		const cid = Number(item.cid);
+		if (!Number.isFinite(cid)) {
+			return;
+		}
+
+		if (!groupedByCid.has(cid)) {
+			groupedByCid.set(cid, []);
+		}
+
+		groupedByCid.get(cid).push(item);
+	});
+
+	const matrix = position?.positions || { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+	const polylines = [];
+
+	groupedByCid.forEach(items => {
+		const pointGroups = items
+			.slice()
+			.sort((leftItem, rightItem) => (
+				getResidualCutPathRoleRank(leftItem) - getResidualCutPathRoleRank(rightItem)
+			))
+			.map(item => normalizeLegacyResidualCutPolyline(
+				getPathPoints(transformPath(item.path, matrix), 2),
+				sheetWidth,
+				sheetHeight
+			))
+			.filter(path => path.length >= 2);
+
+		stitchResidualCutPolylines(pointGroups).forEach(path => {
+			polylines.push(path);
+		});
+	});
+
+	return polylines;
+};
+
+const sortNumericCoordinates = (values = [], minValue = 0, maxValue = Number.MAX_SAFE_INTEGER) => (
+	[...new Set(
+		(Array.isArray(values) ? values : [])
+			.map(value => roundCoord(value))
+			.filter(value => Number.isFinite(value) && value >= minValue - EPSILON && value <= maxValue + EPSILON)
+	)]
+		.map(value => clamp(value, minValue, maxValue))
+		.sort((left, right) => left - right)
+		.filter((value, index, items) => index === 0 || Math.abs(value - items[index - 1]) > EPSILON)
+);
+
+const getSegmentOverlap = (startA, endA, startB, endB) => (
+	Math.min(Math.max(startA, endA), Math.max(startB, endB)) -
+	Math.max(Math.min(startA, endA), Math.min(startB, endB))
+);
+
+const buildResidualCutSegments = (polylines = []) => (
+	(Array.isArray(polylines) ? polylines : []).flatMap(path => (
+		path.slice(0, -1).map((point, index) => ({
+			start: point,
+			end: path[index + 1],
+		}))
+	))
+		.filter(segment => (
+			segment.start &&
+			segment.end &&
+			(
+				Math.abs(segment.start.x - segment.end.x) > EPSILON ||
+				Math.abs(segment.start.y - segment.end.y) > EPSILON
+			)
+		))
+);
+
+const hasVerticalBarrier = (x, top, bottom, segments = []) => (
+	(Array.isArray(segments) ? segments : []).some(segment => (
+		Math.abs(sanitizeNumber(segment.start?.x) - sanitizeNumber(segment.end?.x)) <= EPSILON &&
+		Math.abs(sanitizeNumber(segment.start?.x) - x) <= EPSILON &&
+		getSegmentOverlap(
+			sanitizeNumber(segment.start?.y),
+			sanitizeNumber(segment.end?.y),
+			top,
+			bottom
+		) > EPSILON
+	))
+);
+
+const hasHorizontalBarrier = (y, left, right, segments = []) => (
+	(Array.isArray(segments) ? segments : []).some(segment => (
+		Math.abs(sanitizeNumber(segment.start?.y) - sanitizeNumber(segment.end?.y)) <= EPSILON &&
+		Math.abs(sanitizeNumber(segment.start?.y) - y) <= EPSILON &&
+		getSegmentOverlap(
+			sanitizeNumber(segment.start?.x),
+			sanitizeNumber(segment.end?.x),
+			left,
+			right
+		) > EPSILON
+	))
+);
+
+const getLegacyResidualCutPolylines = (
+	svgData,
+	partCode = RESIDUAL_CUT_PART_CODE
+) => {
+	const sheetWidth = Math.max(0, sanitizeNumber(svgData?.width));
+	const sheetHeight = Math.max(0, sanitizeNumber(svgData?.height));
+	const parts = Array.isArray(svgData?.part_code) ? svgData.part_code : [];
+	const positions = Array.isArray(svgData?.positions) ? svgData.positions : [];
+	const residualPart = parts.find(part => part?.name === partCode);
+
+	if (!sheetWidth || !sheetHeight || !residualPart) {
+		return [];
+	}
+
+	const residualPartId = residualPart.id ?? residualPart.uuid;
+	const residualPositions = positions.filter(position => position?.part_code_id === residualPartId);
+	const fallbackPosition = residualPositions.length
+		? []
+		: [{ positions: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 } }];
+
+	return [...residualPositions, ...fallbackPosition]
+		.flatMap(position => getResidualCutPolylinesFromPart(
+			residualPart,
+			position,
+			sheetWidth,
+			sheetHeight
+		))
+		.filter(path => path.length >= 2);
+};
+
+export const buildResidualCutPathsFromLegacyPart = (
+	svgData,
+	partCode = RESIDUAL_CUT_PART_CODE
+) => normalizeResidualCutDisplayPaths(
+	getLegacyResidualCutPolylines(svgData, partCode)
+);
+
+export const buildResidualCutAreasFromLegacyPart = (
+	svgData,
+	partCode = RESIDUAL_CUT_PART_CODE
+) => {
+	const sheetWidth = Math.max(0, sanitizeNumber(svgData?.width));
+	const sheetHeight = Math.max(0, sanitizeNumber(svgData?.height));
+	const parts = Array.isArray(svgData?.part_code) ? svgData.part_code : [];
+	const positions = Array.isArray(svgData?.positions) ? svgData.positions : [];
+	const residualPart = parts.find(part => part?.name === partCode);
+
+	if (!sheetWidth || !sheetHeight || !residualPart) {
+		return [];
+	}
+
+	const residualPartId = residualPart.id ?? residualPart.uuid;
+	const residualPolylines = getLegacyResidualCutPolylines(svgData, partCode);
+
+	if (!residualPolylines.length) {
+		return [];
+	}
+
+	const collisionSvgData = {
+		...svgData,
+		part_code: parts.filter(part => part !== residualPart),
+		positions: positions.filter(position => position?.part_code_id !== residualPartId),
+	};
+	const collisionContours = getOuterContours(collisionSvgData);
+	const xCoordinates = [0, sheetWidth];
+	const yCoordinates = [0, sheetHeight];
+
+	residualPolylines.forEach(path => {
+		path.forEach(point => {
+			xCoordinates.push(point.x);
+			yCoordinates.push(point.y);
+		});
+	});
+
+	const xValues = sortNumericCoordinates(xCoordinates, 0, sheetWidth);
+	const yValues = sortNumericCoordinates(yCoordinates, 0, sheetHeight);
+	if (xValues.length < 2 || yValues.length < 2) {
+		return [];
+	}
+
+	const segments = buildResidualCutSegments(residualPolylines);
+	const rowCount = yValues.length - 1;
+	const columnCount = xValues.length - 1;
+	const cells = Array.from({ length: rowCount }, () => Array(columnCount).fill(null));
+
+	for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+		for (let columnIndex = 0; columnIndex < columnCount; columnIndex += 1) {
+			const cell = normalizeResidualCutArea(
+				{
+					left: xValues[columnIndex],
+					top: yValues[rowIndex],
+					right: xValues[columnIndex + 1],
+					bottom: yValues[rowIndex + 1],
+				},
+				sheetWidth,
+				sheetHeight
+			);
+
+			if (!cell) {
+				continue;
+			}
+
+			cells[rowIndex][columnIndex] = cell;
+		}
+	}
+
+	const visited = Array.from({ length: rowCount }, () => Array(columnCount).fill(false));
+	const recoveredAreas = [];
+	const getCellKey = (rowIndex, columnIndex) => `${rowIndex}:${columnIndex}`;
+
+	for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+		for (let columnIndex = 0; columnIndex < columnCount; columnIndex += 1) {
+			if (!cells[rowIndex][columnIndex] || visited[rowIndex][columnIndex]) {
+				continue;
+			}
+
+			const queue = [[rowIndex, columnIndex]];
+			const componentCells = [];
+			const componentKeySet = new Set();
+			visited[rowIndex][columnIndex] = true;
+
+			while (queue.length) {
+				const [currentRow, currentColumn] = queue.shift();
+				const currentCell = cells[currentRow][currentColumn];
+				if (!currentCell) {
+					continue;
+				}
+
+				componentCells.push({
+					row: currentRow,
+					column: currentColumn,
+					cell: currentCell,
+				});
+				componentKeySet.add(getCellKey(currentRow, currentColumn));
+
+				if (currentColumn + 1 < columnCount && cells[currentRow][currentColumn + 1] && !visited[currentRow][currentColumn + 1]) {
+					const edgeX = xValues[currentColumn + 1];
+					if (!hasVerticalBarrier(edgeX, currentCell.top, currentCell.bottom, segments)) {
+						visited[currentRow][currentColumn + 1] = true;
+						queue.push([currentRow, currentColumn + 1]);
+					}
+				}
+
+				if (currentColumn - 1 >= 0 && cells[currentRow][currentColumn - 1] && !visited[currentRow][currentColumn - 1]) {
+					const edgeX = xValues[currentColumn];
+					if (!hasVerticalBarrier(edgeX, currentCell.top, currentCell.bottom, segments)) {
+						visited[currentRow][currentColumn - 1] = true;
+						queue.push([currentRow, currentColumn - 1]);
+					}
+				}
+
+				if (currentRow + 1 < rowCount && cells[currentRow + 1][currentColumn] && !visited[currentRow + 1][currentColumn]) {
+					const edgeY = yValues[currentRow + 1];
+					if (!hasHorizontalBarrier(edgeY, currentCell.left, currentCell.right, segments)) {
+						visited[currentRow + 1][currentColumn] = true;
+						queue.push([currentRow + 1, currentColumn]);
+					}
+				}
+
+				if (currentRow - 1 >= 0 && cells[currentRow - 1][currentColumn] && !visited[currentRow - 1][currentColumn]) {
+					const edgeY = yValues[currentRow];
+					if (!hasHorizontalBarrier(edgeY, currentCell.left, currentCell.right, segments)) {
+						visited[currentRow - 1][currentColumn] = true;
+						queue.push([currentRow - 1, currentColumn]);
+					}
+				}
+			}
+
+			if (!componentCells.length) {
+				continue;
+			}
+
+			const minRow = Math.min(...componentCells.map(item => item.row));
+			const maxRow = Math.max(...componentCells.map(item => item.row));
+			const minColumn = Math.min(...componentCells.map(item => item.column));
+			const maxColumn = Math.max(...componentCells.map(item => item.column));
+			let isSolidRectangle = true;
+
+			for (let checkRow = minRow; checkRow <= maxRow && isSolidRectangle; checkRow += 1) {
+				for (let checkColumn = minColumn; checkColumn <= maxColumn; checkColumn += 1) {
+					if (
+						!cells[checkRow][checkColumn] ||
+						!componentKeySet.has(getCellKey(checkRow, checkColumn))
+					) {
+						isSolidRectangle = false;
+						break;
+					}
+				}
+			}
+
+			if (!isSolidRectangle) {
+				continue;
+			}
+
+			const area = normalizeResidualCutArea(
+				{
+					left: xValues[minColumn],
+					top: yValues[minRow],
+					right: xValues[maxColumn + 1],
+					bottom: yValues[maxRow + 1],
+					manual: false,
+				},
+				sheetWidth,
+				sheetHeight
+			);
+
+			if (area && !doesAreaIntersectContours(area, collisionContours, 0)) {
+				recoveredAreas.push(area);
+			}
+		}
+	}
+
+	return recoveredAreas.sort((firstArea, secondArea) => {
+		const firstValue = (
+			(sanitizeNumber(firstArea?.right) - sanitizeNumber(firstArea?.left)) *
+			(sanitizeNumber(firstArea?.bottom) - sanitizeNumber(firstArea?.top))
+		);
+		const secondValue = (
+			(sanitizeNumber(secondArea?.right) - sanitizeNumber(secondArea?.left)) *
+			(sanitizeNumber(secondArea?.bottom) - sanitizeNumber(secondArea?.top))
+		);
+
+		if (Math.abs(secondValue - firstValue) > EPSILON) {
+			return secondValue - firstValue;
+		}
+
+		if (Math.abs(sanitizeNumber(firstArea?.left) - sanitizeNumber(secondArea?.left)) > EPSILON) {
+			return sanitizeNumber(firstArea?.left) - sanitizeNumber(secondArea?.left);
+		}
+
+		return sanitizeNumber(firstArea?.top) - sanitizeNumber(secondArea?.top);
+	});
 };
 
 export const toResidualCutPolylinePoints = (path = []) => (
@@ -1033,6 +1533,7 @@ export const parseResidualCutMetadata = (
 	return {
 		step,
 		areas,
+		source: areas.length ? RESIDUAL_CUT_SOURCE_NCP : RESIDUAL_CUT_SOURCE_NONE,
 	};
 };
 

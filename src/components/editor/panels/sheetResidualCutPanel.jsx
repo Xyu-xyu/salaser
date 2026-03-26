@@ -34,6 +34,7 @@ const SheetResidualCutPanel = observer(() => {
 		svgStore.svgData?.height,
 		svgStore.svgData?.width,
 	]);
+	const activeDisplayPaths = geometry.displayPaths;
 
 	useEffect(() => {
 		svgStore.ensureResidualCutState();
@@ -103,17 +104,10 @@ const SheetResidualCutPanel = observer(() => {
 		editorStore.setMode("residualCut");
 	}, []);
 
-	const handleSaveResidualCut = useCallback(() => {
-		if (!isManualMode) {
-			return;
-		}
 
-		exitManualMode();
-		addToSheetLog("Residual cut saved");
-	}, [exitManualMode, isManualMode]);
 
 	const handleShowResidualCut = useCallback(() => {
-		const sequence = buildResidualCutSimulationSequence(geometry.displayPaths);
+		const sequence = buildResidualCutSimulationSequence(activeDisplayPaths);
 		if (!sequence.length) {
 			showToast({
 				type: "warning",
@@ -129,7 +123,7 @@ const SheetResidualCutPanel = observer(() => {
 			segmentIndex: 0,
 			segmentProgress: 0,
 		});
-	}, [exitManualMode, geometry.displayPaths]);
+	}, [activeDisplayPaths, exitManualMode]);
 
 	const handleStepChange = useCallback((event) => {
 		setStepInput(event.currentTarget.value);
@@ -223,22 +217,7 @@ const SheetResidualCutPanel = observer(() => {
 											strokeWidth={0}
 										/>
 									</button>
-									<button
-										type="button"
-										className="btn btn-sm violet_button text-white"
-										title={t("Save")}
-										onMouseDown={handleSaveResidualCut}
-										disabled={!isManualMode}
-									>
-										<CustomIcon
-											icon="upload"
-											width="20"
-											height="20"
-											color="white"
-											fill="white"
-											strokeWidth={0}
-										/>
-									</button>
+									
 									<button
 										type="button"
 										className="btn btn-sm violet_button text-white"
@@ -257,7 +236,7 @@ const SheetResidualCutPanel = observer(() => {
 									{isManualMode ? (
 										<button
 											type="button"
-											className="btn btn-sm violet_button text-white"
+											className="btn btn-sm red_button text-white"
 											title={t("Exit")}
 											onMouseDown={exitManualMode}
 										>
@@ -307,7 +286,7 @@ const SheetResidualCutPanel = observer(() => {
 										<strong>{residualCutAreas.length}</strong>
 										<span className="ms-1">areas</span>
 										<span className="mx-1">/</span>
-										<strong>{geometry.displayPaths.length}</strong>
+										<strong>{activeDisplayPaths.length}</strong>
 										<span className="ms-1">cuts</span>
 									</div>
 								</div>
