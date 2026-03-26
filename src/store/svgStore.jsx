@@ -229,6 +229,7 @@ class SvgStore {
 		allowPartInPart: true,
 	};
 	sheetSafetyState = createEmptySheetSafetyState();
+	selectionRect = null;
 
 	svgData = {
 		"file":"",
@@ -1076,6 +1077,41 @@ class SvgStore {
 		});
 	};
 
+	setSelectionRect(rect = null) {
+		this.selectionRect = rect ? { ...rect } : null;
+	}
+
+	selectIntersecting(rect) {
+		if (!rect) {
+			this.deselect();
+			return [];
+		}
+
+		const normalizedRect = {
+			x: Number(rect.x) || 0,
+			y: Number(rect.y) || 0,
+			width: Math.max(0, Number(rect.width) || 0),
+			height: Math.max(0, Number(rect.height) || 0),
+		};
+		const selectedIds = [];
+
+		runInAction(() => {
+			this.svgData.positions.forEach(pos => {
+				const bbox = this.getPositionWorldBBox(pos);
+				const isIntersecting = bbox
+					? !this.isOutOfRect(bbox, normalizedRect)
+					: false;
+				pos.selected = isIntersecting;
+
+				if (isIntersecting) {
+					selectedIds.push(pos.part_id);
+				}
+			});
+		});
+
+		return selectedIds;
+	}
+
 	deleteAll = (uuid) => {
 		if (!uuid) {
 			console.warn('deleteAll: uuid не передан');
@@ -1133,6 +1169,31 @@ class SvgStore {
 			minY: Math.min(...ys),
 			maxY: Math.max(...ys),
 		};
+	}
+
+	getPositionWorldBBox(position) {
+		if (!position) {
+			return null;
+		}
+
+		const partCode = this.svgData.part_code.find(
+			part => part.uuid === position.part_code_id || part.id === position.part_code_id
+		);
+		if (!partCode) {
+			return null;
+		}
+
+		const outer = this.getOuterPath(partCode);
+		if (!outer?.path) {
+			return null;
+		}
+
+		const outerBBox = SVGPathCommander.getPathBBox(outer.path);
+		if (!outerBBox) {
+			return null;
+		}
+
+		return this.transformBBox(outerBBox, position.positions || {});
 	}
 
 

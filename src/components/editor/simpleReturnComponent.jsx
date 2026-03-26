@@ -114,7 +114,16 @@ const handlePartSelection = (partId) => {
 };
 
 const handlePartMove = (event, selected) => {
-	if (event.buttons === 1 && selected && editorStore.mode !== "dragging") {
+	if (event.buttons === 1 && selected && editorStore.mode === "resize") {
+		editorStore.setMode("dragging");
+	}
+};
+
+const handlePartTouchStart = (partId) => {
+	const { mode } = editorStore;
+
+	handlePartSelection(partId);
+	if (mode === "resize") {
 		editorStore.setMode("dragging");
 	}
 };
@@ -271,11 +280,7 @@ const SheetPositionInstance = memo(({
 			data-part-id={partId}
 			onMouseDown={() => handlePartSelection(partId)}
 			onMouseMove={(event) => handlePartMove(event, selected)}
-			onTouchStart={(event) => {
-				handlePartSelection(partId);
-				handlePartMove(event, selected);
-				editorStore.setMode("dragging");
-			}}
+			onTouchStart={() => handlePartTouchStart(partId)}
 		>
 			<use
 				href={`#part_${partCodeId}`}
@@ -386,11 +391,35 @@ const PositionInstancesLayer = observer(() => {
 	);
 });
 
+const SheetSelectionRectLayer = observer(() => {
+	const rect = svgStore.selectionRect;
+
+	if (!rect) {
+		return null;
+	}
+
+	return (
+		<rect
+			x={rect.x}
+			y={rect.y}
+			width={rect.width}
+			height={rect.height}
+			fill="rgba(111, 66, 193, 0.12)"
+			stroke="var(--violet)"
+			strokeWidth={1}
+			strokeDasharray="4 2"
+			vectorEffect="non-scaling-stroke"
+			pointerEvents="none"
+		/>
+	);
+});
+
 const SimpleReturnComponent = memo(() => (
 	<>
 		<ResidualCutLayer />
 		<StaticPartDefinitions />
 		<PositionInstancesLayer />
+		<SheetSelectionRectLayer />
 	</>
 ));
 

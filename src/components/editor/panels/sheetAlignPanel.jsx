@@ -122,7 +122,7 @@ const SheetAlignPanel = observer(() => {
 		const { a, b, c, d, e, f } = templatePos.positions;
 		const offsetMinX = templateBox.minX - e;
 		const offsetMinY = templateBox.minY - f;
-		const gap = Math.max(0, Number(intend) || 0);
+		const gap = Math.max(0, Number(svgStore.getSheetSafetyClearance?.() ?? intend) || 0);
 		const EPS = 0.0001;
 		const sheetWidth = svgStore.svgData.width;
 		const sheetHeight = svgStore.svgData.height;

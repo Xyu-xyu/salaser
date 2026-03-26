@@ -17,6 +17,17 @@ import panelStore from '../../../store/panelStore.jsx';
 const SheetToolsPanel = observer(() => {
 
 	const [angle, setAngle] = useState(constants.defaultAngle);
+	const activeModeIconColor = "var(--violet)";
+	const inactiveModeIconColor = "black";
+	const inactivePointerStrokeColor = "white";
+
+	const isModeActive = (mode) => editorStore.mode === mode;
+	const getModeIconFill = (mode) => (
+		isModeActive(mode) ? activeModeIconColor : inactiveModeIconColor
+	);
+	const getModeIconStroke = (mode, inactiveColor = inactiveModeIconColor) => (
+		isModeActive(mode) ? activeModeIconColor : inactiveColor
+	);
 
 	const deleteSelectedPosition = () => {
 		const selectedCount = svgStore.svgData.positions.filter(pos => pos.selected).length;
@@ -81,8 +92,10 @@ const SheetToolsPanel = observer(() => {
 						type="button"
 						className="btn text-white btn_tool btn_resize_mode"
 						onMouseDown={() => { 
+							if (editorStore.mode === "resize") {
+								svgStore.deselect()
+							}
 							editorStore.setMode("resize")
-							svgStore.deselect()
 						}}
 					>
 
@@ -90,8 +103,8 @@ const SheetToolsPanel = observer(() => {
 							icon="fa-arrow-pointer"
 							width="20"
 							height="20"
-							color="white"
-							fill="black"
+							color={getModeIconStroke("resize", inactivePointerStrokeColor)}
+							fill={getModeIconFill("resize")}
 							strokeWidth={10}
 							viewBox='0 0 640 640'
 						/>
@@ -100,22 +113,22 @@ const SheetToolsPanel = observer(() => {
 					<button
 						type="button"
 						className="btn text-white btn_tool btn_resize_mode"
-						onMouseDown={() => { 
-							svgStore.inverSelection()
-							editorStore.setMode("resize")
+						onMouseDown={() => {
+							editorStore.setMode("selector")
 						}}
 					>
 						<CustomIcon
-							icon="fa-arrow-pointer"
+							icon="rect-dash"
 							width="20"
 							height="20"
-							color="white"
-							fill="var(--violet)"
-							strokeWidth={10}
-							viewBox='0 0 640 640'
+							color={getModeIconStroke("selector")}
+							fill={getModeIconFill("selector")}
+							strokeWidth={1.5}
+							viewBox='0 0 256 256'
 						/>
 					</button>
-					
+
+				
 
 					<button
 						type="button"
@@ -128,12 +141,12 @@ const SheetToolsPanel = observer(() => {
 								icon="fa-arrow-pointer"
 								width="20"
 								height="20"
-								color="white"
-								fill="black"
+								color={getModeIconStroke("selectionPlus", inactivePointerStrokeColor)}
+								fill={getModeIconFill("selectionPlus")}
 								strokeWidth={10}
 								viewBox='0 0 640 640'
 							/>
-							<div style={{ marginLeft: -4, marginTop: 11, color: "black" }}>+</div>
+							<div style={{ marginLeft: -4, marginTop: 11, color: getModeIconFill("selectionPlus") }}>+</div>
 						</div>
 					</button>
 
@@ -149,14 +162,35 @@ const SheetToolsPanel = observer(() => {
 								icon="fa-arrow-pointer"
 								width="20"
 								height="20"
-								color="white"
-								fill="black"
+								color={getModeIconStroke("selectionMinus", inactivePointerStrokeColor)}
+								fill={getModeIconFill("selectionMinus")}
 								strokeWidth={10}
 								viewBox='0 0 640 640'
 							/>
-							<div style={{ marginLeft: -4, marginTop: 11, color: "black" }}>-</div>
+							<div style={{ marginLeft: -4, marginTop: 11, color: getModeIconFill("selectionMinus") }}>-</div>
 						</div>
 					</button>
+
+					<button
+						type="button"
+						className="btn text-white btn_tool btn_resize_mode"
+						onMouseDown={() => { 
+							svgStore.inverSelection()
+							editorStore.setMode("resize")
+						}}
+					>
+						<CustomIcon
+							icon="invert"
+							width="20"
+							height="20"
+							color="black"
+							fill="black"
+							strokeWidth={1}
+							viewBox='0 0 16 16'
+						/>
+					</button>
+
+					<ShapeModalComponent />
 
 					<button 
 						type="button"
@@ -206,7 +240,6 @@ const SheetToolsPanel = observer(() => {
 						className="form-control"
 					/>
 
-					<ShapeModalComponent />
  
 
 					<button 

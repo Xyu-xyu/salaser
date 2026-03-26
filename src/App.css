@@ -2578,6 +2578,10 @@ g.contour.skeletonText path {
   cursor: default !important;
 }
 
+.cursorSelector {
+  cursor: crosshair !important;
+}
+
 .cursorGrabbing {
   cursor: grabbing !important;
 }

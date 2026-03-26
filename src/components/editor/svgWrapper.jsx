@@ -23,6 +23,13 @@ const SvgWrapper = observer(() => {
 		initialMatrices: new Map(), // part_id → { e, f }
 		hasMoved: false,
 	});
+	const selectionState = useRef({
+		isSelecting: false,
+		startSvgX: 0,
+		startSvgY: 0,
+		currentSvgX: 0,
+		currentSvgY: 0,
+	});
 	const safetyPreviewFrameRef = useRef(null);
 
 	// Touch state
@@ -61,6 +68,72 @@ const SvgWrapper = observer(() => {
 			safetyPreviewFrameRef.current = null;
 			runSheetSafetyPreview();
 		});
+	};
+
+	const buildSelectionRect = (startX, startY, currentX, currentY) => ({
+		x: Math.min(startX, currentX),
+		y: Math.min(startY, currentY),
+		width: Math.abs(currentX - startX),
+		height: Math.abs(currentY - startY),
+	});
+
+	const startSelection = (clientX, clientY) => {
+		const startSvg = util.convertScreenCoordsToSvgCoords(clientX, clientY);
+		selectionState.current = {
+			isSelecting: true,
+			startSvgX: startSvg.x,
+			startSvgY: startSvg.y,
+			currentSvgX: startSvg.x,
+			currentSvgY: startSvg.y,
+		};
+		svgStore.setSelectionRect(
+			buildSelectionRect(startSvg.x, startSvg.y, startSvg.x, startSvg.y)
+		);
+	};
+
+	const updateSelection = (clientX, clientY) => {
+		if (!selectionState.current.isSelecting) {
+			return;
+		}
+
+		const currentSvg = util.convertScreenCoordsToSvgCoords(clientX, clientY);
+		selectionState.current.currentSvgX = currentSvg.x;
+		selectionState.current.currentSvgY = currentSvg.y;
+		svgStore.setSelectionRect(
+			buildSelectionRect(
+				selectionState.current.startSvgX,
+				selectionState.current.startSvgY,
+				currentSvg.x,
+				currentSvg.y
+			)
+		);
+	};
+
+	const clearSelectionRect = () => {
+		selectionState.current = {
+			isSelecting: false,
+			startSvgX: 0,
+			startSvgY: 0,
+			currentSvgX: 0,
+			currentSvgY: 0,
+		};
+		svgStore.setSelectionRect(null);
+	};
+
+	const finishSelection = () => {
+		if (!selectionState.current.isSelecting) {
+			return false;
+		}
+
+		const rect = buildSelectionRect(
+			selectionState.current.startSvgX,
+			selectionState.current.startSvgY,
+			selectionState.current.currentSvgX,
+			selectionState.current.currentSvgY
+		);
+		svgStore.selectIntersecting(rect);
+		clearSelectionRect();
+		return true;
 	};
 
 	// =============== WHEEL ZOOM ===============
@@ -123,10 +196,14 @@ const SvgWrapper = observer(() => {
 
 	// =============== TOUCH HANDLERS ===============
 	const TouchStart = (e) => {
+		const touches = e.touches;
 
-		if (editorStore.mode === "resize") {
+		if (editorStore.mode === "selector" && touches.length === 1) {
+			startSelection(touches[0].clientX, touches[0].clientY);
+			return;
+		}
 
-			const touches = e.touches;
+		if (editorStore.mode === "resize" || editorStore.mode === "selector") {
 			evCache.current = Array.from(touches);
 
 			if (inMoveRef.current) return;
@@ -172,8 +249,14 @@ const SvgWrapper = observer(() => {
 		evCache.current = Array.from(touches);
 		///console.log ("TouchStart mode: " + editorStore.mode)
 		
+		if (selectionState.current.isSelecting) {
+			const touch = touches[0];
+			if (!touch) return;
+			updateSelection(touch.clientX, touch.clientY);
+			return;
+		}
 
-		if (editorStore.mode === "resize") {
+		if (editorStore.mode === "resize" || editorStore.mode === "selector") {
 
 			if (touches.length === 1 && inMoveRef.current) {
 
@@ -240,8 +323,9 @@ const SvgWrapper = observer(() => {
 			if (idx >= 0) evCache.current.splice(idx, 1);
 		}
 
-	
-		endDrag();
+		if (!finishSelection()) {
+			endDrag();
+		}
 		inMoveRef.current = false;
 		prevDiff.current = -1;
 		evCache.current = [];
@@ -259,6 +343,9 @@ const SvgWrapper = observer(() => {
 				y: pos.y - groupMatrix.f,
 			};
 			//editorStore.setMode('drag');
+		} else if (e.button === 0 && editorStore.mode === 'selector') {
+			startSelection(e.clientX, e.clientY);
+			return;
 		} else if (e.buttons === 1 /*&& editorStore.mode === "dragging"*/) {
 			const selected = svgStore.svgData.positions.filter(p => p.selected);
 			if (selected.length === 0) return;
@@ -284,6 +371,10 @@ const SvgWrapper = observer(() => {
 	};
 
 	const MouseDrag = (e) => {
+		if (selectionState.current.isSelecting) {
+			updateSelection(e.clientX, e.clientY);
+			return;
+		}
 
 		if (e.button === 0 && inMoveRef.current) {
 			
@@ -324,6 +415,11 @@ const SvgWrapper = observer(() => {
 	};
 
 	const endDrag = () => {
+		if (finishSelection()) {
+			inMoveRef.current = false;
+			return;
+		}
+
 		inMoveRef.current = false;
 		cancelSheetSafetyPreview();
 		console.log ("END DRAG")
@@ -375,6 +471,7 @@ const SvgWrapper = observer(() => {
 		svgStore.recalculateSheetSafety();
 		return () => {
 			cancelSheetSafetyPreview();
+			clearSelectionRect();
 		};
 	}, []);
 
@@ -412,8 +509,12 @@ const SvgWrapper = observer(() => {
 
 	useEffect(() => {
 		const mode = editorStore.mode;
+		if (mode !== 'selector' && selectionState.current.isSelecting) {
+			clearSelectionRect();
+		}
 		const classes = {
 			resize: 'cursorArrow',
+			selector: 'cursorSelector',
 			drag: 'cursorGrab',
 			dragging: 'cursorGrabbing',
 			addPoint: 'cursorCustomPlus',
