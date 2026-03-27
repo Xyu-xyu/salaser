@@ -15,6 +15,8 @@ export const RESIDUAL_CUT_SOURCE_NCP = "ncp";
 export const RESIDUAL_CUT_SOURCE_USER = "user";
 
 const AUTO_MAX_RECTANGLES = 50;
+const AUTO_EDGE_REFINE_ITERATIONS = 12;
+const AUTO_EDGE_REFINE_PASSES = 2;
 const CLIPPER_SCALE = 1000;
 const EPSILON = 0.001;
 
@@ -84,7 +86,7 @@ const buildRectanglePath = (area) => ([
 	{ x: area.left, y: area.bottom },
 ]);
 
-const getSafetyMargin = (clearance = 0) => normalizeSheetSafetyClearance(clearance) / 2;
+const getSafetyMargin = (clearance = 0) => normalizeSheetSafetyClearance(clearance);
 
 const expandAreaByMargin = (area, margin = 0) => {
 	const safeMargin = Math.max(0, Number(margin) || 0);
@@ -208,6 +210,20 @@ const hasMeaningfulPolygon = (points = []) => (
 	Math.abs(getSignedArea(points)) > EPSILON
 );
 
+const pickLargestPolygon = (paths = []) => (
+	(Array.isArray(paths) ? paths : [])
+		.filter(hasMeaningfulPolygon)
+		.reduce((bestPath, currentPath) => {
+			if (!bestPath) {
+				return currentPath;
+			}
+
+			return Math.abs(getSignedArea(currentPath)) > Math.abs(getSignedArea(bestPath))
+				? currentPath
+				: bestPath;
+		}, null)
+);
+
 const hasPolygonIntersection = (subjectPolygon = [], clipPolygon = []) => {
 	if (!hasMeaningfulPolygon(subjectPolygon) || !hasMeaningfulPolygon(clipPolygon)) {
 		return false;
@@ -306,6 +322,57 @@ const doesPolylineIntersectArea = (points = [], area) => {
 	return false;
 };
 
+const hasPathData = (item) => (
+	typeof item?.path === "string" &&
+	item.path.trim().length > 0
+);
+
+const hasClassToken = (item, token) => (
+	typeof item?.class === "string" &&
+	item.class.includes(token)
+);
+
+const getResidualContourCidKey = (item) => {
+	const rawCid = item?.cid;
+	if (rawCid === null || rawCid === undefined || rawCid === "") {
+		return null;
+	}
+
+	const numericCid = Number(rawCid);
+	return Number.isFinite(numericCid)
+		? String(numericCid)
+		: String(rawCid);
+};
+
+const getPathBBox = (path = "") => {
+	if (!path?.trim()) {
+		return null;
+	}
+
+	try {
+		const bbox = SVGPathCommander.getPathBBox(path);
+		return {
+			left: sanitizeNumber(bbox?.x),
+			top: sanitizeNumber(bbox?.y),
+			right: sanitizeNumber(bbox?.x) + sanitizeNumber(bbox?.width),
+			bottom: sanitizeNumber(bbox?.y) + sanitizeNumber(bbox?.height),
+		};
+	} catch (error) {
+		return null;
+	}
+};
+
+const buildPolylineGeometry = (points = []) => {
+	const nextPoints = dedupePolyline(points);
+	const bbox = getBBoxFromPoints(nextPoints);
+	return nextPoints.length >= 2 && bbox
+		? {
+			points: nextPoints,
+			bbox,
+		}
+		: null;
+};
+
 const doesAreaIntersectContours = (area, contours = [], clearance = 0) => {
 	const collisionArea = expandAreaByMargin(area, getSafetyMargin(clearance));
 	const areaPolygon = buildRectanglePath(collisionArea);
@@ -315,24 +382,28 @@ const doesAreaIntersectContours = (area, contours = [], clearance = 0) => {
 			return false;
 		}
 
-		if (!hasMeaningfulPolygon(contour.vertices) && !Array.isArray(contour.leadPolylines)) {
+		const boundaryPolylines = Array.isArray(contour.boundaryPolylines)
+			? contour.boundaryPolylines
+			: [];
+
+		if (!hasMeaningfulPolygon(contour.vertices) && !boundaryPolylines.length) {
 			return true;
 		}
 
 		const polygonIntersection = hasMeaningfulPolygon(contour.vertices)
 			? hasPolygonIntersection(areaPolygon, contour.vertices)
 			: false;
-		const leadIntersection = (Array.isArray(contour.leadPolylines) ? contour.leadPolylines : [])
-			.some(leadPolyline => (
-				doesCellIntersectBBox(collisionArea, leadPolyline.bbox) &&
-				doesPolylineIntersectArea(leadPolyline.points, collisionArea)
+		const boundaryIntersection = boundaryPolylines
+			.some(boundaryPolyline => (
+				doesCellIntersectBBox(collisionArea, boundaryPolyline.bbox) &&
+				doesPolylineIntersectArea(boundaryPolyline.points, collisionArea)
 			));
 
-		if (!hasMeaningfulPolygon(contour.vertices) && !leadIntersection) {
+		if (!hasMeaningfulPolygon(contour.vertices) && !boundaryIntersection) {
 			return true;
 		}
 
-		return polygonIntersection || leadIntersection;
+		return polygonIntersection || boundaryIntersection;
 	});
 };
 
@@ -574,67 +645,105 @@ const getOuterContours = (svgData) => {
 	const positions = Array.isArray(svgData?.positions) ? svgData.positions : [];
 	const partMap = new Map(parts.map(part => [part?.id ?? part?.uuid, part]));
 
-	return positions.map(position => {
+	return positions.flatMap(position => {
 		const part = (
 			partMap.get(position?.part_code_id) ||
 			parts.find(item => item?.uuid === position?.part_code_id)
 		);
-		const outerContour = Array.isArray(part?.code)
-			? part.code.find(item => (
-				typeof item?.class === "string" &&
-				item.class.includes("contour") &&
-				item.class.includes("outer") &&
-				typeof item?.path === "string" &&
-				item.path.trim().length > 0
-			))
-			: null;
+		const code = Array.isArray(part?.code) ? part.code : [];
+		const outerCidKeys = new Set(
+			code
+				.filter(item => (
+					hasPathData(item) &&
+					hasClassToken(item, "contour") &&
+					hasClassToken(item, "outer")
+				))
+				.map(getResidualContourCidKey)
+				.filter(Boolean)
+		);
 
-		if (!outerContour?.path) {
-			return null;
+		if (!outerCidKeys.size) {
+			return [];
 		}
 
 		const matrix = position?.positions || {};
-		const transformedPath = transformPath(outerContour.path, matrix);
-		const leadPolylines = (Array.isArray(part?.code) ? part.code : [])
-			.filter(item => (
-				item !== outerContour &&
-				item?.cid === outerContour.cid &&
-				typeof item?.class === "string" &&
+		return [...outerCidKeys].map(cidKey => {
+			const boundaryItems = code.filter(item => (
+				hasPathData(item) &&
+				getResidualContourCidKey(item) === cidKey &&
 				(
-					item.class.includes("inlet") ||
-					item.class.includes("outlet")
-				) &&
-				typeof item?.path === "string" &&
-				item.path.trim().length > 0
-			))
-			.map(item => {
-				const transformedLeadPath = transformPath(item.path, matrix);
-				const points = getPathPoints(transformedLeadPath, 2);
-				return {
-					points,
-					bbox: getBBoxFromPoints(points),
-				};
-			})
-			.filter(item => item.points.length >= 2 && item.bbox);
+					(hasClassToken(item, "contour") && hasClassToken(item, "outer")) ||
+					hasClassToken(item, "inlet") ||
+					hasClassToken(item, "outlet")
+				)
+			));
 
-		try {
-			const bbox = SVGPathCommander.getPathBBox(transformedPath);
-			const contourBbox = {
-				left: sanitizeNumber(bbox?.x),
-				top: sanitizeNumber(bbox?.y),
-				right: sanitizeNumber(bbox?.x) + sanitizeNumber(bbox?.width),
-				bottom: sanitizeNumber(bbox?.y) + sanitizeNumber(bbox?.height),
-			};
+			if (!boundaryItems.length) {
+				return null;
+			}
 
-			return {
-				path: transformedPath,
-				bbox: mergeBBoxes([contourBbox, ...leadPolylines.map(item => item.bbox)]),
-				vertices: getPathVertices(transformedPath),
-				leadPolylines,
-			};
-		} catch (error) {
-			return null;
-		}
+			const contourPolylines = [];
+			const contourPolygons = [];
+			const leadPolylines = [];
+			const boxes = [];
+
+			boundaryItems.forEach(item => {
+				const transformedPath = transformPath(item.path, matrix);
+				const pathBBox = getPathBBox(transformedPath);
+				if (pathBBox) {
+					boxes.push(pathBBox);
+				}
+
+				const points = getPathPoints(transformedPath, 2);
+				const polyline = buildPolylineGeometry(points);
+				if (polyline?.bbox) {
+					boxes.push(polyline.bbox);
+				}
+
+				if (hasClassToken(item, "contour")) {
+					if (polyline) {
+						contourPolylines.push(polyline.points);
+					}
+
+					const vertices = getPathVertices(transformedPath);
+					if (hasMeaningfulPolygon(vertices)) {
+						contourPolygons.push(vertices);
+					}
+					return;
+				}
+
+				if (polyline) {
+					leadPolylines.push(polyline);
+				}
+			});
+
+			const stitchedContourPolylines = stitchResidualCutPolylines(contourPolylines);
+			const contourBoundaryPolylines = (
+				stitchedContourPolylines.length
+					? stitchedContourPolylines
+					: contourPolylines
+			)
+				.map(buildPolylineGeometry)
+				.filter(Boolean);
+			const boundaryPolylines = [...contourBoundaryPolylines, ...leadPolylines];
+			const vertices = pickLargestPolygon([
+				...stitchedContourPolylines,
+				...contourPolygons,
+				...contourPolylines,
+			]);
+			const bbox = mergeBBoxes([
+				...boxes,
+				...boundaryPolylines.map(item => item.bbox),
+			]);
+
+			return bbox
+				? {
+					bbox,
+					vertices: vertices || [],
+					boundaryPolylines,
+				}
+				: null;
+		}).filter(Boolean);
 	}).filter(Boolean);
 };
 
@@ -929,6 +1038,234 @@ export const buildResidualCutGeometry = (areas = [], sheetWidth, sheetHeight) =>
 	};
 };
 
+const doesResidualCutAreasOverlap = (firstArea, secondArea) => (
+	Boolean(firstArea) &&
+	Boolean(secondArea) &&
+	sanitizeNumber(firstArea.left) < sanitizeNumber(secondArea.right) - EPSILON &&
+	sanitizeNumber(firstArea.right) > sanitizeNumber(secondArea.left) + EPSILON &&
+	sanitizeNumber(firstArea.top) < sanitizeNumber(secondArea.bottom) - EPSILON &&
+	sanitizeNumber(firstArea.bottom) > sanitizeNumber(secondArea.top) + EPSILON
+);
+
+const doesResidualCutAreaOverlapExistingAreas = (
+	area,
+	areas = [],
+	excludedIndex = -1
+) => (
+	(Array.isArray(areas) ? areas : []).some((item, index) => (
+		index !== excludedIndex &&
+		doesResidualCutAreasOverlap(area, item)
+	))
+);
+
+const buildAreaWithAdjustedEdge = (area, edge, value, sheetWidth, sheetHeight) => (
+	normalizeResidualCutArea(
+		{
+			...area,
+			[edge]: roundCoord(value),
+			manual: Boolean(area?.manual),
+		},
+		sheetWidth,
+		sheetHeight
+	)
+);
+
+const findSafestAdjustedEdge = ({
+	area,
+	edge,
+	boundaryValue,
+	contours,
+	safetyClearance,
+	areas,
+	areaIndex,
+	sheetWidth,
+	sheetHeight,
+}) => {
+	const currentValue = sanitizeNumber(area?.[edge]);
+	const targetValue = roundCoord(boundaryValue);
+
+	if (Math.abs(currentValue - targetValue) <= EPSILON) {
+		return area;
+	}
+
+	const isSafeEdgeValue = (value) => {
+		const candidate = buildAreaWithAdjustedEdge(
+			area,
+			edge,
+			value,
+			sheetWidth,
+			sheetHeight
+		);
+		return (
+			Boolean(candidate) &&
+			!doesAreaIntersectContours(candidate, contours, safetyClearance) &&
+			!doesResidualCutAreaOverlapExistingAreas(candidate, areas, areaIndex)
+		);
+	};
+
+	if (isSafeEdgeValue(targetValue)) {
+		return buildAreaWithAdjustedEdge(
+			area,
+			edge,
+			targetValue,
+			sheetWidth,
+			sheetHeight
+		) || area;
+	}
+
+	let safeValue = currentValue;
+	let unsafeValue = targetValue;
+
+	for (let iteration = 0; iteration < AUTO_EDGE_REFINE_ITERATIONS; iteration += 1) {
+		const midValue = (safeValue + unsafeValue) / 2;
+		if (isSafeEdgeValue(midValue)) {
+			safeValue = midValue;
+		} else {
+			unsafeValue = midValue;
+		}
+	}
+
+	return buildAreaWithAdjustedEdge(
+		area,
+		edge,
+		safeValue,
+		sheetWidth,
+		sheetHeight
+	) || area;
+};
+
+const refineAutoResidualCutArea = ({
+	area,
+	areas,
+	areaIndex,
+	contours,
+	sheetWidth,
+	sheetHeight,
+	step,
+	safetyClearance,
+}) => {
+	const normalizedArea = normalizeResidualCutArea(area, sheetWidth, sheetHeight);
+	if (!normalizedArea) {
+		return null;
+	}
+
+	const refineDistance = Math.max(0, sanitizeNumber(step));
+	const limits = {
+		left: Math.max(0, sanitizeNumber(normalizedArea.left) - refineDistance),
+		right: Math.min(sheetWidth, sanitizeNumber(normalizedArea.right) + refineDistance),
+		top: Math.max(0, sanitizeNumber(normalizedArea.top) - refineDistance),
+		bottom: Math.min(sheetHeight, sanitizeNumber(normalizedArea.bottom) + refineDistance),
+	};
+	let nextArea = normalizedArea;
+
+	for (let pass = 0; pass < AUTO_EDGE_REFINE_PASSES; pass += 1) {
+		const previousArea = nextArea;
+		nextArea = findSafestAdjustedEdge({
+			area: nextArea,
+			edge: "left",
+			boundaryValue: limits.left,
+			contours,
+			safetyClearance,
+			areas,
+			areaIndex,
+			sheetWidth,
+			sheetHeight,
+		});
+		nextArea = findSafestAdjustedEdge({
+			area: nextArea,
+			edge: "right",
+			boundaryValue: limits.right,
+			contours,
+			safetyClearance,
+			areas,
+			areaIndex,
+			sheetWidth,
+			sheetHeight,
+		});
+		nextArea = findSafestAdjustedEdge({
+			area: nextArea,
+			edge: "top",
+			boundaryValue: limits.top,
+			contours,
+			safetyClearance,
+			areas,
+			areaIndex,
+			sheetWidth,
+			sheetHeight,
+		});
+		nextArea = findSafestAdjustedEdge({
+			area: nextArea,
+			edge: "bottom",
+			boundaryValue: limits.bottom,
+			contours,
+			safetyClearance,
+			areas,
+			areaIndex,
+			sheetWidth,
+			sheetHeight,
+		});
+
+		if (
+			Math.abs(sanitizeNumber(previousArea?.left) - sanitizeNumber(nextArea?.left)) <= EPSILON &&
+			Math.abs(sanitizeNumber(previousArea?.right) - sanitizeNumber(nextArea?.right)) <= EPSILON &&
+			Math.abs(sanitizeNumber(previousArea?.top) - sanitizeNumber(nextArea?.top)) <= EPSILON &&
+			Math.abs(sanitizeNumber(previousArea?.bottom) - sanitizeNumber(nextArea?.bottom)) <= EPSILON
+		) {
+			break;
+		}
+	}
+
+	return nextArea;
+};
+
+const markGridAreaAsOccupied = (
+	grid = [],
+	area,
+	step,
+	sheetWidth,
+	sheetHeight
+) => {
+	const normalizedArea = normalizeResidualCutArea(area, sheetWidth, sheetHeight);
+	if (
+		!normalizedArea ||
+		!Array.isArray(grid) ||
+		!grid.length ||
+		!Array.isArray(grid[0]) ||
+		!grid[0].length
+	) {
+		return;
+	}
+
+	const normalizedStep = Math.max(EPSILON, sanitizeNumber(step));
+	const rowCount = grid.length;
+	const columnCount = grid[0].length;
+	const startColumn = Math.max(0, Math.floor(sanitizeNumber(normalizedArea.left) / normalizedStep));
+	const endColumn = Math.min(
+		columnCount - 1,
+		Math.ceil(sanitizeNumber(normalizedArea.right) / normalizedStep) - 1
+	);
+	const startRow = Math.max(0, Math.floor(sanitizeNumber(normalizedArea.top) / normalizedStep));
+	const endRow = Math.min(
+		rowCount - 1,
+		Math.ceil(sanitizeNumber(normalizedArea.bottom) / normalizedStep) - 1
+	);
+
+	for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+		for (let columnIndex = startColumn; columnIndex <= endColumn; columnIndex += 1) {
+			const cell = {
+				left: columnIndex * normalizedStep,
+				top: rowIndex * normalizedStep,
+				right: Math.min(sheetWidth, (columnIndex + 1) * normalizedStep),
+				bottom: Math.min(sheetHeight, (rowIndex + 1) * normalizedStep),
+			};
+
+			if (doesResidualCutAreasOverlap(cell, normalizedArea)) {
+				grid[rowIndex][columnIndex] = 1;
+			}
+		}
+	}
+};
+
 export const generateAutoResidualCutAreas = (
 	svgData,
 	step = RESIDUAL_CUT_DEFAULT_STEP,
@@ -993,13 +1330,18 @@ export const generateAutoResidualCutAreas = (
 			break;
 		}
 
-		nextAreas.push(area);
-
-		for (let rowIndex = rectangle.top; rowIndex <= rectangle.bottom; rowIndex += 1) {
-			for (let columnIndex = rectangle.left; columnIndex <= rectangle.right; columnIndex += 1) {
-				grid[rowIndex][columnIndex] = 1;
-			}
-		}
+		const refinedArea = refineAutoResidualCutArea({
+			area,
+			areas: nextAreas,
+			areaIndex: -1,
+			contours,
+			sheetWidth,
+			sheetHeight,
+			step: normalizedStep,
+			safetyClearance,
+		}) || area;
+		nextAreas.push(refinedArea);
+		markGridAreaAsOccupied(grid, refinedArea, normalizedStep, sheetWidth, sheetHeight);
 	}
 
 	return nextAreas;
