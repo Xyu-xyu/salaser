@@ -9,6 +9,7 @@ export const RESIDUAL_CUT_DEFAULT_STEP = 100;
 export const RESIDUAL_CUT_MIN_STEP = 10;
 export const RESIDUAL_CUT_MAX_STEP = 100;
 export const RESIDUAL_CUT_SNAP_DISTANCE = 19;
+export const RESIDUAL_CUT_BOUNDS_SNAP_DISTANCE = 25;
 export const RESIDUAL_CUT_DISPLAY_OFFSET = 10;
 export const RESIDUAL_CUT_SOURCE_NONE = "none";
 export const RESIDUAL_CUT_SOURCE_NCP = "ncp";
@@ -860,6 +861,39 @@ export const normalizeResidualCutPoint = (point, sheetWidth, sheetHeight) => {
 	};
 };
 
+export const snapResidualCutPointToBounds = (
+	point,
+	sheetWidth,
+	sheetHeight,
+	snapDistance = RESIDUAL_CUT_BOUNDS_SNAP_DISTANCE
+) => {
+	const normalizedPoint = normalizeResidualCutPoint(point, sheetWidth, sheetHeight);
+	if (!normalizedPoint) {
+		return null;
+	}
+
+	const maxX = sanitizeNumber(sheetWidth);
+	const maxY = sanitizeNumber(sheetHeight);
+	let { x, y } = normalizedPoint;
+
+	if (x <= snapDistance) {
+		x = 0;
+	} else if (Math.abs(maxX - x) <= snapDistance) {
+		x = maxX;
+	}
+
+	if (y <= snapDistance) {
+		y = 0;
+	} else if (Math.abs(maxY - y) <= snapDistance) {
+		y = maxY;
+	}
+
+	return {
+		x: roundCoord(x),
+		y: roundCoord(y),
+	};
+};
+
 const normalizeResidualCutDisplayPoint = (point) => {
 	const x = Number(point?.x);
 	const y = Number(point?.y);
@@ -917,7 +951,7 @@ export const snapResidualCutAreaToBounds = (
 	area,
 	sheetWidth,
 	sheetHeight,
-	snapDistance = RESIDUAL_CUT_SNAP_DISTANCE
+	snapDistance = RESIDUAL_CUT_BOUNDS_SNAP_DISTANCE
 ) => {
 	const normalizedArea = normalizeResidualCutArea(area, sheetWidth, sheetHeight);
 	if (!normalizedArea) {

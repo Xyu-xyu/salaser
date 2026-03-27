@@ -224,6 +224,9 @@ class SvgStore {
 		segmentIndex: 0,
 		segmentProgress: 0,
 	};
+	residualCutSelection = {
+		areaIndexes: [],
+	};
 	laserShowPartFlags = new Map();
 	laserShowOrderIndexById = new Map();
 	laserShowOrderDirty = true;
@@ -813,15 +816,19 @@ class SvgStore {
 			source: normalizeResidualCutSource(previousState.source, normalizedAreas.length > 0),
 		};
 		const previousAreas = Array.isArray(previousState.areas) ? previousState.areas : [];
+		const areasChanged = JSON.stringify(previousAreas) !== JSON.stringify(nextState.areas);
 		const hasChanged = (
 			previousState.step !== nextState.step ||
-			JSON.stringify(previousAreas) !== JSON.stringify(nextState.areas) ||
+			areasChanged ||
 			previousState.source !== nextState.source
 		);
 
 		if (hasChanged) {
 			runInAction(() => {
 				this.svgData.residualCut = nextState;
+				if (areasChanged) {
+					this.residualCutSelection.areaIndexes = [];
+				}
 			});
 		}
 
@@ -834,6 +841,68 @@ class SvgStore {
 
 	getResidualCutAreas() {
 		return this.ensureResidualCutState().areas;
+	}
+
+	getSelectedResidualCutAreaIndexes() {
+		const areaCount = this.getResidualCutAreas().length;
+		return sortNumericIds(
+			Array.isArray(this.residualCutSelection.areaIndexes)
+				? this.residualCutSelection.areaIndexes
+				: []
+		).filter(index => index >= 0 && index < areaCount);
+	}
+
+	clearResidualCutAreaSelection() {
+		if (!this.residualCutSelection.areaIndexes.length) {
+			return [];
+		}
+
+		runInAction(() => {
+			this.residualCutSelection.areaIndexes = [];
+		});
+
+		return this.residualCutSelection.areaIndexes;
+	}
+
+	setResidualCutAreaSelection(indexes = []) {
+		const areaCount = this.getResidualCutAreas().length;
+		const nextIndexes = sortNumericIds(
+			Array.isArray(indexes) ? indexes : [indexes]
+		).filter(index => index >= 0 && index < areaCount);
+		const currentIndexes = this.getSelectedResidualCutAreaIndexes();
+
+		if (sameIdOrder(currentIndexes, nextIndexes)) {
+			return currentIndexes;
+		}
+
+		runInAction(() => {
+			this.residualCutSelection.areaIndexes = nextIndexes;
+		});
+
+		return this.residualCutSelection.areaIndexes;
+	}
+
+	toggleResidualCutAreaSelection(index, additive = false) {
+		const nextIndex = Math.trunc(Number(index));
+		if (!Number.isFinite(nextIndex)) {
+			return this.getSelectedResidualCutAreaIndexes();
+		}
+
+		const currentIndexes = this.getSelectedResidualCutAreaIndexes();
+		const isSelected = currentIndexes.includes(nextIndex);
+		if (additive) {
+			return this.setResidualCutAreaSelection(
+				isSelected
+					? currentIndexes.filter(item => item !== nextIndex)
+					: [...currentIndexes, nextIndex]
+			);
+		}
+
+		if (isSelected && currentIndexes.length === 1) {
+			return this.clearResidualCutAreaSelection();
+		}
+
+		return this.setResidualCutAreaSelection([nextIndex]);
 	}
 
 	setResidualCutStep(step) {
@@ -863,6 +932,32 @@ class SvgStore {
 		runInAction(() => {
 			this.svgData.residualCut.areas = nextAreas;
 			this.svgData.residualCut.source = nextSource;
+			this.residualCutSelection.areaIndexes = [];
+		});
+		this.stopResidualCutSimulation();
+
+		return this.svgData.residualCut.areas;
+	}
+
+	deleteSelectedResidualCutAreas() {
+		this.ensureResidualCutState();
+		const selectedIndexes = new Set(this.getSelectedResidualCutAreaIndexes());
+
+		if (!selectedIndexes.size) {
+			return this.svgData.residualCut.areas;
+		}
+
+		const nextAreas = this.svgData.residualCut.areas.filter(
+			(_, index) => !selectedIndexes.has(index)
+		);
+
+		runInAction(() => {
+			this.svgData.residualCut.areas = nextAreas;
+			this.svgData.residualCut.source = normalizeResidualCutSource(
+				RESIDUAL_CUT_SOURCE_USER,
+				nextAreas.length > 0
+			);
+			this.residualCutSelection.areaIndexes = [];
 		});
 		this.stopResidualCutSimulation();
 
@@ -874,6 +969,7 @@ class SvgStore {
 		runInAction(() => {
 			this.svgData.residualCut.areas = [];
 			this.svgData.residualCut.source = RESIDUAL_CUT_SOURCE_NONE;
+			this.residualCutSelection.areaIndexes = [];
 		});
 		this.stopResidualCutSimulation();
 		this.resetResidualCutDraft();

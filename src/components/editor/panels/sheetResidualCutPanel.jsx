@@ -22,6 +22,7 @@ const SheetResidualCutPanel = observer(() => {
 	const isMini = panelStore.positions.sheetResidualCutPopup?.mini ?? true;
 	const residualCutStep = svgStore.getResidualCutStep();
 	const residualCutAreas = svgStore.getResidualCutAreas();
+	const selectedResidualCutAreaCount = svgStore.getSelectedResidualCutAreaIndexes().length;
 	const safetyClearance = svgStore.getSheetSafetyClearance();
 	const [stepInput, setStepInput] = useState(() => String(residualCutStep));
 	const isManualMode = editorStore.mode === "residualCut";
@@ -72,9 +73,16 @@ const SheetResidualCutPanel = observer(() => {
 		}
 
 		exitManualMode();
+
+		if (selectedResidualCutAreaCount > 0) {
+			const nextAreas = svgStore.deleteSelectedResidualCutAreas();
+			addToSheetLog(nextAreas.length ? "Residual cut updated" : "Residual cut deleted");
+			return;
+		}
+
 		svgStore.clearResidualCut();
 		addToSheetLog("Residual cut deleted");
-	}, [exitManualMode, isManualMode, residualCutAreas.length]);
+	}, [exitManualMode, isManualMode, residualCutAreas.length, selectedResidualCutAreaCount]);
 
 	const handleAutoResidualCut = useCallback(() => {
 		const nextStep = commitStep(stepInput);
@@ -101,6 +109,7 @@ const SheetResidualCutPanel = observer(() => {
 	const handleEnterManualMode = useCallback(() => {
 		svgStore.stopResidualCutSimulation();
 		svgStore.resetResidualCutDraft();
+		svgStore.clearResidualCutAreaSelection();
 		editorStore.setMode("residualCut");
 	}, []);
 

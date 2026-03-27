@@ -8,9 +8,9 @@ import {
 	buildResidualCutGeometry,
 	doesResidualCutAreaCollideWithParts,
 	normalizeResidualCutArea,
-	normalizeResidualCutPoint,
 	snapResidualCutAreaToBounds,
 	snapResidualCutAreaToExistingEdges,
+	snapResidualCutPointToBounds,
 	toResidualCutPolylinePoints,
 } from "../../scripts/residualCutUtils.jsx";
 
@@ -107,6 +107,9 @@ const ResidualCutSimulationController = observer(() => {
 });
 
 const ResidualCutLayer = observer(() => {
+	const manualDragActiveRef = useRef(false);
+	const manualStartPointRef = useRef(null);
+	const manualCursorPointRef = useRef(null);
 	const sheetWidth = Math.max(0, Number(svgStore.svgData?.width) || 0);
 	const sheetHeight = Math.max(0, Number(svgStore.svgData?.height) || 0);
 	const residualCut = svgStore.svgData?.residualCut || { areas: [] };
@@ -120,11 +123,38 @@ const ResidualCutLayer = observer(() => {
 	const areaOutlinePaths = geometry.areaOutlinePaths || [];
 	const activeDisplayPaths = geometry.displayPaths;
 	const isManualMode = editorStore.mode === "residualCut";
+	const selectedAreaIndexes = svgStore.getSelectedResidualCutAreaIndexes();
 	const draftPoints = Array.isArray(svgStore.residualCutDraft.points)
 		? svgStore.residualCutDraft.points
 		: [];
 	const cursorPoint = svgStore.residualCutDraft.cursorPoint;
 	const simulation = svgStore.residualCutSimulation;
+	const selectedAreaIndexSet = useMemo(
+		() => new Set(selectedAreaIndexes),
+		[selectedAreaIndexes]
+	);
+
+	useEffect(() => {
+		manualCursorPointRef.current = cursorPoint;
+	}, [cursorPoint]);
+
+	useEffect(() => {
+		if (draftPoints.length === 1) {
+			manualStartPointRef.current = draftPoints[0];
+			return;
+		}
+
+		manualDragActiveRef.current = false;
+		manualStartPointRef.current = null;
+	}, [draftPoints]);
+
+	useEffect(() => {
+		if (!isManualMode) {
+			manualDragActiveRef.current = false;
+			manualStartPointRef.current = null;
+			manualCursorPointRef.current = null;
+		}
+	}, [isManualMode]);
 
 	const previewArea = useMemo(() => {
 		if (!isManualMode || draftPoints.length !== 1 || !cursorPoint) {
@@ -152,7 +182,7 @@ const ResidualCutLayer = observer(() => {
 			return null;
 		}
 
-		return normalizeResidualCutPoint(
+		return snapResidualCutPointToBounds(
 			util.convertScreenCoordsToSvgCoords(sourceEvent.clientX, sourceEvent.clientY),
 			sheetWidth,
 			sheetHeight
@@ -173,19 +203,37 @@ const ResidualCutLayer = observer(() => {
 		}
 
 		stopPointerEvent(event);
-		svgStore.setResidualCutCursor(getPointerPosition(event));
+		const point = getPointerPosition(event);
+		if (!point) {
+			return;
+		}
+
+		manualCursorPointRef.current = point;
+		svgStore.setResidualCutCursor(point);
 	}, [getPointerPosition, isManualMode, stopPointerEvent]);
 
-	const handlePointerLeave = useCallback(() => {
+	const handlePointerLeave = useCallback((event) => {
 		if (!isManualMode) {
 			return;
 		}
 
+		if (manualDragActiveRef.current) {
+			const point = getPointerPosition(event) || manualCursorPointRef.current;
+			if (!point) {
+				return;
+			}
+
+			manualCursorPointRef.current = point;
+			svgStore.setResidualCutCursor(point);
+			return;
+		}
+
+		manualCursorPointRef.current = null;
 		svgStore.setResidualCutCursor(null);
-	}, [isManualMode]);
+	}, [getPointerPosition, isManualMode]);
 
 	const handlePointerDown = useCallback((event) => {
-		if (!isManualMode) {
+		if (!isManualMode || manualDragActiveRef.current) {
 			return;
 		}
 
@@ -195,16 +243,42 @@ const ResidualCutLayer = observer(() => {
 			return;
 		}
 
-		if (!draftPoints.length) {
-			svgStore.setResidualCutDraftPoints([point]);
+		manualDragActiveRef.current = true;
+		manualStartPointRef.current = point;
+		manualCursorPointRef.current = point;
+		svgStore.setResidualCutDraftPoints([point]);
+		svgStore.setResidualCutCursor(point);
+	}, [getPointerPosition, isManualMode, stopPointerEvent]);
+
+	const handlePointerUp = useCallback((event) => {
+		if (!isManualMode || !manualDragActiveRef.current) {
+			return;
+		}
+
+		stopPointerEvent(event);
+		manualDragActiveRef.current = false;
+		const startPoint = manualStartPointRef.current;
+		const point = getPointerPosition(event) || manualCursorPointRef.current;
+		manualStartPointRef.current = null;
+
+		if (!point) {
+			manualCursorPointRef.current = null;
+			svgStore.resetResidualCutDraft();
+			svgStore.setResidualCutCursor(null);
+			return;
+		}
+
+		manualCursorPointRef.current = point;
+		if (!startPoint) {
+			svgStore.resetResidualCutDraft();
 			svgStore.setResidualCutCursor(point);
 			return;
 		}
 
 		const rawArea = normalizeResidualCutArea(
 			{
-				left: draftPoints[0].x,
-				top: draftPoints[0].y,
+				left: startPoint?.x,
+				top: startPoint?.y,
 				right: point.x,
 				bottom: point.y,
 				manual: true,
@@ -235,7 +309,6 @@ const ResidualCutLayer = observer(() => {
 		svgStore.setResidualCutCursor(point);
 	}, [
 		areas,
-		draftPoints,
 		getPointerPosition,
 		isManualMode,
 		safetyClearance,
@@ -243,6 +316,50 @@ const ResidualCutLayer = observer(() => {
 		sheetWidth,
 		stopPointerEvent,
 	]);
+
+	useEffect(() => {
+		if (!isManualMode || draftPoints.length !== 1) {
+			return undefined;
+		}
+
+		const touchListenerOptions = { passive: false };
+		const handleWindowMove = (event) => {
+			handlePointerMove(event);
+		};
+		const handleWindowUp = (event) => {
+			handlePointerUp(event);
+		};
+
+		window.addEventListener("mousemove", handleWindowMove);
+		window.addEventListener("mouseup", handleWindowUp);
+		window.addEventListener("touchmove", handleWindowMove, touchListenerOptions);
+		window.addEventListener("touchend", handleWindowUp, touchListenerOptions);
+		window.addEventListener("touchcancel", handleWindowUp, touchListenerOptions);
+
+		return () => {
+			window.removeEventListener("mousemove", handleWindowMove);
+			window.removeEventListener("mouseup", handleWindowUp);
+			window.removeEventListener("touchmove", handleWindowMove, touchListenerOptions);
+			window.removeEventListener("touchend", handleWindowUp, touchListenerOptions);
+			window.removeEventListener("touchcancel", handleWindowUp, touchListenerOptions);
+		};
+	}, [draftPoints.length, handlePointerMove, handlePointerUp, isManualMode]);
+
+	const handleAreaPointerDown = useCallback((event, areaIndex) => {
+		if (isManualMode) {
+			return;
+		}
+
+		stopPointerEvent(event);
+		svgStore.toggleResidualCutAreaSelection(
+			areaIndex,
+			Boolean(event?.ctrlKey || event?.metaKey || event?.shiftKey)
+		);
+	}, [isManualMode, stopPointerEvent]);
+
+	const handleAreaTouchStart = useCallback((event, areaIndex) => {
+		handleAreaPointerDown(event, areaIndex);
+	}, [handleAreaPointerDown]);
 
 	const completedSegments = Array.isArray(simulation.sequence)
 		? simulation.sequence.slice(0, Math.min(simulation.segmentIndex, simulation.sequence.length))
@@ -284,11 +401,6 @@ const ResidualCutLayer = observer(() => {
 			{geometry.areas.length ? (
 				<g
 					className="residuals_areas"
-					fill="url(#residualCutHatch)"
-					stroke="var(--grey-nav)"
-					strokeWidth="1"
-					opacity={0.95}
-					pointerEvents="none"
 				>
 					{geometry.areas.map((area, index) => (
 						<rect
@@ -298,7 +410,27 @@ const ResidualCutLayer = observer(() => {
 							y={area.top}
 							width={area.right - area.left}
 							height={area.bottom - area.top}
+							fill={
+								selectedAreaIndexSet.has(index)
+									? "var(--violetTransparent)"
+									: "url(#residualCutHatch)"
+							}
+							stroke={
+								selectedAreaIndexSet.has(index)
+									? "var(--violet)"
+									: "var(--grey-nav)"
+							}
+							strokeWidth={selectedAreaIndexSet.has(index) ? "2" : "1"}
+							opacity={selectedAreaIndexSet.has(index) ? 1 : 0.95}
 							vectorEffect="non-scaling-stroke"
+							pointerEvents="all"
+							style={{
+								cursor: isManualMode ? "crosshair" : "pointer",
+								touchAction: "manipulation",
+							}}
+							onMouseDown={(event) => handleAreaPointerDown(event, index)}
+							onTouchStart={(event) => handleAreaTouchStart(event, index)}
+							onTouchEnd={stopPointerEvent}
 						/>
 					))}
 				</g>
@@ -415,13 +547,15 @@ const ResidualCutLayer = observer(() => {
 					height={sheetHeight}
 					fill="transparent"
 					pointerEvents="all"
-					style={{ cursor: "crosshair" }}
+					style={{ cursor: "crosshair", touchAction: "none" }}
 					onMouseDown={handlePointerDown}
+					onMouseUp={handlePointerUp}
 					onMouseMove={handlePointerMove}
 					onMouseLeave={handlePointerLeave}
 					onTouchStart={handlePointerDown}
 					onTouchMove={handlePointerMove}
-					onTouchEnd={handlePointerLeave}
+					onTouchEnd={handlePointerUp}
+					onTouchCancel={handlePointerUp}
 				/>
 			) : null}
 		</>
