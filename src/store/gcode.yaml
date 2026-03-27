@@ -206,6 +206,13 @@ M:
     description: |
       ?
       Замечено только после M5 (M5M15).
+
+
+  M18:
+    description: |
+      ?
+      Замечено только в SkeletonCut M18M4.
+
   
   M80:
     description: |
@@ -218,4 +225,4 @@ M:
     description: |
 
       ?
-      Замечено в сочетании M10M5M90M11 ResidualSheetCut.
+      Замечено в сочетании M10M5M90M11

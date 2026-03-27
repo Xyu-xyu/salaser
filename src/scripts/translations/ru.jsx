@@ -505,6 +505,7 @@ const ru = {
     "Create residual cut first": "Сначала создайте остаточный рез",
     "No residual cut found": "Свободные зоны для остаточного реза не найдены",
     "Residual cut overlaps parts": "Остаточный рез пересекается с деталями",
+    "Current residual cut is not detected.": "Текущий остаточный рез не обнаружен.",
     " Max retries exceeded with url. /gcore/1/listing.json (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7f4a01f93340>, `Connection to 192.168.11.56 timed out. (connect timeout=2)`))": "Превышено максимальное количество повторов с URL-адресом.",
     " Read timed out.": "Время чтения истекло."
 }

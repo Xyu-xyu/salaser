@@ -3,6 +3,7 @@ import SVGPathCommander from 'svg-path-commander';
 import { toJS } from "mobx";
 import utils from "../scripts/util";
 import arc from "../scripts/arc";
+import { showToast } from "../components/toast.jsx";
 import constants from "./constants";
 import jobStore from "./jobStore";
 import {
@@ -2588,6 +2589,13 @@ class SvgStore {
 				areas: nextAreas,
 				source: nextAreas.length ? RESIDUAL_CUT_SOURCE_NCP : RESIDUAL_CUT_SOURCE_NONE,
 			};
+
+			if (!nextAreas.length) {
+				showToast({
+					type: "error",
+					message: "Current residual cut is not detected.",
+				});
+			}
 		}
 
 		if (residualPart) {

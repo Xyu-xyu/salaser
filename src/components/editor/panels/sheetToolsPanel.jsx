@@ -246,13 +246,14 @@ const SheetToolsPanel = observer(() => {
 						type="button"
 						className="btn text-white btn_delete btn_tool" onMouseDown={deleteSelectedPosition}
 					>
-						<CustomIcon
-							icon="ic:twotone-delete-outline"
-							width="24"
-							height="24"
-							fill={"black"}
-							strokeWidth={0.2}
-						/>
+							<CustomIcon
+								icon="material-symbols:delete-outline-sharp"
+								width="24"
+								height="24"
+								fill= {"black"}
+								strokeWidth={0}
+								className="ms-1"
+							/>
 					</button>
 					<button
 						type="button"

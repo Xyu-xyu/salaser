@@ -29,26 +29,6 @@ const getInterpolatedPoint = (start, end, progress = 0) => ({
 	y: start.y + (end.y - start.y) * progress,
 });
 
-const toClosedResidualAreaPoints = (path = []) => {
-	if (!Array.isArray(path) || !path.length) {
-		return "";
-	}
-
-	const points = [...path];
-	const firstPoint = path[0];
-	const lastPoint = path[path.length - 1];
-
-	if (
-		firstPoint &&
-		lastPoint &&
-		(firstPoint.x !== lastPoint.x || firstPoint.y !== lastPoint.y)
-	) {
-		points.push(firstPoint);
-	}
-
-	return toResidualCutPolylinePoints(points);
-};
-
 const ResidualCutSimulationController = observer(() => {
 	const frameRef = useRef(null);
 	const sequence = svgStore.residualCutSimulation.sequence;
@@ -137,6 +117,7 @@ const ResidualCutLayer = observer(() => {
 		sheetHeight,
 		sheetWidth,
 	]);
+	const areaOutlinePaths = geometry.areaOutlinePaths || [];
 	const activeDisplayPaths = geometry.displayPaths;
 	const isManualMode = editorStore.mode === "residualCut";
 	const draftPoints = Array.isArray(svgStore.residualCutDraft.points)
@@ -300,7 +281,7 @@ const ResidualCutLayer = observer(() => {
 				</pattern>
 			</defs>
 
-			{geometry.unionPaths.length ? (
+			{geometry.areas.length ? (
 				<g
 					className="residuals_areas"
 					fill="url(#residualCutHatch)"
@@ -309,27 +290,31 @@ const ResidualCutLayer = observer(() => {
 					opacity={0.95}
 					pointerEvents="none"
 				>
-					{geometry.unionPaths.map((path, index) => (
-						<polyline
+					{geometry.areas.map((area, index) => (
+						<rect
 							key={`residual_area_${index}`}
 							className="residual_area"
-							points={toClosedResidualAreaPoints(path)}
+							x={area.left}
+							y={area.top}
+							width={area.right - area.left}
+							height={area.bottom - area.top}
 							vectorEffect="non-scaling-stroke"
 						/>
 					))}
 				</g>
 			) : null}
 
-			{activeDisplayPaths.map((path, index) => (
+			{areaOutlinePaths.map((path, index) => (
 				<polyline
-					key={`residual_cut_${index}`}
+					key={`residual_area_outline_${index}`}
 					points={toResidualCutPolylinePoints(path)}
 					fill="none"
 					stroke="red"
+					strokeDasharray={"8 6"}
 					strokeWidth="1.5"
-					strokeDasharray="4 2"
-					vectorEffect="non-scaling-stroke"
-					opacity={simulation.on ? 0.35 : 1}
+					strokeLinecap="round"
+/* 					vectorEffect="non-scaling-stroke"
+ */					opacity={simulation.on ? 0.35 : 1}
 					pointerEvents="none"
 				/>
 			))}

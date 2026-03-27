@@ -527,6 +527,48 @@ const sortResidualCutPaths = (paths = [], sheetWidth, sheetHeight) => {
 	return [...innerPaths, ...outerPaths];
 };
 
+const getResidualCutEdgeKey = (startPoint, endPoint) => {
+	const startKey = `${roundCoord(startPoint?.x)}:${roundCoord(startPoint?.y)}`;
+	const endKey = `${roundCoord(endPoint?.x)}:${roundCoord(endPoint?.y)}`;
+	return startKey < endKey
+		? `${startKey}|${endKey}`
+		: `${endKey}|${startKey}`;
+};
+
+const buildResidualCutAreaOutlinePaths = (areas = [], sheetWidth, sheetHeight) => {
+	const seenEdges = new Set();
+	const outlinePaths = [];
+
+	(Array.isArray(areas) ? areas : []).forEach(area => {
+		const rectanglePath = buildRectanglePath(area);
+		if (rectanglePath.length < 4) {
+			return;
+		}
+
+		rectanglePath.forEach((startPoint, index) => {
+			const endPoint = rectanglePath[(index + 1) % rectanglePath.length];
+			if (isBorderEdge(startPoint, endPoint, sheetWidth, sheetHeight)) {
+				return;
+			}
+
+			const nextPath = dedupePolyline([startPoint, endPoint]);
+			if (nextPath.length < 2) {
+				return;
+			}
+
+			const edgeKey = getResidualCutEdgeKey(nextPath[0], nextPath[1]);
+			if (seenEdges.has(edgeKey)) {
+				return;
+			}
+
+			seenEdges.add(edgeKey);
+			outlinePaths.push(nextPath);
+		});
+	});
+
+	return sortResidualCutPaths(outlinePaths, sheetWidth, sheetHeight);
+};
+
 const getOuterContours = (svgData) => {
 	const parts = Array.isArray(svgData?.part_code) ? svgData.part_code : [];
 	const positions = Array.isArray(svgData?.positions) ? svgData.positions : [];
@@ -855,6 +897,11 @@ export const snapResidualCutAreaToExistingEdges = (
 export const buildResidualCutGeometry = (areas = [], sheetWidth, sheetHeight) => {
 	const normalizedAreas = normalizeAreaCollection(areas, sheetWidth, sheetHeight);
 	const unionPaths = buildUnionPaths(normalizedAreas);
+	const areaOutlinePaths = buildResidualCutAreaOutlinePaths(
+		normalizedAreas,
+		sheetWidth,
+		sheetHeight
+	);
 	const cutPaths = sortResidualCutPaths(
 		unionPaths.flatMap(path => splitRingIntoCutPaths(path, sheetWidth, sheetHeight)),
 		sheetWidth,
@@ -875,6 +922,7 @@ export const buildResidualCutGeometry = (areas = [], sheetWidth, sheetHeight) =>
 	return {
 		areas: normalizedAreas,
 		unionPaths,
+		areaOutlinePaths,
 		fillPath: buildFillPath(unionPaths),
 		cutPaths,
 		displayPaths,

@@ -34,7 +34,7 @@ const SheetResidualCutPanel = observer(() => {
 		svgStore.svgData?.height,
 		svgStore.svgData?.width,
 	]);
-	const activeDisplayPaths = geometry.displayPaths;
+	const activeDisplayPaths = geometry.areaOutlinePaths || [];
 
 	useEffect(() => {
 		svgStore.ensureResidualCutState();
@@ -172,21 +172,7 @@ const SheetResidualCutPanel = observer(() => {
 									className="d-flex align-items-center justify-content-center flex-wrap"
 									style={{ gap: "6px" }}
 								>
-									<button
-										type="button"
-										className="btn btn-sm violet_button text-white"
-										title={t("Delete")}
-										onMouseDown={handleDeleteResidualCut}
-									>
-										<CustomIcon
-											icon="material-symbols:delete-outline"
-											width="20"
-											height="20"
-											color="white"
-											fill="white"
-											strokeWidth={0}
-										/>
-									</button>
+
 									<button
 										type="button"
 										className="btn btn-sm violet_button text-white"
@@ -226,6 +212,21 @@ const SheetResidualCutPanel = observer(() => {
 									>
 										<CustomIcon
 											icon="play"
+											width="20"
+											height="20"
+											color="white"
+											fill="white"
+											strokeWidth={0}
+										/>
+									</button>
+									<button
+										type="button"
+										className="btn btn-sm violet_button text-white"
+										title={t("Delete")}
+										onMouseDown={handleDeleteResidualCut}
+									>
+										<CustomIcon
+											icon="material-symbols:delete-outline"
 											width="20"
 											height="20"
 											color="white"
