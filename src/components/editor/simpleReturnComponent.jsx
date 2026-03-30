@@ -416,10 +416,10 @@ const SheetSelectionRectLayer = observer(() => {
 
 const SimpleReturnComponent = memo(() => (
 	<>
-		<ResidualCutLayer />
 		<StaticPartDefinitions />
 		<PositionInstancesLayer />
 		<SheetSelectionRectLayer />
+		<ResidualCutLayer />
 	</>
 ));
 

@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import svgStore from "../../store/svgStore.jsx";
 import editorStore from "../../store/editorStore.jsx";
 import util from "../../scripts/util.jsx";
+import { addToSheetLog } from "../../scripts/addToSheetLog.jsx";
 import { showToast } from "../toast.jsx";
 import {
 	buildResidualCutGeometry,
@@ -298,6 +299,7 @@ const ResidualCutLayer = observer(() => {
 			)
 		) {
 			svgStore.setResidualCutAreas([...areas, nextArea]);
+			addToSheetLog("Residual cut saved");
 		} else if (nextArea) {
 			showToast({
 				type: "warning",

@@ -556,47 +556,342 @@ const buildFillPath = (rings = []) => (
 		.join(" ")
 );
 
-const getBorderPointCount = (path = [], sheetWidth, sheetHeight) => (
-	(Array.isArray(path) ? path : [])
-		.filter(point => isResidualCutPointOnBorder(point, sheetWidth, sheetHeight))
-		.length
-);
+const mergeCollinearCutPaths = (paths = []) => {
+	const verticalSegments = [];
+	const horizontalSegments = [];
+	const otherPaths = [];
 
-const sortResidualCutPaths = (paths = [], sheetWidth, sheetHeight) => {
-	const innerPaths = [];
-	const outerPaths = [];
-
-	(Array.isArray(paths) ? paths : []).forEach(path => {
+	paths.forEach(path => {
 		if (!Array.isArray(path) || path.length < 2) {
 			return;
 		}
 
-		if (path.some(point => isResidualCutPointOnBorder(point, sheetWidth, sheetHeight))) {
-			outerPaths.push(path);
+		const refX = sanitizeNumber(path[0].x);
+		const refY = sanitizeNumber(path[0].y);
+		const allSameX = path.every(p => Math.abs(sanitizeNumber(p.x) - refX) <= EPSILON);
+		const allSameY = path.every(p => Math.abs(sanitizeNumber(p.y) - refY) <= EPSILON);
+
+		if (allSameX && !allSameY) {
+			const yValues = path.map(p => sanitizeNumber(p.y));
+			verticalSegments.push({
+				fixedCoord: refX,
+				min: Math.min(...yValues),
+				max: Math.max(...yValues),
+			});
 			return;
 		}
 
-		innerPaths.push(path);
-	});
-
-	innerPaths.sort((leftPath, rightPath) => (
-		getPathDistanceToOrigin(leftPath) - getPathDistanceToOrigin(rightPath)
-	));
-
-	outerPaths.sort((leftPath, rightPath) => {
-		const borderCountDifference = (
-			getBorderPointCount(leftPath, sheetWidth, sheetHeight) -
-			getBorderPointCount(rightPath, sheetWidth, sheetHeight)
-		);
-
-		if (borderCountDifference !== 0) {
-			return borderCountDifference;
+		if (allSameY && !allSameX) {
+			const xValues = path.map(p => sanitizeNumber(p.x));
+			horizontalSegments.push({
+				fixedCoord: refY,
+				min: Math.min(...xValues),
+				max: Math.max(...xValues),
+			});
+			return;
 		}
 
-		return getPathDistanceToOrigin(leftPath) - getPathDistanceToOrigin(rightPath);
+		otherPaths.push(path);
 	});
 
-	return [...innerPaths, ...outerPaths];
+	const mergeAxisSegments = (segments, isVertical) => {
+		if (!segments.length) {
+			return [];
+		}
+
+		segments.sort((a, b) => a.fixedCoord - b.fixedCoord || a.min - b.min);
+
+		const groups = [[segments[0]]];
+
+		for (let i = 1; i < segments.length; i += 1) {
+			const lastGroup = groups[groups.length - 1];
+			if (Math.abs(segments[i].fixedCoord - lastGroup[0].fixedCoord) <= EPSILON) {
+				lastGroup.push(segments[i]);
+			} else {
+				groups.push([segments[i]]);
+			}
+		}
+
+		const result = [];
+
+		groups.forEach(group => {
+			group.sort((a, b) => a.min - b.min);
+
+			const merged = [{ min: group[0].min, max: group[0].max }];
+
+			for (let i = 1; i < group.length; i += 1) {
+				const top = merged[merged.length - 1];
+				if (group[i].min <= top.max + EPSILON) {
+					top.max = Math.max(top.max, group[i].max);
+				} else {
+					merged.push({ min: group[i].min, max: group[i].max });
+				}
+			}
+
+			const coord = roundCoord(group[0].fixedCoord);
+
+			merged.forEach(interval => {
+				result.push(isVertical
+					? [
+						{ x: coord, y: roundCoord(interval.min) },
+						{ x: coord, y: roundCoord(interval.max) },
+					]
+					: [
+						{ x: roundCoord(interval.min), y: coord },
+						{ x: roundCoord(interval.max), y: coord },
+					]
+				);
+			});
+		});
+
+		return result;
+	};
+
+	return [
+		...mergeAxisSegments(verticalSegments, true),
+		...mergeAxisSegments(horizontalSegments, false),
+		...otherPaths,
+	];
+};
+
+const getPathAreaCount = (path, areas) => {
+	if (!Array.isArray(path) || path.length < 2 || !Array.isArray(areas) || !areas.length) {
+		return 0;
+	}
+
+	const start = path[0];
+	const end = path[path.length - 1];
+	const px1 = Math.min(sanitizeNumber(start.x), sanitizeNumber(end.x));
+	const px2 = Math.max(sanitizeNumber(start.x), sanitizeNumber(end.x));
+	const py1 = Math.min(sanitizeNumber(start.y), sanitizeNumber(end.y));
+	const py2 = Math.max(sanitizeNumber(start.y), sanitizeNumber(end.y));
+	const isVertical = Math.abs(px1 - px2) <= EPSILON;
+	const isHorizontal = Math.abs(py1 - py2) <= EPSILON;
+
+	if (!isVertical && !isHorizontal) {
+		return 0;
+	}
+
+	let count = 0;
+
+	areas.forEach(area => {
+		const left = sanitizeNumber(area.left);
+		const right = sanitizeNumber(area.right);
+		const top = sanitizeNumber(area.top);
+		const bottom = sanitizeNumber(area.bottom);
+
+		if (isVertical) {
+			const x = (px1 + px2) / 2;
+			if (
+				(Math.abs(x - left) <= EPSILON || Math.abs(x - right) <= EPSILON) &&
+				py1 < bottom - EPSILON && py2 > top + EPSILON
+			) {
+				count += 1;
+			}
+		} else {
+			const y = (py1 + py2) / 2;
+			if (
+				(Math.abs(y - top) <= EPSILON || Math.abs(y - bottom) <= EPSILON) &&
+				px1 < right - EPSILON && px2 > left + EPSILON
+			) {
+				count += 1;
+			}
+		}
+	});
+
+	return count;
+};
+
+const getPathCutPriority = (path, sheetWidth, sheetHeight, areas = []) => {
+	if (!Array.isArray(path) || path.length < 2) {
+		return 0;
+	}
+
+	const startPoint = path[0];
+	const endPoint = path[path.length - 1];
+	const startOnBorder = isResidualCutPointOnBorder(startPoint, sheetWidth, sheetHeight);
+	const endOnBorder = isResidualCutPointOnBorder(endPoint, sheetWidth, sheetHeight);
+	const isClosed = path.length >= 3 && samePoint(startPoint, endPoint);
+
+	let borderPriority;
+
+	if (isClosed && !startOnBorder) {
+		borderPriority = 3;
+	} else {
+		borderPriority = (startOnBorder ? 1 : 0) + (endOnBorder ? 1 : 0);
+	}
+
+	const isShared = areas.length > 0 && getPathAreaCount(path, areas) >= 2;
+
+	return borderPriority * 2 + (isShared ? 1 : 0);
+};
+
+const orientCutPathFromBorder = (path, sheetWidth, sheetHeight) => {
+	if (!Array.isArray(path) || path.length < 2) {
+		return path;
+	}
+
+	const startOnBorder = isResidualCutPointOnBorder(path[0], sheetWidth, sheetHeight);
+	const endOnBorder = isResidualCutPointOnBorder(
+		path[path.length - 1],
+		sheetWidth,
+		sheetHeight
+	);
+
+	if (endOnBorder && !startOnBorder) {
+		return path.slice().reverse();
+	}
+
+	if (startOnBorder && endOnBorder) {
+		const startDist = util.distance(path[0], { x: 0, y: 0 });
+		const endDist = util.distance(path[path.length - 1], { x: 0, y: 0 });
+		if (endDist > startDist) {
+			return path.slice().reverse();
+		}
+	}
+
+	return path;
+};
+
+const chainPerpendicularCutPaths = (pathItems) => {
+	if (!Array.isArray(pathItems) || pathItems.length < 2) {
+		return Array.isArray(pathItems) ? pathItems : [];
+	}
+
+	const ptKey = (p) => `${roundCoord(sanitizeNumber(p.x))}:${roundCoord(sanitizeNumber(p.y))}`;
+
+	const dirOf = (a, b) => ({
+		dx: sanitizeNumber(b.x) - sanitizeNumber(a.x),
+		dy: sanitizeNumber(b.y) - sanitizeNumber(a.y),
+	});
+
+	const perpendicular = (d1, d2) => {
+		const len1 = Math.sqrt(d1.dx * d1.dx + d1.dy * d1.dy);
+		const len2 = Math.sqrt(d2.dx * d2.dx + d2.dy * d2.dy);
+		if (len1 < EPSILON || len2 < EPSILON) {
+			return false;
+		}
+		const cos = (d1.dx * d2.dx + d1.dy * d2.dy) / (len1 * len2);
+		return Math.abs(cos) < 0.01;
+	};
+
+	const epMap = new Map();
+
+	pathItems.forEach((item, index) => {
+		const path = item.path;
+		const sk = ptKey(path[0]);
+		const ek = ptKey(path[path.length - 1]);
+
+		if (!epMap.has(sk)) { epMap.set(sk, []); }
+		epMap.get(sk).push({ index, atStart: true });
+
+		if (sk !== ek) {
+			if (!epMap.has(ek)) { epMap.set(ek, []); }
+			epMap.get(ek).push({ index, atStart: false });
+		}
+	});
+
+	const used = new Set();
+	const chains = [];
+
+	for (let i = 0; i < pathItems.length; i += 1) {
+		if (used.has(i)) {
+			continue;
+		}
+
+		used.add(i);
+		let chain = pathItems[i].path.slice();
+		let maxPriority = pathItems[i].priority;
+
+		let extended = true;
+		while (extended) {
+			extended = false;
+			const tail = chain[chain.length - 1];
+			const tailDir = dirOf(chain[chain.length - 2], tail);
+
+			for (const cand of (epMap.get(ptKey(tail)) || [])) {
+				if (used.has(cand.index)) {
+					continue;
+				}
+
+				const cp = pathItems[cand.index].path;
+				const oriented = cand.atStart ? cp : cp.slice().reverse();
+				const headDir = dirOf(oriented[0], oriented[1]);
+
+				if (perpendicular(tailDir, headDir)) {
+					used.add(cand.index);
+					chain.push(...oriented.slice(1));
+					maxPriority = Math.max(maxPriority, pathItems[cand.index].priority);
+					extended = true;
+					break;
+				}
+			}
+		}
+
+		extended = true;
+		while (extended) {
+			extended = false;
+			const head = chain[0];
+			const headDir = dirOf(head, chain[1]);
+
+			for (const cand of (epMap.get(ptKey(head)) || [])) {
+				if (used.has(cand.index)) {
+					continue;
+				}
+
+				const cp = pathItems[cand.index].path;
+				const oriented = cand.atStart ? cp.slice().reverse() : cp;
+				const tailDir = dirOf(
+					oriented[oriented.length - 2],
+					oriented[oriented.length - 1]
+				);
+
+				if (perpendicular(tailDir, headDir)) {
+					used.add(cand.index);
+					chain = [...oriented.slice(0, -1), ...chain];
+					maxPriority = Math.max(maxPriority, pathItems[cand.index].priority);
+					extended = true;
+					break;
+				}
+			}
+		}
+
+		chains.push({ path: chain, priority: maxPriority });
+	}
+
+	return chains;
+};
+
+const sortResidualCutPaths = (paths = [], sheetWidth, sheetHeight, areas = []) => {
+	const merged = mergeCollinearCutPaths(
+		(Array.isArray(paths) ? paths : [])
+			.filter(path => Array.isArray(path) && path.length >= 2)
+	);
+
+	const pathItems = merged.map(path => ({
+		path,
+		priority: getPathCutPriority(path, sheetWidth, sheetHeight, areas),
+	}));
+
+	pathItems.sort((a, b) => {
+		if (a.priority !== b.priority) {
+			return a.priority - b.priority;
+		}
+		return getPathDistanceToOrigin(b.path) - getPathDistanceToOrigin(a.path);
+	});
+
+	const chains = chainPerpendicularCutPaths(pathItems);
+
+	chains.sort((a, b) => {
+		if (a.priority !== b.priority) {
+			return a.priority - b.priority;
+		}
+		return getPathDistanceToOrigin(b.path) - getPathDistanceToOrigin(a.path);
+	});
+
+	return chains.map(
+		chain => orientCutPathFromBorder(chain.path, sheetWidth, sheetHeight)
+	);
 };
 
 const getResidualCutEdgeKey = (startPoint, endPoint) => {
@@ -638,7 +933,7 @@ const buildResidualCutAreaOutlinePaths = (areas = [], sheetWidth, sheetHeight) =
 		});
 	});
 
-	return sortResidualCutPaths(outlinePaths, sheetWidth, sheetHeight);
+	return sortResidualCutPaths(outlinePaths, sheetWidth, sheetHeight, areas);
 };
 
 const getOuterContours = (svgData) => {
@@ -1048,7 +1343,8 @@ export const buildResidualCutGeometry = (areas = [], sheetWidth, sheetHeight) =>
 	const cutPaths = sortResidualCutPaths(
 		unionPaths.flatMap(path => splitRingIntoCutPaths(path, sheetWidth, sheetHeight)),
 		sheetWidth,
-		sheetHeight
+		sheetHeight,
+		normalizedAreas
 	);
 	const displayPaths = cutPaths.map(path => (
 		path.map((point, index) => {
