@@ -1,8 +1,8 @@
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import LanguageButton from "./navbar/languageButton";
 import laserStore from "../store/laserStore";
-import img11 from "./../images/11.png"
+import LaserBackground from "./LaserBackground";
 
 
 const LoginPage = () => {
@@ -12,11 +12,7 @@ const LoginPage = () => {
 	const [loading, setLoading] = useState(false);
 	const { t } = useTranslation()
 
-
-
-	// Простая проверка и имитация отправки формы
 	const handleSubmit = async (e) => {
-		
 		laserStore.setVal( 'isLogined', true)
 		e.preventDefault();
 		setError("");
@@ -28,22 +24,22 @@ const LoginPage = () => {
 
 		setLoading(true);
 		try {
- 			await new Promise((r) => setTimeout(r, 700));
- 			console.log (t(`Auth success: `)+ login);
+			await new Promise((r) => setTimeout(r, 700));
+			console.log(t(`Auth success: `) + login);
 		} catch (err) {
 			setError(t("Auth error. Try again."));
 		} finally {
 			setLoading(false);
 			laserStore.setVal( 'isLogined', true)
-
-		} 
+		}
 	};
 
 	return (
 		<>
+			<LaserBackground />
 			<div className="login-page">
-				<div className="login-card" style={{opacity: "1", zIndex:"1"}}>
-					<div className="login-header"></div>
+				<div className="login-card">
+					<div className="login-header" />
 
 					<div className="login-body">
 						<h1 className="login-title">Vematic</h1>
@@ -68,44 +64,15 @@ const LoginPage = () => {
 								{loading ? t("Enter...") : t("Sign in")}
 							</button>
 						</form>
-						<p className="login-hint">
-						</p>
+						<p className="login-hint" />
 					</div>
 				</div>
 			</div>
-			<div className="position-absolute"
-			style={{
-				bottom:"0px",
-				right:"0px",
-				backgroundImage: `url(${img11})`, 
-				width: "100vw",
-				height: "500vh",
-				mixBlendMode: "luminosity",
-				opacity: "0.2"
-			}}		
-			 >
-			</div>
-			<div id="LoginButton" className="position-absolute" style={{right:"0", top:"0"}}>
-				<LanguageButton />
+			<div id="LoginButton" className="position-absolute" style={{right:"0", top:"0", zIndex: 2}}>
+				<LanguageButton color={"rgba(255, 255, 255, 0.5)"}/>
 			</div>
 		</>
 	);
 }
 
-
 export default LoginPage
-
-/*
-
-
-Два варианта:
-Принять изменения (смержить в master):
-git checkout master
-git merge feature/laser-login-background
-Отбросить изменения (удалить ветку):
-git checkout master
-git branch -D feature/laser-login-background
-В обоих случаях вы сначала возвращаетесь на master, а потом либо вливаете ветку, либо удаляете её.
-
-
-*/ 

@@ -8,7 +8,7 @@ import CustomIcon from "../../icons/customIcon";
 
 
 
-const LanguageButton = observer(() => {
+const LanguageButton = observer(({color}) => {
 
 	const [show, setShow] = useState(false);
 	const handleClose = ()=> setShow(false);
@@ -31,7 +31,7 @@ const LanguageButton = observer(() => {
 						style={{ color: show ? "white" : "black" }}
 						viewBox={"0 0 2048 2048"}
 						strokeWidth={1}
-						fill="black"
+						fill={  show ? "white": color }
 					/>
 				</div>
 			</button>
