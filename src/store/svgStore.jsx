@@ -23,15 +23,13 @@ import {
 	RESIDUAL_CUT_SOURCE_USER,
 	buildResidualCutAreasFromLegacyPart,
 	buildResidualCutGeometry,
-	buildResidualCutMetadataLines,
 	buildResidualCutPartLines,
-	buildResidualCutPlanLine,
+	buildResidualCutPlanPlacement,
 	clampResidualCutStep,
 	createEmptyResidualCutState,
 	normalizeResidualCutArea,
 	normalizeResidualCutPoint,
 	normalizeResidualCutSource,
-	parseResidualCutMetadata,
 } from "../scripts/residualCutUtils.jsx";
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -1417,18 +1415,9 @@ class SvgStore {
 			sheetWidth: this.svgData?.width,
 			sheetHeight: this.svgData?.height,
 		});
-		const residualMetadata = buildResidualCutMetadataLines(
-			this.svgData?.residualCut,
-			this.svgData?.width,
-			this.svgData?.height
-		);
 
 		if (residualPart.length) {
 			res.push(residualPart);
-		}
-
-		if (residualMetadata.length) {
-			res.push(residualMetadata);
 		}
 
 		return res;
@@ -2222,10 +2211,23 @@ class SvgStore {
 		const residualProgramNumber = residualDisplayPaths.length
 			? data.part_code.length + 1
 			: null;
-		const residualPlanLine = buildResidualCutPlanLine(residualProgramNumber);
+		const residualPlanPlacement = buildResidualCutPlanPlacement({
+			displayPaths: residualDisplayPaths,
+			programNumber: residualProgramNumber,
+			sheetHeight: this.svgData?.height,
+		});
 
-		if (residualPlanLine) {
-			res.push(`N${lineNumber}${residualPlanLine.slice(2)}`);
+		if (residualPlanPlacement) {
+			const { g: residualG, x: residualX, y: residualY, l: residualL, c: residualC } = residualPlanPlacement;
+			let residualLine = `N${lineNumber}`;
+			if (g !== residualG) residualLine += `G${residualG}`;
+			if (x !== residualX) residualLine += `X${residualX}`;
+			if (y !== residualY) residualLine += `Y${residualY}`;
+			if (l !== residualL) residualLine += `L${residualL}`;
+			if (c !== residualC) residualLine += `C${residualC}`;
+
+			res.push(residualLine);
+			g = residualG, l = residualL, x = residualX, y = residualY, c = residualC;
 			lineNumber++;
 		}
 
@@ -2324,13 +2326,6 @@ class SvgStore {
 			width = result.width;
 			height = result.height;
 		}
-
-		result.residualCut = parseResidualCutMetadata(
-			lines,
-			result.residualCut.step,
-			result.width,
-			result.height
-		);
 
 		const JobCodeLine = lines.find(l => l.includes("JobCode"));
  		if (dimLine && JobCodeLine) {
@@ -2678,7 +2673,7 @@ class SvgStore {
 		});
 
 		const residualPart = result.part_code.find(part => part?.name === RESIDUAL_CUT_PART_CODE);
-		if (residualPart) {
+		if (residualPart && !result.residualCut?.areas?.length) {
 			const nextAreas = buildResidualCutAreasFromLegacyPart(result);
 			result.residualCut = {
 				...(result.residualCut || createEmptyResidualCutState(RESIDUAL_CUT_DEFAULT_STEP)),

@@ -1962,6 +1962,7 @@ height: fit-content;}
   min-height: 0;
   display: flex;
   flex-direction: column;
+  min-height: 50px;
 }
 
 .editor-dock-header {
@@ -1978,6 +1979,7 @@ height: fit-content;}
   border-bottom: none !important;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
+  min-height: 50px;
 }
 
 .editor-dock-header-inner {

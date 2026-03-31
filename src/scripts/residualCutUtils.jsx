@@ -2195,117 +2195,319 @@ export const buildResidualCutSimulationSequence = (displayPaths = []) => {
 	return sequence;
 };
 
-export const buildResidualCutMetadataLines = (residualCut, sheetWidth, sheetHeight) => {
-	const step = clampResidualCutStep(residualCut?.step);
-	const areas = normalizeAreaCollection(residualCut?.areas, sheetWidth, sheetHeight);
+const RESIDUAL_CUT_PROGRAM_PIERCE_DISTANCE = 20;
+const RESIDUAL_CUT_PROGRAM_RAPID_DISTANCE = 40;
+const RESIDUAL_CUT_PROGRAM_RESTART_DISTANCE = 60;
+const RESIDUAL_CUT_PROGRAM_FINAL_MARGIN = 20;
+const RESIDUAL_CUT_PROGRAM_END_SUFFIX = "M10M5M90M11";
+const RESIDUAL_CUT_PROGRAM_RESTART_SUFFIX = "M18M4";
 
-	if (!areas.length && step === RESIDUAL_CUT_DEFAULT_STEP) {
+const getResidualCutProgramGeometry = (displayPaths = [], sheetHeight = 0) => {
+	const height = Math.max(0, sanitizeNumber(sheetHeight));
+	const paths = (Array.isArray(displayPaths) ? displayPaths : [])
+		.map(dedupePolyline)
+		.filter(path => path.length >= 2);
+	const bbox = getBBoxFromPoints(paths.flat());
+
+	if (!height || !paths.length || !bbox) {
+		return null;
+	}
+
+	return {
+		paths,
+		bbox,
+		origin: {
+			x: roundCoord(bbox.left),
+			y: roundCoord(height - bbox.bottom),
+		},
+		width: roundCoord(bbox.right - bbox.left),
+		height: roundCoord(bbox.bottom - bbox.top),
+	};
+};
+
+const toResidualCutProgramPoint = (point, bbox) => ({
+	x: roundCoord(sanitizeNumber(point?.x) - sanitizeNumber(bbox?.left)),
+	y: roundCoord(sanitizeNumber(bbox?.bottom) - sanitizeNumber(point?.y)),
+});
+
+const getResidualCutPolylineLength = (path = []) => (
+	(Array.isArray(path) ? path : []).slice(1).reduce((total, point, index) => (
+		total + util.distance(path[index], point)
+	), 0)
+);
+
+const getResidualCutPointAtDistance = (path = [], distance = 0) => {
+	const cleanPath = dedupePolyline(path);
+
+	if (!cleanPath.length) {
+		return null;
+	}
+
+	if (cleanPath.length === 1) {
+		return cleanPath[0];
+	}
+
+	const totalLength = getResidualCutPolylineLength(cleanPath);
+	const targetDistance = clamp(distance, 0, totalLength);
+
+	if (targetDistance <= EPSILON) {
+		return {
+			x: roundCoord(cleanPath[0].x),
+			y: roundCoord(cleanPath[0].y),
+		};
+	}
+
+	let travelled = 0;
+
+	for (let index = 1; index < cleanPath.length; index += 1) {
+		const startPoint = cleanPath[index - 1];
+		const endPoint = cleanPath[index];
+		const segmentLength = util.distance(startPoint, endPoint);
+
+		if (segmentLength <= EPSILON) {
+			continue;
+		}
+
+		const nextTravelled = travelled + segmentLength;
+		if (targetDistance <= nextTravelled + EPSILON) {
+			const ratio = clamp((targetDistance - travelled) / segmentLength, 0, 1);
+			return {
+				x: roundCoord(
+					sanitizeNumber(startPoint.x) +
+					(sanitizeNumber(endPoint.x) - sanitizeNumber(startPoint.x)) * ratio
+				),
+				y: roundCoord(
+					sanitizeNumber(startPoint.y) +
+					(sanitizeNumber(endPoint.y) - sanitizeNumber(startPoint.y)) * ratio
+				),
+			};
+		}
+
+		travelled = nextTravelled;
+	}
+
+	const lastPoint = cleanPath[cleanPath.length - 1];
+	return {
+		x: roundCoord(lastPoint.x),
+		y: roundCoord(lastPoint.y),
+	};
+};
+
+const sliceResidualCutPolyline = (path = [], startDistance = 0, endDistance = 0) => {
+	const cleanPath = dedupePolyline(path);
+
+	if (cleanPath.length < 2) {
+		return cleanPath;
+	}
+
+	const totalLength = getResidualCutPolylineLength(cleanPath);
+	const from = clamp(startDistance, 0, totalLength);
+	const to = clamp(endDistance, 0, totalLength);
+
+	if (to < from) {
 		return [];
 	}
 
-	return [
-		`(<ResidualCut Step="${step}">)`,
-		...areas.map(area => (
-			`(<ResidualCutArea Left="${roundCoord(area.left)}" Top="${roundCoord(area.top)}" Right="${roundCoord(area.right)}" Bottom="${roundCoord(area.bottom)}" Manual="${area.manual ? 1 : 0}">)`
-		)),
-		`(</ResidualCut>)`,
-	];
+	const points = [getResidualCutPointAtDistance(cleanPath, from)];
+	let travelled = 0;
+
+	for (let index = 1; index < cleanPath.length; index += 1) {
+		const segmentLength = util.distance(cleanPath[index - 1], cleanPath[index]);
+		const nextTravelled = travelled + segmentLength;
+
+		if (
+			nextTravelled > from + EPSILON &&
+			nextTravelled < to - EPSILON
+		) {
+			points.push({
+				x: roundCoord(cleanPath[index].x),
+				y: roundCoord(cleanPath[index].y),
+			});
+		}
+
+		travelled = nextTravelled;
+	}
+
+	points.push(getResidualCutPointAtDistance(cleanPath, to));
+	return dedupePolyline(points.filter(Boolean));
 };
 
-export const parseResidualCutMetadata = (
-	lines,
-	fallbackStep = RESIDUAL_CUT_DEFAULT_STEP,
-	sheetWidth = 0,
-	sheetHeight = 0
-) => {
-	const rawLines = Array.isArray(lines) ? lines : [];
-	const stepLine = rawLines.find(line => /<ResidualCut Step=/i.test(line));
-	const stepMatch = stepLine?.match(/Step="([^"]+)"/i);
-	const step = clampResidualCutStep(stepMatch?.[1] ?? fallbackStep);
-	const areas = [];
-
-	rawLines.forEach(line => {
-		const areaMatch = line.match(
-			/<ResidualCutArea Left="([^"]+)" Top="([^"]+)" Right="([^"]+)" Bottom="([^"]+)"(?: Manual="([^"]+)")?/i
-		);
-
-		if (!areaMatch) {
-			return;
-		}
-
-		const area = normalizeResidualCutArea(
-			{
-				left: areaMatch[1],
-				top: areaMatch[2],
-				right: areaMatch[3],
-				bottom: areaMatch[4],
-				manual: areaMatch[5] === "1",
-			},
-			sheetWidth,
-			sheetHeight
-		);
-
-		if (area) {
-			areas.push(area);
-		}
-	});
+const getResidualCutProgramDistances = (pathLength = 0) => {
+	const length = Math.max(0, sanitizeNumber(pathLength));
+	const scale = length > 80 ? 1 : length / 80;
+	const pierceDistance = Math.min(length, roundCoord(RESIDUAL_CUT_PROGRAM_PIERCE_DISTANCE * scale));
+	const rapidDistance = Math.min(length, roundCoord(RESIDUAL_CUT_PROGRAM_RAPID_DISTANCE * scale));
+	const restartDistance = Math.min(length, roundCoord(RESIDUAL_CUT_PROGRAM_RESTART_DISTANCE * scale));
+	const finalBreakDistance = Math.max(
+		restartDistance,
+		roundCoord(length - Math.min(RESIDUAL_CUT_PROGRAM_FINAL_MARGIN, pierceDistance || length))
+	);
 
 	return {
-		step,
-		areas,
-		source: areas.length ? RESIDUAL_CUT_SOURCE_NCP : RESIDUAL_CUT_SOURCE_NONE,
+		pierceDistance,
+		rapidDistance: Math.max(pierceDistance, rapidDistance),
+		restartDistance: Math.max(rapidDistance, restartDistance),
+		finalBreakDistance,
 	};
+};
+
+const pushResidualCutMotionLine = (lines, state, motionCode, point, suffix = "") => {
+	if (!point) {
+		return;
+	}
+
+	const nextPoint = {
+		x: roundCoord(point.x),
+		y: roundCoord(point.y),
+	};
+	let line = "N0";
+
+	if (motionCode && state.g !== motionCode) {
+		line += motionCode;
+	}
+	if (state.x == null || Math.abs(nextPoint.x - state.x) > EPSILON) {
+		line += `X${nextPoint.x}`;
+	}
+	if (state.y == null || Math.abs(nextPoint.y - state.y) > EPSILON) {
+		line += `Y${nextPoint.y}`;
+	}
+	line += suffix;
+
+	if (line === "N0" && !suffix) {
+		return;
+	}
+
+	lines.push(line);
+	state.g = motionCode || state.g;
+	state.x = nextPoint.x;
+	state.y = nextPoint.y;
+};
+
+const pushResidualCutCommandLine = (lines, state, command) => {
+	lines.push(`N0${command}`);
+	const motionCodeMatch = String(command).match(/^(G\d+)/i);
+	if (motionCodeMatch) {
+		state.g = motionCodeMatch[1].toUpperCase();
+	}
+};
+
+const pushResidualCutContour = (lines, state, path = [], finalSuffix = "") => {
+	const contourPath = dedupePolyline(path);
+
+	if (contourPath.length < 2) {
+		return;
+	}
+
+	lines.push(`(<Contour>)`);
+
+	for (let index = 1; index < contourPath.length; index += 1) {
+		pushResidualCutMotionLine(
+			lines,
+			state,
+			"G1",
+			contourPath[index],
+			index === contourPath.length - 1 ? finalSuffix : ""
+		);
+	}
+
+	lines.push(`(</Contour>)`);
 };
 
 export const buildResidualCutPartLines = ({
 	displayPaths = [],
 	programNumber,
-	sheetWidth,
 	sheetHeight,
 }) => {
 	const validProgramNumber = Math.max(0, Math.trunc(sanitizeNumber(programNumber)));
-	const width = Math.max(0, sanitizeNumber(sheetWidth));
-	const height = Math.max(0, sanitizeNumber(sheetHeight));
-	const paths = (Array.isArray(displayPaths) ? displayPaths : [])
-		.map(dedupePolyline)
-		.filter(path => path.length >= 2);
+	const geometry = getResidualCutProgramGeometry(displayPaths, sheetHeight);
 
-	if (!validProgramNumber || !paths.length || !width || !height) {
+	if (!validProgramNumber || !geometry) {
 		return [];
 	}
 
 	const lines = [
-		`(<Part PartCode="${RESIDUAL_CUT_PART_CODE}" Debit="1">)`,
-		`N0G28X${roundCoord(width)}Y${roundCoord(height)}L${validProgramNumber}P1`,
+		`(<Part PartCode="${RESIDUAL_CUT_PART_CODE}" Debit="0">)`,
 	];
+	const state = {
+		g: null,
+		x: null,
+		y: null,
+	};
 
-	paths.forEach(path => {
-		lines.push(`(<Contour>)`);
-		lines.push(
-			`N0G0X${roundCoord(path[0].x)}Y${roundCoord(height - path[0].y)}`
+	pushResidualCutMotionLine(
+		lines,
+		state,
+		"G28",
+		{ x: geometry.width, y: geometry.height },
+		`L${validProgramNumber}P0`
+	);
+
+	geometry.paths.forEach(path => {
+		const localPath = dedupePolyline(
+			path.map(point => toResidualCutProgramPoint(point, geometry.bbox))
 		);
+		const pathLength = getResidualCutPolylineLength(localPath);
 
-		for (let index = 1; index < path.length; index += 1) {
-			const point = path[index];
-			const suffix = index === 1 ? "M4" : "";
-			lines.push(
-				`N0G1X${roundCoord(point.x)}Y${roundCoord(height - point.y)}${suffix}`
-			);
+		if (localPath.length < 2 || pathLength <= EPSILON) {
+			return;
 		}
 
-		lines.push(`N0M5`);
-		lines.push(`(</Contour>)`);
+		const {
+			pierceDistance,
+			rapidDistance,
+			restartDistance,
+			finalBreakDistance,
+		} = getResidualCutProgramDistances(pathLength);
+		const rapidPoint = getResidualCutPointAtDistance(localPath, rapidDistance);
+		const piercePoint = getResidualCutPointAtDistance(localPath, pierceDistance);
+		const restartPoint = getResidualCutPointAtDistance(localPath, restartDistance);
+		const firstContour = sliceResidualCutPolyline(localPath, 0, pierceDistance).reverse();
+		const secondContour = dedupePolyline([
+			...sliceResidualCutPolyline(localPath, restartDistance, finalBreakDistance),
+			...sliceResidualCutPolyline(localPath, finalBreakDistance, pathLength).slice(1),
+		]);
+
+		pushResidualCutMotionLine(lines, state, "G0", rapidPoint);
+		pushResidualCutCommandLine(lines, state, "G10S0");
+		pushResidualCutMotionLine(lines, state, "G1", piercePoint, "M4");
+		pushResidualCutContour(lines, state, firstContour, RESIDUAL_CUT_PROGRAM_END_SUFFIX);
+
+		if (secondContour.length >= 2) {
+			pushResidualCutMotionLine(lines, state, "G0", rapidPoint);
+			pushResidualCutMotionLine(
+				lines,
+				state,
+				"G1",
+				restartPoint,
+				RESIDUAL_CUT_PROGRAM_RESTART_SUFFIX
+			);
+			pushResidualCutContour(lines, state, secondContour, RESIDUAL_CUT_PROGRAM_END_SUFFIX);
+		}
 	});
 
-	lines.push(`N0G98`);
+	pushResidualCutCommandLine(lines, state, "G98");
 	lines.push(`(</Part>)`);
 
 	return lines;
 };
 
-export const buildResidualCutPlanLine = (programNumber) => {
+export const buildResidualCutPlanPlacement = ({
+	displayPaths = [],
+	programNumber,
+	sheetHeight,
+}) => {
 	const validProgramNumber = Math.max(0, Math.trunc(sanitizeNumber(programNumber)));
-	return validProgramNumber
-		? `N0G52X0Y0L${validProgramNumber}C0`
-		: null;
+	const geometry = getResidualCutProgramGeometry(displayPaths, sheetHeight);
+
+	if (!validProgramNumber || !geometry) {
+		return null;
+	}
+
+	return {
+		g: 52,
+		x: geometry.origin.x,
+		y: geometry.origin.y,
+		l: validProgramNumber,
+		c: 0,
+	};
 };
