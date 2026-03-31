@@ -227,6 +227,7 @@ const SheetPositionInstance = memo(({
 	isHovered,
 	isCompleted,
 	isDangerous,
+	interactive = true,
 }) => {
 	const isFocused = isHovered || isActive;
 	const fillColor = isDangerous
@@ -278,9 +279,10 @@ const SheetPositionInstance = memo(({
 		<g
 			transform={transform}
 			data-part-id={partId}
-			onMouseDown={() => handlePartSelection(partId)}
-			onMouseMove={(event) => handlePartMove(event, selected)}
-			onTouchStart={() => handlePartTouchStart(partId)}
+			pointerEvents={interactive ? undefined : "none"}
+			onMouseDown={interactive ? () => handlePartSelection(partId) : undefined}
+			onMouseMove={interactive ? (event) => handlePartMove(event, selected) : undefined}
+			onTouchStart={interactive ? () => handlePartTouchStart(partId) : undefined}
 		>
 			<use
 				href={`#part_${partCodeId}`}
@@ -288,7 +290,7 @@ const SheetPositionInstance = memo(({
 				stroke={strokeColor}
 				strokeWidth={strokeWidth}
 				opacity={opacity}
-				pointerEvents="visiblePainted"
+				pointerEvents={interactive ? "visiblePainted" : "none"}
 			/>
 		</g>
 	);
@@ -312,8 +314,7 @@ const PositionInstancesLayer = observer(() => {
 	const overlayPartIds = getOverlayPartIds(activePartId, hoverPartId, dangerPartIds);
 	const overlayPartIdSet = new Set(overlayPartIds);
 	const overlayItemsById = new Map();
-	const unselectedPositions = [];
-	const selectedPositions = [];
+	const basePositions = [];
 
 	positions.forEach((pos, index) => {
 		const isActive = activePartId === pos.part_id;
@@ -331,15 +332,8 @@ const PositionInstancesLayer = observer(() => {
 
 		if (overlayPartIdSet.has(pos.part_id)) {
 			overlayItemsById.set(pos.part_id, itemProps);
-			return;
 		}
-
-		if (itemProps.selected) {
-			selectedPositions.push(itemProps);
-			return;
-		}
-
-		unselectedPositions.push(itemProps);
+		basePositions.push(itemProps);
 	});
 
 	const overlayPositions = overlayPartIds
@@ -348,22 +342,9 @@ const PositionInstancesLayer = observer(() => {
 
 	return (
 		<>
-			{unselectedPositions.map(pos => (
+			{basePositions.map(pos => (
 				<SheetPositionInstance
-					key={`form_${pos.partId}`}
-					partId={pos.partId}
-					partCodeId={pos.partCodeId}
-					transform={pos.transform}
-					selected={pos.selected}
-					isActive={pos.isActive}
-					isHovered={pos.isHovered}
-					isCompleted={pos.isCompleted}
-					isDangerous={pos.isDangerous}
-				/>
-			))}
-			{selectedPositions.map(pos => (
-				<SheetPositionInstance
-					key={`form_selected_${pos.partId}`}
+					key={`part_${pos.partId}`}
 					partId={pos.partId}
 					partCodeId={pos.partCodeId}
 					transform={pos.transform}
@@ -376,7 +357,7 @@ const PositionInstancesLayer = observer(() => {
 			))}
 			{overlayPositions.map(pos => (
 				<SheetPositionInstance
-					key={`form_focused_${pos.partId}`}
+					key={`part_overlay_${pos.partId}`}
 					partId={pos.partId}
 					partCodeId={pos.partCodeId}
 					transform={pos.transform}
@@ -385,6 +366,7 @@ const PositionInstancesLayer = observer(() => {
 					isHovered={pos.isHovered}
 					isCompleted={pos.isCompleted}
 					isDangerous={pos.isDangerous}
+					interactive={false}
 				/>
 			))}
 		</>

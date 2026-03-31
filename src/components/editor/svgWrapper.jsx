@@ -11,6 +11,8 @@ import util from './../../scripts/util.jsx';
 import SvgComponent from './svgComponent.jsx';
 
 const SvgWrapper = observer(() => {
+	const TOUCH_SHEET_SAFETY_MOVE_EPSILON = 0.1;
+	const TOUCH_SHEET_SAFETY_MIN_INTERVAL_MS = 32;
 	const { matrix, groupMatrix } = svgStore;
  	const wrapperRef = useRef(null);
 	const inMoveRef = useRef(false);
@@ -22,6 +24,9 @@ const SvgWrapper = observer(() => {
 		startY: 0,
 		initialMatrices: new Map(), // part_id → { e, f }
 		hasMoved: false,
+		lastTouchPreviewSvgX: null,
+		lastTouchPreviewSvgY: null,
+		lastTouchPreviewTs: 0,
 	});
 	const selectionState = useRef({
 		isSelecting: false,
@@ -31,6 +36,9 @@ const SvgWrapper = observer(() => {
 		currentSvgY: 0,
 	});
 	const safetyPreviewFrameRef = useRef(null);
+	const touchDragHandlerRef = useRef(null);
+	const touchEndHandlerRef = useRef(null);
+	const hasActiveTouchInteractionRef = useRef(() => false);
 
 	// Touch state
 	const evCache = useRef([]);                         // массив Touch
@@ -68,6 +76,38 @@ const SvgWrapper = observer(() => {
 			safetyPreviewFrameRef.current = null;
 			runSheetSafetyPreview();
 		});
+	};
+
+	const hasActiveTouchInteraction = () => (
+		selectionState.current.isSelecting ||
+		dragState.current.isDragging ||
+		inMoveRef.current ||
+		evCache.current.length > 0
+	);
+
+	const shouldScheduleTouchSheetSafetyPreview = (currentSvg) => {
+		if (!currentSvg) {
+			return false;
+		}
+
+		const lastX = Number(dragState.current.lastTouchPreviewSvgX);
+		const lastY = Number(dragState.current.lastTouchPreviewSvgY);
+		const movedEnough = !Number.isFinite(lastX) ||
+			!Number.isFinite(lastY) ||
+			Math.hypot(currentSvg.x - lastX, currentSvg.y - lastY) >= TOUCH_SHEET_SAFETY_MOVE_EPSILON;
+		if (!movedEnough) {
+			return false;
+		}
+
+		const now = performance.now();
+		if (now - dragState.current.lastTouchPreviewTs < TOUCH_SHEET_SAFETY_MIN_INTERVAL_MS) {
+			return false;
+		}
+
+		dragState.current.lastTouchPreviewSvgX = currentSvg.x;
+		dragState.current.lastTouchPreviewSvgY = currentSvg.y;
+		dragState.current.lastTouchPreviewTs = now;
+		return true;
 	};
 
 	const buildSelectionRect = (startX, startY, currentX, currentY) => ({
@@ -235,6 +275,9 @@ const SvgWrapper = observer(() => {
 					])
 				),
 				hasMoved: false,
+				lastTouchPreviewSvgX: startSvg.x,
+				lastTouchPreviewSvgY: startSvg.y,
+				lastTouchPreviewTs: performance.now(),
 			};
 			e.stopPropagation();
 			//e.preventDefault()			
@@ -244,7 +287,10 @@ const SvgWrapper = observer(() => {
 	};
 
 	const TouchDrag = (e) => {
-		//e.preventDefault(); // обязательно!
+		if (!hasActiveTouchInteraction()) {
+			return;
+		}
+		e.preventDefault();
 		const touches = e.touches;
 		evCache.current = Array.from(touches);
 		///console.log ("TouchStart mode: " + editorStore.mode)
@@ -310,17 +356,30 @@ const SvgWrapper = observer(() => {
 					}
 				});
 			});
-			scheduleSheetSafetyPreview();
+			if (shouldScheduleTouchSheetSafetyPreview(currentSvg)) {
+				scheduleSheetSafetyPreview();
+			}
 
 		}
 
 	}
 
 	const handleTouchEnd = (e) => {
+		if (!hasActiveTouchInteraction()) {
+			return;
+		}
+		e.preventDefault();
 		// Удаляем ушедшие пальцы
  		for (let i = 0; i < e.changedTouches.length; i++) {
 			const idx = evCache.current.findIndex(t => t.identifier === e.changedTouches[i].identifier);
 			if (idx >= 0) evCache.current.splice(idx, 1);
+		}
+		if ((e.touches?.length || 0) > 0) {
+			evCache.current = Array.from(e.touches);
+			if (e.touches.length < 2) {
+				prevDiff.current = -1;
+			}
+			return;
 		}
 
 		if (!finishSelection()) {
@@ -364,6 +423,9 @@ const SvgWrapper = observer(() => {
 					])
 				),
 				hasMoved: false,
+				lastTouchPreviewSvgX: null,
+				lastTouchPreviewSvgY: null,
+				lastTouchPreviewTs: 0,
 			};
 			e.stopPropagation();
 		};
@@ -432,6 +494,9 @@ const SvgWrapper = observer(() => {
 		if (dragState.current.isDragging) {
 			dragState.current.isDragging = false;
 			dragState.current.hasMoved = false;
+			dragState.current.lastTouchPreviewSvgX = null;
+			dragState.current.lastTouchPreviewSvgY = null;
+			dragState.current.lastTouchPreviewTs = 0;
 			dragState.current.initialMatrices.clear();
 			//editorStore.setMode('resize');
 		}
@@ -444,26 +509,52 @@ const SvgWrapper = observer(() => {
 		endDrag()
 	};
 
+	useEffect(() => {
+		touchDragHandlerRef.current = TouchDrag;
+		touchEndHandlerRef.current = handleTouchEnd;
+		hasActiveTouchInteractionRef.current = hasActiveTouchInteraction;
+	});
+
 	// =============== EFFECTS ===============
 	useEffect(() => {
 		const wrapper = wrapperRef.current;
 		if (!wrapper) return;
-
-		const handleTouchMove = (e) => {
-			TouchDrag(e);
-		};
 
 		const handleWheel = (e) => {
 			e.preventDefault(); // теперь можно!
 			handleMouseWheel(e);
 		};
 
-		wrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
 		wrapper.addEventListener('wheel', handleWheel, { passive: false });
 
 		return () => {
-			wrapper.removeEventListener('touchmove', handleTouchMove);
 			wrapper.removeEventListener('wheel', handleWheel);
+		};
+	}, []);
+
+	useEffect(() => {
+		const touchListenerOptions = { passive: false };
+		const handleWindowTouchMove = (e) => {
+			if (!hasActiveTouchInteractionRef.current()) {
+				return;
+			}
+			touchDragHandlerRef.current?.(e);
+		};
+		const handleWindowTouchEnd = (e) => {
+			if (!hasActiveTouchInteractionRef.current()) {
+				return;
+			}
+			touchEndHandlerRef.current?.(e);
+		};
+
+		window.addEventListener('touchmove', handleWindowTouchMove, touchListenerOptions);
+		window.addEventListener('touchend', handleWindowTouchEnd, touchListenerOptions);
+		window.addEventListener('touchcancel', handleWindowTouchEnd, touchListenerOptions);
+
+		return () => {
+			window.removeEventListener('touchmove', handleWindowTouchMove, touchListenerOptions);
+			window.removeEventListener('touchend', handleWindowTouchEnd, touchListenerOptions);
+			window.removeEventListener('touchcancel', handleWindowTouchEnd, touchListenerOptions);
 		};
 	}, []);
 
@@ -568,8 +659,6 @@ const SvgWrapper = observer(() => {
 
 							//onTouchMove={TouchDrag}
 							onTouchStart={TouchStart}
-							onTouchEnd={handleTouchEnd}
-							onTouchCancel={handleTouchEnd}
 							onContextMenu={e => e.preventDefault()}
 						>
 							<SvgComponent />

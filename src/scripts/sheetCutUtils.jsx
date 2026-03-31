@@ -8,12 +8,14 @@ const partCutItemCache = new WeakMap();
 const positionPreviewCache = new WeakMap();
 const sheetCutPositionItemCache = new WeakMap();
 const partSafetyGeometryCache = new WeakMap();
+const partSafetyModelCache = new WeakMap();
 const positionSafetyGeometryCache = new WeakMap();
 const EPSILON = 0.0001;
 const SHEET_SAFETY_CLIPPER_SCALE = 1000;
 const SHEET_SAFETY_AREA_EPSILON = 0.01;
 const SHEET_SAFETY_MIN_CELL_SIZE = 25;
 const SHEET_SAFETY_MIN_OPEN_PATH_RADIUS = 0.001;
+const SHEET_SAFETY_MODEL_MATRIX_TOLERANCE = 0.001;
 export const SHEET_CUT_DEFAULT_SECTOR_SIZE = 100;
 export const SHEET_CUT_ORDER_MODES = ["current", "auto", "manual"];
 export const SHEET_SAFETY_DEFAULT_CLEARANCE = 10;
@@ -342,6 +344,19 @@ export const normalizeSheetSafetyClearance = (clearance = SHEET_SAFETY_DEFAULT_C
 
 const getSheetSafetyRadius = (clearance) => normalizeSheetSafetyClearance(clearance) / 2;
 
+const canUsePartSafetyModelForPosition = (pos) => {
+	const { a = 1, b = 0, c = 0, d = 1 } = getMatrixObject(pos);
+	const firstAxisLength = Math.hypot(a, b);
+	const secondAxisLength = Math.hypot(c, d);
+	const axisDot = (a * c) + (b * d);
+
+	return (
+		Math.abs(firstAxisLength - 1) <= SHEET_SAFETY_MODEL_MATRIX_TOLERANCE &&
+		Math.abs(secondAxisLength - 1) <= SHEET_SAFETY_MODEL_MATRIX_TOLERANCE &&
+		Math.abs(axisDot) <= SHEET_SAFETY_MODEL_MATRIX_TOLERANCE
+	);
+};
+
 const cloneClipperPath = (path = []) => path.map(point => ({
 	X: Number(point?.X) || 0,
 	Y: Number(point?.Y) || 0,
@@ -656,11 +671,132 @@ const getPartSafetyGeometry = (part) => {
 	return result;
 };
 
+const buildSafetyGeometryFromBasePaths = (
+	outerPaths = [],
+	innerPaths = [],
+	openPaths = [],
+	radius = 0
+) => {
+	const safeOuterSourcePaths = radius > EPSILON
+		? offsetClipperPaths(outerPaths, radius)
+		: cloneClipperPaths(outerPaths);
+	const safeOuterPaths = unionClipperPaths(safeOuterSourcePaths);
+	const safeHoleSourcePaths = !innerPaths.length
+		? []
+		: radius > EPSILON
+			? offsetClipperPaths(innerPaths, -radius)
+			: cloneClipperPaths(innerPaths);
+	const safeHolePaths = unionClipperPaths(safeHoleSourcePaths);
+	const safeOpenPaths = openPaths.length
+		? unionClipperPaths(offsetOpenClipperPaths(openPaths, radius))
+		: [];
+	const safeSolidBasePaths = safeHolePaths.length
+		? differenceClipperPaths(safeOuterPaths, safeHolePaths)
+		: cloneClipperPaths(safeOuterPaths);
+	const safeSolidPaths = safeOpenPaths.length
+		? unionClipperPaths([...safeSolidBasePaths, ...safeOpenPaths])
+		: safeSolidBasePaths;
+	const safeOuterCollisionPaths = safeOpenPaths.length
+		? unionClipperPaths([...safeOuterPaths, ...safeOpenPaths])
+		: safeOuterPaths;
+
+	return {
+		safeOpenPaths,
+		safeOuterPaths: safeOuterCollisionPaths.length
+			? safeOuterCollisionPaths
+			: cloneClipperPaths(safeOuterPaths),
+		safeSolidPaths: safeSolidPaths.length
+			? safeSolidPaths
+			: cloneClipperPaths(safeOuterCollisionPaths.length ? safeOuterCollisionPaths : safeOuterPaths),
+	};
+};
+
+const buildPositionSafetyGeometryResult = ({
+	partId = null,
+	pos = null,
+	part = null,
+	clearance = SHEET_SAFETY_DEFAULT_CLEARANCE,
+	radius = getSheetSafetyRadius(clearance),
+	safeOpenPaths = [],
+	safeOuterPaths = [],
+	safeSolidPaths = [],
+}) => {
+	const normalizedOpenPaths = filterMeaningfulClipperPaths(safeOpenPaths);
+	const normalizedOuterPaths = filterMeaningfulClipperPaths(safeOuterPaths);
+	const normalizedSolidPaths = filterMeaningfulClipperPaths(safeSolidPaths);
+	const fallbackOuterPaths = normalizedOuterPaths.length
+		? normalizedOuterPaths
+		: cloneClipperPaths(normalizedOpenPaths);
+	const fallbackSolidPaths = normalizedSolidPaths.length
+		? normalizedSolidPaths
+		: cloneClipperPaths(fallbackOuterPaths);
+	const safeOuterBBox = getClipperPathsBBox(fallbackOuterPaths);
+	const safeSolidBBox = getClipperPathsBBox(fallbackSolidPaths) || safeOuterBBox;
+
+	return {
+		partId,
+		pos,
+		part,
+		clearance,
+		radius,
+		safeOpenPaths: normalizedOpenPaths,
+		safeOuterPaths: fallbackOuterPaths,
+		safeSolidPaths: fallbackSolidPaths,
+		safeOuterBBox,
+		safeSolidBBox,
+	};
+};
+
+const getPartSafetyModel = (
+	part,
+	clearance = SHEET_SAFETY_DEFAULT_CLEARANCE
+) => {
+	const normalizedClearance = normalizeSheetSafetyClearance(clearance);
+	const radius = getSheetSafetyRadius(normalizedClearance);
+	if (!part) {
+		return buildPositionSafetyGeometryResult({
+			partId: null,
+			pos: null,
+			part: null,
+			clearance: normalizedClearance,
+			radius,
+		});
+	}
+
+	const signature = `${getPartCodeSignature(part)}:${normalizedClearance}`;
+	const cached = partSafetyModelCache.get(part);
+	if (cached?.signature === signature) {
+		return cached.result;
+	}
+
+	const partGeometry = getPartSafetyGeometry(part);
+	const result = buildPositionSafetyGeometryResult({
+		partId: part?.id ?? part?.uuid ?? null,
+		pos: null,
+		part,
+		clearance: normalizedClearance,
+		radius,
+		...buildSafetyGeometryFromBasePaths(
+			partGeometry.outerPaths,
+			partGeometry.innerPaths,
+			partGeometry.openPaths,
+			radius
+		),
+	});
+
+	partSafetyModelCache.set(part, {
+		signature,
+		result,
+	});
+
+	return result;
+};
+
 const transformClipperPaths = (paths = [], pos) => {
 	const matrix = getMatrixObject(pos);
 
-	return filterMeaningfulClipperPaths(paths)
-		.map(path => path.map(point => ({
+	return (Array.isArray(paths) ? paths : [])
+		.map(path => (Array.isArray(path) ? path : []).map(point => ({
 			X: matrix.a * point.X + matrix.c * point.Y + matrix.e,
 			Y: matrix.b * point.X + matrix.d * point.Y + matrix.f,
 		})))
@@ -670,12 +806,54 @@ const transformClipperPaths = (paths = [], pos) => {
 const transformClipperOpenPaths = (paths = [], pos) => {
 	const matrix = getMatrixObject(pos);
 
-	return filterMeaningfulClipperOpenPaths(paths)
-		.map(path => path.map(point => ({
+	return (Array.isArray(paths) ? paths : [])
+		.map(path => (Array.isArray(path) ? path : []).map(point => ({
 			X: matrix.a * point.X + matrix.c * point.Y + matrix.e,
 			Y: matrix.b * point.X + matrix.d * point.Y + matrix.f,
 		})))
 		.filter(hasMeaningfulClipperOpenPath);
+};
+
+const buildPositionSafetyGeometryFromPartGeometry = (
+	part,
+	pos,
+	normalizedClearance = SHEET_SAFETY_DEFAULT_CLEARANCE
+) => {
+	const radius = getSheetSafetyRadius(normalizedClearance);
+	const partGeometry = getPartSafetyGeometry(part);
+
+	return buildPositionSafetyGeometryResult({
+		partId: pos?.part_id ?? null,
+		pos,
+		part,
+		clearance: normalizedClearance,
+		radius,
+		...buildSafetyGeometryFromBasePaths(
+			transformClipperPaths(partGeometry.outerPaths, pos),
+			transformClipperPaths(partGeometry.innerPaths, pos),
+			transformClipperOpenPaths(partGeometry.openPaths, pos),
+			radius
+		),
+	});
+};
+
+const buildPositionSafetyGeometryFromPartModel = (
+	part,
+	pos,
+	normalizedClearance = SHEET_SAFETY_DEFAULT_CLEARANCE
+) => {
+	const partSafetyModel = getPartSafetyModel(part, normalizedClearance);
+
+	return buildPositionSafetyGeometryResult({
+		partId: pos?.part_id ?? null,
+		pos,
+		part,
+		clearance: normalizedClearance,
+		radius: partSafetyModel.radius,
+		safeOpenPaths: transformClipperPaths(partSafetyModel.safeOpenPaths, pos),
+		safeOuterPaths: transformClipperPaths(partSafetyModel.safeOuterPaths, pos),
+		safeSolidPaths: transformClipperPaths(partSafetyModel.safeSolidPaths, pos),
+	});
 };
 
 const getPositionSafetyGeometry = (
@@ -695,51 +873,9 @@ const getPositionSafetyGeometry = (
 		return cached.result;
 	}
 
-	const radius = getSheetSafetyRadius(normalizedClearance);
-	const partGeometry = getPartSafetyGeometry(part);
-	const worldOuterPaths = transformClipperPaths(partGeometry.outerPaths, pos);
-	const worldInnerPaths = transformClipperPaths(partGeometry.innerPaths, pos);
-	const worldOpenPaths = transformClipperOpenPaths(partGeometry.openPaths, pos);
-	const safeOuterSourcePaths = radius > EPSILON
-		? offsetClipperPaths(worldOuterPaths, radius)
-		: cloneClipperPaths(worldOuterPaths);
-	const safeOuterPaths = unionClipperPaths(safeOuterSourcePaths);
-	const safeHoleSourcePaths = !worldInnerPaths.length
-		? []
-		: radius > EPSILON
-			? offsetClipperPaths(worldInnerPaths, -radius)
-			: cloneClipperPaths(worldInnerPaths);
-	const safeHolePaths = unionClipperPaths(safeHoleSourcePaths);
-	const safeOpenPaths = worldOpenPaths.length
-		? unionClipperPaths(offsetOpenClipperPaths(worldOpenPaths, radius))
-		: [];
-	const safeSolidBasePaths = safeHolePaths.length
-		? differenceClipperPaths(safeOuterPaths, safeHolePaths)
-		: cloneClipperPaths(safeOuterPaths);
-	const safeSolidPaths = safeOpenPaths.length
-		? unionClipperPaths([...safeSolidBasePaths, ...safeOpenPaths])
-		: safeSolidBasePaths;
-	const safeOuterCollisionPaths = safeOpenPaths.length
-		? unionClipperPaths([...safeOuterPaths, ...safeOpenPaths])
-		: safeOuterPaths;
-	const safeOuterBBox = getClipperPathsBBox(safeOuterCollisionPaths) || getClipperPathsBBox(safeOuterPaths);
-	const safeSolidBBox = getClipperPathsBBox(safeSolidPaths) || safeOuterBBox;
-	const result = {
-		partId: pos?.part_id ?? null,
-		pos,
-		part,
-		clearance: normalizedClearance,
-		radius,
-		safeOpenPaths,
-		safeOuterPaths: safeOuterCollisionPaths.length
-			? safeOuterCollisionPaths
-			: cloneClipperPaths(safeOuterPaths),
-		safeSolidPaths: safeSolidPaths.length
-			? safeSolidPaths
-			: cloneClipperPaths(safeOuterCollisionPaths.length ? safeOuterCollisionPaths : safeOuterPaths),
-		safeOuterBBox,
-		safeSolidBBox,
-	};
+	const result = canUsePartSafetyModelForPosition(pos)
+		? buildPositionSafetyGeometryFromPartModel(part, pos, normalizedClearance)
+		: buildPositionSafetyGeometryFromPartGeometry(part, pos, normalizedClearance);
 
 	positionSafetyGeometryCache.set(pos, {
 		signature,
