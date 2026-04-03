@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import coordsStore from '../../store/coordStore.jsx';
 import editorStore from '../../store/editorStore.jsx';
@@ -9,19 +9,70 @@ import jointStore from '../../store/jointStore.jsx';
 import inlet from '../../scripts/inlet.jsx';
 import util from '../../scripts/util.jsx';
 import PartSvgComponent from './partSvgComponent.jsx';
-import Part from "./../../scripts/part.jsx";
 import { addToLog } from './../../scripts/addToLog.jsx';
 
+const NAVBAR_OFFSET = 58;
 
+/** Размеры viewBox и `rect` сетки: область холста `#wrapper_svg` в тех же единицах, что и после `groupMatrix` × `matrix`. */
+function calculateRectParamsFromPartStore() {
+	const widthSVG = partStore.svgParams.width;
+	const heightSVG = partStore.svgParams.height;
+	if (!widthSVG || !heightSVG) {
+		return { x: 0, y: 0, width: 0, height: 0 };
+	}
+	const combinedMatrix = util.multiplyMatrices(partStore.groupMatrix, partStore.matrix);
+	const scaleX = combinedMatrix.a;
+	const scaleY = combinedMatrix.d;
+	if (!scaleX || !scaleY) {
+		return { x: 0, y: 0, width: 0, height: 0 };
+	}
+	return {
+		x: -combinedMatrix.e / scaleX,
+		y: -combinedMatrix.f / scaleY,
+		width: widthSVG / scaleX,
+		height: heightSVG / scaleY,
+	};
+}
+
+function fitPartCanvasToPage() {
+	const PADDING = 50;
+	const svgWidth = partStore.svgParams.width || window.innerWidth;
+	const svgHeight = partStore.svgParams.height || (window.innerHeight - NAVBAR_OFFSET);
+
+	const contentWidth = partStore?.svgData?.width;
+	const contentHeight = partStore?.svgData?.height;
+
+	if (!contentWidth || !contentHeight) return;
+
+	const availableWidth = svgWidth - PADDING * 2;
+	const availableHeight = svgHeight - PADDING * 2;
+
+	const scaleX = availableWidth / contentWidth;
+	const scaleY = availableHeight / contentHeight;
+
+	const scale = Math.min(scaleX, scaleY);
+
+	const scaledWidth = contentWidth * scale;
+	const scaledHeight = contentHeight * scale;
+
+	const translateX = (svgWidth - scaledWidth) / 2;
+	const translateY = (svgHeight - scaledHeight) / 2;
+	partStore.setGroupMatrix({
+		a: scale,
+		b: 0,
+		c: 0,
+		d: scale,
+		e: translateX,
+		f: translateY,
+	});
+}
 
 const PartSvgWrapper = observer(() => {
 	const {
 		matrix,  
         groupMatrix,
         offset, 
-        rectParams,
         gridState,
-        svgParams, 
 		selectedText,
 		pointInMove
 	} =  partStore
@@ -31,7 +82,29 @@ const PartSvgWrapper = observer(() => {
 	const [wrapperClass, setWrapperClass] = useState('')
 	const inMoveRef = useRef(0); 
     const wrapperSVG = useRef(null);
-			
+	const initialLayoutDoneRef = useRef(false);
+
+	useLayoutEffect(() => {
+		const el = wrapperSVG.current;
+		if (!el) return;
+		const ro = new ResizeObserver((entries) => {
+			const cr = entries[0]?.contentRect;
+			if (!cr) return;
+			const w = Math.max(0, Math.round(cr.width));
+			const h = Math.max(0, Math.round(cr.height));
+			if (w < 1 || h < 1) return;
+			partStore.setSvgParams({ width: w, height: h });
+			if (!initialLayoutDoneRef.current) {
+				initialLayoutDoneRef.current = true;
+				fitPartCanvasToPage();
+				coordsStore.setPreloader(false);
+			}
+			partStore.setRectParams(calculateRectParamsFromPartStore());
+		});
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, []);
+
 	const handleMouseWheel = (event) => {
 		var svg = document.getElementById("svg")
 		var gTransform = svg.createSVGMatrix()
@@ -52,8 +125,7 @@ const PartSvgWrapper = observer(() => {
 			e: comboMatrix.e,
 			f: comboMatrix.f
 		});
-		let attr = calculateRectAttributes()
-		partStore.setRectParams( attr)
+		partStore.setRectParams(calculateRectParamsFromPartStore());
 	};
 
 	const touchZoom = (event, curDiff, prevDiff) =>{
@@ -81,8 +153,7 @@ const PartSvgWrapper = observer(() => {
 			f: comboMatrix.f
 		});
 
-        let attr = calculateRectAttributes()
-		partStore.setRectParams( attr)
+		partStore.setRectParams(calculateRectParamsFromPartStore());
     
      	/*Применение трансформации к элементу SVG
         let transform = part.svg.createSVGTransform();
@@ -296,8 +367,7 @@ const PartSvgWrapper = observer(() => {
 					f: f,
 				})
 
-				let attr = calculateRectAttributes()
-				partStore.setRectParams( attr)
+				partStore.setRectParams(calculateRectParamsFromPartStore());
 			}
 			editorStore.setMode('dragging')
 		} else if ( 
@@ -314,16 +384,6 @@ const PartSvgWrapper = observer(() => {
 	}
  
 	useEffect(() => {
-		let rr = Part.getSvgParams()
-		partStore.setSvgParams( rr )
- 		const timeoutId = setTimeout(() => {
-			//console.log ('Delayed message after 2 seconds!');
- 			fitToPage()
-			coordsStore.setPreloader(false)
-			let attr = calculateRectAttributes()
-			partStore.setRectParams( attr)
-		}, 1);
-	  		
 		const handleKeyDown = (e) => {
 				console.log ('handleKeyDown')
 				if (!selectedText && e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'z' || e.key.toLowerCase() === 'я')) { 
@@ -353,56 +413,16 @@ const PartSvgWrapper = observer(() => {
 		window.addEventListener('keydown', handleKeyDown);
 		return () => {
 		  window.removeEventListener('keydown', handleKeyDown);
-		  clearTimeout(timeoutId); 
 		};
 
 	}, []); 
 
 	useEffect(() => { 
 		if (coordsStore.needeToFit) {
- 			fitToPage()		 
+			fitPartCanvasToPage();
+			partStore.setRectParams(calculateRectParamsFromPartStore());
 		}		
 	}, [coordsStore.needeToFit]); 
-
-
-	const fitToPage = () => {
-		const PADDING = 50
-
-		const svgWidth = window.innerWidth
-		//Navbar height fron css
-		const svgHeight = window.innerHeight-58
-	
-		const contentWidth = partStore?.svgData?.width
-		const contentHeight = partStore?.svgData?.height
-	
-		if (!contentWidth || !contentHeight) return
-	
-		// доступная область с отступами
-		const availableWidth = svgWidth - PADDING * 2
-		const availableHeight = svgHeight - PADDING * 2
-	
-		const scaleX = availableWidth / contentWidth
-		const scaleY = availableHeight / contentHeight
-	
-		const scale = Math.min(scaleX, scaleY)
-	
-		const scaledWidth = contentWidth * scale
-		const scaledHeight = contentHeight * scale
-	
-		const translateX = (svgWidth - scaledWidth) / 2
-		const translateY = (svgHeight - scaledHeight) / 2
-		partStore.setGroupMatrix({
-			a: scale,
-			b: 0,
-			c: 0,
-			d: scale,
-			e: translateX,
-			f: translateY,
-		})
-		//console.log ( "setGroupMatrix"+(`${scale} 0 0 ${scale} ${translateX} ${translateY}`))
-
- 	};
-	    
 
 	useEffect(() => {
 		//console.log ('UseEffect in Matrix')
@@ -454,26 +474,6 @@ const PartSvgWrapper = observer(() => {
 		}
 	},
 	[editorStore.mode])
-
-	const calculateRectAttributes = () => {
-		
-		const widthSVG = svgParams.width
-		const heightSVG = svgParams.height
-	
-        // Ширина и высота исходя из scale
-        const combinedMatrix = util.multiplyMatrices(groupMatrix, matrix);
-        const scaleX = combinedMatrix.a;
-        const scaleY = combinedMatrix.d;
-
-        const width = widthSVG/ scaleX;
-        const height = heightSVG / scaleY;
-
-        // Координаты x и y исходя из translate
-        const x = -combinedMatrix.e / scaleX;
-        const y = -combinedMatrix.f / scaleY;
-
-        return { x:x, y:y, width:width, height:height }
-    };
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">

@@ -232,7 +232,7 @@ const ContourPanel = observer(() => {
 					</tbody>
 				</table>
 				<table className="table mb-0">
-					<thead className="table-dark">
+					<thead className="panelTableSectionHead">
 						<tr>
 							<th colSpan={5}>{t('Transformations')}</th>
 						</tr>

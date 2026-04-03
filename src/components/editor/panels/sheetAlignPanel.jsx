@@ -321,7 +321,7 @@ const SheetAlignPanel = observer(() => {
 	
 
 				<table className="table">
-					<thead className="table-dark">
+					<thead className="panelTableSectionHead">
 						<tr>
 							<th colSpan={5}>{t('Align')}</th>
 						</tr>
@@ -427,7 +427,7 @@ const SheetAlignPanel = observer(() => {
 					</tbody>
 				</table>
 				<table className="table">
-					<thead className="table-dark">
+					<thead className="panelTableSectionHead">
 						<tr>
 							<th colSpan={5}>{t('Spread')}</th>
 						</tr>
@@ -520,7 +520,7 @@ const SheetAlignPanel = observer(() => {
 					</tbody>
 				</table>
 				<table className="table">
-					<thead className="table-dark">
+					<thead className="panelTableSectionHead">
 						<tr>
 							<th colSpan={5}>{t('Clone')}</th>
 						</tr> 

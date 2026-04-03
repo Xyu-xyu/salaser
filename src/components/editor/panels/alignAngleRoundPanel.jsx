@@ -36,7 +36,7 @@ const AlignAngleRoundPanel = observer(() => {
 			content: (<div className="d-flex flex-column">
 
 				<table className="table">
-					<thead className="table-dark">
+					<thead className="panelTableSectionHead">
 						<tr>
 							<th colSpan={5}>{t('Align')}</th>
 						</tr>
@@ -142,7 +142,7 @@ const AlignAngleRoundPanel = observer(() => {
 					</tbody>
 				</table>
 				<table className="table">
-					<thead className="table-dark">
+					<thead className="panelTableSectionHead">
 						<tr>
 							<th colSpan={5}>{t('Rounding')}</th>
 						</tr>
@@ -180,7 +180,7 @@ const AlignAngleRoundPanel = observer(() => {
 					</tbody>
 				</table>
 				<table className="table mb-0">
-					<thead className="table-dark">
+					<thead className="panelTableSectionHead">
 						<tr>
 							<th colSpan={2}>{t('Angle')}</th>
 						</tr>

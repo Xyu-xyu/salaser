@@ -44,7 +44,7 @@ const PointPanel = observer(() => {
 				</>),
 			content: (<div className="d-flex flex-column">
 				<table className="table mb-0">
-					<thead className="table-dark">
+					<thead className="panelTableSectionHead">
 						<tr />
 					</thead>
 					<tbody>

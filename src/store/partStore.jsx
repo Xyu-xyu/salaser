@@ -34,7 +34,7 @@ class PartStore {
 	matrix =  { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
 	groupMatrix =  { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }
 	offset =  {x:0,y:0}
-	rectParams =  {x:0, y:0, width:0, heigh:0};
+	rectParams =  {x:0, y:0, width:0, height:0};
 	gridState =  {
 		xsGrid: {
 			visibility: "visible",
@@ -652,7 +652,7 @@ class PartStore {
 			matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
 			groupMatrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
 			offset: { x: 0, y: 0 },
-			rectParams: { x: 0, y: 0, width: 0, heigh: 0 }
+			rectParams: { x: 0, y: 0, width: 0, height: 0 }
 		}
 	}
 
