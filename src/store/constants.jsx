@@ -155,17 +155,17 @@ const constants = {
 				top: 120,
 				left: 12,
 				width: 350,
-				height: 220,
+				height: 520,
 				zIndex:1
 			}
 		},
-		contourTransformPopup: {
+		alignAngleRoundPopup: {
 			mini: true,
 			style: {
 				top: 120,
 				left: 370,
 				width: 350,
-				height: 600,
+				height: 520,
 				zIndex:1
 			}
 		},
