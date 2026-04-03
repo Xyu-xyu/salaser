@@ -18,7 +18,9 @@ const ContourPanel = observer(() => {
 		selectedType,
 		selectedContourModeType,
 		selectedInletModeType,
-		selectedPiercingType } = partStore;
+		selectedPiercingType,
+		InnerAndOuter,
+	} = partStore;
 
 	const { activePoint, activeCoord, wh } = contourTransformSharedStore;
 
@@ -342,6 +344,18 @@ const ContourPanel = observer(() => {
 						</tr>
 					</tbody>
 				</table>
+				<div className="px-2 pb-2">
+					<input
+						id="transformAll"
+						type="checkbox"
+						className="form-check-input"
+						checked={InnerAndOuter}
+						onChange={(e) => partStore.setInnerAndOuter(e.target.checked)}
+					/>
+					<label htmlFor="transformAll" className="ms-2">
+						{t('outer&inner')}
+					</label>
+				</div>
 			</div>
 			),
 		},

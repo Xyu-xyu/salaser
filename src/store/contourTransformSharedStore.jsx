@@ -122,6 +122,48 @@ class ContourTransformSharedStore {
 				res = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath);
 				inlet.applyNewPaths(res);
 			}
+			if (partStore.InnerAndOuter && classes && classes.includes('outer')) {
+				const rotateParam = updPathParams.rotate || { angle: 0, x: 0, y: 0 };
+				for (const innerEl of partStore.getFiltered(['contour'], ['outer'])) {
+					const innerCid = innerEl.cid;
+					const innerPath = innerEl.path;
+					if (!innerPath) continue;
+					let newInnerPath = util.applyTransform(
+						innerPath,
+						updPathParams.scaleX,
+						updPathParams.scaleY,
+						updPathParams.translateX,
+						updPathParams.translateY,
+						rotateParam
+					);
+					newInnerPath = SVGPathCommander.normalizePath(newInnerPath).toString().replaceAll(',', ' ');
+					let resInner;
+					if (id === 'contourRotateValue') {
+						resInner = inlet.getNewInletOutlet(innerCid, 'contour', 'path', newInnerPath, { angle: this.angle, x: this.activeCoord.x, y: this.activeCoord.y });
+					} else {
+						resInner = inlet.getNewInletOutlet(innerCid, 'contour', 'path', newInnerPath);
+					}
+					inlet.applyNewPaths(resInner);
+					const innerClasses = partStore.getElementByCidAndClass(innerCid, 'contour', 'class');
+					if (innerClasses && innerClasses.includes('skeletonText') && resInner) {
+						let textStart = partStore.getElementByCidAndClass(innerCid, 'contour', 'coords');
+						let scaleX = partStore.getElementByCidAndClass(innerCid, 'contour', 'scaleX');
+						let scaleY = partStore.getElementByCidAndClass(innerCid, 'contour', 'scaleY');
+						let fakePath = 'M ' + textStart.x + ' ' + textStart.y;
+						let fuckPath = util.applyTransform(fakePath, updPathParams.scaleX, updPathParams.scaleY, updPathParams.translateX, updPathParams.translateY, { angle: this.angle, x: this.activeCoord.x, y: this.activeCoord.y });
+						fuckPath = SVGPathCommander.normalizePath(fuckPath);
+						let newStart = { x: fuckPath[0][1], y: fuckPath[0][2] };
+						scaleX *= updPathParams.scaleX;
+						scaleY *= updPathParams.scaleY;
+						partStore.updateElementValues(innerCid, 'contour', {
+							coords: newStart,
+							scaleX: scaleX,
+							scaleY: scaleY,
+							angle: this.angle,
+						});
+					}
+				}
+			}
 			if (classes && classes.includes('skeletonText') && res) {
 
 				let textStart = partStore.getElementByCidAndClass(cid, 'contour', 'coords');

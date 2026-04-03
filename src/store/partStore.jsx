@@ -29,6 +29,8 @@ class PartStore {
 	guidesMode = true;
 	selectedEdge = false;
 	textFocus =false;
+	/** Если true, трансформация внешнего контура применяется ко всем внутренним контурам. */
+	InnerAndOuter = true;
 	matrix =  { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
 	groupMatrix =  { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }
 	offset =  {x:0,y:0}
@@ -598,6 +600,10 @@ class PartStore {
 		Object.assign(this.gridState, val);
 	}
 
+	setInnerAndOuter(value) {
+		this.InnerAndOuter = Boolean(value);
+	}
+
 	setSvgParams(val) {
         Object.assign(this.svgParams, val);
     } 
@@ -642,6 +648,7 @@ class PartStore {
 			guidesMode: true,
 			selectedEdge: false,
 			textFocus: false,
+			InnerAndOuter: true,
 			matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
 			groupMatrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
 			offset: { x: 0, y: 0 },

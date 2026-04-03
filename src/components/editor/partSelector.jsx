@@ -254,6 +254,34 @@ const PartSelector = observer(() => {
 				if (classes.includes('outer')) {
 					partStore.setNewPartSize(newCoords.width, newCoords.height)
 				}
+				if (partStore.InnerAndOuter && classes.includes('outer')) {
+					for (const innerEl of partStore.getFiltered(['contour'], ['outer'])) {
+						const innerCid = innerEl.cid;
+						const innerPath = innerEl.path;
+						if (!innerPath) continue;
+						let newInnerPath = Util.applyTransform(innerPath, scaleX, scaleY, translateX, translateY);
+						let respInner = inlet.getNewInletOutlet(innerCid, 'contour', 'path', newInnerPath);
+						let innerResult = inlet.applyNewPaths(respInner);
+						if (!((partStore.safeMode.mode && innerResult) || !partStore.safeMode.mode)) continue;
+						let innerClasses = partStore.getElementByCidAndClass(innerCid, 'contour', 'class');
+						if (innerClasses && innerClasses.includes('skeletonText')) {
+							let textStart = partStore.getElementByCidAndClass(innerCid, 'contour', 'coords');
+							let curScaleX = partStore.getElementByCidAndClass(innerCid, 'contour', 'scaleX');
+							let curScaleY = partStore.getElementByCidAndClass(innerCid, 'contour', 'scaleY');
+							curScaleX *= scaleX;
+							curScaleY *= scaleY;
+							let fakePath = 'M ' + textStart.x + ' ' + textStart.y;
+							let fuckPath = Util.applyTransform(fakePath, scaleX, scaleY, translateX, translateY);
+							fuckPath = SVGPathCommander.normalizePath(fuckPath);
+							let newStart = { x: fuckPath[0][1], y: fuckPath[0][2] };
+							partStore.updateElementValues(innerCid, 'contour', {
+								coords: newStart,
+								scaleX: curScaleX,
+								scaleY: curScaleY
+							});
+						}
+					}
+				}
 				part.initialHeight = newCoords.height
 				part.initialWidth = newCoords.width 
 				part.initialRectLeft = newCoords.x
