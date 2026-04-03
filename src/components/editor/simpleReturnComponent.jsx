@@ -188,7 +188,7 @@ const StaticPartDefinitions = observer(() => {
 							d={inletOutletPath}
 							fill="none"
 							stroke="currentColor"
-							strokeWidth={2}
+							strokeWidth={.5}
 							strokeLinecap="round"
 							vectorEffect="non-scaling-stroke"
 						/>

@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import ToolsPanel from './toolsPanel.jsx'
 import ContourPanel from './contourPanel.jsx';
+import ContourTransformPanel from './contourTransformPanel.jsx';
 import InletPanel from './inletPanel.jsx';
 import OutletPanel from './outletPanel.jsx';
 import TecnologyPanel from './tecnologyPanel.jsx';
@@ -19,6 +20,7 @@ const PartPanels = observer(() => {
 	const dockablePanels = (
 		<>
 			<ContourPanel />
+			<ContourTransformPanel />
 			<InletPanel />	
 			<OutletPanel />
 			<TecnologyPanel />

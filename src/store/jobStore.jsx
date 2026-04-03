@@ -315,6 +315,8 @@ class JobStore {
 	async saveNcpToServer(ncpText) {
 
 		if (!this.selectedId) return;
+		//const start = performance.now(); // ⏱ старт
+
 	
 		let resp = await fetch(constants.SERVER_URL + "/jdb/update_ncp", {
 			method: "POST",
@@ -338,6 +340,8 @@ class JobStore {
 	
 		const data = await resp.json()
 
+		//const end = performance.now(); // ⏱ конец
+ 		//console.log(`⏱ saveNcpToServer took ${(end - start).toFixed(2)} ms`)
 		
 
 		console.log("updated:", data)	

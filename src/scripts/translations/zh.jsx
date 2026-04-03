@@ -485,6 +485,7 @@ const zh = {
     "Residual cut overlaps parts": "余料切割与零件发生重叠",
     "Current residual cut is not detected.": "当前未检测到余料切割。",
     " Max retries exceeded with url. /gcore/1/listing.json (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7f4a01f93340>, `Connection to 192.168.11.56 timed out. (connect timeout=2)`))": "url 超出最大重试次数。",
-    " Read timed out.": "读取超时。"
+    " Read timed out.": "读取超时。",
+    "Contour transform": "轮廓变换"
 }
 export default zh;

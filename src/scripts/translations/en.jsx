@@ -529,6 +529,7 @@ const en = {
     "Residual cut overlaps parts": "Residual cut overlaps parts",
     "Current residual cut is not detected.": "Current residual cut is not detected.",
     " Max retries exceeded with url. /gcore/1/listing.json (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7f4a01f93340>, `Connection to 192.168.11.56 timed out. (connect timeout=2)`))": "Max retries exceeded with url. /gcore/1/listing.json (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7f4a01f93340>, `Connection to 192.168.11.56 timed out. (connect timeout=2)`))",
-    " Read timed out.": " Read timed out."
+    " Read timed out.": "Read timed out.",
+    "Contour transform": "Contour transform"
 }
 export default en;

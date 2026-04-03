@@ -2916,6 +2916,7 @@ class SvgStore {
 		
 		const { selectedId } = jobStore;
 		let ncpStart;
+		//const start = performance.now(); // ⏱ конец
 
 		if (selectedId === 'newSheet') {
 
@@ -2946,6 +2947,10 @@ class SvgStore {
 		}
 
 		let ncpPositons = this.generatePositions()
+
+		//const end = performance.now(); // ⏱ конец
+ 		//console.log(`⏱ generatePositions took ${(end - start).toFixed(2)} ms`)
+
 		let ncpParts = this.generateParts()
 		let ncpFinish = [
 			`(</NcpProgram>)`,
@@ -2954,6 +2959,10 @@ class SvgStore {
 
 		let ncp = [...ncpStart, ...ncpPositons, ...ncpParts.flat(), ...ncpFinish]
 		ncp = this.renumberNLines (ncp, 1)
+
+
+		//const end1 = performance.now(); // ⏱ конец
+ 		//console.log(`⏱ renumberNLines took ${(end1 - end).toFixed(2)} ms`)
 
 		if (selectedId ==='newSheet' ) {
 			jobStore.saveNcpAsNewSheet(ncp)

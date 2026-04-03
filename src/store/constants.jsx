@@ -155,6 +155,16 @@ const constants = {
 				top: 120,
 				left: 12,
 				width: 350,
+				height: 220,
+				zIndex:1
+			}
+		},
+		contourTransformPopup: {
+			mini: true,
+			style: {
+				top: 120,
+				left: 370,
+				width: 350,
 				height: 600,
 				zIndex:1
 			}

@@ -2110,8 +2110,8 @@ height: fit-content;}
   position: absolute;
   top: 50%;
   left: 50%;
-  min-height: 500px;
-  max-width: 750px;     /* = высота контейнера */
+/*   min-height: 500px;
+ */  max-width: 750px;     /* = высота контейнера */
   max-height: 90%;     /* ограничиваем второй стороной */
 
   transform: translate(-50%, -50%) rotate(-90deg);
