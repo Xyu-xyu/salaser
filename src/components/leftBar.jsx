@@ -32,21 +32,42 @@ const LeftBar = observer(() => {
 					</div>
 					<div className="mx-2 mt-1"
 						onClick={()=> {
-							console.log ("click")
-							laserStore.setVal ('rightMode', 'parameter')
+							laserStore.setVal ('rightMode', 'plan')
 							laserStore.setVal ('leftMode', 'sheet')
 						}} 
 					>
 						<button 							
-							className={`${leftMode !== 'plan' ? "viotet_button" :"grey_button"} navbar_button w-100`}>
+							className={`${leftMode === 'sheet' ? "viotet_button" :"grey_button"} navbar_button w-100`}>
 							<div className="d-flex align-items-center justify-content-center">
 								<CustomIcon 
 									viewBox={'0 0 36 36'} 								
 									icon="LaserIcon" 
 									width={60} height={60} 
-									style={{ color: leftMode !== 'plan'? "white": 'black' }} 
+									style={{ color: leftMode === 'sheet'? "white": 'black' }} 
 									strokeWidth={1.5} />
 							</div>	
+						</button>
+					</div>
+					<div className="mx-2 mt-1"
+						onClick={() => {
+							laserStore.setVal('rightMode', 'part')
+							laserStore.setVal('leftMode', 'part')
+						}}
+					>
+						<button
+							className={`${leftMode === 'part' ? "viotet_button" : "grey_button"} navbar_button w-100`}
+						>
+							<div className="d-flex align-items-center justify-content-center">
+								<CustomIcon
+									icon="shapes"
+									viewBox="0 0 24 24"
+									width="48"
+									height="48"
+									strokeWidth={1.2}		
+									stroke={leftMode === 'part' ? 'white' : 'black'}
+									color={leftMode === 'part' ? 'white' : 'black'}
+								/>
+							</div>
 						</button>
 					</div>
 				</div>

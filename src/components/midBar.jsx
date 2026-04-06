@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import constants from "../store/constants";
 import CustomIcon from "../icons/customIcon";
 import DetailsButtonImg from "./detailsButtonImg"
+import { findJobById, parsePartsFromLoadResult } from "./partForm";
  
 
 const MidBar = observer(() => {
@@ -337,6 +338,48 @@ const MidBar = observer(() => {
 							<div><CanBan /></div>
 						</div>
 					</motion.div>
+				</motion.div>
+
+				<motion.div
+					key="blockPart"
+					initial={false}
+					animate={{
+						opacity: leftMode === 'part' ? 1 : 0,
+						x: leftMode === 'part' ? 0 : 20,
+						pointerEvents: leftMode === 'part' ? "auto" : "none",
+					}}
+					transition={{ duration: 0.25, ease: "easeInOut" }}
+					style={{
+						position: "absolute",
+						inset: 0,
+						width: "100%",
+						height: "100%",
+					}}
+				>
+					<div className="d-flex flex-column w-100 h-100 overflow-auto px-3 py-2">
+						<h5 className="mt-2">{t("Parts")}</h5>
+						{(() => {
+							const job = findJobById(selectedId);
+							const raw = job?.loadResult ?? laserStore.loadResult;
+							const parts = parsePartsFromLoadResult(raw);
+							if (!parts.length) {
+								return <div className="text-muted small">{t("No parts data")}</div>;
+							}
+							return (
+								<div className="d-flex flex-column gap-2 mt-2">
+									{parts.map((p, i) => (
+										<div
+											key={`${p.partcode ?? i}-${i}`}
+											className="d-flex justify-content-between align-items-center border rounded px-3 py-2"
+										>
+											<span className="text-truncate me-2" title={p.partcode}>{p.partcode}</span>
+											<span className="text-muted">×{p.debit ?? 0}</span>
+										</div>
+									))}
+								</div>
+							);
+						})()}
+					</div>
 				</motion.div>
 			</div>
 		</>

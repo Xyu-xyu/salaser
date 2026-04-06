@@ -127,6 +127,9 @@ const zh = {
     "Parameters": "参数",
     "Plan": "计划",
     "Plans": "计划",
+    "Parts": "零件",
+    "No parts data": "无零件数据",
+    "Sort": "排序",
     "Tidy up": "整理",
     "Введите значение": "输入值",
     "Макрос": "宏",
@@ -488,6 +491,6 @@ const zh = {
     " Read timed out.": "读取超时。",
     "Contour transform": "轮廓变换",
     "Align Angle Round": "将角对齐圆",
-    "Align angle round": "将角对齐圆"
+    "Align angle round": "将角对齐圆",
 }
 export default zh;

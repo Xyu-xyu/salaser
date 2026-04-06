@@ -9,6 +9,7 @@ import jobStore from "../store/jobStore";
 import macrosStore from "../store/macrosStore";
 import CustomIcon from "../icons/customIcon";
 import { DetailsButton } from "./detailsButton";
+import PartForm from "./partForm";
 import NewPlanButton from "./navbar/newPlanButton";
 import svgStore from "../store/svgStore";
 import constants from "../store/constants";
@@ -342,6 +343,10 @@ const RightBar = observer(() => {
 					{rightMode === 'function' &&
 						<FunctionsForm />
 					}
+                   {rightMode === 'part' &&
+						<PartForm />
+					}
+
 				</motion.div>
 			)}
 		</AnimatePresence>

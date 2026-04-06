@@ -9,7 +9,7 @@ class LaserStore {
 	
 	mainMode = "planMode";
 	rightMode = "plan"//plan, sheet, canBan ??
-	leftMode = "plan" //functions parameter, plan
+	leftMode = "plan" // plan | sheet | part
 	planViewType ="CanBan"
 	knobMode = false
 	cutSeg = 0

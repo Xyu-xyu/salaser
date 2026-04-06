@@ -164,7 +164,10 @@ const FunctionsForm = observer(() => {
 							setRotated(!rotated)
 							setTimeout(() => {
 								// здесь переключалка когда закрываем раздел функции								
-								laserStore.setVal('rightMode', leftMode === "plan" ? "plan" : "parameter")
+								laserStore.setVal(
+									'rightMode',
+									leftMode === "plan" ? "plan" : leftMode === "part" ? "part" : "parameter"
+								)
 							}, 500)
 						}
 						}
