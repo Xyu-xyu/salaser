@@ -1,5 +1,9 @@
 const constants = {
-	
+	/** Расширения файлов для загрузки деталей (part mode) */
+	PART_UPLOAD_EXTENSIONS: ['ncp', 'dxf'],
+	/** Значение атрибута accept для input type="file" */
+	PART_UPLOAD_ACCEPT: '.ncp,.dxf',
+
 	SERVER_URL:import.meta.env.DEV ? 'http://localhost:5005' : '',
 	languages: [
 		{ lang: 'ru', name: 'Русский' },

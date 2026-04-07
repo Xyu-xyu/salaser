@@ -130,6 +130,8 @@ const en = {
     "Parts": "Parts",
     "No parts data": "No parts data",
     "Sort": "Sort",
+    "Loading": "Loading",
+    "Do you want to delete part ?": "Do you want to delete part ?",
     "Tidy up": "Tidy up",
     "Введите значение": "Enter value",
     "Макрос": "Macro",

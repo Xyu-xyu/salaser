@@ -10,6 +10,12 @@ import jointStore from "./jointStore";
 
 
 class PartStore {
+	// ---- Parts DB list (for UI parts mode) ----
+	dbParts = [];
+	dbPartsLoading = false;
+	dbPartsError = null;
+	selectedPartUuid = "";
+
 	partInEdit = false;
 	tooltips = false;
 	laserShow =  {};
@@ -622,8 +628,58 @@ class PartStore {
 		}
 	}
 
+	async loadDbParts(limit = 50, offset = 0) {
+		partStore.setVal('dbPartsLoading', true);
+		partStore.setVal('dbPartsError', null);
+		try {
+			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/get_parts?limit=${limit}&offset=${offset}`, {
+				method: "GET",
+			});
+			const data = await resp.json();
+			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+			partStore.setVal('dbParts', Array.isArray(data?.parts) ? data.parts : []);
+		} catch (e) {
+			partStore.setVal('dbPartsError', e?.message ?? String(e));
+		} finally {
+			partStore.setVal('dbPartsLoading', false);
+		}
+	}
+
+	selectPart(uuid) {
+		partStore.setVal('selectedPartUuid', uuid ?? "");
+	}
+
+	async deletePart(uuid) {
+		const targetUuid = uuid ?? partStore.selectedPartUuid;
+		if (!targetUuid) return;
+
+		try {
+			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/delete_part`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ uuid: targetUuid }),
+			});
+			const data = await resp.json().catch(() => ({}));
+			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+
+			partStore.setVal('dbParts', partStore.dbParts.filter(p => p?.uuid !== targetUuid));
+			if (partStore.selectedPartUuid === targetUuid) {
+				partStore.setVal('selectedPartUuid', "");
+			}
+		} catch (e) {
+			console.error(e);
+			partStore.setVal('dbPartsError', e?.message ?? String(e));
+		}
+	}
+
 	getDefaultState() {
 		return {
+			// я ни фига не уверен что это нужно, но пусть будет
+			dbParts: [],
+			dbPartsLoading: false,
+			dbPartsError: null,
+			selectedPartUuid: "",
+			// 
 			partInEdit: false,
 			tooltips: false,
 			laserShow: {},

@@ -3032,3 +3032,23 @@ cursor: url('./images//cursor_plus.cur'), auto !important;
   margin-left: 5px;
 
 }
+
+.part_item-class {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--grey-button-bottom);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+
+}
+
+.part_item-class.selected   {
+  border: 2px solid var(--violet) !important;
+ 
+}

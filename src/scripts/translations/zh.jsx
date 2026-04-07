@@ -130,6 +130,8 @@ const zh = {
     "Parts": "零件",
     "No parts data": "无零件数据",
     "Sort": "排序",
+    "Loading": "加载中",
+    "Do you want to delete part ?": "是否删除零件？",
     "Tidy up": "整理",
     "Введите значение": "输入值",
     "Макрос": "宏",
