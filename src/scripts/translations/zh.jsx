@@ -128,6 +128,8 @@ const zh = {
     "Plan": "计划",
     "Plans": "计划",
     "Parts": "零件",
+    "New part": "新建零件",
+    "Edit part": "编辑零件",
     "No parts data": "无零件数据",
     "Sort": "排序",
     "Part name prefix": "名称前缀",

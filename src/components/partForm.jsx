@@ -4,6 +4,8 @@ import { useRef } from "react";
 import constants from "../store/constants";
 import CustomIcon from "../icons/customIcon";
 import macrosStore from "../store/macrosStore";
+import jointStore from "../store/jointStore";
+import laserStore from "../store/laserStore";
 import partStore from "../store/partStore";
 
 function fileToBase64(file) {
@@ -61,6 +63,20 @@ const PartForm = observer(() => {
 	const { t } = useTranslation();
 	const fileInputRef = useRef(null);
 
+	const openNewPartEditor = () => {
+		partStore.clearSvgData();
+		partStore.setVal("partInEdit", false);
+		jointStore.setData({});
+		laserStore.setVal("centralBarMode", "partEditor");
+	};
+
+	const openEditPartEditor = async () => {
+		const uuid = partStore.selectedPartUuid;
+		if (!uuid) return;
+		const ok = await partStore.loadPartIntoEditor(uuid);
+		if (ok) laserStore.setVal("centralBarMode", "partEditor");
+	};
+
 	const openPartFileDialog = () => {
 		fileInputRef.current?.click();
 	};
@@ -91,7 +107,7 @@ const PartForm = observer(() => {
 			</div>
 
 			<div>
-				<button type="button" className="w-100" onClick={openPartFileDialog}>
+				<button type="button" className="w-100" onClick={openNewPartEditor}>
 					<div className="d-flex align-items-center">
 						<CustomIcon
 							icon="gridicons:add"
@@ -102,7 +118,64 @@ const PartForm = observer(() => {
 							strokeWidth={0}
 							className="ms-1"
 						/>
-						<div className="flex-grow-1 text-center">{t("Add")}</div>
+						<div className="flex-grow-1 text-center">{t("New part")}</div>
+					</div>
+				</button>
+			</div>
+			<div>
+				<button
+					type="button"
+					className="w-100"
+					onClick={openEditPartEditor}
+					disabled={!partStore.selectedPartUuid}
+				>
+					<div className="d-flex align-items-center">
+						<CustomIcon
+							icon="fa-regular:edit"
+							width="24"
+							height="24"
+							viewBox="0 0 512 512"
+							color="black"
+							fill="black"
+							strokeWidth={0}
+							className="ms-1"
+						/>
+						<div className="flex-grow-1 text-center">{t("Edit part")}</div>
+					</div>
+				</button>
+			</div>
+
+			<div>
+				<button type="button" className="w-100" onClick={openPartFileDialog}>
+					<div className="d-flex align-items-center">
+						<CustomIcon
+							icon="fluent:copy-add-20-regular"
+							width="26"
+							height="26"
+							color='black'
+							fill='black'
+							strokeWidth={0}
+							viewBox="0 0 20 20"
+						/>
+						<div className="flex-grow-1 text-center">{t("Upload")}</div>
+					</div>
+				</button>
+			</div>
+
+			<div>
+				<button type="button" className="w-100" onMouseDown={() => { }}>
+					<div className="d-flex align-items-center">
+						<CustomIcon
+							icon="fa-regular:copy"
+							width="24"
+							height="24"
+							viewBox="0 0 448 512"
+							color="black"
+							fill="black"
+							strokeWidth={0}
+							className="ms-1"
+						/>
+						<div className="flex-grow-1 text-center">{t("Clone")}</div>
 					</div>
 				</button>
 			</div>
@@ -133,23 +206,6 @@ const PartForm = observer(() => {
 							className="ms-1"
 						/>
 						<div className="flex-grow-1 text-center">{t("Delete")}</div>
-					</div>
-				</button>
-			</div>
-			<div>
-				<button type="button" className="w-100" onMouseDown={() => { }}>
-					<div className="d-flex align-items-center">
-						<CustomIcon
-							icon="fa-regular:copy"
-							width="24"
-							height="24"
-							viewBox="0 0 448 512"
-							color="black"
-							fill="black"
-							strokeWidth={0}
-							className="ms-1"
-						/>
-						<div className="flex-grow-1 text-center">{t("Copy")}</div>
 					</div>
 				</button>
 			</div>

@@ -755,6 +755,43 @@ class PartStore {
 		partStore.setVal('selectedPartUuid', uuid ?? "");
 	}
 
+	/**
+	 * Загружает деталь с бэка и открывает её в partStore для редактора.
+	 * Ожидается GET /jdb/get_part/<uuid> с JSON телом детали (как в part_code: code, width, height, uuid, …)
+	 * или { part: {…} }.
+	 * @returns {Promise<boolean>}
+	 */
+	async loadPartIntoEditor(uuid) {
+		const id = String(uuid ?? "").trim();
+		if (!id) return false;
+		try {
+			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/get_part/${encodeURIComponent(id)}`, {
+				method: "GET",
+			});
+			const data = await resp.json().catch(() => ({}));
+			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+
+			let raw = data?.part ?? data?.svg_data ?? data;
+			if (!raw || typeof raw !== "object") {
+				throw new Error("Пустой ответ get_part");
+			}
+			const next = JSON.parse(JSON.stringify(raw));
+			if (!Array.isArray(next.code)) next.code = [];
+			next.params = typeof next.params === "object" && next.params !== null ? next.params : {};
+			if (!next.params.uuid) next.params.uuid = next.uuid ?? id;
+			if (!next.uuid) next.uuid = id;
+
+			runInAction(() => {
+				partStore.setSvgData(next);
+				partStore.setVal("partInEdit", next.uuid ?? id);
+			});
+			return true;
+		} catch (e) {
+			console.error("jdb/get_part", e);
+			return false;
+		}
+	}
+
 	async deletePart(uuid) {
 		const targetUuid = uuid ?? partStore.selectedPartUuid;
 		if (!targetUuid) return;

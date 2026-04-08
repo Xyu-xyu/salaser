@@ -69,7 +69,7 @@ const DbPartsSortPanel = observer(() => {
 					type="number"
 					min={1}
 					className="form-control form-control-sm"
-					style={{ width: "4.75rem" }}
+					style={inputBase}
 					placeholder={t("Created last days")}
 					value={q.created_last_days}
 					onChange={setField("created_last_days")}
@@ -78,7 +78,7 @@ const DbPartsSortPanel = observer(() => {
 					type="number"
 					min={1}
 					className="form-control form-control-sm"
-					style={{ width: "4.75rem" }}
+					style={inputBase}
 					placeholder={t("Updated last days")}
 					value={q.updated_last_days}
 					onChange={setField("updated_last_days")}
@@ -87,7 +87,7 @@ const DbPartsSortPanel = observer(() => {
 					type="number"
 					step="any"
 					className="form-control form-control-sm"
-					style={{ width: "4.25rem" }}
+					style={inputBase}
 					placeholder={t("Thickness mm")}
 					value={q.thickness}
 					onChange={setField("thickness")}
@@ -235,9 +235,9 @@ const DbPartsSortPanel = observer(() => {
 					!!partStore.dbParts.length && (
 						<div
 							className="db-parts-list flex-grow-1"
-							style={{ overflowX: "auto", overflowY: "hidden", minHeight: 0 }}
+							style={{ overflowX: "hidden", overflowY: "auto", minHeight: 0 }}
 						>
-							<div className="d-flex flex-row flex-nowrap gap-2 pb-1 h-100 align-items-stretch">
+							<div className="d-flex flex-wrap gap-2 pb-2 align-content-start">
 								{partStore.dbParts.map((p) => (
 									<div
 										key={p.uuid ?? p.id}
@@ -250,7 +250,7 @@ const DbPartsSortPanel = observer(() => {
 												partStore.selectPart(p.uuid);
 											}
 										}}
-										className={`d-flex flex-column align-items-center border rounded p-2 small part_item-class flex-shrink-0 ${
+										className={`d-flex flex-column align-items-center border rounded p-2 small part_item-class ${
 											p.uuid && p.uuid === partStore.selectedPartUuid ? "selected" : ""
 										}`}
 										style={{

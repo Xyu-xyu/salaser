@@ -128,6 +128,8 @@ const en = {
     "Plan": "Plan",
     "Plans": "Plans",
     "Parts": "Parts",
+    "New part": "New part",
+    "Edit part": "Edit part",
     "No parts data": "No parts data",
     "Sort": "Sort",
     "Part name prefix": "Part name prefix",
