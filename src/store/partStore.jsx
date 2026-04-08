@@ -8,12 +8,32 @@ import CONSTANTS from "./constants";
 import log from "../scripts/log";
 import jointStore from "./jointStore";
 
+const DEFAULT_DB_PARTS_QUERY = Object.freeze({
+	limit: 50,
+	offset: 0,
+	name_prefix: "",
+	name_contains: "",
+	created_last_days: "",
+	updated_last_days: "",
+	created_from: "",
+	created_to: "",
+	updated_from: "",
+	updated_to: "",
+	owner: "",
+	thickness: "",
+	material_id: "",
+});
 
 class PartStore {
 	// ---- Parts DB list (for UI parts mode) ----
 	dbParts = [];
 	dbPartsLoading = false;
 	dbPartsError = null;
+	dbPartsQuery = { ...DEFAULT_DB_PARTS_QUERY };
+	/** @type {{ id: number|string, label: string, name?: string }[]} */
+	dbMaterials = [];
+	dbMaterialsLoading = false;
+	dbMaterialsError = null;
 	selectedPartUuid = "";
 
 	partInEdit = false;
@@ -628,20 +648,106 @@ class PartStore {
 		}
 	}
 
-	async loadDbParts(limit = 50, offset = 0) {
-		partStore.setVal('dbPartsLoading', true);
-		partStore.setVal('dbPartsError', null);
+	async loadDbParts(limitOrPatch, maybeOffset) {
+		let patch = {};
+		if (typeof limitOrPatch === "number") {
+			patch = { limit: limitOrPatch, offset: Number(maybeOffset) || 0 };
+		} else if (limitOrPatch != null && typeof limitOrPatch === "object") {
+			patch = limitOrPatch;
+		}
+		if (Object.keys(patch).length) {
+			runInAction(() => Object.assign(this.dbPartsQuery, patch));
+		}
+
+		const q = this.dbPartsQuery;
+		const params = new URLSearchParams();
+		const lim = Math.max(1, Math.min(500, Number(q.limit) || 50));
+		const off = Math.max(0, Number(q.offset) || 0);
+		params.set("limit", String(lim));
+		params.set("offset", String(off));
+
+		const addParam = (key, val) => {
+			const s = val == null ? "" : String(val).trim();
+			if (s !== "") params.set(key, s);
+		};
+		addParam("name_prefix", q.name_prefix);
+		addParam("name_contains", q.name_contains);
+		addParam("created_last_days", q.created_last_days);
+		addParam("updated_last_days", q.updated_last_days);
+		addParam("created_from", q.created_from);
+		addParam("created_to", q.created_to);
+		addParam("updated_from", q.updated_from);
+		addParam("updated_to", q.updated_to);
+		addParam("owner", q.owner);
+		addParam("thickness", q.thickness);
+		addParam("material_id", q.material_id);
+
+		partStore.setVal("dbPartsLoading", true);
+		partStore.setVal("dbPartsError", null);
 		try {
-			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/get_parts?limit=${limit}&offset=${offset}`, {
-				method: "GET",
-			});
+			const resp = await fetch(
+				`${CONSTANTS.SERVER_URL}/jdb/get_parts?${params.toString()}`,
+				{ method: "GET" }
+			);
 			const data = await resp.json();
 			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
-			partStore.setVal('dbParts', Array.isArray(data?.parts) ? data.parts : []);
+			partStore.setVal("dbParts", Array.isArray(data?.parts) ? data.parts : []);
 		} catch (e) {
-			partStore.setVal('dbPartsError', e?.message ?? String(e));
+			partStore.setVal("dbPartsError", e?.message ?? String(e));
 		} finally {
-			partStore.setVal('dbPartsLoading', false);
+			partStore.setVal("dbPartsLoading", false);
+		}
+	}
+
+	setDbPartsQuery(partial) {
+		runInAction(() => Object.assign(this.dbPartsQuery, partial));
+	}
+
+	resetDbPartsQuery() {
+		runInAction(() => {
+			Object.assign(this.dbPartsQuery, { ...DEFAULT_DB_PARTS_QUERY });
+		});
+	}
+
+	async loadDbMaterials() {
+		partStore.setVal("dbMaterialsLoading", true);
+		partStore.setVal("dbMaterialsError", null);
+		try {
+			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/get_materials`, {
+				method: "GET",
+			});
+			const data = await resp.json().catch(() => ({}));
+			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+
+			let raw = data?.materials;
+			if (!Array.isArray(raw) && Array.isArray(data?.data)) raw = data.data;
+			if (!Array.isArray(raw)) raw = [];
+
+			const list = raw
+				.map((row) => {
+					if (row == null || typeof row !== "object") return null;
+					const id = row.id ?? row.material_id;
+					if (id == null || id === "") return null;
+					const label =
+						row.label != null && String(row.label).trim() !== ""
+							? String(row.label)
+							: row.name != null && String(row.name).trim() !== ""
+								? String(row.name)
+								: String(id);
+					return {
+						id,
+						label,
+						name: row.name != null ? String(row.name) : undefined,
+					};
+				})
+				.filter(Boolean);
+
+			partStore.setVal("dbMaterials", list);
+		} catch (e) {
+			partStore.setVal("dbMaterialsError", e?.message ?? String(e));
+			console.error("jdb/get_materials", e);
+		} finally {
+			partStore.setVal("dbMaterialsLoading", false);
 		}
 	}
 
@@ -678,6 +784,10 @@ class PartStore {
 			dbParts: [],
 			dbPartsLoading: false,
 			dbPartsError: null,
+			dbPartsQuery: { ...DEFAULT_DB_PARTS_QUERY },
+			dbMaterials: [],
+			dbMaterialsLoading: false,
+			dbMaterialsError: null,
 			selectedPartUuid: "",
 			// 
 			partInEdit: false,

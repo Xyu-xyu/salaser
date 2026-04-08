@@ -12,10 +12,10 @@ import { motion } from "framer-motion";
 import CanBan from "./canBan";
 import jobStore from "../store/jobStore";
 import { useTranslation } from 'react-i18next';
-import constants from "../store/constants";
 import CustomIcon from "../icons/customIcon";
 import DetailsButtonImg from "./detailsButtonImg"
 import partStore from "../store/partStore";
+import DbPartsSortPanel from "./dbPartsSortPanel";
  
 
 const MidBar = observer(() => {
@@ -362,54 +362,11 @@ const MidBar = observer(() => {
 						height: "100%",
 					}}
 				>
-					<div className="d-flex flex-column w-100 h-100 overflow-auto px-3 py-2">
-						<h5 className="mt-2">{t("Parts")}</h5>
-						{partStore.dbPartsLoading && (
-							<div className="text-muted small mt-2">{t("Loading")}...</div>
-						)}
-						{!partStore.dbPartsLoading && partStore.dbPartsError && (
-							<div className="text-danger small mt-2">{partStore.dbPartsError}</div>
-						)}
-						{!partStore.dbPartsLoading && !partStore.dbPartsError && !partStore.dbParts.length && (
-							<div className="text-muted small mt-2">{t("No parts data")}</div>
-						)}
-						{!partStore.dbPartsLoading && !partStore.dbPartsError && !!partStore.dbParts.length && (
-							<div className="d-flex flex-column gap-2 mt-2">
-								{partStore.dbParts.map((p) => (
-									<div
-										key={p.uuid ?? p.id}
-										onPointerDown={() => partStore.selectPart(p.uuid)}
-										className={`d-flex justify-content-between align-items-center border rounded px-3 py-2 part_item-class ${
-											p.uuid && p.uuid === partStore.selectedPartUuid ? "selected" : ""
-										}`}
-									>
-										<div className="d-flex align-items-center flex-grow-1 me-2" style={{ minWidth: 0 }}>
-											{p.uuid && (
-												<img
-													src={`${constants.SERVER_URL}/jdb/get_part_svg/${p.uuid}`}
-													alt={p.name ?? "part"}
-													width={48}
-													height={48}
-													style={{
-														borderRadius: 6,
-														border: "1px solid rgba(0,0,0,0.1)",
-														background: "white",
-														objectFit: "contain",
-														flex: "0 0 auto",
-													}}
-												/>
-											)}
-											<span className="text-truncate ms-2" title={p.name}>
-												{p.name}
-											</span>
-										</div>
-										<span className="text-muted text-nowrap">
-											{p.width}×{p.height}
-										</span>
-									</div>
-								))}
-							</div>
-						)}
+					<div
+						className="d-flex flex-column w-100 h-100 px-3 py-2"
+						style={{ minHeight: 0, overflow: "hidden" }}
+					>
+						<DbPartsSortPanel />
 					</div>
 				</motion.div>
 			</div>

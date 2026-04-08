@@ -1,8 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
 import { useRef } from "react";
-import jobStore from "../store/jobStore";
-import laserStore from "../store/laserStore";
 import constants from "../store/constants";
 import CustomIcon from "../icons/customIcon";
 import macrosStore from "../store/macrosStore";
@@ -59,23 +57,9 @@ export function parsePartsFromLoadResult(loadResultStr) {
 	}
 }
 
-export function findJobById(id) {
-	if (!id) return null;
-	for (const key of Object.keys(jobStore.mockCards)) {
-		const found = jobStore.mockCards[key].find((j) => j.id === id);
-		if (found) return found;
-	}
-	return null;
-}
-
 const PartForm = observer(() => {
 	const { t } = useTranslation();
 	const fileInputRef = useRef(null);
-	const { selectedId } = jobStore;
-	const job = findJobById(selectedId);
-	const parts = job?.loadResult
-		? parsePartsFromLoadResult(job.loadResult)
-		: parsePartsFromLoadResult(laserStore.loadResult);
 
 	const openPartFileDialog = () => {
 		fileInputRef.current?.click();
@@ -170,27 +154,6 @@ const PartForm = observer(() => {
 				</button>
 			</div>
 
-			<div className="mt-4">
-				<h5>{t("Sort")}</h5>
-			</div>
-
-			{!parts.length ? (
-				<div className="text-muted small mt-2">{t("No parts data")}</div>
-			) : (
-				<div className="mt-2 d-flex flex-column gap-1">
-					{parts.map((p, i) => (
-						<div
-							key={`${p.partcode ?? i}-${i}`}
-							className="d-flex justify-content-between align-items-center border rounded px-2 py-1 small"
-						>
-							<span className="text-truncate me-2" title={p.partcode}>
-								{p.partcode}
-							</span>
-							<span className="text-nowrap text-muted">×{p.debit ?? 0}</span>
-						</div>
-					))}
-				</div>
-			)}
 		</div>
 	);
 });
