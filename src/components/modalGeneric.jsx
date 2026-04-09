@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { Modal, Button } from 'react-bootstrap';
 import macrosStore from '../store/macrosStore';
 import { useTranslation } from 'react-i18next';
+import NewPartModalForm from './newPartModalForm';
 
  
 const modalGeneric = observer(() => {
@@ -11,7 +12,10 @@ const modalGeneric = observer(() => {
 		confirmText: '',
 		cancelText:'',
 		func:()=>{},
-		args:['']
+		args:[],
+		variant: undefined,
+		func1: undefined,
+		confirmText1: undefined,
 	}
 
 	const handleClose = () => {
@@ -21,17 +25,19 @@ const modalGeneric = observer(() => {
 	const { t } = useTranslation()
 
 	const handleSubmit = () => {
-		if (macrosStore.modalProps.func && Array.isArray(macrosStore.modalProps.args)) {
-			macrosStore.modalProps.func(...macrosStore.modalProps.args);
-			macrosStore.setModalProps ( def )
-		}
+		const fn = macrosStore.modalProps.func;
+		if (typeof fn !== "function") return;
+		const a = macrosStore.modalProps.args;
+		if (Array.isArray(a)) fn(...a); else fn();
+		macrosStore.setModalProps(def);
  	};
 
 	 const handleSubmit1 = () => {
-		if (macrosStore.modalProps.func1 && Array.isArray(macrosStore.modalProps.args)) {
-			macrosStore.modalProps.func1(...macrosStore.modalProps.args);
-			macrosStore.setModalProps ( def )
-		}
+		const fn = macrosStore.modalProps.func1;
+		if (typeof fn !== "function") return;
+		const a = macrosStore.modalProps.args;
+		if (Array.isArray(a)) fn(...a); else fn();
+		macrosStore.setModalProps(def);
  	};
 
 	return (
@@ -43,13 +49,21 @@ const modalGeneric = observer(() => {
 				 className="with-inner-backdrop">
 				<Modal.Header closeButton>
 					<Modal.Title>
+						{macrosStore.modalProps.variant === "newPart" && macrosStore.modalProps.modalBody
+							? t(macrosStore.modalProps.modalBody)
+							: ""}
  					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className="position-relative">
-					<div className='modulatiomNacroName text-center'>{macrosStore.modalProps.modalBody ? 
-					t(macrosStore.modalProps.modalBody) : ""
-				}</div>
+					{macrosStore.modalProps.variant === "newPart" ? (
+						<NewPartModalForm onCancel={handleClose} />
+					) : (
+						<div className='modulatiomNacroName text-center'>
+							{macrosStore.modalProps.modalBody ? t(macrosStore.modalProps.modalBody) : ""}
+						</div>
+					)}
 				</Modal.Body>
+				{macrosStore.modalProps.variant !== "newPart" && (
 				<Modal.Footer className="position-relative">
 					<Button
 						variant="secondary"
@@ -78,6 +92,7 @@ const modalGeneric = observer(() => {
 						{macrosStore.modalProps.confirmText  ? t(macrosStore.modalProps.confirmText) : "Confirm"}
 					</Button>
 				</Modal.Footer>
+				)}
  			</Modal>
 		</>
 	);
