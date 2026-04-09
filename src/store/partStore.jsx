@@ -7,6 +7,7 @@ import Util from "./../scripts/util";
 import CONSTANTS from "./constants";
 import log from "../scripts/log";
 import jointStore from "./jointStore";
+import svgStore from "./svgStore";
 
 const DEFAULT_DB_PARTS_QUERY = Object.freeze({
 	limit: 50,
@@ -35,6 +36,9 @@ class PartStore {
 	dbMaterialsLoading = false;
 	dbMaterialsError = null;
 	selectedPartUuid = "";
+
+	/** Сохранить в jdb/parts при выходе из редактора (новая деталь или из библиотеки). */
+	savePartToDbOnExit = false;
 
 	partInEdit = false;
 	tooltips = false;
@@ -756,6 +760,46 @@ class PartStore {
 	}
 
 	/**
+	 * Новая деталь из модалки: пустой контур, имя / толщина / материал с формы.
+	 */
+	applyNewPartDefaultsAndOpenEditor({ name, thickness, material_id }) {
+		const uuid =
+			typeof crypto !== "undefined" && crypto.randomUUID
+				? crypto.randomUUID()
+				: `p-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+		const mid = String(material_id ?? "").trim();
+		const mat = partStore.dbMaterials.find((m) => String(m.id) === mid);
+		const t = Number(String(thickness).replace(",", "."));
+
+		const part = {
+			name: String(name ?? "").trim(),
+			uuid,
+			width: 0,
+			height: 0,
+			x: 0,
+			y: 0,
+			code: [],
+			params: {
+				uuid,
+				pcode: "",
+				id: "",
+			},
+			thickness: t,
+			material_id: Number(mid),
+			material: mat
+				? { label: mat.label, name: mat.name ?? "" }
+				: { label: "", name: "" },
+		};
+
+		runInAction(() => {
+			partStore.setSvgData(part);
+			partStore.setVal("partInEdit", uuid);
+			partStore.setVal("savePartToDbOnExit", true);
+		});
+		jointStore.setData({});
+	}
+
+	/**
 	 * Загружает деталь с бэка и открывает её в partStore для редактора.
 	 * Ожидается GET /jdb/get_part/<uuid> с JSON телом детали (как в part_code: code, width, height, uuid, …)
 	 * или { part: {…} }.
@@ -784,12 +828,73 @@ class PartStore {
 			runInAction(() => {
 				partStore.setSvgData(next);
 				partStore.setVal("partInEdit", next.uuid ?? id);
+				partStore.setVal("savePartToDbOnExit", true);
 			});
 			return true;
 		} catch (e) {
 			console.error("jdb/get_part", e);
 			return false;
 		}
+	}
+
+	/**
+	 * Сохранение детали в БД.
+	 * POST /jdb/save_part — тело JSON по схеме:
+	 * { uuid, name, thickness, material_id, part: { … }, ncp: string }.
+	 */
+	async savePartToDatabase(partObject) {
+		const raw = partObject && typeof partObject === "object" ? partObject : partStore.svgData;
+		const po = toJS(raw);
+		const uuid = po?.uuid ?? partStore.partInEdit;
+		if (!uuid) throw new Error("Нет uuid детали");
+
+		const numOrNull = (v) => {
+			if (v === undefined || v === null || v === "") return null;
+			const n = Number(v);
+			return Number.isFinite(n) ? n : null;
+		};
+		const intOrNull = (v) => {
+			if (v === undefined || v === null || v === "") return null;
+			const n = parseInt(String(v), 10);
+			return Number.isFinite(n) ? n : null;
+		};
+
+		const ncpLines = svgStore.generateStandalonePartNcp(po, 1);
+		const ncp = Array.isArray(ncpLines) ? ncpLines.flat().join("\n") : String(ncpLines ?? "");
+
+		const name = String(po.name ?? "").trim();
+		const thickness = numOrNull(po.thickness);
+		const material_id = intOrNull(po.material_id);
+
+		let partPayload;
+		try {
+			partPayload = JSON.parse(JSON.stringify(po));
+		} catch {
+			partPayload = { ...po };
+		}
+		partPayload.uuid = String(uuid);
+		partPayload.name = name;
+		partPayload.thickness = thickness;
+		partPayload.material_id = material_id;
+
+		const body = {
+			uuid: String(uuid),
+			name,
+			thickness,
+			material_id,
+			part: partPayload,
+			ncp,
+		};
+
+		const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/save_part`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body),
+		});
+		const data = await resp.json().catch(() => ({}));
+		if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+		await partStore.loadDbParts();
+		return data;
 	}
 
 	async deletePart(uuid) {
@@ -826,6 +931,7 @@ class PartStore {
 			dbMaterialsLoading: false,
 			dbMaterialsError: null,
 			selectedPartUuid: "",
+			savePartToDbOnExit: false,
 			// 
 			partInEdit: false,
 			tooltips: false,
@@ -860,12 +966,27 @@ class PartStore {
 	}
 
 	setToDefault() {
-		log.clearBase()
-		this.clearSvgData()	
-		const defaults = this.getDefaultState()	
-		Object.assign(this, defaults)
-		this.printStore()
-		jointStore.setData({})
+		log.clearBase();
+		this.clearSvgData();
+		const defaults = this.getDefaultState();
+		/** Каталог деталей / материалов — не затирать: иначе после save + loadDbParts список обнуляется. */
+		const preserveKeys = [
+			"dbParts",
+			"dbPartsLoading",
+			"dbPartsError",
+			"dbPartsQuery",
+			"dbMaterials",
+			"dbMaterialsLoading",
+			"dbMaterialsError",
+		];
+		const preserved = {};
+		for (const k of preserveKeys) {
+			if (k in this) preserved[k] = this[k];
+		}
+		Object.assign(this, defaults);
+		Object.assign(this, preserved);
+		this.printStore();
+		jointStore.setData({});
 	}
 	
 }

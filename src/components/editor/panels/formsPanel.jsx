@@ -341,6 +341,7 @@ const FormsPanel = observer(() => {
 		laserStore.setVal("centralBarMode", "partEditor")
 		partStore.setSvgData(JSON.parse(JSON.stringify(a)));
 		partStore.setVal( "partInEdit", a.uuid )
+		partStore.setVal("savePartToDbOnExit", false);
 		partStore.printStore()
 
 	}

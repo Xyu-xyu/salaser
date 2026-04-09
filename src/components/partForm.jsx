@@ -4,7 +4,6 @@ import { useRef } from "react";
 import constants from "../store/constants";
 import CustomIcon from "../icons/customIcon";
 import macrosStore from "../store/macrosStore";
-import jointStore from "../store/jointStore";
 import laserStore from "../store/laserStore";
 import partStore from "../store/partStore";
 
@@ -63,11 +62,17 @@ const PartForm = observer(() => {
 	const { t } = useTranslation();
 	const fileInputRef = useRef(null);
 
-	const openNewPartEditor = () => {
-		partStore.clearSvgData();
-		partStore.setVal("partInEdit", false);
-		jointStore.setData({});
-		laserStore.setVal("centralBarMode", "partEditor");
+	const openNewPartModal = () => {
+		partStore.loadDbMaterials();
+		macrosStore.setModalProps({
+			show: true,
+			variant: "newPart",
+			modalBody: "New part dialog",
+			cancelText: "Cancel",
+			confirmText: "Submit",
+			func: () => {},
+			args: [],
+		});
 	};
 
 	const openEditPartEditor = async () => {
@@ -107,7 +112,7 @@ const PartForm = observer(() => {
 			</div>
 
 			<div>
-				<button type="button" className="w-100" onClick={openNewPartEditor}>
+				<button type="button" className="w-100" onClick={openNewPartModal}>
 					<div className="d-flex align-items-center">
 						<CustomIcon
 							icon="gridicons:add"

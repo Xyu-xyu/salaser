@@ -7,12 +7,13 @@ import { useTranslation } from 'react-i18next';
 import partStore from "../../store/partStore";
 import svgStore from "../../store/svgStore";
 import jointStore from "../../store/jointStore";
+import { showToast } from "../toast";
 
 const ExitButton = observer(() => {
 
 	const [show, setShow] = useState(false);
 	const { t } = useTranslation()
-	const { svgData, partInEdit } = partStore
+	const { svgData, partInEdit, savePartToDbOnExit } = partStore
 	const showModal = () => {
 		setShow(true);
 	};
@@ -23,33 +24,51 @@ const ExitButton = observer(() => {
 		partStore.setToDefault()
 	};
 
-	const handleSubmit = () => {
-		setShow(false)
-		laserStore.setVal("centralBarMode", "planEditor")
-	
-	
-		// 1) получаем joints из jointStore
-		let box  = svgStore.findBox (svgData.code)
+	const handleSubmit = async () => {
+		setShow(false);
+
+		let box = svgStore.findBox(svgData.code);
 		const currentPart = jointStore.exportForCurrentPart();
-		currentPart.width = box.width
-		currentPart.height = box.height
-		currentPart.x = box.x
-		currentPart.y = box.y
-		
-		// обновляем в partStore
-		partStore.setSvgData(currentPart)
-	
-		// 2) формируем объект для svgStore:
+		currentPart.width = box.width;
+		currentPart.height = box.height;
+		currentPart.x = box.x;
+		currentPart.y = box.y;
+
+		partStore.setSvgData(currentPart);
+
 		const updatedPart = {
-			...currentPart
+			...currentPart,
 		};
-	
-		// 3) сохраняем в svgStore
-		svgStore.updateForm(partInEdit, updatedPart);
-	
-		// 4) сбрасываем состояние редактора
-		partStore.setToDefault()			
-	}
+
+		try {
+			const savedUuid = String(updatedPart?.uuid ?? partStore.partInEdit ?? "");
+			if (savePartToDbOnExit) {
+				await partStore.savePartToDatabase(updatedPart);
+				showToast({
+					type: "success",
+					message: "Part saved to database",
+					//theme: "dark", colored!!
+				});
+				// Экран «Детали» (midBar + rightBar), список обновлён в savePartToDatabase → loadDbParts
+				laserStore.setVal("rightMode", "part");
+				laserStore.setVal("leftMode", "part");
+				laserStore.setVal("centralBarMode", "plans");
+				partStore.setToDefault();
+				if (savedUuid) partStore.selectPart(savedUuid);
+			} else {
+				svgStore.updateForm(partInEdit, updatedPart);
+				laserStore.setVal("centralBarMode", "planEditor");
+				partStore.setToDefault();
+			}
+		} catch (e) {
+			console.error(e);
+			showToast({
+				type: "error",
+				message: "Part save failed",
+				theme: "dark",
+			});
+		}
+	};
 
 	const modalProps = {
 		modalBody: 'Do you want to save changes ?',

@@ -1341,6 +1341,42 @@ class SvgStore {
 		}
 	};
 
+	escapeNcpAttr(val) {
+		return String(val ?? "").replace(/"/g, "'");
+	}
+
+	/**
+	 * Фрагмент NCP для одной детали (как в generateParts): Part, MaterialInfo из модалки/объекта, G-код контуров.
+	 */
+	generateStandalonePartNcp(part, progNum = 1) {
+		const encName = this.escapeNcpAttr(part?.name ?? "part");
+		const res = [];
+		let lineNumber = 4;
+		res.push(`(<Part PartCode="${encName}" Debit="1">)`);
+
+		const mat = part?.material && typeof part.material === "object" ? part.material : {};
+		const matLabel = this.escapeNcpAttr(mat.label ?? "");
+		const matCode = this.escapeNcpAttr(mat.name ?? "");
+		const th = part?.thickness;
+		const hasMat =
+			matLabel !== "" ||
+			matCode !== "" ||
+			(th !== undefined && th !== null && String(th).trim() !== "");
+		if (hasMat) {
+			res.push(
+				`(<MaterialInfo Label="${matLabel}" MaterialCode="${matCode}" Thickness="${th ?? ""}" FormatType="Part" DimX="${part?.width ?? 0}" DimY="${part?.height ?? 0}"/>)`
+			);
+		}
+
+		const contours = this.generateSinglePart(part?.code || [], progNum);
+		res.push(contours);
+		lineNumber += contours.length;
+		res.push(`N${lineNumber}G98`);
+		lineNumber++;
+		res.push("(</Part>)");
+		return res;
+	}
+
 	updateForm(uuid, newPartCodeObject) {
 		//console.log( arguments );
 		if (!this.svgData || !Array.isArray(this.svgData.part_code)) {
@@ -1378,15 +1414,32 @@ class SvgStore {
 				width: part.width,
 				height: part.height,
 				code: part.code,
+				thickness: part.thickness,
+				material: part.material,
+				material_id: part.material_id,
  			});
 		}
 		let progNum = 1
 
 		for (const [partCodeId, partInfo ] of uniqueParts) {
-			const { name, code } = partInfo;
+			const { name, code, thickness, material, width, height } = partInfo;
 			const instancesCount = data.positions.filter(p => p.part_code_id === partCodeId).length;
-			res.push(`(<Part PartCode="${name}" Debit="${instancesCount}">)`);
-			//res.push(`ПРОГРАММА №` + progNum);
+			const encName = this.escapeNcpAttr(name);
+			res.push(`(<Part PartCode="${encName}" Debit="${instancesCount}">)`);
+
+			const mat = material && typeof material === "object" ? material : {};
+			const matLabel = this.escapeNcpAttr(mat.label ?? "");
+			const matCode = this.escapeNcpAttr(mat.name ?? "");
+			const hasMat =
+				matLabel !== "" ||
+				matCode !== "" ||
+				(thickness !== undefined && thickness !== null && String(thickness).trim() !== "");
+			if (hasMat) {
+				const th = thickness ?? "";
+				res.push(
+					`(<MaterialInfo Label="${matLabel}" MaterialCode="${matCode}" Thickness="${th}" FormatType="Part" DimX="${width ?? 0}" DimY="${height ?? 0}"/>)`
+				);
+			}
 
 			const contours = this.generateSinglePart(code, progNum)
 			res.push(contours);
