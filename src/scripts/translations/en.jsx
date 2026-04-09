@@ -573,6 +573,8 @@ const en = {
     "Contour transform": "Contour transform",
     "Align Angle Round": "Align Angle Round",
     "Filter": "Filter",
-    "All materials": "All materials"
+    "All materials": "All materials",
+    "Деталь обновлена в базе": "Деталь обновлена в базе",
+    "Сохранена новая копия детали": "Сохранена новая копия детали"
 }
 export default en;

@@ -530,6 +530,8 @@ const zh = {
     "Align Angle Round": "将角对齐圆",
     "Align angle round": "将角对齐圆",
     "Filter": "筛选",
-    "All materials": "所有材料"
+    "All materials": "所有材料",
+    "Деталь обновлена в базе": "Деталь обновлена в базе",
+    "Сохранена новая копия детали": "Сохранена новая копия детали"
 }
 export default zh;

@@ -113,7 +113,6 @@ const ExitButton = observer(() => {
 			showToast({
 				type: "error",
 				message: t("Part save failed"),
-				theme: "dark",
 			});
 		}
 	};

@@ -904,6 +904,23 @@ class PartStore {
 		}
 	}
 
+	/** UTF-8 строка → Base64 (для /jdb/update_part поле ncp, как в add_part). */
+	_stringToBase64Utf8(text) {
+		const s = String(text ?? "");
+		const bytes = new TextEncoder().encode(s);
+		let binary = "";
+		for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+		return btoa(binary);
+	}
+
+	/**
+	 * Бэк /jdb/update_part: декодированный NCP проверяется как ASCII-only.
+	 * Таб/перевод строки и печатные US-ASCII оставляем, остальное → «?».
+	 */
+	_ncpPlainTextToAscii(ncpPlain) {
+		return String(ncpPlain ?? "").replace(/[^\t\n\r\x20-\x7E]/g, "?");
+	}
+
 	preparePartPersistencePayload(partObject) {
 		const raw = partObject && typeof partObject === "object" ? partObject : partStore.svgData;
 		const po = toJS(raw);
@@ -951,6 +968,66 @@ class PartStore {
 	}
 
 	/**
+	 * Тело для POST /jdb/update_part (контракт бэка, не как save_part):
+	 * — uuid или id: хотя бы одно, чтобы найти запись;
+	 * — ncp: Base64; после decode на бэке текст NCP должен быть ASCII (не-ASCII в файле заменяем на «?»);
+	 * — опционально svg / img: Base64 превью;
+	 * — param + value: одна колонка за раз; вместе с ncp обрабатывается после NCP.
+	 * Имя каталога — отдельным запросом (см. updatePartOnServer): иначе Python
+	 * base64.b64decode() на бэке может получить не-ASCII из поля value в том же JSON.
+	 */
+	prepareUpdatePartNcpPayload(partObject) {
+		const raw = partObject && typeof partObject === "object" ? partObject : partStore.svgData;
+		const po = toJS(raw);
+		const uuid = po?.uuid ?? partStore.partInEdit;
+		if (!uuid) throw new Error("Нет uuid детали");
+
+		const ncpLines = svgStore.generateStandalonePartNcp(po, 1);
+		const ncpPlain = Array.isArray(ncpLines) ? ncpLines.flat().join("\n") : String(ncpLines ?? "");
+		const ncpAscii = this._ncpPlainTextToAscii(ncpPlain);
+		// После ASCII-only достаточно btoa; строка Base64 — только символы ASCII (требование Python b64decode(str)).
+		let ncp = btoa(ncpAscii).replace(/\s+/g, "");
+		for (let i = 0; i < ncp.length; i++) {
+			if (ncp.charCodeAt(i) > 127) {
+				throw new Error("NCP Base64 содержит не-ASCII");
+			}
+		}
+
+		const body = {
+			uuid: String(uuid),
+			ncp,
+		};
+
+		const rowId = partStore.dbParts.find((p) => String(p?.uuid) === String(uuid))?.id;
+		if (rowId != null && rowId !== "" && Number.isFinite(Number(rowId))) {
+			body.id = Number(rowId);
+		}
+
+		return { body };
+	}
+
+	prepareUpdatePartNamePayload(partObject) {
+		const raw = partObject && typeof partObject === "object" ? partObject : partStore.svgData;
+		const po = toJS(raw);
+		const uuid = po?.uuid ?? partStore.partInEdit;
+		if (!uuid) throw new Error("Нет uuid детали");
+		const name = String(po.name ?? "").trim();
+
+		const body = {
+			uuid: String(uuid),
+			param: "name",
+			value: name,
+		};
+
+		const rowId = partStore.dbParts.find((p) => String(p?.uuid) === String(uuid))?.id;
+		if (rowId != null && rowId !== "" && Number.isFinite(Number(rowId))) {
+			body.id = Number(rowId);
+		}
+
+		return { body };
+	}
+
+	/**
 	 * Сохранение детали в БД.
 	 * POST /jdb/save_part — тело JSON по схеме:
 	 * { uuid, name, thickness, material_id, part: { … }, ncp: string }.
@@ -970,21 +1047,44 @@ class PartStore {
 	}
 
 	/**
-	 * Обновление существующей детали (превью, NCP, запись в БД).
-	 * POST /jdb/update_part — то же тело, что и save_part.
+	 * Обновление существующей детали: POST /jdb/update_part
+	 * (ncp как Base64; имя — второй POST с param/value, без ncp в том же теле).
 	 */
 	async updatePartOnServer(partObject) {
-		const { body } = partStore.preparePartPersistencePayload(partObject);
+		const ncpBody = partStore.prepareUpdatePartNcpPayload(partObject);
+		const nameBody = partStore.prepareUpdatePartNamePayload(partObject);
 
-		const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/update_part`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(body),
-		});
-		const data = await resp.json().catch(() => ({}));
-		if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+		const post = async (body) => {
+			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/update_part`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(body),
+			});
+			const data = await resp.json().catch(() => ({}));
+			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+			return data;
+		};
+
+		const dataNcp = await post(ncpBody.body);
+		let dataName = null;
+		const rawForName =
+			partObject && typeof partObject === "object" ? partObject : partStore.svgData;
+		const name = String(toJS(rawForName)?.name ?? "").trim();
+		const nameIsAsciiOnly = /^[\t\n\r\x20-\x7E]*$/.test(name);
+		if (nameIsAsciiOnly) {
+			try {
+				dataName = await post(nameBody.body);
+			} catch (e) {
+				console.warn("update_part name param failed after ncp ok", e);
+				throw e;
+			}
+		} else {
+			console.warn(
+				"update_part: пропуск param name (не ASCII): бэк может вызывать b64decode для value; имя остаётся из NCP/БД"
+			);
+		}
 		await partStore.loadDbParts();
-		return data;
+		return { ncp: dataNcp, name: dataName };
 	}
 
 	async deletePart(uuid) {
