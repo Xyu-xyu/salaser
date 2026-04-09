@@ -7,6 +7,7 @@ import macrosStore from "../store/macrosStore";
 import laserStore from "../store/laserStore";
 import partStore from "../store/partStore";
 import { showToast } from "./toast";
+import { DetailsPartButton } from "./detailsPartButton";
 
 function fileToBase64(file) {
 	return new Promise((resolve, reject) => {
@@ -173,21 +174,7 @@ const PartForm = observer(() => {
 			</div>
 
 			<div>
-				<button type="button" className="w-100" onMouseDown={() => { }}>
-					<div className="d-flex align-items-center">
-						<CustomIcon
-							icon="fa-regular:copy"
-							width="24"
-							height="24"
-							viewBox="0 0 448 512"
-							color="black"
-							fill="black"
-							strokeWidth={0}
-							className="ms-1"
-						/>
-						<div className="flex-grow-1 text-center">{t("Clone")}</div>
-					</div>
-				</button>
+				<DetailsPartButton />
 			</div>
 			<div>
 				<button
