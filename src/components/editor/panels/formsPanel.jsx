@@ -342,6 +342,8 @@ const FormsPanel = observer(() => {
 		partStore.setSvgData(JSON.parse(JSON.stringify(a)));
 		partStore.setVal( "partInEdit", a.uuid )
 		partStore.setVal("savePartToDbOnExit", false);
+		partStore.setVal("partEditorExitMode", "sheet");
+		partStore.setVal("editingDbPartUuid", "");
 		partStore.printStore()
 
 	}

@@ -6,8 +6,7 @@ import Part from "./../scripts/part";
 import Util from "./../scripts/util";
 import CONSTANTS from "./constants";
 import log from "../scripts/log";
-import jointStore from "./jointStore";
-import svgStore from "./svgStore";
+import jointStore from "./jointStore";import svgStore from "./svgStore";
 
 const DEFAULT_DB_PARTS_QUERY = Object.freeze({
 	limit: 50,
@@ -39,6 +38,14 @@ class PartStore {
 
 	/** Сохранить в jdb/parts при выходе из редактора (новая деталь или из библиотеки). */
 	savePartToDbOnExit = false;
+
+	/**
+	 * Режим редактора детали для диалога выхода: idle | sheet (с листа) | db_new | db_existing.
+	 */
+	partEditorExitMode = "idle";
+
+	/** UUID детали в каталоге при редактировании существующей записи (для «Отмена» и update). */
+	editingDbPartUuid = "";
 
 	partInEdit = false;
 	tooltips = false;
@@ -795,54 +802,109 @@ class PartStore {
 			partStore.setSvgData(part);
 			partStore.setVal("partInEdit", uuid);
 			partStore.setVal("savePartToDbOnExit", true);
+			partStore.setVal("partEditorExitMode", "db_new");
+			partStore.setVal("editingDbPartUuid", "");
 		});
 		jointStore.setData({});
 	}
 
+	_mergeDbMetaIntoPartModel(next, dbRow, catalogUuid) {
+		const id = String(catalogUuid ?? "").trim();
+		if (!next || typeof next !== "object") return null;
+		const row = dbRow && typeof dbRow === "object" ? dbRow : {};
+		const matId =
+			row.material_id != null && row.material_id !== ""
+				? Number(row.material_id)
+				: next.material_id != null
+					? Number(next.material_id)
+					: null;
+
+		let material = next.material;
+		if (!material || typeof material !== "object") material = { label: "", name: "" };
+		const rowLabel = row.material_label ?? row.material?.label ?? row.material_name;
+		const rowName = row.material_name ?? row.material?.name;
+		if (rowLabel != null && String(rowLabel).trim() !== "")
+			material = { ...material, label: String(rowLabel) };
+		if (rowName != null && String(rowName).trim() !== "")
+			material = { ...material, name: String(rowName) };
+
+		const nameFromRow = row.name != null ? String(row.name).trim() : "";
+		const merged = {
+			...next,
+			uuid: id,
+			name: nameFromRow || String(next.name ?? "").trim() || String(next.params?.pcode ?? "").trim(),
+			thickness:
+				row.thickness != null && row.thickness !== ""
+					? Number(String(row.thickness).replace(",", "."))
+					: next.thickness,
+			material_id: Number.isFinite(matId) ? matId : next.material_id,
+			material,
+		};
+		if (!Array.isArray(merged.code)) merged.code = [];
+		merged.params =
+			typeof merged.params === "object" && merged.params !== null ? { ...merged.params } : {};
+		merged.params.uuid = id;
+		return merged;
+	}
+
 	/**
-	 * Загружает деталь с бэка и открывает её в partStore для редактора.
-	 * Ожидается GET /jdb/get_part/<uuid> с JSON телом детали (как в part_code: code, width, height, uuid, …)
-	 * или { part: {…} }.
+	 * Загружает NCP детали из каталога (parts DB), парсит и открывает в редакторе.
+	 * Не путать с POST /jdb/get_ncp (job / план на листе) — здесь только деталь из библиотеки.
+	 *
+	 * Бэкенд: POST /jdb/get_ncp_part
+	 * Запрос (JSON):
+	 *   { "uuid": "<uuid детали в каталоге>" }
+	 * Успех 200, JSON-тело (достаточно одного из полей текста):
+	 *   {
+	 *     "content": "<строка: полный текст NCP, строки через \\n>",
+	 *     // или синоним:
+	 *     "ncp": "<то же>"
+	 *   }
+	 * Ошибка: статус 4xx/5xx, при возможности { "error": "<текст для пользователя>" }.
+	 *
 	 * @returns {Promise<boolean>}
 	 */
 	async loadPartIntoEditor(uuid) {
 		const id = String(uuid ?? "").trim();
 		if (!id) return false;
 		try {
-			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/get_part/${encodeURIComponent(id)}`, {
-				method: "GET",
+			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/get_ncp_part`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ uuid: id }),
 			});
 			const data = await resp.json().catch(() => ({}));
 			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
 
-			let raw = data?.part ?? data?.svg_data ?? data;
-			if (!raw || typeof raw !== "object") {
-				throw new Error("Пустой ответ get_part");
+			const ncpText = data?.content ?? data?.ncp ?? "";
+			if (typeof ncpText !== "string" || !ncpText.trim()) {
+				throw new Error("Пустой NCP в ответе get_ncp_part");
 			}
-			const next = JSON.parse(JSON.stringify(raw));
-			if (!Array.isArray(next.code)) next.code = [];
-			next.params = typeof next.params === "object" && next.params !== null ? next.params : {};
-			if (!next.params.uuid) next.params.uuid = next.uuid ?? id;
-			if (!next.uuid) next.uuid = id;
+
+			const first = svgStore.firstPartModelFromNcp(ncpText);
+			if (!first || typeof first !== "object") {
+				throw new Error("Не удалось разобрать NCP детали");
+			}
+
+			const row = partStore.dbParts.find((p) => String(p?.uuid) === id);
 
 			runInAction(() => {
-				partStore.setSvgData(next);
-				partStore.setVal("partInEdit", next.uuid ?? id);
-				partStore.setVal("savePartToDbOnExit", true);
+				const merged = partStore._mergeDbMetaIntoPartModel(first, row, id);
+				partStore.setSvgData(merged);
+				partStore.setVal("partInEdit", id);
+				partStore.setVal("savePartToDbOnExit", false);
+				partStore.setVal("partEditorExitMode", "db_existing");
+				partStore.setVal("editingDbPartUuid", id);
 			});
+			jointStore.setData({});
 			return true;
 		} catch (e) {
-			console.error("jdb/get_part", e);
+			console.error("loadPartIntoEditor get_ncp_part", e);
 			return false;
 		}
 	}
 
-	/**
-	 * Сохранение детали в БД.
-	 * POST /jdb/save_part — тело JSON по схеме:
-	 * { uuid, name, thickness, material_id, part: { … }, ncp: string }.
-	 */
-	async savePartToDatabase(partObject) {
+	preparePartPersistencePayload(partObject) {
 		const raw = partObject && typeof partObject === "object" ? partObject : partStore.svgData;
 		const po = toJS(raw);
 		const uuid = po?.uuid ?? partStore.partInEdit;
@@ -885,8 +947,36 @@ class PartStore {
 			part: partPayload,
 			ncp,
 		};
+		return { body };
+	}
+
+	/**
+	 * Сохранение детали в БД.
+	 * POST /jdb/save_part — тело JSON по схеме:
+	 * { uuid, name, thickness, material_id, part: { … }, ncp: string }.
+	 */
+	async savePartToDatabase(partObject) {
+		const { body } = partStore.preparePartPersistencePayload(partObject);
 
 		const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/save_part`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body),
+		});
+		const data = await resp.json().catch(() => ({}));
+		if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+		await partStore.loadDbParts();
+		return data;
+	}
+
+	/**
+	 * Обновление существующей детали (превью, NCP, запись в БД).
+	 * POST /jdb/update_part — то же тело, что и save_part.
+	 */
+	async updatePartOnServer(partObject) {
+		const { body } = partStore.preparePartPersistencePayload(partObject);
+
+		const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/update_part`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(body),
@@ -932,6 +1022,8 @@ class PartStore {
 			dbMaterialsError: null,
 			selectedPartUuid: "",
 			savePartToDbOnExit: false,
+			partEditorExitMode: "idle",
+			editingDbPartUuid: "",
 			// 
 			partInEdit: false,
 			tooltips: false,

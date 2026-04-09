@@ -2170,19 +2170,45 @@ class Utils {
     }
 
 	fakeBox (paths) {
-        var fakePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        fakePath.setAttribute("d", paths);
-        fakePath.setAttribute("id", 'fakePath');
-		var svg = document.getElementById("svg")
-        svg.appendChild(fakePath);
-        let stringBox =  document.querySelector('#fakePath').getBBox();
-        stringBox.x2 = stringBox.x + stringBox.width
-        stringBox.y2 = stringBox.y + stringBox.height
-        stringBox.сy = stringBox.y + stringBox.height*0.5
-        stringBox.сx = stringBox.x + stringBox.width*0.5
-		document.querySelector('#fakePath').remove()
-        return stringBox
-    }
+		if (paths == null || paths === "") {
+			return null;
+		}
+		const d = String(paths);
+		const fakePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		fakePath.setAttribute("d", d);
+
+		let svg = document.getElementById("svg");
+		let ephemeralSvg = false;
+		if (!svg) {
+			// Редактор детали: панели (cutPanel и т.д.) иногда первыми читают DOM до commit <svg id="svg">.
+			svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+			svg.setAttribute("width", "0");
+			svg.setAttribute("height", "0");
+			svg.setAttribute("aria-hidden", "true");
+			svg.style.cssText =
+				"position:absolute;left:-99999px;top:0;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none;";
+			document.body.appendChild(svg);
+			ephemeralSvg = true;
+		}
+
+		try {
+			svg.appendChild(fakePath);
+			const stringBox = fakePath.getBBox();
+			stringBox.x2 = stringBox.x + stringBox.width;
+			stringBox.y2 = stringBox.y + stringBox.height;
+			stringBox.сy = stringBox.y + stringBox.height * 0.5;
+			stringBox.сx = stringBox.x + stringBox.width * 0.5;
+			return stringBox;
+		} catch (e) {
+			console.error("fakeBox", e);
+			return null;
+		} finally {
+			fakePath.remove();
+			if (ephemeralSvg) {
+				svg.remove();
+			}
+		}
+	}
 
 		calculatePathPercentageOptimized(cid, x, y, step = 1) {
 		let closestLength = 0;

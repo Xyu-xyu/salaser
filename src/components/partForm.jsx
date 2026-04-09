@@ -6,6 +6,7 @@ import CustomIcon from "../icons/customIcon";
 import macrosStore from "../store/macrosStore";
 import laserStore from "../store/laserStore";
 import partStore from "../store/partStore";
+import { showToast } from "./toast";
 
 function fileToBase64(file) {
 	return new Promise((resolve, reject) => {
@@ -79,7 +80,11 @@ const PartForm = observer(() => {
 		const uuid = partStore.selectedPartUuid;
 		if (!uuid) return;
 		const ok = await partStore.loadPartIntoEditor(uuid);
-		if (ok) laserStore.setVal("centralBarMode", "partEditor");
+		if (!ok) {
+			showToast({ type: "error", message: t("Could not open part for edit")});
+			return;
+		}
+		laserStore.setVal("centralBarMode", "partEditor");
 	};
 
 	const openPartFileDialog = () => {

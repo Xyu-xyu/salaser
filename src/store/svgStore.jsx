@@ -2337,11 +2337,12 @@ class SvgStore {
 		return [xRot, yRot];
 	};
 
-	startToEdit(ncp) {
-		if (!ncp) {
-			ncp = constants.lines
-		}
-		const lines = ncp.trim()
+	/**
+	 * Разбор NCP в структуру плана (без записи в svgStore) — для импорта одной детали в part editor.
+	 */
+	_buildPlanResultFromNcp(ncp) {
+		const lines = String(ncp ?? "")
+			.trim()
 			.split(/\n+/)
 			.map(line => line.trim())
 
@@ -2748,8 +2749,6 @@ class SvgStore {
 			result.positions = result.positions.filter(pos => pos?.part_code_id !== residualPartId);
 		}
 
-		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
-		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		let result1 = this.defineInlets (result)
 		const positionIds = Array.isArray(result1?.positions)
 			? result1.positions.map(pos => pos?.part_id)
@@ -2764,6 +2763,31 @@ class SvgStore {
 				manual: [...positionIds],
 			},
 		};
+
+		return result1;
+	}
+
+	firstPartModelFromNcp(ncpText) {
+		if (ncpText == null || String(ncpText).trim() === "") return null;
+		let result1;
+		try {
+			result1 = this._buildPlanResultFromNcp(ncpText);
+		} catch (e) {
+			console.error("firstPartModelFromNcp", e);
+			return null;
+		}
+		const pc = result1?.part_code;
+		if (!Array.isArray(pc) || pc.length === 0) return null;
+		return JSON.parse(JSON.stringify(pc[0]));
+	}
+
+	startToEdit(ncp) {
+		if (!ncp) {
+			ncp = constants.lines
+		}
+		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
+		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
+		const result1 = this._buildPlanResultFromNcp(ncp);
 
 		svgStore.svgData = Object.assign({}, result1)
 		this.markLaserShowOrderDirty();
