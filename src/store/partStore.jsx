@@ -848,6 +848,33 @@ class PartStore {
 	}
 
 	/**
+	 * Текст NCP детали из каталога (POST /jdb/get_ncp_part).
+	 * @returns {Promise<{ ok: true, ncp: string } | { ok: false, ncp: null, error: string }>}
+	 */
+	async fetchNcpPartContent(uuid) {
+		const id = String(uuid ?? "").trim();
+		if (!id) return { ok: false, ncp: null, error: "empty uuid" };
+		try {
+			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/get_ncp_part`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ uuid: id }),
+			});
+			const data = await resp.json().catch(() => ({}));
+			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+
+			const ncpText = data?.content ?? data?.ncp ?? "";
+			if (typeof ncpText !== "string" || !ncpText.trim()) {
+				throw new Error("Пустой NCP в ответе get_ncp_part");
+			}
+			return { ok: true, ncp: ncpText, error: null };
+		} catch (e) {
+			console.error("fetchNcpPartContent", e);
+			return { ok: false, ncp: null, error: e?.message ?? String(e) };
+		}
+	}
+
+	/**
 	 * Загружает NCP детали из каталога (parts DB), парсит и открывает в редакторе.
 	 * Не путать с POST /jdb/get_ncp (job / план на листе) — здесь только деталь из библиотеки.
 	 *
@@ -868,18 +895,9 @@ class PartStore {
 		const id = String(uuid ?? "").trim();
 		if (!id) return false;
 		try {
-			const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/get_ncp_part`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ uuid: id }),
-			});
-			const data = await resp.json().catch(() => ({}));
-			if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
-
-			const ncpText = data?.content ?? data?.ncp ?? "";
-			if (typeof ncpText !== "string" || !ncpText.trim()) {
-				throw new Error("Пустой NCP в ответе get_ncp_part");
-			}
+			const fetched = await this.fetchNcpPartContent(id);
+			if (!fetched.ok) throw new Error(fetched.error || "get_ncp_part failed");
+			const ncpText = fetched.ncp;
 
 			const first = svgStore.firstPartModelFromNcp(ncpText);
 			if (!first || typeof first !== "object") {

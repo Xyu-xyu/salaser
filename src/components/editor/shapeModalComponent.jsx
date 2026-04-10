@@ -4,19 +4,87 @@ import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { observer } from 'mobx-react-lite';
 import svgStore from './../../store/svgStore';
+import partStore from './../../store/partStore';
 import util from './../../scripts/util';
 import SVGPathCommander from 'svg-path-commander';
 import { useTranslation } from 'react-i18next';
 import CustomIcon from '../../icons/customIcon';
 import constants from '../../store/constants';
 import { addToSheetLog } from './../../scripts/addToSheetLog.jsx';
+import { showToast } from '../toast';
+import DbPartsSortPanel from '../dbPartsSortPanel';
 
 
 const ShapeModalComponent = observer(() => {
 	const { t } = useTranslation();
 	const [show, setShow] = useState(false);
+	const [showImportDb, setShowImportDb] = useState(false);
+	const [importSelectedUuids, setImportSelectedUuids] = useState(() => new Set());
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
+
+	const importFromDb = () => {
+		setShow(false);
+		setShowImportDb(true);
+		partStore.loadDbParts();
+	};
+
+	/** Закрыть обе модалки и вернуться к раскрою (лист). */
+	const closeAllShapeModals = () => {
+		setShowImportDb(false);
+		setImportSelectedUuids(new Set());
+		setShow(false);
+	};
+
+	const toggleImportUuid = (uuid) => {
+		if (uuid == null || uuid === '') return;
+		const k = String(uuid);
+		setImportSelectedUuids((prev) => {
+			const next = new Set(prev);
+			if (next.has(k)) next.delete(k);
+			else next.add(k);
+			return next;
+		});
+	};
+
+	const confirmImportFromDb = async () => {
+		if (!importSelectedUuids.size) {
+			showToast({
+				type: 'warning',
+				message: t('No part selected'),
+				position: 'bottom-right',
+				autoClose: 2500,
+			});
+			closeAllShapeModals();
+			return;
+		}
+		const ids = [...importSelectedUuids];
+		let okCount = 0;
+		for (const u of ids) {
+			const r = await partStore.fetchNcpPartContent(u);
+			if (r.ok && svgStore.appendPlanFromNcp(r.ncp)) okCount += 1;
+		}
+		if (okCount === 0) {
+			showToast({
+				type: 'error',
+				message: t('Import failed'),
+				position: 'bottom-right',
+				autoClose: 3500,
+			});
+			closeAllShapeModals();
+			return;
+		}
+		addToSheetLog(t('Parts imported from DB'));
+		if (okCount < ids.length) {
+			showToast({
+				type: 'warning',
+				message: t('Some parts failed to import'),
+				position: 'bottom-right',
+				autoClose: 3500,
+			});
+		}
+		closeAllShapeModals();
+	};
 	const [selected, setSelected] = useState(0)
 	const [partXPosition, setPartXPosition] = useState(0)
 	const [partYPosition, setPartYPosition] = useState(0)
@@ -159,10 +227,13 @@ const ShapeModalComponent = observer(() => {
 
 		<Modal variant="" show={show} onHide={handleClose}>
 			<Modal.Header closeButton className="custom_modal">
-				<Modal.Title>{t('Add contour from shapes')}</Modal.Title>
+				<Modal.Title>{t('Adding parts')}</Modal.Title>
 			</Modal.Header>
-			<Modal.Body className="custom_modal">
-				<div className="modal-body">
+			<Modal.Body className="custom_modal p-0">
+			
+
+				<div className="modal-body p-0">
+					<div className="shape-modal-section-heading">{t('Add contour from shapes')}</div>
 					<div className="d-flex align-items-center justify-content-center">
 						{
 							shapes.map((shape, i) => (
@@ -311,16 +382,70 @@ const ShapeModalComponent = observer(() => {
 							</tbody>
 						</table>
 					</div>
+
+						<div className="d-flex justify-content-center mt-2">
+							<Button variant="primary"
+								onClick={handleClose}
+								onMouseDown={addContour}>
+								{t('Add contour')}
+							</Button>
+						</div>
+						<div className="shape-modal-section-heading">{t('import from DB')}</div>
+						<div className="d-flex justify-content-center">
+							<Button variant="secondary" className="violet_button" onClick={importFromDb}>
+								{t('import from DB')}
+							</Button>
+						</div>
+
+
+
 				</div>
 			</Modal.Body>
 			<Modal.Footer className="custom_modal">
 				<Button variant="secondary" onClick={handleClose}>
 					{t('Close')}
 				</Button>
-				<Button variant="primary"
-					onClick={handleClose}
-					onMouseDown={addContour}>
-					{t('Add contour')}
+				
+			</Modal.Footer>
+		</Modal>
+
+		<Modal
+			show={showImportDb}
+			onHide={closeAllShapeModals}
+			size="xl"
+			className="with-inner-backdrop"
+			centered
+		>
+			<Modal.Header closeButton className="custom_modal">
+				<Modal.Title>{t('import from DB')}</Modal.Title>
+			</Modal.Header>
+			<Modal.Body
+				className="custom_modal p-0"
+				style={{
+					minHeight: 'min(50vh, 420px)',
+					maxHeight: '75vh',
+					display: 'flex',
+					flexDirection: 'column',
+					overflow: 'hidden',
+				}}
+			>
+				<div
+					className="d-flex flex-column flex-grow-1 px-3 py-2"
+					style={{ minHeight: 0, overflow: 'hidden' }}
+				>
+					<DbPartsSortPanel
+						multiSelect
+						selectedImportUuids={importSelectedUuids}
+						onToggleImportUuid={toggleImportUuid}
+					/>
+				</div>
+			</Modal.Body>
+			<Modal.Footer className="custom_modal">
+				<Button variant="secondary" onClick={closeAllShapeModals}>
+					{t('Cancel')}
+				</Button>
+				<Button variant="secondary" className="violet_button" onClick={confirmImportFromDb}>
+					{t('Import')}
 				</Button>
 			</Modal.Footer>
 		</Modal>

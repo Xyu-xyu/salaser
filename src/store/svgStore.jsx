@@ -376,6 +376,66 @@ class SvgStore {
 		return maxId + 1;
 	}
 
+	_maxExistingPartCodeId() {
+		let max = 0;
+		for (const p of this.svgData.part_code || []) {
+			const a = Number(p?.id);
+			const b = Number(p?.uuid);
+			if (Number.isFinite(a)) max = Math.max(max, a);
+			if (Number.isFinite(b)) max = Math.max(max, b);
+		}
+		return max;
+	}
+
+	/**
+	 * Импорт детали из NCP каталога: только записи в part_code (как библиотека форм).
+	 * Позиции на листе не создаются — в отличие от «контура из фигур», где addForm + addPosition.
+	 */
+	_mergeImportedNcpPartCodesOnly(ncpText) {
+		let imported;
+		try {
+			imported = this._buildPlanResultFromNcp(ncpText);
+		} catch (e) {
+			console.error("_mergeImportedNcpPartCodesOnly", e);
+			return false;
+		}
+		if (!imported?.part_code?.length) return false;
+
+		let maxCodeId = this._maxExistingPartCodeId();
+		const clonedParts = imported.part_code.map((pc) => {
+			maxCodeId += 1;
+			const newId = maxCodeId;
+			const copy = JSON.parse(JSON.stringify(pc));
+			copy.id = newId;
+			copy.uuid = newId;
+			const box = this.findBox(copy.code);
+			copy.width = 0;
+			copy.height = 0;
+			if (box) {
+				copy.width = box.width;
+				copy.height = box.height;
+				copy.x = box.x;
+				copy.y = box.y;
+			}
+			return copy;
+		});
+
+		this.svgData.part_code = [...(this.svgData.part_code || []), ...clonedParts];
+		return true;
+	}
+
+	/** Добавляет только определения part_code из NCP детали БД; positions не меняются. */
+	appendPlanFromNcp(ncpText) {
+		let ok = false;
+		runInAction(() => {
+			ok = this._mergeImportedNcpPartCodesOnly(ncpText);
+			if (ok) {
+				this.recalculateSheetSafety();
+			}
+		});
+		return ok;
+	}
+
 	setMatrix(val) {
 		Object.assign(this.matrix, val)
 	}

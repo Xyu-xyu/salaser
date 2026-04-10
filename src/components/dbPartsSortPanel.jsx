@@ -11,7 +11,12 @@ const inputBase = {
 	maxWidth: "12rem",
 };
 
-const DbPartsSortPanel = observer(() => {
+const DbPartsSortPanel = observer((props = {}) => {
+	const {
+		multiSelect = false,
+		selectedImportUuids = null,
+		onToggleImportUuid = null,
+	} = props;
 	const { t } = useTranslation();
 	const q = partStore.dbPartsQuery;
 
@@ -243,15 +248,31 @@ const DbPartsSortPanel = observer(() => {
 										key={p.uuid ?? p.id}
 										role="button"
 										tabIndex={0}
-										onPointerDown={() => partStore.selectPart(p.uuid)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" || e.key === " ") {
-												e.preventDefault();
+										onPointerDown={() => {
+											if (multiSelect && typeof onToggleImportUuid === "function") {
+												onToggleImportUuid(p.uuid);
+											} else {
 												partStore.selectPart(p.uuid);
 											}
 										}}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												if (multiSelect && typeof onToggleImportUuid === "function") {
+													onToggleImportUuid(p.uuid);
+												} else {
+													partStore.selectPart(p.uuid);
+												}
+											}
+										}}
 										className={`d-flex flex-column align-items-center border rounded p-2 small part_item-class ${
-											p.uuid && p.uuid === partStore.selectedPartUuid ? "selected" : ""
+											multiSelect && selectedImportUuids && p.uuid
+												? selectedImportUuids.has(String(p.uuid))
+													? "selected"
+													: ""
+												: p.uuid && p.uuid === partStore.selectedPartUuid
+													? "selected"
+													: ""
 										}`}
 										style={{
 											width: "9.5rem",

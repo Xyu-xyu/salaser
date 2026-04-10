@@ -88,7 +88,7 @@ export const DetailsPartButton = observer(({ item }) => {
 								<div className="cardfileName mt-2">{resolved.name ?? "—"}</div>
 							</div>
 							{imgSrc ? (
-								<div className="detailsImage d-flex justify-content-center"
+								<div className="detailsPartImage d-flex justify-content-center"
 								style={{
 									transform: "rotate(90deg)",
 									transformOrigin: "center",

@@ -472,6 +472,17 @@ body {
 .violet_button {
   background-color: var(--violet) !important;
   border: 1px solid var(--violet) !important;
+  color: var(--white) !important;
+}
+
+/* Заголовки секций в модалке «Добавление деталей» (контуры / импорт из БД) */
+.shape-modal-section-heading {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  background: var(--grey-nav);
+  border-radius: 6px;
 }
 
 .grey_button {
@@ -2098,11 +2109,11 @@ height: fit-content;}
 }
 
 
-.detailsImage {
+.detailsImage,
+.detailsPartImage {
   height: 700px;
   padding: 8px;
   overflow: hidden;
-
   position: relative;
 }
 
@@ -2119,6 +2130,17 @@ height: fit-content;}
 
   object-fit: contain;
   border: 1px solid grey;
+}
+
+.detailsPartImage img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 750px;     /* = высота контейнера */
+  max-height: 90%;     /* ограничиваем второй стороной */
+  transform: translate(-50%, -50%) rotate(-90deg);
+  transform-origin: center;
+  object-fit: contain;
 }
 
 .currentCut1 {

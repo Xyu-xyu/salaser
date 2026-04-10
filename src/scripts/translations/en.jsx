@@ -581,6 +581,13 @@ const en = {
     "Filter": "Filter",
     "All materials": "All materials",
     "Деталь обновлена в базе": "Деталь обновлена в базе",
-    "Сохранена новая копия детали": "Сохранена новая копия детали"
+    "Сохранена новая копия детали": "Сохранена новая копия детали",
+    "Adding parts": "Adding parts",
+    "import from DB": "import from DB",
+    "Import": "Import",
+    "Parts imported from DB": "Parts imported from DB",
+    "Import failed": "Import failed",
+    "Some parts failed to import": "Some parts failed to import",
+    "Детали импортированы из БД": "Детали импортированы из БД"
 }
 export default en;
