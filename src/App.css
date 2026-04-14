@@ -1322,7 +1322,7 @@ height: fit-content;}
  */
  }
 
- .sgn_main_els g > path.laserOn.cutted.macros0:first-of-type {
+ .sgn_main_els g > path.laserOn.cutted:first-of-type {
   fill: green !important;
   opacity: 0.5; 
 }

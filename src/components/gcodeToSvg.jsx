@@ -13,6 +13,9 @@ import CustomIcon from "../icons/customIcon";
 import jobStore from "../store/jobStore";
 import LaserMarker from "./laserMarker";
 
+const countListingLines = (text) => (
+	String(text ?? "").trim().split(/\n+/).filter(Boolean).length
+);
 
 const GCodeToSvg = observer(() => {
 	const { currentCuttingJobId} = jobStore
@@ -56,6 +59,9 @@ const GCodeToSvg = observer(() => {
 		  .filter(line => line && !line.startsWith(';')) // опционально: фильтр комментариев
 		  .map(parseGcodeLine);
 	}, [listing]);
+
+	const listingLineCount = useMemo(() => countListingLines(listing), [listing]);
+	const cutSegNum = Math.max(0, Math.min(listingLineCount, Number(cutSeg) || 0));
 
 	useEffect(() => {
  		setLabels([])
@@ -207,6 +213,7 @@ const GCodeToSvg = observer(() => {
 
 	const  update = async () => {
 		const controller = new AbortController();
+		laserStore.setVal("listing", "");
 		const timeoutId = setTimeout(() => {
 			controller.abort();
 			//setListing(sampleListing);
@@ -251,8 +258,10 @@ const GCodeToSvg = observer(() => {
 				if (data.includes("404 Page Not Found")) {
 					throw new Error("HTML error page received");
 				} 
-			
-				setListing(utils.extractGcodeLines(data));			})
+				const extracted = utils.extractGcodeLines(data);
+				setListing(extracted);
+				laserStore.setVal("listing", extracted);
+			})
 			.catch(() => {
 				clearTimeout(timeoutId);
 				//setListing(sampleListing);
@@ -511,8 +520,8 @@ const GCodeToSvg = observer(() => {
 		let cmdsReverted = [];
 		let path = [];
    
-		for (let i = 0; i < cutSeg; i++) {
-			const c = cmds[cutSeg - i-1];
+		for (let i = 0; i < cutSegNum; i++) {
+			const c = cmds[cutSegNum - i - 1];
 			const g = c.g;
 			if (typeof g === "number" && (g === 0 || g === 1)) {
 				cmdsReverted.push(c)
@@ -666,10 +675,10 @@ const GCodeToSvg = observer(() => {
 						type="range"
 						className="w-full cursor-pointer accent-orange-500"
 						min={0}
-						max={ listing.trim().split(/\n+/).length }
+						max={Math.max(0, listingLineCount)}
 						step={1}
-						value={cutSeg}
-						onChange={(e)=> laserStore.setVal('cutSeg', e.target.value)}
+						value={cutSegNum}
+						onChange={(e) => laserStore.setVal("cutSeg", Number(e.target.value))}
 					/>
 
 					{/* Поле ввода */}
@@ -677,9 +686,10 @@ const GCodeToSvg = observer(() => {
 						type="number"
 						className="w-full p-2 border rounded-md d-none"
 						min={0}
+						max={listingLineCount}
 						step={1}
-						value={ cutSeg}
-						onChange={(e)=> laserStore.setVal('cutSeg', e.target.value)}
+						value={cutSegNum}
+						onChange={(e) => laserStore.setVal("cutSeg", Number(e.target.value))}
 					/>
  			</div>
 
@@ -762,9 +772,9 @@ const GCodeToSvg = observer(() => {
 												className={
 													className +
 													(
-														n[0] <= cutSeg && cutSeg <= n[1]
+														n[0] <= cutSegNum && cutSegNum <= n[1]
 															? "  "
-															: n[0] < cutSeg
+															: n[0] < cutSegNum
 																? " cutted "
 																: " uncutted "
 													)
