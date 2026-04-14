@@ -19,6 +19,7 @@ const GCodeToSvg = observer(() => {
 	const { loadResult, cutSeg } = laserStore
 	const { isVertical } = macrosStore
 	const containerRef = useRef(null);
+	const rootRef = useRef(null);
  	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
 	const data = JSON.parse(loadResult)
@@ -147,6 +148,62 @@ const GCodeToSvg = observer(() => {
 			}
 		};
 	}, [listing]);
+
+	const LOAD_RESULT_POLL_MS = 10_000;
+
+	useEffect(() => {
+		const el = rootRef.current;
+		if (!el) return;
+
+		const inView = { current: true };
+		const io = new IntersectionObserver(
+			([entry]) => {
+				inView.current = Boolean(entry?.isIntersecting);
+			},
+			{ root: null, threshold: 0 }
+		);
+		io.observe(el);
+
+		let cancelled = false;
+
+		const pollLoadResult = async () => {
+			if (cancelled) return;
+			if (document.visibilityState !== "visible") return;
+			if (!inView.current) return;
+			try {
+				const response = await fetch(
+					`${constants.SERVER_URL}/api/loadresult`
+				);
+				if (!response.ok || cancelled) return;
+				const textData = await response.text();
+				if (cancelled) return;
+				if (textData !== laserStore.loadResult) {
+					laserStore.setVal("loadResult", textData);
+				}
+			} catch {
+				/* тихий поллинг */
+			}
+		};
+
+		const tick = () => {
+			void pollLoadResult();
+		};
+
+		tick();
+		const intervalId = setInterval(tick, LOAD_RESULT_POLL_MS);
+
+		const onVisibility = () => {
+			if (document.visibilityState === "visible") tick();
+		};
+		document.addEventListener("visibilitychange", onVisibility);
+
+		return () => {
+			cancelled = true;
+			clearInterval(intervalId);
+			document.removeEventListener("visibilitychange", onVisibility);
+			io.disconnect();
+		};
+	}, []);
 
 	const  update = async () => {
 		const controller = new AbortController();
@@ -544,6 +601,7 @@ const GCodeToSvg = observer(() => {
 
 	return (
 		<div
+			ref={rootRef}
 			 style={{
 				border: "1px solid var(--grey-progress)",
 				borderRadius: "10px",

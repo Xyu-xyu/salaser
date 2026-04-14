@@ -132,7 +132,7 @@ const MidBar = observer(() => {
 
 						{/* SVG компонент */}
 						<div className={`d-flex w-100 h-100 flex-center align-items-center ${isVertical ? "mt-2 ms-2" : ""}`}>
-							<div className="planMain">
+							<div id="GCodeToSvg" className="planMain">
 								<GCodeToSvg />
 							</div>
 						</div>
@@ -181,7 +181,7 @@ const MidBar = observer(() => {
 						<div>
 							{/* Первый блок (Carousel) */}
 							<div className="d-flex w-100 h-100 flex-center align-items-center justify-content-center">
-								<div className="planMain">
+								<div id="SwiperContainer" className="planMain">
 									<Swiper
 										onSwiper={(swiper) => {
 											swiperRef.current = swiper;
