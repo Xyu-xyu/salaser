@@ -60,7 +60,7 @@ export const DetailsButton = observer(({ item }) => {
 						strokeWidth={.5}
 						className="ms-1"
 					/>
-					<div className="flex-grow-1 text-center">{t("Details")}</div>
+					<div className="flex-grow-1 text-center">{t("Part details")}</div>
 				</div>
 			</button>
 			<Modal

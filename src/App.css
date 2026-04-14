@@ -2122,21 +2122,21 @@ height: fit-content;}
   top: 50%;
   left: 50%;
 /*   min-height: 500px;
- */  max-width: 750px;     /* = высота контейнера */
+ */  max-width: 700px;     /* = высота контейнера */
   max-height: 90%;     /* ограничиваем второй стороной */
 
   transform: translate(-50%, -50%) rotate(-90deg);
   transform-origin: center;
 
   object-fit: contain;
-  border: 1px solid grey;
+  border: 0.7px solid gray; 
 }
 
 .detailsPartImage img {
   position: absolute;
   top: 50%;
   left: 50%;
-  max-width: 750px;     /* = высота контейнера */
+  max-width: 700px;     /* = высота контейнера */
   max-height: 90%;     /* ограничиваем второй стороной */
   transform: translate(-50%, -50%) rotate(-90deg);
   transform-origin: center;

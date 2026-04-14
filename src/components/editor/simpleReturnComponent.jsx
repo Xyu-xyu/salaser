@@ -316,7 +316,15 @@ const PositionInstancesLayer = observer(() => {
 	const overlayItemsById = new Map();
 	const basePositions = [];
 
-	positions.forEach((pos, index) => {
+	const positionsWithIndex = positions.map((pos, index) => ({ pos, index }));
+	const paintOrder = svgStore.isShowDangersEnabled()
+		? positionsWithIndex
+		: [
+			...positionsWithIndex.filter(({ pos: p }) => !p.selected),
+			...positionsWithIndex.filter(({ pos: p }) => p.selected),
+		];
+
+	paintOrder.forEach(({ pos, index }) => {
 		const isActive = activePartId === pos.part_id;
 		const isHovered = hoverPartId === pos.part_id;
 		const itemProps = {
