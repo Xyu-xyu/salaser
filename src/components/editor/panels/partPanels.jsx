@@ -8,7 +8,7 @@ import OutletPanel from './outletPanel.jsx';
 import TecnologyPanel from './tecnologyPanel.jsx';
 import TextPanel from './textPanel.jsx';
 import LogPanel from './logPanel.jsx';
-import PointPanel from './pointPanel .jsx';
+import PointPanel from './pointPanel.jsx';
 import EdgePanel from './edgePanel.jsx';
 import CutPanel from './cutPanel.jsx';
 import ExitButton from '../../navbar/ExitButton.jsx';

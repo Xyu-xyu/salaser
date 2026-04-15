@@ -40,7 +40,7 @@ const PointPanel = observer(() => {
 					strokeWidth={2}
 					className=""					
 				/>
-					<div>{t('Point')}</div>
+					<div>{t('Point')}xxx</div>
 				</>),
 			content: (<div className="d-flex flex-column">
 				<table className="table mb-0">

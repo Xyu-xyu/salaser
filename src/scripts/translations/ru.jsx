@@ -468,6 +468,7 @@ const ru = {
     "Set outlet type Hook for all": "Установить тип выхода Крючок для всех",
     "Set outlet type Tangent for all": "Установить тип выхода Тангенциальный для всех",
     "Contour added": "Контур добавлен",
+    "Point": "Точка",
     "Apply": "Применить",
     "Point position update": "Обновление положения точки",
     "Edge": "Грань",
