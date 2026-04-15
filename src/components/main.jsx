@@ -22,6 +22,7 @@ import Panels from "./editor/panels/panels";
 const Main = observer(() => {
 	const { knobMode, centralBarMode } = laserStore;
 	const { t } = useTranslation()
+	const { laserSettingsUnavailable } = macrosStore
 
 	useEffect(() => {
 		if (!macrosStore.schema) macrosStore.loadCutSettingsSchema()
@@ -55,6 +56,11 @@ const Main = observer(() => {
 								id="sidePanelWrapper"
 								className="h-100 d-flex flex-column justify-content-evenly fade-toggle visible"
 							>
+								{laserSettingsUnavailable && (
+									<div className="alert alert-warning py-2 px-2 mb-2" role="alert">
+										{t("Лазера недоступны")}
+									</div>
+								)}
 								<h5>{t("Макрос")}</h5>
 
 								<div key={0} className="h-125 col-12 vidget">

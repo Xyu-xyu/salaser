@@ -91,6 +91,8 @@ class MacrosStore {
     loading = false;
     error  = null;
 
+    laserSettingsUnavailable = false;
+
     technology = cut_settings.technology
     macrosProperties = cut_settings_schema.properties.technology.properties.macros.items.properties
 
@@ -250,9 +252,22 @@ class MacrosStore {
     }
 
     setCutSettings(data) {
-        this.cut_settings = data;
-        this.technology = data?.technology ?? null;
-      }
+        const hasTechnology = Boolean(data && typeof data === 'object' && data.technology);
+
+        // Always keep a sane cut_settings object around
+        this.cut_settings = (data && typeof data === 'object') ? data : cut_settings;
+
+        if (hasTechnology) {
+            this.technology = data.technology;
+            this.laserSettingsUnavailable = false;
+            return;
+        }
+
+        // If backend returned an incomplete object (or request failed and caller passes null),
+        // do NOT wipe technology to null. Fall back to defaults.
+        this.technology = cut_settings.technology;
+        this.laserSettingsUnavailable = true;
+    }
 
     setModalProps(val) {
         // console.log (JSON.stringify(val))
