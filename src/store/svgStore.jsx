@@ -1412,7 +1412,6 @@ class SvgStore {
 		const encName = this.escapeNcpAttr(part?.name ?? "part");
 		const res = [];
 		let lineNumber = 4;
-		res.push(`(<Part PartCode="${encName}" Debit="1">)`);
 
 		const mat = part?.material && typeof part.material === "object" ? part.material : {};
 		const matLabel = this.escapeNcpAttr(mat.label ?? "");
@@ -1427,14 +1426,15 @@ class SvgStore {
 				`(<MaterialInfo Label="${matLabel}" MaterialCode="${matCode}" Thickness="${th ?? ""}" FormatType="Part" DimX="${part?.width ?? 0}" DimY="${part?.height ?? 0}"/>)`
 			);
 		}
-
+		res.push(`(<Part PartCode="${encName}" Debit="1">)`);
 		const contours = this.generateSinglePart(part?.code || [], progNum);
-		res.push(contours);
+		// generateSinglePart возвращает строки с N0..., включая теги (<Contour>) с N0 префиксом.
+		// Разворачиваем в плоский список, добавляем G98, затем делаем последовательную перенумерацию N-строк.
+		res.push(...contours);
 		lineNumber += contours.length;
 		res.push(`N${lineNumber}G98`);
-		lineNumber++;
 		res.push("(</Part>)");
-		return res;
+		return this.renumberNLines(res, 1);
 	}
 
 	updateForm(uuid, newPartCodeObject) {
@@ -3036,13 +3036,9 @@ class SvgStore {
 
 			const rest = m[1].trim()
 
-			// ❗ не нумеруем теги Contour
-			if (
-				rest === '(<Contour>)' ||
-				rest === '(</Contour>)'
-			) {
-				return rest
-			}
+			// ❗ не нумеруем NCP теги: (<Part ...>), (<MaterialInfo .../>), (<Contour>), (</...>)
+			// Они иногда попадают с префиксом N0 (из generateSinglePart/svgToGcode).
+			if (rest.startsWith("(<") || rest.startsWith("(</")) return rest
 
 			return `N${n++}${m[1]}`
 		})

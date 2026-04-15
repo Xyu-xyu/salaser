@@ -58,9 +58,7 @@ const contourModalComponent = observer(() => {
 	return (
 	<>
 		<Button variant="" onClick={handleShow} className='mt-1 ms-2'>
-			<div
-				className="text-white btn_shapes btn_tool"
-			>
+			
 				<CustomIcon
 					icon="fa-shapes"
 					width="20"
@@ -69,7 +67,6 @@ const contourModalComponent = observer(() => {
 					strokeWidth={0}
 					viewBox='0 0 512 512'
 				/>
-			</div>
 		</Button>
 
 		<Modal variant="" show={show} onHide={handleClose}>
