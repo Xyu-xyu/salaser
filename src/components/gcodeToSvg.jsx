@@ -23,8 +23,11 @@ const GCodeToSvg = observer(() => {
 	const { isVertical } = macrosStore
 	const containerRef = useRef(null);
 	const rootRef = useRef(null);
+	const inViewRef = useRef(true);
  	const panZoomRef = useRef(null);
 	const [listing, setListing] = useState("");
+	const prevLoadResultRef = useRef(loadResult);
+	const pendingListingRefreshRef = useRef(false);
 	const data = JSON.parse(loadResult)
 
 	/* console.log (data)
@@ -161,10 +164,18 @@ const GCodeToSvg = observer(() => {
 		const el = rootRef.current;
 		if (!el) return;
 
-		const inView = { current: true };
 		const io = new IntersectionObserver(
 			([entry]) => {
-				inView.current = Boolean(entry?.isIntersecting);
+				const next = Boolean(entry?.isIntersecting);
+				inViewRef.current = next;
+				if (next && document.visibilityState === "visible" && pendingListingRefreshRef.current) {
+					pendingListingRefreshRef.current = false;
+					const controller = new AbortController();
+					const timeoutId = setTimeout(() => controller.abort(), 2000);
+					fetchListing(controller.signal)
+						.catch(() => {})
+						.finally(() => clearTimeout(timeoutId));
+				}
 			},
 			{ root: null, threshold: 0 }
 		);
@@ -175,7 +186,7 @@ const GCodeToSvg = observer(() => {
 		const pollLoadResult = async () => {
 			if (cancelled) return;
 			if (document.visibilityState !== "visible") return;
-			if (!inView.current) return;
+			if (!inViewRef.current) return;
 			try {
 				const response = await fetch(
 					`${constants.SERVER_URL}/api/loadresult`
@@ -199,7 +210,16 @@ const GCodeToSvg = observer(() => {
 		const intervalId = setInterval(tick, LOAD_RESULT_POLL_MS);
 
 		const onVisibility = () => {
-			if (document.visibilityState === "visible") tick();
+			if (document.visibilityState !== "visible") return;
+			tick();
+			if (inViewRef.current && pendingListingRefreshRef.current) {
+				pendingListingRefreshRef.current = false;
+				const controller = new AbortController();
+				const timeoutId = setTimeout(() => controller.abort(), 2000);
+				fetchListing(controller.signal)
+					.catch(() => {})
+					.finally(() => clearTimeout(timeoutId));
+			}
 		};
 		document.addEventListener("visibilitychange", onVisibility);
 
@@ -211,16 +231,57 @@ const GCodeToSvg = observer(() => {
 		};
 	}, []);
 
+	const fetchListing = async (signal) => {
+		const r = await fetch(`${constants.SERVER_URL}/api/listing`, { signal });
+		const text = await r.text();
+		if (text.includes("404 Page Not Found")) {
+			throw new Error("HTML error page received");
+		}
+		const extracted = utils.extractGcodeLines(text);
+		setListing(extracted);
+		laserStore.setVal("listing", extracted);
+	};
+
+	useEffect(() => {
+		// Когда loadResult обновился (например поллингом), подтягиваем listing,
+		// чтобы SVG соответствовал текущей задаче. Не дергаем /api/loadresult повторно.
+		if (prevLoadResultRef.current === loadResult) return;
+		prevLoadResultRef.current = loadResult;
+
+		if (document.visibilityState !== "visible" || !inViewRef.current) {
+			pendingListingRefreshRef.current = true;
+			return;
+		}
+
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+		(async () => {
+			try {
+				await fetchListing(controller.signal);
+			} catch (e) {
+				if (e?.name !== "AbortError") {
+					// тихо: listing может быть недоступен при старте/переключениях
+				}
+			} finally {
+				clearTimeout(timeoutId);
+			}
+		})();
+
+		return () => {
+			clearTimeout(timeoutId);
+			controller.abort();
+		};
+	}, [loadResult]);
+
 	const  update = async () => {
 		const controller = new AbortController();
-		laserStore.setVal("listing", "");
 		const timeoutId = setTimeout(() => {
 			controller.abort();
 			//setListing(sampleListing);
 		}, 2000);
 
 		try {
-			const controller = new AbortController();		  
 			const response = await fetch( constants.SERVER_URL + "/api/loadresult", {
 			  signal: controller.signal,
 			});
@@ -232,7 +293,7 @@ const GCodeToSvg = observer(() => {
 			const textData = await response.text();
 		  
 			// Сравниваем с текущим состоянием
-			if (textData !== JSON.stringify(loadResult)) {
+			if (textData !== loadResult) {
 			  laserStore.setVal('loadResult', textData);
 			}
 		  } catch (error) {
@@ -249,23 +310,13 @@ const GCodeToSvg = observer(() => {
 			}
 		  }
 
-		fetch( constants.SERVER_URL + "/api/listing", {
-			signal: controller.signal,
-		})
-			.then((r) => r.text())
-			.then((data) => {
-				clearTimeout(timeoutId);
-				if (data.includes("404 Page Not Found")) {
-					throw new Error("HTML error page received");
-				} 
-				const extracted = utils.extractGcodeLines(data);
-				setListing(extracted);
-				laserStore.setVal("listing", extracted);
-			})
-			.catch(() => {
-				clearTimeout(timeoutId);
-				//setListing(sampleListing);
-			});
+		try {
+			await fetchListing(controller.signal);
+		} catch (e) {
+			// noop
+		} finally {
+			clearTimeout(timeoutId);
+		}
 
  		return () => {
 			clearTimeout(timeoutId);
