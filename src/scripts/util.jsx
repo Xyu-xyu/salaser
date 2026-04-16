@@ -1971,42 +1971,93 @@ class Utils {
 	}
 
 	createBoundsList () {
-		let xcoords = new Set()
-		let ycoords = new Set()
-		let angles = new Set([0,45,135,315,30,60,120,150,210,240,270])
+		const xcoords = new Set()
+		const ycoords = new Set()
+		const angles = new Set([0,45,135,315,30,60,120,150,210,240,270])
 		
-		let searchResult = partStore.selectedPointOnEdge
-		let updPath = searchResult.path
-		let commandIndex = searchResult.segIndex
+		const searchResult = partStore.selectedPointOnEdge
+		const currentPath = searchResult?.path
+		const currentSegIndex = Number.isFinite(searchResult?.segIndex) ? searchResult.segIndex : null
+		const currentCid = searchResult?.cid ?? null
 
-		for (let c in updPath){
-			let cx, cy, command=updPath[c];
-			if (+c !== commandIndex){
-				if (command[0] === "M") {
-					cx=command[1]
-					cy=command[2]
-				} else if (command[0] === "L") {
-					cx=command[1]
-					cy=command[2]
+		const addPathBounds = (updPath, excludeIndex = null) => {
+			if (!Array.isArray(updPath) || !updPath.length) return;
+
+			for (let c = 0; c < updPath.length; c += 1) {
+				const command = updPath[c];
+				if (!Array.isArray(command) || !command.length) continue;
+
+				let cx;
+				let cy;
+
+				if (command[0] === "M" || command[0] === "L") {
+					cx = command[1]
+					cy = command[2]
 				} else if (command[0] === "A") {
-					cx=command[6]
-					cy=command[7]
+					cx = command[6]
+					cy = command[7]
 				}
-				xcoords.add(cx)
-				ycoords.add(cy)
+
+				if (excludeIndex === null || c !== excludeIndex) {
+					if (typeof cx === "number") xcoords.add(cx)
+					if (typeof cy === "number") ycoords.add(cy)
+				}
+
+				// Углы нужны только для наклонных направляющих, их считаем по соседней точке (M/L)
+				if (c < updPath.length - 2) {
+					const commandNext = updPath[c + 1];
+					if (Array.isArray(commandNext) && (commandNext[0] === "M" || commandNext[0] === "L")) {
+						const nx = commandNext[1]
+						const ny = commandNext[2]
+						if (typeof cx === "number" && typeof cy === "number" && typeof nx === "number" && typeof ny === "number") {
+							const angle = this.angleBetweenPoints(cx, cy, nx, ny)
+							angles.add(angle)
+						}
+					}
+				}
 			}
-			if ( +c < updPath.length-2 ) {
-				let nx, ny, commandNext=updPath[+c+1];
-				if (commandNext[0] === "M" || commandNext[0] === "L") {
-					nx=commandNext[1]
-					ny=commandNext[2]
-					let angle = this.angleBetweenPoints (cx, cy, nx, ny) 
-					angles.add(angle)
-				}
+		};
+
+		// 1) Точки текущего выбранного контура (исключаем текущую вершину)
+		addPathBounds(currentPath, currentSegIndex)
+
+		// 2) Точки внешнего контура (outer) + углы — чтобы направляющие работали между inner и outer
+		const outer = partStore.getOuterElement?.() || null
+		if (outer && outer.cid !== currentCid) {
+			const outerPathRaw = outer.path
+			if (outerPathRaw) {
+				const outerUpdPath = SVGPathCommander.normalizePath(outerPathRaw)
+				addPathBounds(outerUpdPath, null)
 			}
 		}
-		//console.log ( {x:xcoords,y:ycoords,angles:angles})
-		return {x:xcoords,y:ycoords,angles:angles}
+
+		// 3) Крайние точки bbox (minX/maxX/minY/maxY) для outer + inner контуров
+		// Это помогает получать направляющие по краям даже если рядом нет "вершины" с нужным x/y.
+		const addBBoxExtremes = (pathString) => {
+			if (!pathString) return;
+			const box = this.fakeBox(pathString);
+			if (!box) return;
+
+			const minX = box.x
+			const minY = box.y
+			const maxX = box.x2
+			const maxY = box.y2
+
+			if (typeof minX === "number") xcoords.add(minX)
+			if (typeof maxX === "number") xcoords.add(maxX)
+			if (typeof minY === "number") ycoords.add(minY)
+			if (typeof maxY === "number") ycoords.add(maxY)
+		};
+
+		const contours = partStore.getFiltered?.("contour") || []
+		contours.forEach((contour) => {
+			if (!contour?.class || !contour?.path) return;
+			// берём только "реальные" контуры детали: outer + inner
+			if (!contour.class.includes("outer") && !contour.class.includes("inner")) return;
+			addBBoxExtremes(contour.path)
+		})
+
+		return { x: xcoords, y: ycoords, angles }
 	}
 
 
