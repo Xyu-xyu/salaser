@@ -464,6 +464,15 @@ const zh = {
     "To line": "至行",
     "Save points": "保存积分",
     "Save arc angle": "保存圆弧角度",
+    "Edge: to arc": "边：转弧",
+    "Edge: to arc failed": "边：转弧失败",
+    "Edge: to line": "边：转线",
+    "Edge: toggle large-arc-flag": "边：切换 large-arc-flag",
+    "Edge: toggle large-arc-flag failed": "边：切换 large-arc-flag 失败",
+    "Edge: toggle sweep-flag": "边：切换 sweep-flag",
+    "Edge: toggle sweep-flag failed": "边：切换 sweep-flag 失败",
+    "Edge: apply radius": "边：应用半径",
+    "Edge: apply radius failed": "边：应用半径失败",
     "Length": "长度",
     "To arc": "转弧",
     "Cutting order": "切割顺序",
@@ -546,6 +555,7 @@ const zh = {
     "Parts imported from DB": "已从数据库导入零件",
     "Import failed": "导入失败",
     "Some parts failed to import": "部分零件导入失败",
-    "Детали импортированы из БД": "Детали импортированы из БД"
+    "Детали импортированы из БД": "Детали импортированы из БД",
+    "End": "结尾"
 }
 export default zh;

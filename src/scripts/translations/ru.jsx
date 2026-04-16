@@ -360,7 +360,7 @@ const ru = {
     "Tasks": "Задачи",
     "No selected jobs": "Нет выбранных вакансий",
     "Error in sending preset to laser!": "Ошибка отправки пресета на лазер!",
-    "Start": "Начать",
+    "Start": "Начало",
     "Do you want to start laser cut process ?": "Вы хотите начать процесс лазерной резки?",
     "Open": "Открыть",
     "Do you want to open plan editor?": "Хотите открыть редактор планов?",
@@ -476,6 +476,15 @@ const ru = {
     "Save arc angle": "Сохранить угол дуги",
     "Length": "Длина",
     "Edge transform": "Элемент изменен",
+    "Edge: to arc": "Грань: в дугу",
+    "Edge: to arc failed": "Грань: не удалось в дугу",
+    "Edge: to line": "Грань: в линию",
+    "Edge: toggle large-arc-flag": "Грань: переключить large-arc-flag",
+    "Edge: toggle large-arc-flag failed": "Грань: не удалось переключить large-arc-flag",
+    "Edge: toggle sweep-flag": "Грань: переключить sweep-flag",
+    "Edge: toggle sweep-flag failed": "Грань: не удалось переключить sweep-flag",
+    "Edge: apply radius": "Грань: применить радиус",
+    "Edge: apply radius failed": "Грань: не удалось применить радиус",
     "To line": "В линию",
     "To arc": "В дугу",
     "Engraving": "Гравировка",
@@ -567,6 +576,7 @@ const ru = {
     "Parts imported from DB": "Детали импортированы из БД",
     "Import failed": "Не удалось импортировать",
     "Some parts failed to import": "Часть деталей не импортирована",
-    "Детали импортированы из БД": "Детали импортированы из БД"
+    "Детали импортированы из БД": "Детали импортированы из БД",
+    "End": "Конец"
 }
 export default ru;

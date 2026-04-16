@@ -24,19 +24,48 @@ const EdgePanel = observer(() => {
 	const [LL, setLL] = useState('')
 	const [RX, setRX] = useState('')
 	const [RY, setRY] = useState('')
+	const [startX, setStartX] = useState('')
+	const [startY, setStartY] = useState('')
+	const [endX, setEndX] = useState('')
+	const [endY, setEndY] = useState('')
 
 	useEffect(() => {
-		console.log('useEffedct selectedEdge')
-		console.log(selectedEdge)
-
 		if (!selectedEdge) {
 			setLL('')
 			setRX('')
 			setRY('')
+			setStartX('')
+			setStartY('')
+			setEndX('')
+			setEndY('')
 			return
 		}
 		let normPath = util.normPath(selectedEdgePath)
-		console.log(normPath)
+
+		if (Array.isArray(normPath) && normPath.length >= 2) {
+			const s = normPath[0]
+			const e = normPath[1]
+			const sx = s?.[s.length - 2]
+			const sy = s?.[s.length - 1]
+			const ex = e?.[e.length - 2]
+			const ey = e?.[e.length - 1]
+			if ([sx, sy, ex, ey].every((v) => typeof v === 'number' && Number.isFinite(v))) {
+				setStartX(round(sx))
+				setStartY(round(sy))
+				setEndX(round(ex))
+				setEndY(round(ey))
+			} else {
+				setStartX('')
+				setStartY('')
+				setEndX('')
+				setEndY('')
+			}
+		} else {
+			setStartX('')
+			setStartY('')
+			setEndX('')
+			setEndY('')
+		}
 
 		if (selectedEdgePath.includes('L')) {
 			let dist = util.distance(normPath[0][1], normPath[0][2], normPath[1][1], normPath[1][2])
@@ -50,17 +79,33 @@ const EdgePanel = observer(() => {
 
 	}, [selectedEdge, selectedEdgePath])
 
+	const getEdgeLogMeta = () => {
+		if (!selectedEdge) return null;
+		return {
+			cid: selectedEdge.cid,
+			segment: selectedEdge?.edge?.segIndex,
+			pathType: selectedEdgePath?.includes('A') ? 'A' : (selectedEdgePath?.includes('L') ? 'L' : ''),
+		};
+	};
+
+	const logEdgeAction = (message, meta = {}) => {
+		const baseMeta = getEdgeLogMeta() || {};
+		const merged = { ...baseMeta, ...meta };
+		const metaString = Object.entries(merged)
+			.filter(([, value]) => value !== undefined && value !== null && value !== '')
+			.map(([key, value]) => `${key}=${value}`)
+			.join(' ');
+		addToLog(metaString ? `${message} (${metaString})` : message);
+	};
+
 	const toArc = () => {
 		let cid = selectedEdge.cid;
 		let newPath = partStore.getElementByCidAndClass(cid, 'contour', 'path');
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
-		console.log('segment ' + segment);
-		console.log(updPath);
-
 		if (segment < 1) {
-			console.error("Невозможно преобразовать в дугу: недостаточно точек");
+			logEdgeAction('Edge: to arc failed', { reason: 'insufficient_points' });
 			return;
 		}
 
@@ -83,7 +128,7 @@ const EdgePanel = observer(() => {
 
 		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 });
 		inlet.applyNewPaths(res);
-		addToLog ("Edge transform")
+		logEdgeAction('Edge: to arc', { rx: round(rx), ry: round(ry) });
 	};
 
 
@@ -95,7 +140,7 @@ const EdgePanel = observer(() => {
 		updPath[segment] = ['L', updPath[segment][6], updPath[segment][7]]
 		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 })
 		inlet.applyNewPaths(res)
-		addToLog ("Edge transform")
+		logEdgeAction('Edge: to line')
 	}
 
 	const arcFlag = () => {
@@ -104,21 +149,20 @@ const EdgePanel = observer(() => {
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
-		console.log('segment ' + segment);
-		console.log(updPath);
-
 		if (!updPath[segment] || updPath[segment][0] !== 'A') {
-			console.error("Выбранный сегмент не является дугой");
+			logEdgeAction('Edge: toggle large-arc-flag failed', { reason: 'not_arc' });
 			return;
 		}
 
 		let arcSegment = updPath[segment];
 
 		// Меняем large-arc-flag (4-й параметр, индекс 4) с 0 на 1 и наоборот
+		const prevFlag = arcSegment[4];
 		arcSegment[4] = arcSegment[4] === 0 ? 1 : 0;
 
 		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 });
 		inlet.applyNewPaths(res);
+		logEdgeAction('Edge: toggle large-arc-flag', { from: prevFlag, to: arcSegment[4] });
 	};
 
 	const sweepFlag = () => {
@@ -128,30 +172,35 @@ const EdgePanel = observer(() => {
 		let segment = selectedEdge.edge.segIndex;
 
 		if (!updPath[segment] || updPath[segment][0] !== 'A') {
-			console.error("Выбранный сегмент не является дугой");
+			logEdgeAction('Edge: toggle sweep-flag failed', { reason: 'not_arc' });
 			return;
 		}
 
 		let arcSegment = updPath[segment];
 
 		// Меняем sweep-flag (5-й параметр, индекс 5) с 0 на 1 и наоборот
+		const prevFlag = arcSegment[5];
 		arcSegment[5] = arcSegment[5] === 0 ? 1 : 0;
 
 		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 });
 		inlet.applyNewPaths(res);
+		logEdgeAction('Edge: toggle sweep-flag', { from: prevFlag, to: arcSegment[5] });
 	};
 
 	const applyR = () => {
-		let RX = +inputRX.current.textContent
-		let RY = +inputRX.current.textContent
-		if (typeof RX !== 'number' || typeof RY !== 'number') return;
+		const nextRX = Number(inputRX.current?.textContent);
+		const nextRY = Number(inputRY.current?.textContent);
+		if (!Number.isFinite(nextRX) || !Number.isFinite(nextRY)) {
+			logEdgeAction('Edge: apply radius failed', { reason: 'invalid_radius' });
+			return;
+		}
 		let cid = selectedEdge.cid;
 		let newPath = partStore.getElementByCidAndClass(cid, 'contour', 'path');
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
 		if (!updPath[segment] || updPath[segment][0] !== 'A') {
-			console.error("Выбранный сегмент не является дугой");
+			logEdgeAction('Edge: apply radius failed', { reason: 'not_arc' });
 			return;
 		}
 
@@ -164,16 +213,19 @@ const EdgePanel = observer(() => {
 		let currY = currSegment[currSegment.length - 1];
 
 		let d1 = util.distance(prevX, prevY, currX, currY)*0.5
-		if (d1 > RX && d1 > RY) {
-			console.log("Imp[ossible radius")
+		if (d1 > nextRX && d1 > nextRY) {
+			logEdgeAction('Edge: apply radius failed', { reason: 'radius_too_large', limit: round(d1) });
 			return
 		}
 
-		updPath[segment][1] = RX
-		updPath[segment][2] = RY
+		const prevRX = updPath[segment][1];
+		const prevRY = updPath[segment][2];
+		updPath[segment][1] = nextRX
+		updPath[segment][2] = nextRY
 
 		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 });
 		inlet.applyNewPaths(res);
+		logEdgeAction('Edge: apply radius', { from: `${round(prevRX)}×${round(prevRY)}`, to: `${round(nextRX)}×${round(nextRY)}` });
 
 	}
 
@@ -197,7 +249,7 @@ const EdgePanel = observer(() => {
 					<div className="d-flex flex-column">
 						{selectedEdge && selectedEdgePath.includes('L') && <table className="table mb-0">
 							<tbody>
-								<tr id="edgeParameters">
+								<tr id="lineParameters">
 									<td>
 										<div className="d-flex align-items-center justify-content-center">
 											<div className="d-flex align-items-center justify-content-around">
@@ -220,6 +272,26 @@ const EdgePanel = observer(() => {
 										</div>
 									</td>
 								</tr>
+								<tr id="lineCoordinates">
+									<td className="text-start ps-2">
+										<div className="d-flex align-items-center justify-content-center">
+											<div className="d-flex align-items-center flex-wrap gap-2">
+												<div className="me-2">
+													<span className="me-1">{t('Start')}</span>
+													<span className="panel_info_text">{startX}</span>
+													<span className="mx-1">×</span>
+													<span className="panel_info_text">{startY}</span>
+												</div>
+												<div>
+													<span className="me-1">{t('End')}</span>
+													<span className="panel_info_text">{endX}</span>
+													<span className="mx-1">×</span>
+													<span className="panel_info_text">{endY}</span>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
 							</tbody>
 						</table>}
 
@@ -231,13 +303,12 @@ const EdgePanel = observer(() => {
 											<div className="d-flex align-items-center">
 												<div>rx</div>
 												<div
-													ref={inputRY}
+													ref={inputRX}
 													contentEditable={true}
 													suppressContentEditableWarning={true}
 													className='panel_info_text ms-1 me-1'
 													onInput={(e) => {
-														//setRX(e.target.innerText)
-														setRY(e.target.innerText)
+														setRX(e.target.innerText)
 													}}
 												>
 													{RX}
@@ -256,13 +327,12 @@ const EdgePanel = observer(() => {
 											<div className="d-flex align-items-center">
 												<div className="">ry</div>
 												<div
-													ref={inputRX}
+													ref={inputRY}
 													contentEditable={true}
 													suppressContentEditableWarning={true}
 													className='panel_info_text ms-1 me-1'
 													onInput={(e) => {
-														setRX(e.target.innerText)
-														//setRY(e.target.innerText)
+														setRY(e.target.innerText)
 													}}
 												>
 													{RY}
@@ -274,6 +344,26 @@ const EdgePanel = observer(() => {
 													onMouseDown={applyR}
 												>{t('Apply')}
 												</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr id="edgeCoordinates">
+									<td className="text-start ps-2">
+										<div className="d-flex align-items-center justify-content-center">
+											<div className="d-flex align-items-center flex-wrap gap-2">
+												<div className="me-2">
+													<span className="me-1">{t('Start')}</span>
+													<span className="panel_info_text">{startX}</span>
+													<span className="mx-1">×</span>
+													<span className="panel_info_text">{startY}</span>
+												</div>
+												<div>
+													<span className="me-1">{t('End')}</span>
+													<span className="panel_info_text">{endX}</span>
+													<span className="mx-1">×</span>
+													<span className="panel_info_text">{endY}</span>
+												</div>
 											</div>
 										</div>
 									</td>

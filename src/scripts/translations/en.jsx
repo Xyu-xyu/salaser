@@ -490,6 +490,15 @@ const en = {
     "Save points": "Save points",
     "Save arc angle": "Save arc angle",
     "Edge transform": "Edge transform",
+    "Edge: to arc": "Edge: to arc",
+    "Edge: to arc failed": "Edge: to arc failed",
+    "Edge: to line": "Edge: to line",
+    "Edge: toggle large-arc-flag": "Edge: toggle large-arc-flag",
+    "Edge: toggle large-arc-flag failed": "Edge: toggle large-arc-flag failed",
+    "Edge: toggle sweep-flag": "Edge: toggle sweep-flag",
+    "Edge: toggle sweep-flag failed": "Edge: toggle sweep-flag failed",
+    "Edge: apply radius": "Edge: apply radius",
+    "Edge: apply radius failed": "Edge: apply radius failed",
     "Length": "Length",
     "To arc": "To arc",
     "Cutting order": "Cutting order",
@@ -588,6 +597,7 @@ const en = {
     "Parts imported from DB": "Parts imported from DB",
     "Import failed": "Import failed",
     "Some parts failed to import": "Some parts failed to import",
-    "Детали импортированы из БД": "Детали импортированы из БД"
+    "Детали импортированы из БД": "Детали импортированы из БД",
+    "End": "End"
 }
 export default en;
