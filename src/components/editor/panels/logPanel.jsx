@@ -1,6 +1,6 @@
 import logStore from './../../../store/logStore'; 
 import partStore from "./../../../store/partStore";
-//import jointStore from "../stores/jointStore.js";
+import jointStore from "./../../../store/jointStore";
 import { useEffect  } from 'react';
 import log from './../../../scripts/log.jsx'
 import { useTranslation } from 'react-i18next';

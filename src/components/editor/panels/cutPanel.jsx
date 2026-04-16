@@ -31,8 +31,18 @@ const CutPanel = observer(() => {
 	const [WH, setWH] = useState({ w: 100, h: 100 })
 	const [miniSvg, setMiniSvg] = useState({ sizeX: 50, sizeY: 50 })
 
+	const getOrderSignature = (list = []) => (
+		(Array.isArray(list) ? list : [])
+			.map((item) => String(item?.cid ?? ''))
+			.join('|')
+	);
+
 	const setList =(e) =>{
 		if (e.length && inners.length) {
+			const prevSignature = getOrderSignature(inners);
+			const nextSignature = getOrderSignature(e);
+			// ReactSortable can call setList during init/sync; log only on actual reorder.
+			if (!nextSignature || prevSignature === nextSignature) return;
 			partStore.reorderItems (e, inners)		
 			addToLog("Cut order was changed")
 		}
