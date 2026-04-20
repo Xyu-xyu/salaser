@@ -9,6 +9,8 @@ import svgStore from "../../store/svgStore";
 import jobStore from "../../store/jobStore";
 import constants from "../../store/constants";
 import { showToast } from "../toast";
+import DbPartsSortPanel from "../dbPartsSortPanel";
+import partStore from "../../store/partStore";
 
 
 const NewPlanButton = observer(() => {
@@ -26,16 +28,14 @@ const NewPlanButton = observer(() => {
 
 	/** Пустой лист | авто-раскрой через POST /jdb/b7/nest */
 	const [creationMode, setCreationMode] = useState("empty");
-	const [nestPartRows, setNestPartRows] = useState(() => [
-		{
-			id: "p0",
-			path: "parts/2d34f6fa-7643-4f9e-96e0-59ce5be9fd3c/part.ncp:11111111yy111011111",
-			quantity: "10",
-			rotation: "90",
-		},
-	]);
+	const [nestPartRows, setNestPartRows] = useState(() => []);
 	const [materialName, setMaterialName] = useState("DC01");
+	const [partProtectionGap, setPartProtectionGap] = useState("10");
 	const [nestLoading, setNestLoading] = useState(false);
+
+	/** Импорт деталей из БД в B7-раскрой */
+	const [showImportDb, setShowImportDb] = useState(false);
+	const [importSelectedUuids, setImportSelectedUuids] = useState(() => new Set());
 
 	// Ошибки валидации
 	const [errors, setErrors] = useState({
@@ -96,7 +96,7 @@ const NewPlanButton = observer(() => {
 		if (creationMode === "b7_nest") {
 			const filled = nestPartRows.filter((row) => row.path.trim());
 			if (!filled.length) {
-				newErrors.nestParts = t("Add at least one part with a server file path");
+				newErrors.nestParts = t("No parts added");
 			} else {
 				filled.forEach((row) => {
 					const idx = nestPartRows.indexOf(row);
@@ -117,6 +117,15 @@ const NewPlanButton = observer(() => {
 			if (!materialName.trim()) {
 				newErrors.materialName = t("Material name is required");
 			}
+			const gap = Number(partProtectionGap);
+			if (
+				partProtectionGap === "" ||
+				partProtectionGap == null ||
+				Number.isNaN(gap) ||
+				gap < 0
+			) {
+				newErrors.partProtectionGap = t("Part protection gap must be a non-negative number");
+			}
 		}
 
 		setErrors(newErrors);
@@ -124,25 +133,6 @@ const NewPlanButton = observer(() => {
 	};
 
 	const buildB7NestConfig = () => {
-		// NOTE: временно отправляем на бэк фиксированный JSON (как в примере),
-		// остальную «генерацию из полей формы» оставили ниже закомментированной.
-		return {
-			parts: [
-				{
-					path: "parts/2d34f6fa-7643-4f9e-96e0-59ce5be9fd3c/part.ncp:11111111yy111011111",
-					quantity: 10,
-					rotation_allowance: 90,
-				},
-			],
-			sheets: [{ size_x: 1000, size_y: 700, count: 1 }],
-			material: { thickness: 3, name: "DC01" },
-			nesting: {
-				part_protection_gap: 2,
-				plan_name: "TEST_1000x700",
-			},
-		};
-
-		/*
 		const parts = nestPartRows
 			.filter((row) => row.path.trim())
 			.map((row) => ({
@@ -161,8 +151,11 @@ const NewPlanButton = observer(() => {
 				thickness: th,
 				name: materialName.trim() || "Steel",
 			},
+			nesting: {
+				part_protection_gap: Number(partProtectionGap) || 0,
+				plan_name: name.trim() || `PLAN_${w}x${h}`,
+			},
 		};
-		*/
 	};
 
 	const nestRequestPreview = useMemo(
@@ -176,7 +169,7 @@ const NewPlanButton = observer(() => {
 		if (!raw.config.parts.length) {
 			showToast({
 				type: "error",
-				message: t("Add at least one part with a server file path"),
+				message: t("No parts added"),
 			});
 			return;
 		}
@@ -223,7 +216,7 @@ const NewPlanButton = observer(() => {
 		if (!config.parts.length) {
 			setErrors((prev) => ({
 				...prev,
-				nestParts: t("Add at least one part with a server file path"),
+				nestParts: t("No parts added"),
 			}));
 			return;
 		}
@@ -284,13 +277,9 @@ const NewPlanButton = observer(() => {
 		setThickness("");
 		setSelectedPreset(null);
 		setCreationMode("empty");
-		setNestPartRows([{
-			id: `p_${Date.now()}`,
-			path: "parts/2d34f6fa-7643-4f9e-96e0-59ce5be9fd3c/part.ncp:11111111yy111011111",
-			quantity: "10",
-			rotation: "90",
-		}]);
+		setNestPartRows([]);
 		setMaterialName("DC01");
+		setPartProtectionGap("10");
 		setNestLoading(false);
 		setErrors({
 			name: "",
@@ -301,6 +290,7 @@ const NewPlanButton = observer(() => {
 			thickness: "",
 			nestParts: "",
 			materialName: "",
+			partProtectionGap: "",
 		});
 	};
 
@@ -309,6 +299,57 @@ const NewPlanButton = observer(() => {
 			...rows,
 			{ id: `p_${Date.now()}_${rows.length}`, path: "", quantity: "1", rotation: "90" },
 		]);
+	};
+
+	const openDbPartsImport = async () => {
+		setImportSelectedUuids(new Set());
+		setShowImportDb(true);
+		try {
+			await partStore.loadDbParts();
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	const toggleImportUuid = (uuid) => {
+		const key = String(uuid);
+		setImportSelectedUuids((prev) => {
+			const next = new Set(prev);
+			if (next.has(key)) next.delete(key);
+			else next.add(key);
+			return next;
+		});
+	};
+
+	const confirmImportFromDb = () => {
+		if (!importSelectedUuids.size) {
+			showToast({ type: "error", message: t("No parts selected") });
+			return;
+		}
+
+		const baseDir = "parts";
+		const byUuid = new Map(
+			(partStore.dbParts || [])
+				.filter((p) => p && p.uuid != null)
+				.map((p) => [String(p.uuid), p])
+		);
+		const newRows = Array.from(importSelectedUuids).map((uuid) => {
+			const row = byUuid.get(String(uuid));
+			const partCode = row?.name != null && String(row.name).trim() !== ""
+				? String(row.name).trim()
+				: null;
+			const suffix = partCode ? `:${partCode}` : "";
+
+			return {
+				id: `p_${Date.now()}_${uuid}`,
+				path: `${baseDir}/${uuid}/part.ncp${suffix}`,
+				quantity: "1",
+				rotation: "90",
+			};
+		});
+
+		setNestPartRows((rows) => [...rows, ...newRows]);
+		setShowImportDb(false);
 	};
 
 	const removeNestPartRow = (id) => {
@@ -498,13 +539,28 @@ const NewPlanButton = observer(() => {
 								</Form.Group>
 
 								<Form.Group className="mb-3">
+									<Form.Label>{t("Part protection gap (mm)")} *</Form.Label>
+									<Form.Control
+										type="number"
+										min="0"
+										step="0.1"
+										value={partProtectionGap}
+										onChange={(e) => setPartProtectionGap(e.target.value)}
+										isInvalid={!!errors.partProtectionGap}
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.partProtectionGap}
+									</Form.Control.Feedback>
+								</Form.Group>
+
+								<Form.Group className="mb-3">
 									<div className="d-flex justify-content-between align-items-center mb-2">
 										<Form.Label className="mb-0">{t("Parts for nesting")}</Form.Label>
 										<Button
 											variant="outline-secondary"
 											size="sm"
 											type="button"
-											onClick={addNestPartRow}
+											onClick={openDbPartsImport}
 										>
 											{t("Add part")}
 										</Button>
@@ -514,13 +570,26 @@ const NewPlanButton = observer(() => {
 									)}
 									{nestPartRows.map((row) => (
 										<InputGroup className="mb-2" key={row.id}>
-											<Form.Control
-												placeholder={t("Absolute path on server (DXF, NCP, plan:offset)")}
-												value={row.path}
-												onChange={(e) =>
-													updateNestPartRow(row.id, "path", e.target.value)
-												}
-											/>
+											<div
+												className="form-control"
+												title={row.path || t("Absolute path on server (DXF, NCP, plan:offset)")}
+												style={{
+													overflow: "hidden",
+													whiteSpace: "nowrap",
+													textOverflow: "ellipsis",
+													background: "#f8f9fa",
+													display: "flex",
+													alignItems: "center",
+												}}
+											>
+												{row.path ? (
+													row.path
+												) : (
+													<span className="text-muted">
+														{t("Absolute path on server (DXF, NCP, plan:offset)")}
+													</span>
+												)}
+											</div>
 											<Form.Control
 												style={{ maxWidth: "88px" }}
 												type="number"
@@ -648,6 +717,47 @@ const NewPlanButton = observer(() => {
 								: t("Create")}
 						</div>
 					</button>
+				</Modal.Footer>
+			</Modal>
+
+			<Modal
+				show={showImportDb}
+				onHide={() => setShowImportDb(false)}
+				size="xl"
+				className="with-inner-backdrop"
+				centered
+			>
+				<Modal.Header closeButton>
+					<Modal.Title>{t("Select parts from DB")}</Modal.Title>
+				</Modal.Header>
+				<Modal.Body
+					className="p-0"
+					style={{
+						minHeight: "min(50vh, 420px)",
+						maxHeight: "75vh",
+						display: "flex",
+						flexDirection: "column",
+						overflow: "hidden",
+					}}
+				>
+					<div
+						className="d-flex flex-column flex-grow-1 px-3 py-2"
+						style={{ minHeight: 0, overflow: "hidden" }}
+					>
+						<DbPartsSortPanel
+							multiSelect
+							selectedImportUuids={importSelectedUuids}
+							onToggleImportUuid={toggleImportUuid}
+						/>
+					</div>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={() => setShowImportDb(false)}>
+						{t("Cancel")}
+					</Button>
+					<Button variant="primary" onClick={confirmImportFromDb}>
+						{t("Add to nesting")}
+					</Button>
 				</Modal.Footer>
 			</Modal>
 		</div>

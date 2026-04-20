@@ -1,4 +1,6 @@
 const zh = {
+    "Part protection gap (mm)": "零件保护间隙（毫米）",
+    "Part protection gap must be a non-negative number": "保护间隙必须是非负数",
     "Technology": "技术",
     "Охлаждение": "冷却",
     "Разрешено": "启用",
@@ -581,6 +583,15 @@ const zh = {
     "Some parts failed to import": "部分零件导入失败",
     "Детали импортированы из БД": "Детали импортированы из БД",
     "End": "结尾",
-    "DC01": "DC01"
+    "DC01": "DC01",
+    "Нестинг выполнен успешно": "Нестинг выполнен успешно",
+    "Add to nesting": "添加到嵌套",
+    "Select parts from DB": "从数据库选择零件",
+    "No parts selected": "未选择零件",
+    "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: part_code `11111111yy111011111` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`：在 NCP 中找不到零件代码 `11111111yy111011111`",
+    "JSON скопирован в буфер": "JSON 格式",
+    "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: part_code `12___10__2` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`：在 NCP 中找不到零件代码 `12___10__2`",
+    "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`: part_code `13___10__4` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`：在 NCP 中找不到零件代码 `13___10__4`",
+    "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`：在 NCP 中找不到部分代码“上传”"
 }
 export default zh;

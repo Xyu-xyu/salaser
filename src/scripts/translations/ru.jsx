@@ -1,4 +1,6 @@
 const ru = {
+    "Part protection gap (mm)": "Отступ между деталями (мм)",
+    "Part protection gap must be a non-negative number": "Отступ должен быть неотрицательным числом",
     "Technology": "Технология",
     "Охлаждение": "Охлаждение",
     "Разрешено": "Разрешено",
@@ -602,6 +604,15 @@ const ru = {
     "Some parts failed to import": "Часть деталей не импортирована",
     "Детали импортированы из БД": "Детали импортированы из БД",
     "End": "Конец",
-    "DC01": "DC01"
+    "DC01": "DC01",
+    "Нестинг выполнен успешно": "Нестинг успешно завершен",
+    "Select parts from DB": "Выбрать детали из БД",
+    "Add to nesting": "Добавить в раскрой",
+    "No parts selected": "Не выбраны детали",
+    "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: part_code `11111111yy111011111` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: код детали `11111111yy111011111` не найден в NCP",
+    "JSON скопирован в буфер": "JSON скопирован в буфер",
+    "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: part_code `12___10__2` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: код детали `12___10__2` не найден в NCP",
+    "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`: part_code `13___10__4` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`: код детали `13___10__4` не найден в NCP",
+    "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: `upload` кода детали не найден в NCP"
 }
 export default ru;

@@ -332,6 +332,8 @@ class SvgStore {
 			},
 		},
 		"residualCut": createEmptyResidualCutState(RESIDUAL_CUT_DEFAULT_STEP),
+		/** Последний ответ POST /jdb/b7/nest (режим нового листа) или null */
+		"b7NestMeta": null,
 	}
 
 	matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
@@ -1570,6 +1572,12 @@ class SvgStore {
 
 		const splittedPath = utils.splitPathByJointPoints( contour.path, joints);
 
+		/** Гравировка (macro2): коррекция G41/G42 и отмена G40 не применяются. */
+		const skipRadiusComp =
+			contour.class.includes('engraving') ||
+			/\bmacro2\b/i.test(contour.class) ||
+			this.getMacro(contour.class) === 2;
+
 		let currentMacro = false
 		let currentCompensation = false
 
@@ -1604,7 +1612,7 @@ class SvgStore {
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
-				needG40 =true
+				if (!skipRadiusComp) needG40 = true
 				g = 'G1'
 				let line = ''
 
@@ -1635,7 +1643,7 @@ class SvgStore {
 			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
-				needG40 =true
+				if (!skipRadiusComp) needG40 = true
 				// старт и конец в координатах станка
 				const x1 = X
 				const y1 = height - Y
@@ -1702,19 +1710,21 @@ class SvgStore {
 					needLaserOff = true
 				}
 				
-				if (
-					(direction === true && inner === false) ||
-					(direction === false && inner === true)
-				) {
-					neededComp = 'G41';
-				}
-				else {
-					neededComp = 'G42';
-				}
+				if (!skipRadiusComp) {
+					if (
+						(direction === true && inner === false) ||
+						(direction === false && inner === true)
+					) {
+						neededComp = 'G41';
+					}
+					else {
+						neededComp = 'G42';
+					}
 
-				if (currentCompensation !== neededComp) {
-					currentCompensation = neededComp;
-					res.push(neededComp);
+					if (currentCompensation !== neededComp) {
+						currentCompensation = neededComp;
+						res.push(neededComp);
+					}
 				}
 				res.push(line)
 
@@ -1764,19 +1774,21 @@ class SvgStore {
 			const inner = contour.class.includes("inner");
 			let neededComp;
 
-			if (
-				(direction === true && inner === false) ||
-				(direction === false && inner === true)
-			) {
-				neededComp = 'G41';
-			}
-			else {
-				neededComp = 'G42';
-			}
+			if (!skipRadiusComp) {
+				if (
+					(direction === true && inner === false) ||
+					(direction === false && inner === true)
+				) {
+					neededComp = 'G41';
+				}
+				else {
+					neededComp = 'G42';
+				}
 
-			if (currentCompensation !== neededComp) {
-				currentCompensation = neededComp;
-				res.push(neededComp);
+				if (currentCompensation !== neededComp) {
+					currentCompensation = neededComp;
+					res.push(neededComp);
+				}
 			}
 
 			if (cmd === 'L') {
@@ -1816,7 +1828,7 @@ class SvgStore {
 			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
-				needG40 =true
+				if (!skipRadiusComp) needG40 = true
 
 				const x1 = X
 				const y1 = height - Y
@@ -1921,7 +1933,7 @@ class SvgStore {
 		}
 
 
-		if (needG40 && (!outlet || o.segments.length ===0 )) {
+		if (!skipRadiusComp && needG40 && (!outlet || o.segments.length ===0 )) {
 			res.push(`G40`)
 			G="G40"
 			needG40 = false
@@ -1987,7 +1999,7 @@ class SvgStore {
 			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
-				needG40 =true
+				if (!skipRadiusComp) needG40 = true
 				// старт и конец в координатах станка
 				const x1 = X
 				const y1 = height - Y
@@ -2047,19 +2059,21 @@ class SvgStore {
 				const inner = contour.class.includes("inner");
 				let neededComp;
 
-				if (
-					(direction === true  && inner === false) ||
-					(direction === false && inner === true)
-				) {
-					neededComp = 'G41';
-				}
-				else {
-					neededComp = 'G42';
-				}
+				if (!skipRadiusComp) {
+					if (
+						(direction === true  && inner === false) ||
+						(direction === false && inner === true)
+					) {
+						neededComp = 'G41';
+					}
+					else {
+						neededComp = 'G42';
+					}
 
-				if (currentCompensation !== neededComp) {
-					currentCompensation = neededComp;
-					res.push(neededComp);
+					if (currentCompensation !== neededComp) {
+						currentCompensation = neededComp;
+						res.push(neededComp);
+					}
 				}
 
 				if (needLaserOn && !line.endsWith("M4")) {
@@ -2076,7 +2090,7 @@ class SvgStore {
 			needLaserOff = false
 		}
 
-		if (needG40 ) res.push(`G40`)
+		if (!skipRadiusComp && needG40) res.push(`G40`)
 		return res
 	}
 
@@ -2397,6 +2411,72 @@ class SvgStore {
 		return [xRot, yRot];
 	};
 
+	/** Пустой path или только один сегмент Move — «битый» контур после парсинга NCP без тегов. */
+	_isContourPathDegenerate(path) {
+		const p = String(path ?? "").trim();
+		if (p === "") return true;
+		try {
+			const segs = new SVGPathCommander(p).normalize().segments;
+			return segs.length === 1 && segs[0][0] === "M";
+		} catch {
+			return true;
+		}
+	}
+
+	/**
+	 * NCP без/с кривыми `(<Contour>)`: вся геометрия остаётся во `inlet.path`, а `contour.path` пустой или только M.
+	 * Одинаковый cid: переносим path в контур, `inlet.path` очищаем (элемент inlet сохраняем).
+	 */
+	_fixInletContourDegeneratesFromNcp(code) {
+		if (!Array.isArray(code) || code.length === 0) return;
+
+		const byCid = new Map();
+		for (const el of code) {
+			const id = el?.cid;
+			if (id === undefined || id === null) continue;
+			if (!byCid.has(id)) byCid.set(id, []);
+			byCid.get(id).push(el);
+		}
+
+		for (const [, items] of byCid) {
+			const inlet = items.find((c) => typeof c?.class === "string" && /\binlet\b/i.test(c.class));
+			if (!inlet || !String(inlet.path ?? "").trim()) continue;
+
+			const contour = items.find(
+				(c) => typeof c?.class === "string" && /\bcontour\b/i.test(c.class)
+			);
+			const contourMissingOrBad = !contour || this._isContourPathDegenerate(contour.path);
+			if (!contourMissingOrBad) continue;
+
+			const macroStr = (String(inlet.class ?? "").match(/\bmacro\d+\b/gi) || []).join(" ");
+			const macros = macroStr ? ` ${macroStr} ` : " ";
+
+			if (!contour) {
+				const newContour = {
+					cid: inlet.cid,
+					class: `contour inner${macros}`.replace(/\s+/g, " ").trim() + " ",
+					path: inlet.path,
+					stroke: inlet.stroke ?? "red",
+					strokeWidth: inlet.strokeWidth ?? 0.2,
+					selected: false,
+					joints: Array.isArray(inlet.joints) ? [...inlet.joints] : [],
+				};
+				const idx = code.indexOf(inlet);
+				if (idx >= 0) code.splice(idx + 1, 0, newContour);
+				else code.push(newContour);
+			} else {
+				contour.path = inlet.path;
+				contour.joints = Array.isArray(inlet.joints) ? [...inlet.joints] : [];
+				if (macroStr && !/\bmacro\d+\b/i.test(String(contour.class ?? ""))) {
+					contour.class = `${String(contour.class ?? "").trim()} ${macroStr} `.replace(/\s+/g, " ").trim();
+				}
+			}
+
+			inlet.path = "";
+			if (Array.isArray(inlet.joints)) inlet.joints.length = 0;
+		}
+	}
+
 	/**
 	 * Разбор NCP в структуру плана (без записи в svgStore) — для импорта одной детали в part editor.
 	 */
@@ -2541,6 +2621,8 @@ class SvgStore {
 
 					return bc - ac;
 				});
+
+				this._fixInletContourDegeneratesFromNcp(res);
 
 				res.map(a => currentPart.code.push(a))
 				result.part_code.push(currentPart)
