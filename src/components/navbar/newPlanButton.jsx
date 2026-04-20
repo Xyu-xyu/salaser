@@ -1,12 +1,14 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
-import { Dropdown, DropdownButton, Modal, Form  } from "react-bootstrap";
+import { useEffect, useMemo, useState } from "react";
+import { Dropdown, DropdownButton, Modal, Form, Button, InputGroup } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import macrosStore from "../../store/macrosStore";
 import CustomIcon from "../../icons/customIcon";
 import laserStore from "../../store/laserStore";
 import svgStore from "../../store/svgStore";
 import jobStore from "../../store/jobStore";
+import constants from "../../store/constants";
+import { showToast } from "../toast";
 
 
 const NewPlanButton = observer(() => {
@@ -16,11 +18,24 @@ const NewPlanButton = observer(() => {
 
 	// Форма
 	const [name, setName] = useState("new_plan");
-	const [width, setWidth] = useState("600");
-	const [height, setHeight] = useState("600");
+	const [width, setWidth] = useState("1000");
+	const [height, setHeight] = useState("700");
 	const [quantity, setQuantity] = useState("1");
-	const [thickness, setThickness] = useState("1");
+	const [thickness, setThickness] = useState("3");
 	const [selectedPreset, setSelectedPreset] = useState(null);
+
+	/** Пустой лист | авто-раскрой через POST /jdb/b7/nest */
+	const [creationMode, setCreationMode] = useState("empty");
+	const [nestPartRows, setNestPartRows] = useState(() => [
+		{
+			id: "p0",
+			path: "parts/2d34f6fa-7643-4f9e-96e0-59ce5be9fd3c/part.ncp:11111111yy111011111",
+			quantity: "10",
+			rotation: "90",
+		},
+	]);
+	const [materialName, setMaterialName] = useState("DC01");
+	const [nestLoading, setNestLoading] = useState(false);
 
 	// Ошибки валидации
 	const [errors, setErrors] = useState({
@@ -29,7 +44,9 @@ const NewPlanButton = observer(() => {
 		height: "",
 		quantity: "",
 		preset: "",
-		thickness:""
+		thickness: "",
+		nestParts: "",
+		materialName: "",
 	});
 
 	useEffect(() => {
@@ -66,9 +83,9 @@ const NewPlanButton = observer(() => {
 			newErrors.quantity = t("Quantity must be a positive integer");
 		}
 
-		const th = parseInt(thickness, 10);
-		if (!thickness || isNaN(th) || th <= 0 || !Number.isInteger(th)) {
-			newErrors.thickness = t("Thickness must be a positive integer");
+		const th = parseFloat(thickness);
+		if (!thickness || isNaN(th) || th <= 0) {
+			newErrors.thickness = t("Thickness must be a positive number");
 		}
 
 		// Preset обязателен
@@ -76,33 +93,185 @@ const NewPlanButton = observer(() => {
 			newErrors.preset = t("Please select a preset");
 		}
 
+		if (creationMode === "b7_nest") {
+			const filled = nestPartRows.filter((row) => row.path.trim());
+			if (!filled.length) {
+				newErrors.nestParts = t("Add at least one part with a server file path");
+			} else {
+				filled.forEach((row) => {
+					const idx = nestPartRows.indexOf(row);
+					const q = parseInt(row.quantity, 10);
+					if (!row.quantity || isNaN(q) || q <= 0 || !Number.isInteger(q)) {
+						newErrors[`nestQty_${idx}`] = t("Quantity must be a positive integer");
+					}
+					const rot = Number(row.rotation);
+					if (
+						row.rotation !== "" &&
+						row.rotation != null &&
+						(isNaN(rot) || rot < 0)
+					) {
+						newErrors[`nestRot_${idx}`] = t("Rotation allowance must be a non-negative number");
+					}
+				});
+			}
+			if (!materialName.trim()) {
+				newErrors.materialName = t("Material name is required");
+			}
+		}
+
 		setErrors(newErrors);
 		return Object.keys(newErrors).length === 0;
 	};
 
-	const handleSubmit = () => {
-		if (!validate()) return;
+	const buildB7NestConfig = () => {
+		// NOTE: временно отправляем на бэк фиксированный JSON (как в примере),
+		// остальную «генерацию из полей формы» оставили ниже закомментированной.
+		return {
+			parts: [
+				{
+					path: "parts/2d34f6fa-7643-4f9e-96e0-59ce5be9fd3c/part.ncp:11111111yy111011111",
+					quantity: 10,
+					rotation_allowance: 90,
+				},
+			],
+			sheets: [{ size_x: 1000, size_y: 700, count: 1 }],
+			material: { thickness: 3, name: "DC01" },
+			nesting: {
+				part_protection_gap: 2,
+				plan_name: "TEST_1000x700",
+			},
+		};
 
-		// Здесь можно сохранить данные или передать в store
-		let res = {
+		/*
+		const parts = nestPartRows
+			.filter((row) => row.path.trim())
+			.map((row) => ({
+				path: row.path.trim(),
+				quantity: parseInt(row.quantity, 10) || 1,
+				rotation_allowance: Number(row.rotation) || 90,
+			}));
+		const w = parseFloat(width);
+		const h = parseFloat(height);
+		const sheetCount = parseInt(quantity, 10);
+		const th = parseFloat(thickness);
+		return {
+			parts,
+			sheets: [{ size_x: w, size_y: h, count: sheetCount }],
+			material: {
+				thickness: th,
+				name: materialName.trim() || "Steel",
+			},
+		};
+		*/
+	};
+
+	const nestRequestPreview = useMemo(
+		() => JSON.stringify({ config: buildB7NestConfig() }, null, 2),
+		[width, height, quantity, thickness, materialName, nestPartRows]
+	);
+
+	const copyNestJson = async () => {
+		if (creationMode !== "b7_nest") return;
+		const raw = { config: buildB7NestConfig() };
+		if (!raw.config.parts.length) {
+			showToast({
+				type: "error",
+				message: t("Add at least one part with a server file path"),
+			});
+			return;
+		}
+		try {
+			await navigator.clipboard.writeText(JSON.stringify(raw, null, 2));
+			showToast({ type: "success", message: t("Nest JSON copied to clipboard") });
+		} catch {
+			showToast({ type: "error", message: t("Could not copy to clipboard") });
+		}
+	};
+
+	/** Пустой лист: данные в svgStore и переход в редактор плана */
+	const applyEmptySheetToStore = () => {
+		const res = {
 			name: name.trim(),
 			width: parseFloat(width),
 			height: parseFloat(height),
 			quantity: parseInt(quantity, 10),
-			thickness: parseInt(thickness, 10),
+			thickness: parseFloat(thickness),
 			presetId: selectedPreset.id,
 			presetName: selectedPreset.name,
 			part_code: [],
-			positions:[]
+			positions: [],
+			b7NestMeta: null,
 		};
 
-		for (let key in res) {
-			console.log (key, res[key])
-			svgStore.setVal ('svgData', key, res[key])
-		}	
+		for (const key in res) {
+			svgStore.setVal("svgData", key, res[key]);
+		}
 		laserStore.setVal("centralBarMode", "planEditor");
-		jobStore.setVal('selectedId', 'newSheet')
+		jobStore.setVal("selectedId", "newSheet");
 		handleClose();
+	};
+
+	const handleSubmit = async () => {
+		if (!validate()) return;
+
+		if (creationMode === "empty") {
+			applyEmptySheetToStore();
+			return;
+		}
+
+		const config = buildB7NestConfig();
+		if (!config.parts.length) {
+			setErrors((prev) => ({
+				...prev,
+				nestParts: t("Add at least one part with a server file path"),
+			}));
+			return;
+		}
+
+		if (!constants.SERVER_URL) {
+			showToast({ type: "error", message: t("Server URL is not configured") });
+			return;
+		}
+
+		setNestLoading(true);
+		let nestOk = false;
+		try {
+			const resp = await fetch(`${constants.SERVER_URL}/jdb/b7/nest`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ config }),
+			});
+			let data = {};
+			try {
+				data = await resp.json();
+			} catch {
+				data = {};
+			}
+			if (!resp.ok) {
+				const msg =
+					(typeof data?.error === "string" && data.error) ||
+					resp.statusText ||
+					t("Nest request failed");
+				showToast({ type: "error", message: msg });
+			} else if (data.status !== "ok") {
+				const msg =
+					(typeof data?.error === "string" && data.error) || t("Nest request failed");
+				showToast({ type: "error", message: msg });
+			} else {
+				showToast({ type: "success", message: t("Nest completed successfully") });
+				nestOk = true;
+			}
+		} catch (e) {
+			console.error(e);
+			showToast({ type: "error", message: t("Nest request failed") });
+		} finally {
+			setNestLoading(false);
+		}
+
+		handleClose();
+		if (nestOk) {
+			await jobStore.loadJobs();
+		}
 	};
 
 	const handleClose = () => {
@@ -114,7 +283,44 @@ const NewPlanButton = observer(() => {
 		setQuantity("");
 		setThickness("");
 		setSelectedPreset(null);
-		//setErrors({});
+		setCreationMode("empty");
+		setNestPartRows([{
+			id: `p_${Date.now()}`,
+			path: "parts/2d34f6fa-7643-4f9e-96e0-59ce5be9fd3c/part.ncp:11111111yy111011111",
+			quantity: "10",
+			rotation: "90",
+		}]);
+		setMaterialName("DC01");
+		setNestLoading(false);
+		setErrors({
+			name: "",
+			width: "",
+			height: "",
+			quantity: "",
+			preset: "",
+			thickness: "",
+			nestParts: "",
+			materialName: "",
+		});
+	};
+
+	const addNestPartRow = () => {
+		setNestPartRows((rows) => [
+			...rows,
+			{ id: `p_${Date.now()}_${rows.length}`, path: "", quantity: "1", rotation: "90" },
+		]);
+	};
+
+	const removeNestPartRow = (id) => {
+		setNestPartRows((rows) =>
+			rows.length <= 1 ? rows : rows.filter((r) => r.id !== id)
+		);
+	};
+
+	const updateNestPartRow = (id, field, value) => {
+		setNestPartRows((rows) =>
+			rows.map((r) => (r.id === id ? { ...r, [field]: value } : r))
+		);
 	};
 
 	const showModal = () => setShow(true);
@@ -145,12 +351,48 @@ const NewPlanButton = observer(() => {
 				centered
 				size="lg"
 			>
-				<Modal.Header>
-					<Modal.Title>{t("New sheet")}</Modal.Title>
+				<Modal.Header closeButton>
+					<Modal.Title>
+						{t("New sheet")}
+						{creationMode === "b7_nest" && (
+							<span className="text-muted fw-normal ms-2 small">
+								— {t("B7 auto nest")}
+							</span>
+						)}
+					</Modal.Title>
 				</Modal.Header>
 
 				<Modal.Body>
 					<Form>
+						<Form.Group className="mb-3">
+							<Form.Label>{t("Sheet creation mode")}</Form.Label>
+							<div>
+								<Form.Check
+									inline
+									type="radio"
+									id="newSheetModeEmpty"
+									name="creationMode"
+									label={t("Empty sheet (no parts)")}
+									checked={creationMode === "empty"}
+									onChange={() => setCreationMode("empty")}
+								/>
+								<Form.Check
+									inline
+									type="radio"
+									id="newSheetModeB7"
+									name="creationMode"
+									label={t("Backend B7 nest (server paths)")}
+									checked={creationMode === "b7_nest"}
+									onChange={() => setCreationMode("b7_nest")}
+								/>
+							</div>
+							{creationMode === "b7_nest" && (
+								<Form.Text className="d-block text-muted">
+									{t("b7_nest_path_hint")}
+								</Form.Text>
+							)}
+						</Form.Group>
+
 						<Form.Group className="mb-3">
 							<Form.Label>{t("Sheet name")} *</Form.Label>
 							<Form.Control
@@ -239,6 +481,104 @@ const NewPlanButton = observer(() => {
 							</div>
 						</div>
 
+						{creationMode === "b7_nest" && (
+							<>
+								<Form.Group className="mb-3">
+									<Form.Label>{t("Nest material name (b7)")} *</Form.Label>
+									<Form.Control
+										type="text"
+										value={materialName}
+										onChange={(e) => setMaterialName(e.target.value)}
+										isInvalid={!!errors.materialName}
+										placeholder={t("e.g. Steel")}
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.materialName}
+									</Form.Control.Feedback>
+								</Form.Group>
+
+								<Form.Group className="mb-3">
+									<div className="d-flex justify-content-between align-items-center mb-2">
+										<Form.Label className="mb-0">{t("Parts for nesting")}</Form.Label>
+										<Button
+											variant="outline-secondary"
+											size="sm"
+											type="button"
+											onClick={addNestPartRow}
+										>
+											{t("Add part")}
+										</Button>
+									</div>
+									{errors.nestParts && (
+										<div className="text-danger small mb-2">{errors.nestParts}</div>
+									)}
+									{nestPartRows.map((row) => (
+										<InputGroup className="mb-2" key={row.id}>
+											<Form.Control
+												placeholder={t("Absolute path on server (DXF, NCP, plan:offset)")}
+												value={row.path}
+												onChange={(e) =>
+													updateNestPartRow(row.id, "path", e.target.value)
+												}
+											/>
+											<Form.Control
+												style={{ maxWidth: "88px" }}
+												type="number"
+												min={1}
+												title={t("Quantity")}
+												value={row.quantity}
+												onChange={(e) =>
+													updateNestPartRow(row.id, "quantity", e.target.value)
+												}
+												isInvalid={!!errors[`nestQty_${nestPartRows.indexOf(row)}`]}
+											/>
+											<Form.Control
+												style={{ maxWidth: "88px" }}
+												type="number"
+												min={0}
+												step={90}
+												title={t("Rotation allowance (deg)")}
+												value={row.rotation}
+												onChange={(e) =>
+													updateNestPartRow(row.id, "rotation", e.target.value)
+												}
+												isInvalid={!!errors[`nestRot_${nestPartRows.indexOf(row)}`]}
+											/>
+											<Button
+												variant="outline-danger"
+												type="button"
+												disabled={nestPartRows.length <= 1}
+												onClick={() => removeNestPartRow(row.id)}
+											>
+												×
+											</Button>
+										</InputGroup>
+									))}
+								</Form.Group>
+
+								<Form.Group className="mb-3">
+									<div className="d-flex justify-content-between align-items-center mb-2">
+										<Form.Label className="mb-0">{t("Request JSON (b7 nest)")}</Form.Label>
+										<Button
+											variant="outline-primary"
+											size="sm"
+											type="button"
+											onClick={copyNestJson}
+										>
+											{t("Copy JSON")}
+										</Button>
+									</div>
+									<Form.Control
+										as="textarea"
+										rows={8}
+										readOnly
+										className="font-monospace small"
+										value={nestRequestPreview}
+									/>
+								</Form.Group>
+							</>
+						)}
+
 						<Form.Group className="mb-3">
 							<Form.Label>{t("Material / Preset")} *</Form.Label>
 							<DropdownButton
@@ -291,6 +631,7 @@ const NewPlanButton = observer(() => {
 					<button
 						className="violet_button text-white p-1 br-5"
 						type="button"
+						disabled={nestLoading}
 						onClick={handleSubmit}
 					>
 						<div className="d-flex align-items-center p-2">
@@ -300,7 +641,11 @@ const NewPlanButton = observer(() => {
 							height="24"
 							color="white"
 						/>
-						{t("Create")}
+						{nestLoading
+							? t("Nesting…")
+							: creationMode === "b7_nest"
+								? t("Run nest and open sheet")
+								: t("Create")}
 						</div>
 					</button>
 				</Modal.Footer>
