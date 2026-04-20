@@ -4,7 +4,11 @@ const constants = {
 	/** Значение атрибута accept для input type="file" */
 	PART_UPLOAD_ACCEPT: '.ncp,.dxf',
 
-	SERVER_URL:import.meta.env.DEV ? 'http://localhost:5005' : '',
+	SERVER_URL: import.meta.env.DEV
+		? 'http://localhost:5005'
+		: typeof window !== 'undefined'
+			? window.location.origin
+			: '',
 	languages: [
 		{ lang: 'ru', name: 'Русский' },
 		{ lang: 'en', name: 'English' },
