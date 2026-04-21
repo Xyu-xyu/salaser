@@ -42,7 +42,7 @@ const LeftBar = observer(() => {
 								<CustomIcon 
 									viewBox={'0 0 36 36'} 								
 									icon="LaserIcon" 
-									width={60} height={60} 
+									width={60} height={50} 
 									style={{ color: leftMode === 'sheet'? "white": 'black' }} 
 									strokeWidth={1.5} />
 							</div>	

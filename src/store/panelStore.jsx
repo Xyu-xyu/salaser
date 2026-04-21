@@ -6,7 +6,7 @@ class PanelStore {
 
 	positions = CONSTANTS.panelPostions
 	maxZindex = 0
-	dockMode = false
+	dockMode = true
 	isInitialized = false
 	constructor() {
 		makeAutoObservable(this);
