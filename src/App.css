@@ -2163,6 +2163,19 @@ height: fit-content;}
   position: relative;
 }
 
+#parteditor {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+}
+
+#editor_main_wrapper_1 {
+  height: 100%;
+  min-height: 0;
+}
+
 /* Повернутый блок */
 .rotated {
   position: absolute;

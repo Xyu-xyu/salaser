@@ -140,8 +140,14 @@ class MacrosStore {
             if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
 
             const data = await resp.json();
-            macrosStore.schema = data.result
-            macrosStore.macrosProperties = data.result.properties.technology.properties.macros.items.properties
+            const schema = data?.result ?? data;
+            if (!schema?.properties?.technology?.properties?.macros?.items?.properties) {
+                throw new Error("Некорректный формат схемы cut-settings");
+            }
+
+            macrosStore.schema = schema;
+            macrosStore.macrosProperties =
+                schema.properties.technology.properties.macros.items.properties;
           /*   showToast({
                 type: 'success',
                 message: "Upload  schema from core 0 success!",
@@ -160,7 +166,8 @@ class MacrosStore {
             console.log ("Upload schema from core error" + err.message)
 
             macrosStore.schema = cut_settings_schema
-            macrosStore.macrosProperties = cut_settings_schema.result.properties.technology.properties.macros.items.properties
+            macrosStore.macrosProperties =
+                cut_settings_schema?.properties?.technology?.properties?.macros?.items?.properties ?? {}
             
         } finally {
             this.loading = false;

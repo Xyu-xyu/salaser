@@ -105,20 +105,29 @@ const ContourPanel = observer(() => {
 	},[])
 
 	async function getAndCountMacros () {
-		let id = svgStore.svgData.presetId
- 		const resp = await fetch(`${constants.SERVER_URL}/db/get_preset?id=${id}`, {
-			method: "GET",
-		});
-
-		if (!resp.ok) throw new Error(`Ошибка: ${resp.statusText}`);
-		const data = await resp.json();
 		try {
+			const id = svgStore?.svgData?.presetId;
+			if (!id) {
+				setMacrosCount(0);
+				return;
+			}
 
-			let count = data.preset.technology.macros.length
-			setMacrosCount( count )
+			const resp = await fetch(`${constants.SERVER_URL}/db/get_preset?id=${id}`, {
+				method: "GET",
+			});
 
+			if (!resp.ok) {
+				console.warn("Failed to fetch preset:", resp.status, resp.statusText);
+				setMacrosCount(0);
+				return;
+			}
+
+			const data = await resp.json();
+			const count = data?.preset?.technology?.macros?.length ?? 0;
+			setMacrosCount(count);
 		} catch (error) {
-			console.log ("Error in getAndCountMacros")			
+			console.warn("Error in getAndCountMacros:", error);
+			setMacrosCount(0);
 		}
 	}
 

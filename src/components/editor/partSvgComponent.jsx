@@ -22,8 +22,14 @@ const PartSvgComponent = observer (() => {
         svgParams,
     } = partStore
 
-    const vbW = svgParams.width > 0 ? svgParams.width : window.innerWidth
-    const vbH = svgParams.height > 0 ? svgParams.height : window.innerHeight
+    const vbW = Math.max(
+        1,
+        svgParams?.width || document?.documentElement?.clientWidth || window.innerWidth || 800
+    );
+    const vbH = Math.max(
+        1,
+        svgParams?.height || document?.documentElement?.clientHeight || window.innerHeight || 600
+    );
 
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${groupMatrix.a} ${groupMatrix.b} ${groupMatrix.c} ${groupMatrix.d} ${groupMatrix.e} ${groupMatrix.f}`;
@@ -33,7 +39,9 @@ const PartSvgComponent = observer (() => {
             id="svg"
             baseProfile="full"
             viewBox={`0.00 0.00 ${vbW} ${vbH}`}
-            style={{ overflow: 'hidden', border: '1px solid var(--color)' }}
+            width="100%"
+            height="100%"
+            style={{ overflow: 'hidden', border: '1px solid var(--color)', display: 'block' }}
             version="1.1"
             stroke='var(--color)'
             strokeWidth="0.2"
