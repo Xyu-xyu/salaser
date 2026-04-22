@@ -410,6 +410,7 @@ class SvgStore {
 			const copy = JSON.parse(JSON.stringify(pc));
 			copy.id = newId;
 			copy.uuid = newId;
+			if (pc && pc.program_no != null) copy.program_no = pc.program_no;
 			const box = this.findBox(copy.code);
 			copy.width = 0;
 			copy.height = 0;
@@ -2307,9 +2308,10 @@ class SvgStore {
 			let matrix = pos.positions
 			// высота листа по оси Y в системе станка
 			let sheetHeight = this.svgData.height
-			let L = pos.part_code_id
+			const partId = pos.part_code_id
+			let L = (pos && pos.program_no != null) ? Number(pos.program_no) : Number(partId)
 			let G = 52
-			let part = svgStore.svgData.part_code.filter(a => a.id == L)[0].code
+			let part = svgStore.svgData.part_code.filter(a => a.id == partId)[0].code
 			let partHeight = svgStore.findBox(part).height
 			let XYC = this.matrixToG52(matrix, sheetHeight, partHeight, pos.cx, pos.cy)
 			let X = utils.smartRound(XYC.X)
@@ -2335,9 +2337,20 @@ class SvgStore {
 			this.svgData?.height
 		);
 		const residualDisplayPaths = residualCutGeometry.displayPaths;
-		const residualProgramNumber = residualDisplayPaths.length
-			? data.part_code.length + 1
-			: null;
+		let residualProgramNumber = null;
+		if (residualDisplayPaths.length) {
+			const used = new Set();
+			for (const p of (data.positions || [])) {
+				const pn = (p && p.program_no != null) ? Number(p.program_no) : Number(p?.part_code_id);
+				if (Number.isFinite(pn)) used.add(pn);
+			}
+			for (const pc of (data.part_code || [])) {
+				const pn = (pc && pc.program_no != null) ? Number(pc.program_no) : null;
+				if (Number.isFinite(pn)) used.add(pn);
+			}
+			const maxUsed = used.size ? Math.max(...used) : 0;
+			residualProgramNumber = maxUsed + 1;
+		}
 		const residualPlanPlacement = buildResidualCutPlanPlacement({
 			displayPaths: residualDisplayPaths,
 			programNumber: residualProgramNumber,
@@ -2540,6 +2553,9 @@ class SvgStore {
 
 		/* ---------------- PART CODE ---------------- */
  		let currentPart = null;
+		// L (program number) в NCP может быть любым и в любом порядке — строим явное отображение.
+		const partIdByProgramNo = new Map(); // programNo(L) -> part_code.id
+		const hwByProgramNo = new Map(); // programNo(L) -> [partHeight, partWidth]
 		let cid = -1;
 		let cx = 0, cy = 0;
 		let partOpen = false
@@ -2547,7 +2563,6 @@ class SvgStore {
 		let res = []; // массив путей
 		let laserOn = false
 		let macros = ''
-		let HW = [0]
 		let partHeight = 0		
 		let partWidth = 0
 		const hasMCode = (cmd, ...codes) =>
@@ -2573,6 +2588,7 @@ class SvgStore {
 					code: [],
 					height: 0,
 					width: 0,
+					program_no: null,
 				};
 				res = []
 
@@ -2626,6 +2642,16 @@ class SvgStore {
 
 				res.map(a => currentPart.code.push(a))
 				result.part_code.push(currentPart)
+				if (currentPart?.program_no != null) {
+					const pn = Number(currentPart.program_no);
+					if (Number.isFinite(pn)) {
+						if (!partIdByProgramNo.has(pn)) {
+							partIdByProgramNo.set(pn, currentPart.id);
+						} else if (partIdByProgramNo.get(pn) !== currentPart.id) {
+							console.warn("Duplicate program L in NCP:", pn, "keeping first mapping");
+						}
+					}
+				}
 				continue;
 
 			} else if (c?.comment?.includes('<Contour>')) {
@@ -2803,7 +2829,12 @@ class SvgStore {
 				} else if (g === 28) {
 					partHeight = c.params.Y
 					partWidth = c.params.X
-					HW.push([partHeight, partWidth])
+					const pnRaw = c?.params?.L;
+					const pn = pnRaw != null ? Number(pnRaw) : null;
+					if (partOpen && currentPart && pn != null && Number.isFinite(pn)) {
+						currentPart.program_no = pn;
+						hwByProgramNo.set(pn, [partHeight, partWidth]);
+					}
 
 				} else if (g === 52) {
 				}
@@ -2838,7 +2869,19 @@ class SvgStore {
 				const rad = ((-C) * Math.PI) / 180;
 				//const cos = Math.cos(rad);
 				//const sin = Math.sin(rad);
-				const partHeight = HW[L][0]
+				const programNo = Number(L);
+				const hw = hwByProgramNo.get(programNo);
+				const partHeight = Array.isArray(hw) ? hw[0] : 0;
+				let partCodeId = partIdByProgramNo.get(programNo);
+				if (partCodeId == null) {
+					// legacy fallback: раньше L совпадал с part_code.id
+					const legacy = result.part_code.find(p => p?.id === programNo || p?.uuid === programNo);
+					if (legacy) partCodeId = legacy.id ?? legacy.uuid;
+				}
+				if (partCodeId == null) {
+					console.warn("Plan references missing program L:", programNo);
+					return;
+				}
 				// высота листа по оси Y (DimY)
 				const sheetHeight = height;
 
@@ -2859,7 +2902,8 @@ class SvgStore {
 				result.positions.push(
 					{
 						part_id: partPositionId++,
-						part_code_id: Number(L),
+						part_code_id: Number(partCodeId),
+						program_no: programNo,
 						positions: position,
 						cx,
 						cy
