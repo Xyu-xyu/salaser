@@ -373,8 +373,8 @@ const ru = {
     "B7 auto nest": "Авто-раскрой B7",
     "Sheet creation mode": "Режим создания листа",
     "Empty sheet (no parts)": "Пустой лист (без деталей)",
-    "Backend B7 nest (server paths)": "Раскрой на бэкенде B7 (пути на сервере)",
-    "b7_nest_path_hint": "Каждый путь — абсолютный путь к файлу на хосте бэкенда. Разрешены только каталоги parts/ и plans/ (см. API b7).",
+    "Backend B7 nest (server paths)": "Создать раскрой",
+    "Create nesting plan": "Создать раскрой",
     "Nest material name (b7)": "Название материала (для b7)",
     "e.g. Steel": "например Steel",
     "Parts for nesting": "Детали для раскроя",
@@ -388,7 +388,7 @@ const ru = {
     "Server URL is not configured": "Не задан URL сервера",
     "Nest request failed": "Ошибка запроса нестинга",
     "Nest completed successfully": "Нестинг выполнен успешно",
-    "Nesting…": "Нестинг…",
+    "Nesting…": "Создание раскроя…",
     "Run nest and open sheet": "Запустить нестинг и открыть лист",
     "Add at least one part with a server file path": "Добавьте хотя бы одну деталь с путём к файлу на сервере",
     "Thickness must be a positive number": "Толщина должна быть положительным числом",
@@ -613,6 +613,11 @@ const ru = {
     "JSON скопирован в буфер": "JSON скопирован в буфер",
     "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: part_code `12___10__2` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: код детали `12___10__2` не найден в NCP",
     "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`: part_code `13___10__4` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`: код детали `13___10__4` не найден в NCP",
-    "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: `upload` кода детали не найден в NCP"
+    "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: `upload` кода детали не найден в NCP",
+    "Run nesting": "Создать раскрой",
+    "Validation error": "Ошибка проверки",
+    "Требуется имя": "Требуется имя",
+    "Increase": "Увеличивать",
+    "Ошибка проверки": "Проверка ошибок"
 }
 export default ru;

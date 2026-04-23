@@ -592,6 +592,12 @@ const zh = {
     "JSON скопирован в буфер": "JSON 格式",
     "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: part_code `12___10__2` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`：在 NCP 中找不到零件代码 `12___10__2`",
     "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`: part_code `13___10__4` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`：在 NCP 中找不到零件代码 `13___10__4`",
-    "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`：在 NCP 中找不到部分代码“上传”"
+    "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`：在 NCP 中找不到部分代码“上传”",
+    "Run nesting": "运行嵌套",
+    "Validation error": "验证错误",
+    "Требуется имя": "Требуется имя",
+    "Create nesting plan": "创建嵌套计划",
+    "Increase": "增加",
+    "Ошибка проверки": "Ошибка проверки"
 }
 export default zh;

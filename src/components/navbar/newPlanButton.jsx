@@ -11,6 +11,7 @@ import constants from "../../store/constants";
 import { showToast } from "../toast";
 import DbPartsSortPanel from "../dbPartsSortPanel";
 import partStore from "../../store/partStore";
+import HoldStepperNumberInput from "../holdStepperNumberInput.jsx";
 
 
 const NewPlanButton = observer(() => {
@@ -205,7 +206,13 @@ const NewPlanButton = observer(() => {
 	};
 
 	const handleSubmit = async () => {
-		if (!validate()) return;
+		if (!validate()) {
+			const msg =
+				Object.values(errors || {}).find((v) => typeof v === "string" && v.trim() !== "") ||
+				t("Validation error");
+			showToast({ type: "warning", message: msg });
+			return;
+		}
 
 		if (creationMode === "empty") {
 			applyEmptySheetToStore();
@@ -297,7 +304,7 @@ const NewPlanButton = observer(() => {
 	const addNestPartRow = () => {
 		setNestPartRows((rows) => [
 			...rows,
-			{ id: `p_${Date.now()}_${rows.length}`, path: "", quantity: "1", rotation: "90" },
+			{ id: `p_${Date.now()}_${rows.length}`, uuid: null, path: "", quantity: "1", rotation: "90" },
 		]);
 	};
 
@@ -342,6 +349,7 @@ const NewPlanButton = observer(() => {
 
 			return {
 				id: `p_${Date.now()}_${uuid}`,
+				uuid: String(uuid),
 				path: `${baseDir}/${uuid}/part.ncp${suffix}`,
 				quantity: "1",
 				rotation: "90",
@@ -365,6 +373,17 @@ const NewPlanButton = observer(() => {
 	};
 
 	const showModal = () => setShow(true);
+
+	const getPartThumbSrc = (uuid) => {
+		if (!uuid || !constants.SERVER_URL) return "";
+		return `${constants.SERVER_URL}/jdb/get_part_svg/${encodeURIComponent(String(uuid))}`;
+	};
+	const getPartCodeFromPath = (path) => {
+		const raw = String(path ?? "");
+		const idx = raw.lastIndexOf(":");
+		if (idx < 0) return "";
+		return raw.slice(idx + 1).trim();
+	};
 
 	return (
 		<div>
@@ -390,7 +409,7 @@ const NewPlanButton = observer(() => {
 				id="newPlanButtonModal"
 				className="with-inner-backdrop"
 				centered
-				size="lg"
+				size="xl"
 			>
 				<Modal.Header closeButton>
 					<Modal.Title>
@@ -403,7 +422,7 @@ const NewPlanButton = observer(() => {
 					</Modal.Title>
 				</Modal.Header>
 
-				<Modal.Body>
+				<Modal.Body style={{ maxHeight: "85vh", overflowY: "auto" }}>
 					<Form>
 						<Form.Group className="mb-3">
 							<Form.Label>{t("Sheet creation mode")}</Form.Label>
@@ -429,25 +448,66 @@ const NewPlanButton = observer(() => {
 							</div>
 							{creationMode === "b7_nest" && (
 								<Form.Text className="d-block text-muted">
-									{t("b7_nest_path_hint")}
+									{t("Create nesting plan")}
 								</Form.Text>
 							)}
 						</Form.Group>
 
-						<Form.Group className="mb-3">
-							<Form.Label>{t("Sheet name")} *</Form.Label>
-							<Form.Control
-								type="text"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
-								isInvalid={!!errors.name}
-								placeholder={t("Enter name (up to 50 characters)")}
-								maxLength={50}
-							/>
-							<Form.Control.Feedback type="invalid">
-								{errors.name}
-							</Form.Control.Feedback>
+						
+
+
+
+						<div className="row">
+							<div className="col-md-6">
+
+							<Form.Group className="mb-3">
+								<Form.Label>{t("Sheet name")} *</Form.Label>
+								<Form.Control
+									type="text"
+									value={name}
+									onChange={(e) => setName(e.target.value)}
+									isInvalid={!!errors.name}
+									placeholder={t("Enter name (up to 50 characters)")}
+									maxLength={50}
+								/>
+								<Form.Control.Feedback type="invalid">
+									{errors.name}
+								</Form.Control.Feedback>
+							</Form.Group>
+							</div>
+
+							<div className="col-md-6">
+							<Form.Group className="mb-3">
+							<Form.Label>{t("Material / Preset")} *</Form.Label>
+							<DropdownButton
+								variant={errors.preset ? "outline-danger" : "outline-primary"}
+								title={selectedPreset ? selectedPreset.name : t("Select preset")}
+								onSelect={(eventKey) => {
+									const preset = presets.find(p => p.id === Number(eventKey));
+									setSelectedPreset(preset || null);
+									if (preset) {
+										setErrors(prev => ({ ...prev, preset: "" }));
+									}
+								}}
+							>
+								{presets?.map((preset) => (
+									<Dropdown.Item
+										key={preset.id}
+										eventKey={preset.id}
+										active={selectedPreset?.id === preset.id}
+									>
+										{preset.name}  {preset.id }
+									</Dropdown.Item>
+								)) || <Dropdown.Item disabled>{t("Loading...")}</Dropdown.Item>}
+							</DropdownButton>
+							{errors.preset && (
+								<div className="text-danger mt-1 small">{errors.preset}</div>
+							)}
 						</Form.Group>
+
+
+							</div>
+						</div>
 
 						<div className="row">
 							<div className="col-md-6">
@@ -569,7 +629,7 @@ const NewPlanButton = observer(() => {
 										<div className="text-danger small mb-2">{errors.nestParts}</div>
 									)}
 									{nestPartRows.map((row) => (
-										<InputGroup className="mb-2" key={row.id}>
+										<InputGroup className="" key={row.id}>
 											<div
 												className="form-control"
 												title={row.path || t("Absolute path on server (DXF, NCP, plan:offset)")}
@@ -580,29 +640,50 @@ const NewPlanButton = observer(() => {
 													background: "#f8f9fa",
 													display: "flex",
 													alignItems: "center",
+													gap: 10,
 												}}
 											>
-												{row.path ? (
-													row.path
+												{row.uuid ? (
+													<>
+														<img
+															src={getPartThumbSrc(row.uuid)}
+															alt={getPartCodeFromPath(row.path) || "part"}
+															width={34}
+															height={34}
+															style={{
+																borderRadius: 6,
+																border: "1px solid rgba(0,0,0,0.12)",
+																background: "white",
+																objectFit: "contain",
+																flexShrink: 0,
+															}}
+														/>
+														<span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
+															{getPartCodeFromPath(row.path) || row.path}
+														</span>
+													</>
+												) : row.path ? (
+													<span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
+														{row.path}
+													</span>
 												) : (
 													<span className="text-muted">
 														{t("Absolute path on server (DXF, NCP, plan:offset)")}
 													</span>
 												)}
 											</div>
-											<Form.Control
-												style={{ maxWidth: "88px" }}
-												type="number"
-												min={1}
-												title={t("Quantity")}
+											<HoldStepperNumberInput
 												value={row.quantity}
-												onChange={(e) =>
-													updateNestPartRow(row.id, "quantity", e.target.value)
-												}
+												onChangeValue={(val) => updateNestPartRow(row.id, "quantity", val)}
+												min={1}
+												step={1}
+												title={t("Quantity")}
 												isInvalid={!!errors[`nestQty_${nestPartRows.indexOf(row)}`]}
+												buttonTitlePlus={t("Increase")}
+												buttonTitleMinus={t("Decrease")}
 											/>
 											<Form.Control
-												style={{ maxWidth: "88px" }}
+												style={{ height: "48px !important", maxWidth: "88px !important"}}
 												type="number"
 												min={0}
 												step={90}
@@ -648,33 +729,7 @@ const NewPlanButton = observer(() => {
 							</>
 						)}
 
-						<Form.Group className="mb-3">
-							<Form.Label>{t("Material / Preset")} *</Form.Label>
-							<DropdownButton
-								variant={errors.preset ? "outline-danger" : "outline-primary"}
-								title={selectedPreset ? selectedPreset.name : t("Select preset")}
-								onSelect={(eventKey) => {
-									const preset = presets.find(p => p.id === Number(eventKey));
-									setSelectedPreset(preset || null);
-									if (preset) {
-										setErrors(prev => ({ ...prev, preset: "" }));
-									}
-								}}
-							>
-								{presets?.map((preset) => (
-									<Dropdown.Item
-										key={preset.id}
-										eventKey={preset.id}
-										active={selectedPreset?.id === preset.id}
-									>
-										{preset.name}  {preset.id }
-									</Dropdown.Item>
-								)) || <Dropdown.Item disabled>{t("Loading...")}</Dropdown.Item>}
-							</DropdownButton>
-							{errors.preset && (
-								<div className="text-danger mt-1 small">{errors.preset}</div>
-							)}
-						</Form.Group>
+
 					</Form>
 				</Modal.Body>
 
@@ -713,7 +768,7 @@ const NewPlanButton = observer(() => {
 						{nestLoading
 							? t("Nesting…")
 							: creationMode === "b7_nest"
-								? t("Run nest and open sheet")
+								? t("Run nesting")
 								: t("Create")}
 						</div>
 					</button>

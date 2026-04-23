@@ -634,6 +634,14 @@ const en = {
     "JSON скопирован в буфер": "JSON скопирован в буфер",
     "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: part_code `12___10__2` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/34e7b32a-600e-4fef-afe0-5da3ba736651/part.ncp`: part_code `12___10__2` not found in NCP",
     "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`: part_code `13___10__4` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/fab56bc1-f6b9-425a-9f26-3136af4ba132/part.ncp`: part_code `13___10__4` not found in NCP",
-    "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP"
+    "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP": "NCP `/home/woodver/vematic_1.0/backend/parts/3fa21d69-9b25-4517-b23e-1512dd61761a/part.ncp`: part_code `upload` not found in NCP",
+    "Run nesting": "Run nesting",
+    "Validation error": "Validation error",
+    "No parts added": "No parts added",
+    "Требуется имя": "Требуется имя",
+    "Create nesting plan": "Create nesting plan",
+    "Increase": "Increase",
+    "Decrease": "Decrease",
+    "Ошибка проверки": "Ошибка проверки"
 }
 export default en;
