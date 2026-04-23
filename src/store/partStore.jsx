@@ -785,6 +785,8 @@ class PartStore {
 			height: 0,
 			x: 0,
 			y: 0,
+			/** Один контур в редакторе; для NCP (L) совпадает с первым свободным номером (здесь 1). */
+			program_no: 1,
 			code: [],
 			params: {
 				uuid,

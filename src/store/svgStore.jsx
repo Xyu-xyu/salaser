@@ -389,6 +389,20 @@ class SvgStore {
 		return max;
 	}
 
+	/** Максимальное `program_no` (L) на текущем листе: детали + позиции в плане. */
+	_maxProgramNoInPlan() {
+		let max = 0;
+		for (const p of this.svgData?.part_code || []) {
+			const n = Number(p?.program_no);
+			if (Number.isFinite(n)) max = Math.max(max, n);
+		}
+		for (const pos of this.svgData?.positions || []) {
+			const n = Number(pos?.program_no);
+			if (Number.isFinite(n)) max = Math.max(max, n);
+		}
+		return max;
+	}
+
 	/**
 	 * Импорт детали из NCP каталога: только записи в part_code (как библиотека форм).
 	 * Позиции на листе не создаются — в отличие от «контура из фигур», где addForm + addPosition.
@@ -404,13 +418,16 @@ class SvgStore {
 		if (!imported?.part_code?.length) return false;
 
 		let maxCodeId = this._maxExistingPartCodeId();
+		/* NCP из БД обычно L=1; не копируем, а выдаём свободные L под текущий лист. */
+		let nextProgramNo = this._maxProgramNoInPlan();
 		const clonedParts = imported.part_code.map((pc) => {
 			maxCodeId += 1;
+			nextProgramNo += 1;
 			const newId = maxCodeId;
 			const copy = JSON.parse(JSON.stringify(pc));
 			copy.id = newId;
 			copy.uuid = newId;
-			if (pc && pc.program_no != null) copy.program_no = pc.program_no;
+			copy.program_no = nextProgramNo;
 			const box = this.findBox(copy.code);
 			copy.width = 0;
 			copy.height = 0;
@@ -1174,6 +1191,7 @@ class SvgStore {
 			form.x = box.x
 			form.y = box.y 
 		}
+		form.program_no = this._maxProgramNoInPlan() + 1;
 
 		console.log(form)
 		this.svgData.part_code.push(form)
