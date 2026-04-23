@@ -660,6 +660,7 @@ const en = {
     "right_to_left": "right_to_left",
     "child_first": "child_first",
     "parent_first": "parent_first",
-    "flat": "flat"
+    "flat": "flat",
+    "Не удалось сохранить деталь": "Не удалось сохранить деталь"
 }
 export default en;

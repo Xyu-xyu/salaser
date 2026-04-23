@@ -609,6 +609,7 @@ const zh = {
     "Advanced part parameters": "高级零件参数",
     "bottom_to_top": "从下到上",
     "right_to_left": "从右到左",
-    "flat": "平坦的"
+    "flat": "平坦的",
+    "Не удалось сохранить деталь": "Не удалось сохранить деталь"
 }
 export default zh;

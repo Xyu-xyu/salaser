@@ -12,6 +12,7 @@ import { showToast } from "../toast";
 import DbPartsSortPanel from "../dbPartsSortPanel";
 import partStore from "../../store/partStore";
 import HoldStepperNumberInput from "../holdStepperNumberInput.jsx";
+import PartSvgImg from "../partSvgImg";
 
 
 const NewPlanButton = observer(() => {
@@ -530,9 +531,10 @@ const NewPlanButton = observer(() => {
 
 	const showModal = () => setShow(true);
 
-	const getPartThumbSrc = (uuid) => {
-		if (!uuid || !constants.SERVER_URL) return "";
-		return `${constants.SERVER_URL}/jdb/get_part_svg/${encodeURIComponent(String(uuid))}`;
+	const getPartThumbUpdatedAt = (uuid) => {
+		if (!uuid) return "";
+		const p = partStore.dbParts.find((x) => String(x?.uuid) === String(uuid));
+		return String(p?.updated_at ?? p?.updatedAt ?? "");
 	};
 	const getPartCodeFromPath = (path) => {
 		const raw = String(path ?? "");
@@ -1004,8 +1006,9 @@ const NewPlanButton = observer(() => {
 												>
 													{row.uuid ? (
 														<>
-															<img
-																src={getPartThumbSrc(row.uuid)}
+															<PartSvgImg
+																uuid={row.uuid}
+																updated_at={getPartThumbUpdatedAt(row.uuid)}
 																alt={getPartCodeFromPath(row.path) || "part"}
 																width={34}
 																height={34}

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import constants from "../store/constants";
 import Util from "../scripts/util";
 import partStore from "../store/partStore";
+import PartSvgImg from "./partSvgImg";
 
 const inputBase = {
 	flex: "1 1 7rem",
@@ -280,8 +281,9 @@ const DbPartsSortPanel = observer((props = {}) => {
 										}}
 									>
 										{p.uuid && (
-											<img
-												src={`${constants.SERVER_URL}/jdb/get_part_svg/${p.uuid}`}
+											<PartSvgImg
+												uuid={p.uuid}
+												updated_at={p.updated_at ?? p.updatedAt ?? ""}
 												alt={p.name ?? "part"}
 												width={56}
 												height={56}
