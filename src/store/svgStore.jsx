@@ -1408,6 +1408,16 @@ class SvgStore {
 		return String(val ?? "").replace(/"/g, "'");
 	}
 
+	/** Номер программы L в G28…LP1 — из `program_no` детали; иначе запасной порядковый номер. */
+	_resolveProgramNoForPart(partLike, sequentialFallback) {
+		const raw = partLike?.program_no;
+		if (raw != null && String(raw).trim() !== "") {
+			const n = Number(raw);
+			if (Number.isFinite(n)) return n;
+		}
+		return sequentialFallback;
+	}
+
 	/**
 	 * Фрагмент NCP для одной детали (как в generateParts): Part, MaterialInfo из модалки/объекта, G-код контуров.
 	 */
@@ -1430,7 +1440,8 @@ class SvgStore {
 			);
 		}
 		res.push(`(<Part PartCode="${encName}" Debit="1">)`);
-		const contours = this.generateSinglePart(part?.code || [], progNum);
+		const L = this._resolveProgramNoForPart(part, progNum);
+		const contours = this.generateSinglePart(part?.code || [], L);
 		// generateSinglePart возвращает строки с N0..., включая теги (<Contour>) с N0 префиксом.
 		// Разворачиваем в плоский список, добавляем G98, затем делаем последовательную перенумерацию N-строк.
 		res.push(...contours);
@@ -1480,9 +1491,10 @@ class SvgStore {
 				thickness: part.thickness,
 				material: part.material,
 				material_id: part.material_id,
+				program_no: part.program_no,
  			});
 		}
-		let progNum = 1
+		let sequentialL = 1;
 
 		for (const [partCodeId, partInfo ] of uniqueParts) {
 			const { name, code, thickness, material, width, height } = partInfo;
@@ -1504,10 +1516,11 @@ class SvgStore {
 				);
 			}
 
-			const contours = this.generateSinglePart(code, progNum)
+			const L = this._resolveProgramNoForPart(partInfo, sequentialL);
+			const contours = this.generateSinglePart(code, L);
 			res.push(contours);
 
-			progNum++
+			sequentialL++
 			lineNumber += contours.length;
 
 			//
@@ -2309,10 +2322,22 @@ class SvgStore {
 			// высота листа по оси Y в системе станка
 			let sheetHeight = this.svgData.height
 			const partId = pos.part_code_id
-			let L = (pos && pos.program_no != null) ? Number(pos.program_no) : Number(partId)
+			const partRow = data.part_code?.find(
+				(a) => String(a?.uuid ?? a?.id) === String(partId)
+			);
+			let L;
+			if (pos?.program_no != null && String(pos.program_no).trim() !== "") {
+				const n = Number(pos.program_no);
+				L = Number.isFinite(n) ? n : Number(partId);
+			} else if (partRow?.program_no != null && String(partRow.program_no).trim() !== "") {
+				const n = Number(partRow.program_no);
+				L = Number.isFinite(n) ? n : Number(partId);
+			} else {
+				L = Number(partId);
+			}
 			let G = 52
-			let part = svgStore.svgData.part_code.filter(a => a.id == partId)[0].code
-			let partHeight = svgStore.findBox(part).height
+			const partCodeArr = Array.isArray(partRow?.code) ? partRow.code : [];
+			let partHeight = svgStore.findBox(partCodeArr).height
 			let XYC = this.matrixToG52(matrix, sheetHeight, partHeight, pos.cx, pos.cy)
 			let X = utils.smartRound(XYC.X)
 			let Y = utils.smartRound(XYC.Y)
@@ -2341,7 +2366,20 @@ class SvgStore {
 		if (residualDisplayPaths.length) {
 			const used = new Set();
 			for (const p of (data.positions || [])) {
-				const pn = (p && p.program_no != null) ? Number(p.program_no) : Number(p?.part_code_id);
+				let pn;
+				if (p && p.program_no != null && String(p.program_no).trim() !== "") {
+					pn = Number(p.program_no);
+				} else {
+					const pid = p?.part_code_id;
+					const prow = data.part_code?.find(
+						(a) => String(a?.uuid ?? a?.id) === String(pid)
+					);
+					if (prow?.program_no != null && String(prow.program_no).trim() !== "") {
+						pn = Number(prow.program_no);
+					} else {
+						pn = Number(pid);
+					}
+				}
 				if (Number.isFinite(pn)) used.add(pn);
 			}
 			for (const pc of (data.part_code || [])) {
