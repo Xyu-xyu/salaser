@@ -802,6 +802,14 @@ height: fit-content;}
   z-index: -1;
 }
 
+#newPlanButtonModal .modal-dialog {
+  max-width: min(1400px, 96vw);
+}
+
+#newPlanButtonModal .modal-content {
+  max-height: 92vh;
+}
+
 .addPlanButton-navbar-modal .modal-dialog,
 .functionButton-navbar-modal .modal-dialog, 
 .favoritesButton-navbar-modal .modal-dialog, 
