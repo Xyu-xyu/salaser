@@ -642,6 +642,24 @@ const en = {
     "Create nesting plan": "Create nesting plan",
     "Increase": "Increase",
     "Decrease": "Decrease",
-    "Ошибка проверки": "Ошибка проверки"
+    "Ошибка проверки": "Ошибка проверки",
+    "B7 parameters": "B7 parameters",
+    "Advanced parameters": "Advanced parameters",
+    "Hide advanced": "Hide advanced",
+    "Right": "Right",
+    "Bottom": "Bottom",
+    "Sheet margins (mm)": "Sheet margins (mm)",
+    "Left": "Left",
+    "Top": "Top",
+    "Material auto params": "Material auto params",
+    "Nesting options": "Nesting options",
+    "Advanced part parameters": "Advanced part parameters",
+    "bottom_to_top": "bottom_to_top",
+    "top_to_bottom": "top_to_bottom",
+    "left_to_right": "left_to_right",
+    "right_to_left": "right_to_left",
+    "child_first": "child_first",
+    "parent_first": "parent_first",
+    "flat": "flat"
 }
 export default en;

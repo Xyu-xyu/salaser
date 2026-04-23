@@ -3095,3 +3095,7 @@ cursor: url('./images//cursor_plus.cur'), auto !important;
   border: 2px solid var(--violet) !important;
  
 }
+
+.row-part-inpu-group {
+  height: 50px !important;
+}

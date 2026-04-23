@@ -598,6 +598,17 @@ const zh = {
     "Требуется имя": "Требуется имя",
     "Create nesting plan": "创建嵌套计划",
     "Increase": "增加",
-    "Ошибка проверки": "Ошибка проверки"
+    "Ошибка проверки": "Ошибка проверки",
+    "B7 parameters": "B7参数",
+    "Bottom": "底部",
+    "Top": "顶部",
+    "Right": "正确的",
+    "Hide advanced": "隐藏高级",
+    "Nesting options": "嵌套选项",
+    "Material auto params": "材质自动参数",
+    "Advanced part parameters": "高级零件参数",
+    "bottom_to_top": "从下到上",
+    "right_to_left": "从右到左",
+    "flat": "平坦的"
 }
 export default zh;

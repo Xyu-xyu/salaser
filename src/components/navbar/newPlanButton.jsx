@@ -33,6 +33,24 @@ const NewPlanButton = observer(() => {
 	const [materialName, setMaterialName] = useState("DC01");
 	const [partProtectionGap, setPartProtectionGap] = useState("10");
 	const [nestLoading, setNestLoading] = useState(false);
+	const [showAdvancedB7, setShowAdvancedB7] = useState(false);
+
+	// B7 advanced: sheets/material/nesting defaults
+	const [sheetMarginLeft, setSheetMarginLeft] = useState("0");
+	const [sheetMarginRight, setSheetMarginRight] = useState("0");
+	const [sheetMarginTop, setSheetMarginTop] = useState("0");
+	const [sheetMarginBottom, setSheetMarginBottom] = useState("0");
+	const [materialAutoParams, setMaterialAutoParams] = useState(false);
+	const [materialAutoParamsForce, setMaterialAutoParamsForce] = useState(false);
+
+	const [nestingHoleClearance, setNestingHoleClearance] = useState("");
+	const [nestingMinHoleArea, setNestingMinHoleArea] = useState("");
+	const [nestingInHoles, setNestingInHoles] = useState(true);
+	const [nestingDirection, setNestingDirection] = useState("bottom_to_top");
+	const [mirroringAllowed, setMirroringAllowed] = useState(false);
+	const [cutSequence, setCutSequence] = useState("child_first");
+	const [shakeCount, setShakeCount] = useState("0");
+	const [parallelCandidates, setParallelCandidates] = useState(false);
 
 	/** Импорт деталей из БД в B7-раскрой */
 	const [showImportDb, setShowImportDb] = useState(false);
@@ -136,18 +154,62 @@ const NewPlanButton = observer(() => {
 	const buildB7NestConfig = () => {
 		const parts = nestPartRows
 			.filter((row) => row.path.trim())
-			.map((row) => ({
-				path: row.path.trim(),
-				quantity: parseInt(row.quantity, 10) || 1,
-				rotation_allowance: Number(row.rotation) || 90,
-			}));
+			.map((row) => {
+				const base = {
+					path: row.path.trim(),
+					quantity: parseInt(row.quantity, 10) || 1,
+					rotation_allowance: row.rotation === "" || row.rotation == null
+						? null
+						: Number(row.rotation) || 0,
+				};
+
+				if (showAdvancedB7) {
+					const micro = row.micro_joint_pos;
+					const microNum = micro === "" || micro == null ? null : Number(micro);
+					if (microNum != null && Number.isFinite(microNum)) {
+						base.micro_joint_pos = microNum;
+					} else if (micro === null) {
+						base.micro_joint_pos = null;
+					}
+
+					if (row.is_filler === true) base.is_filler = true;
+
+					const pr = row.priority;
+					const prNum = pr === "" || pr == null ? null : parseInt(pr, 10);
+					if (prNum != null && Number.isFinite(prNum)) base.priority = prNum;
+
+					const lead = row.lead_in || {};
+					const outerType = lead?.outer?.lead_in_type;
+					const innerType = lead?.inner?.lead_in_type;
+					const outerRadius = lead?.outer?.radius;
+					const innerLength = lead?.inner?.length;
+					const leadIn = {};
+					if (outerType) {
+						leadIn.outer = { lead_in_type: outerType };
+						const r = outerRadius === "" || outerRadius == null ? null : Number(outerRadius);
+						if (r != null && Number.isFinite(r)) leadIn.outer.radius = r;
+					}
+					if (innerType) {
+						leadIn.inner = { lead_in_type: innerType };
+						const l = innerLength === "" || innerLength == null ? null : Number(innerLength);
+						if (l != null && Number.isFinite(l)) leadIn.inner.length = l;
+					}
+					if (Object.keys(leadIn).length) base.lead_in = leadIn;
+				}
+
+				return base;
+			});
 		const w = parseFloat(width);
 		const h = parseFloat(height);
 		const sheetCount = parseInt(quantity, 10);
 		const th = parseFloat(thickness);
-		return {
+		const config = {
 			parts,
-			sheets: [{ size_x: w, size_y: h, count: sheetCount }],
+			sheets: [{
+				size_x: w,
+				size_y: h,
+				count: sheetCount,
+			}],
 			material: {
 				thickness: th,
 				name: materialName.trim() || "Steel",
@@ -157,11 +219,69 @@ const NewPlanButton = observer(() => {
 				plan_name: name.trim() || `PLAN_${w}x${h}`,
 			},
 		};
+
+		if (showAdvancedB7) {
+			// sheets margins
+			const ml = Number(sheetMarginLeft);
+			const mr = Number(sheetMarginRight);
+			const mt = Number(sheetMarginTop);
+			const mb = Number(sheetMarginBottom);
+			if (!Number.isNaN(ml) && ml) config.sheets[0].margin_left = ml;
+			if (!Number.isNaN(mr) && mr) config.sheets[0].margin_right = mr;
+			if (!Number.isNaN(mt) && mt) config.sheets[0].margin_top = mt;
+			if (!Number.isNaN(mb) && mb) config.sheets[0].margin_bottom = mb;
+
+			// material auto params
+			if (materialAutoParams) config.material.auto_params = true;
+			if (materialAutoParamsForce) config.material.auto_params_force = true;
+
+			// nesting fields
+			const hc = nestingHoleClearance === "" ? null : Number(nestingHoleClearance);
+			if (hc != null && Number.isFinite(hc)) config.nesting.hole_clearance = hc;
+
+			const mha = nestingMinHoleArea === "" ? null : Number(nestingMinHoleArea);
+			if (mha != null && Number.isFinite(mha)) config.nesting.min_hole_area_for_nesting = mha;
+
+			config.nesting.nesting_in_holes = Boolean(nestingInHoles);
+			config.nesting.nesting_direction = nestingDirection || "bottom_to_top";
+			config.nesting.mirroring_allowed = Boolean(mirroringAllowed);
+			config.nesting.cut_sequence = cutSequence || "child_first";
+
+			const sc = shakeCount === "" ? null : parseInt(shakeCount, 10);
+			if (sc != null && Number.isFinite(sc)) config.nesting.shake_count = sc;
+			config.nesting.parallel = Boolean(parallelCandidates);
+		}
+
+		return config;
 	};
 
 	const nestRequestPreview = useMemo(
 		() => JSON.stringify({ config: buildB7NestConfig() }, null, 2),
-		[width, height, quantity, thickness, materialName, nestPartRows]
+		[
+			name,
+			width,
+			height,
+			quantity,
+			thickness,
+			materialName,
+			partProtectionGap,
+			nestPartRows,
+			showAdvancedB7,
+			sheetMarginLeft,
+			sheetMarginRight,
+			sheetMarginTop,
+			sheetMarginBottom,
+			materialAutoParams,
+			materialAutoParamsForce,
+			nestingHoleClearance,
+			nestingMinHoleArea,
+			nestingInHoles,
+			nestingDirection,
+			mirroringAllowed,
+			cutSequence,
+			shakeCount,
+			parallelCandidates,
+		]
 	);
 
 	const copyNestJson = async () => {
@@ -288,6 +408,21 @@ const NewPlanButton = observer(() => {
 		setMaterialName("DC01");
 		setPartProtectionGap("10");
 		setNestLoading(false);
+		setShowAdvancedB7(false);
+		setSheetMarginLeft("0");
+		setSheetMarginRight("0");
+		setSheetMarginTop("0");
+		setSheetMarginBottom("0");
+		setMaterialAutoParams(false);
+		setMaterialAutoParamsForce(false);
+		setNestingHoleClearance("");
+		setNestingMinHoleArea("");
+		setNestingInHoles(true);
+		setNestingDirection("bottom_to_top");
+		setMirroringAllowed(false);
+		setCutSequence("child_first");
+		setShakeCount("0");
+		setParallelCandidates(false);
 		setErrors({
 			name: "",
 			width: "",
@@ -304,7 +439,21 @@ const NewPlanButton = observer(() => {
 	const addNestPartRow = () => {
 		setNestPartRows((rows) => [
 			...rows,
-			{ id: `p_${Date.now()}_${rows.length}`, uuid: null, path: "", quantity: "1", rotation: "90" },
+			{
+				id: `p_${Date.now()}_${rows.length}`,
+				uuid: null,
+				path: "",
+				quantity: "1",
+				rotation: "90",
+				// advanced (optional)
+				micro_joint_pos: "",
+				is_filler: false,
+				priority: "",
+				lead_in: {
+					outer: { lead_in_type: "" , radius: "" },
+					inner: { lead_in_type: "" , length: "" },
+				},
+			},
 		]);
 	};
 
@@ -353,6 +502,13 @@ const NewPlanButton = observer(() => {
 				path: `${baseDir}/${uuid}/part.ncp${suffix}`,
 				quantity: "1",
 				rotation: "90",
+				micro_joint_pos: "",
+				is_filler: false,
+				priority: "",
+				lead_in: {
+					outer: { lead_in_type: "" , radius: "" },
+					inner: { lead_in_type: "" , length: "" },
+				},
 			};
 		});
 
@@ -584,6 +740,18 @@ const NewPlanButton = observer(() => {
 
 						{creationMode === "b7_nest" && (
 							<>
+								<div className="d-flex justify-content-between align-items-center mb-2">
+									<Form.Label className="mb-0">{t("B7 parameters")}</Form.Label>
+									<Button
+										type="button"
+										variant={showAdvancedB7 ? "secondary" : "outline-secondary"}
+										size="sm"
+										onClick={() => setShowAdvancedB7((v) => !v)}
+									>
+										{showAdvancedB7 ? t("Hide advanced") : t("Advanced parameters")}
+									</Button>
+								</div>
+
 								<Form.Group className="mb-3">
 									<Form.Label>{t("Nest material name (b7)")} *</Form.Label>
 									<Form.Control
@@ -613,6 +781,188 @@ const NewPlanButton = observer(() => {
 									</Form.Control.Feedback>
 								</Form.Group>
 
+								{showAdvancedB7 && (
+									<>
+										<Form.Group className="mb-3">
+											<Form.Label>{t("Sheet margins (mm)")}</Form.Label>
+											<div className="row g-2">
+												<div className="col-6 col-lg-3">
+													<Form.Label className="small text-muted mb-1">
+														{t("Left")}
+													</Form.Label>
+													<Form.Control
+														type="number"
+														min={0}
+														step="0.1"
+														title={t("Left")}
+														placeholder={t("Left")}
+														value={sheetMarginLeft}
+														onChange={(e) => setSheetMarginLeft(e.target.value)}
+													/>
+												</div>
+												<div className="col-6 col-lg-3">
+													<Form.Label className="small text-muted mb-1">
+														{t("Right")}
+													</Form.Label>
+													<Form.Control
+														type="number"
+														min={0}
+														step="0.1"
+														title={t("Right")}
+														placeholder={t("Right")}
+														value={sheetMarginRight}
+														onChange={(e) => setSheetMarginRight(e.target.value)}
+													/>
+												</div>
+												<div className="col-6 col-lg-3">
+													<Form.Label className="small text-muted mb-1">
+														{t("Top")}
+													</Form.Label>
+													<Form.Control
+														type="number"
+														min={0}
+														step="0.1"
+														title={t("Top")}
+														placeholder={t("Top")}
+														value={sheetMarginTop}
+														onChange={(e) => setSheetMarginTop(e.target.value)}
+													/>
+												</div>
+												<div className="col-6 col-lg-3">
+													<Form.Label className="small text-muted mb-1">
+														{t("Bottom")}
+													</Form.Label>
+													<Form.Control
+														type="number"
+														min={0}
+														step="0.1"
+														title={t("Bottom")}
+														placeholder={t("Bottom")}
+														value={sheetMarginBottom}
+														onChange={(e) => setSheetMarginBottom(e.target.value)}
+													/>
+												</div>
+											</div>
+										</Form.Group>
+
+										<Form.Group className="mb-3">
+											<Form.Label className="mb-2">{t("Material auto params")}</Form.Label>
+											<div className="d-flex flex-wrap gap-3">
+												<Form.Check
+													type="switch"
+													id="b7MatAutoParams"
+													label={t("auto_params")}
+													checked={materialAutoParams}
+													onChange={(e) => setMaterialAutoParams(e.target.checked)}
+												/>
+												<Form.Check
+													type="switch"
+													id="b7MatAutoParamsForce"
+													label={t("auto_params_force")}
+													checked={materialAutoParamsForce}
+													onChange={(e) => setMaterialAutoParamsForce(e.target.checked)}
+												/>
+											</div>
+										</Form.Group>
+
+										<Form.Group className="mb-3">
+											<Form.Label>{t("Nesting options")}</Form.Label>
+											<div className="row g-2">
+												<div className="col-6 col-lg-3">
+													<Form.Control
+														type="number"
+														min={0}
+														step="0.1"
+														placeholder={t("hole_clearance")}
+														title={t("hole_clearance")}
+														value={nestingHoleClearance}
+														onChange={(e) => setNestingHoleClearance(e.target.value)}
+													/>
+												</div>
+												<div className="col-6 col-lg-3">
+													<Form.Control
+														type="number"
+														min={0}
+														step="0.1"
+														placeholder={t("min_hole_area_for_nesting")}
+														title={t("min_hole_area_for_nesting")}
+														value={nestingMinHoleArea}
+														onChange={(e) => setNestingMinHoleArea(e.target.value)}
+													/>
+												</div>
+												<div className="col-6 col-lg-3">
+													<Form.Control
+														type="number"
+														min={0}
+														step="1"
+														placeholder={t("shake_count")}
+														title={t("shake_count")}
+														value={shakeCount}
+														onChange={(e) => setShakeCount(e.target.value)}
+													/>
+												</div>
+												<div className="col-6 col-lg-3 d-flex align-items-center">
+													<Form.Check
+														type="switch"
+														id="b7Parallel"
+														label={t("parallel")}
+														checked={parallelCandidates}
+														onChange={(e) => setParallelCandidates(e.target.checked)}
+													/>
+												</div>
+											</div>
+
+											<div className="row g-2 mt-1">
+												<div className="col-12 col-lg-4">
+													<Form.Label className="small text-muted mb-1">
+														{t("nesting_direction")}
+													</Form.Label>
+													<Form.Select
+														title={t("nesting_direction")}
+														value={nestingDirection}
+														onChange={(e) => setNestingDirection(e.target.value)}
+													>
+														<option value="bottom_to_top">{t("bottom_to_top")}</option>
+														<option value="top_to_bottom">{t("top_to_bottom")}</option>
+														<option value="left_to_right">{t("left_to_right")}</option>
+														<option value="right_to_left">{t("right_to_left")}</option>
+													</Form.Select>
+												</div>
+												<div className="col-12 col-lg-4">
+													<Form.Label className="small text-muted mb-1">
+														{t("cut_sequence")}
+													</Form.Label>
+													<Form.Select
+														title={t("cut_sequence")}
+														value={cutSequence}
+														onChange={(e) => setCutSequence(e.target.value)}
+													>
+														<option value="child_first">{t("child_first")}</option>
+														<option value="parent_first">{t("parent_first")}</option>
+														<option value="flat">{t("flat")}</option>
+													</Form.Select>
+												</div>
+												<div className="col-12 col-lg-4 d-flex flex-wrap align-items-center gap-3">
+													<Form.Check
+														type="switch"
+														id="b7NestingInHoles"
+														label={t("nesting_in_holes")}
+														checked={nestingInHoles}
+														onChange={(e) => setNestingInHoles(e.target.checked)}
+													/>
+													<Form.Check
+														type="switch"
+														id="b7MirrorAllowed"
+														label={t("mirroring_allowed")}
+														checked={mirroringAllowed}
+														onChange={(e) => setMirroringAllowed(e.target.checked)}
+													/>
+												</div>
+											</div>
+										</Form.Group>
+									</>
+								)}
+
 								<Form.Group className="mb-3">
 									<div className="d-flex justify-content-between align-items-center mb-2">
 										<Form.Label className="mb-0">{t("Parts for nesting")}</Form.Label>
@@ -629,80 +979,241 @@ const NewPlanButton = observer(() => {
 										<div className="text-danger small mb-2">{errors.nestParts}</div>
 									)}
 									{nestPartRows.map((row) => (
-										<InputGroup className="" key={row.id}>
-											<div
-												className="form-control"
-												title={row.path || t("Absolute path on server (DXF, NCP, plan:offset)")}
-												style={{
-													overflow: "hidden",
-													whiteSpace: "nowrap",
-													textOverflow: "ellipsis",
-													background: "#f8f9fa",
-													display: "flex",
-													alignItems: "center",
-													gap: 10,
-												}}
+										<div key={row.id} className="mb-2"
+										style={{										
+											height: "50px !important"
+										}}
+										>
+											<InputGroup
+												className="align-items-stretch row-part-inpu-group"
+												style={{ height: "50px !important" }}
 											>
-												{row.uuid ? (
-													<>
-														<img
-															src={getPartThumbSrc(row.uuid)}
-															alt={getPartCodeFromPath(row.path) || "part"}
-															width={34}
-															height={34}
-															style={{
-																borderRadius: 6,
-																border: "1px solid rgba(0,0,0,0.12)",
-																background: "white",
-																objectFit: "contain",
-																flexShrink: 0,
-															}}
-														/>
+												<div
+													className="form-control"
+													title={row.path || t("Absolute path on server (DXF, NCP, plan:offset)")}
+													style={{
+														overflow: "hidden",
+														whiteSpace: "nowrap",
+														textOverflow: "ellipsis",
+														background: "#f8f9fa",
+														display: "flex",
+														alignItems: "center",
+														gap: 10,
+														height: "50px"
+													}}
+												>
+													{row.uuid ? (
+														<>
+															<img
+																src={getPartThumbSrc(row.uuid)}
+																alt={getPartCodeFromPath(row.path) || "part"}
+																width={34}
+																height={34}
+																style={{
+																	borderRadius: 6,
+																	border: "1px solid rgba(0,0,0,0.12)",
+																	background: "white",
+																	objectFit: "contain",
+																	flexShrink: 0,
+																}}
+															/>
+															<span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
+																{getPartCodeFromPath(row.path) || row.path}
+															</span>
+														</>
+													) : row.path ? (
 														<span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
-															{getPartCodeFromPath(row.path) || row.path}
+															{row.path}
 														</span>
-													</>
-												) : row.path ? (
-													<span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
-														{row.path}
-													</span>
-												) : (
-													<span className="text-muted">
-														{t("Absolute path on server (DXF, NCP, plan:offset)")}
-													</span>
-												)}
-											</div>
-											<HoldStepperNumberInput
-												value={row.quantity}
-												onChangeValue={(val) => updateNestPartRow(row.id, "quantity", val)}
-												min={1}
-												step={1}
-												title={t("Quantity")}
-												isInvalid={!!errors[`nestQty_${nestPartRows.indexOf(row)}`]}
-												buttonTitlePlus={t("Increase")}
-												buttonTitleMinus={t("Decrease")}
-											/>
-											<Form.Control
-												style={{ height: "48px !important", maxWidth: "88px !important"}}
-												type="number"
-												min={0}
-												step={90}
-												title={t("Rotation allowance (deg)")}
-												value={row.rotation}
-												onChange={(e) =>
-													updateNestPartRow(row.id, "rotation", e.target.value)
-												}
-												isInvalid={!!errors[`nestRot_${nestPartRows.indexOf(row)}`]}
-											/>
-											<Button
-												variant="outline-danger"
-												type="button"
-												disabled={nestPartRows.length <= 1}
-												onClick={() => removeNestPartRow(row.id)}
-											>
-												×
-											</Button>
-										</InputGroup>
+													) : (
+														<span className="text-muted">
+															{t("Absolute path on server (DXF, NCP, plan:offset)")}
+														</span>
+													)}
+												</div>
+												<HoldStepperNumberInput
+													value={row.quantity}
+													onChangeValue={(val) => updateNestPartRow(row.id, "quantity", val)}
+													min={1}
+													step={1}
+													title={t("Quantity")}
+													isInvalid={!!errors[`nestQty_${nestPartRows.indexOf(row)}`]}
+													buttonTitlePlus={t("Increase")}
+													buttonTitleMinus={t("Decrease")}
+													style={{ height: "100%" }}
+													inputStyle={{ height: "100%" }}
+												/>
+												<Form.Control
+													style={{ height: "100%", maxWidth: "88px" }}
+													type="number"
+													min={0}
+													step={90}
+													title={t("Rotation allowance (deg)")}
+													value={row.rotation}
+													onChange={(e) =>
+														updateNestPartRow(row.id, "rotation", e.target.value)
+													}
+													isInvalid={!!errors[`nestRot_${nestPartRows.indexOf(row)}`]}
+												/>
+												<Button
+													variant="outline-danger"
+													type="button"
+													disabled={nestPartRows.length <= 1}
+													onClick={() => removeNestPartRow(row.id)}
+													style={{ height: "100%" }}
+												>
+													×
+												</Button>
+											</InputGroup>
+
+											{showAdvancedB7 && (
+												<details className="mt-1 border rounded p-2">
+													<summary className="cursor-pointer user-select-none">
+														{t("Advanced part parameters")}
+													</summary>
+													<div className="mt-2">
+														<div className="row g-2 align-items-end">
+															<div className="col-6 col-lg-2">
+																<Form.Label className="small text-muted mb-1">{t("micro_joint_pos")}</Form.Label>
+																<Form.Control
+																	type="number"
+																	min={0}
+																	step="0.1"
+																	title={t("micro_joint_pos")}
+																	placeholder={t("micro_joint_pos")}
+																	value={row.micro_joint_pos ?? ""}
+																	onChange={(e) =>
+																		updateNestPartRow(row.id, "micro_joint_pos", e.target.value)
+																	}
+																/>
+															</div>
+															<div className="col-6 col-lg-2">
+																<Form.Label className="small text-muted mb-1">{t("priority")}</Form.Label>
+																<Form.Control
+																	type="number"
+																	min={1}
+																	max={99}
+																	step="1"
+																	title={t("priority")}
+																	placeholder={t("priority")}
+																	value={row.priority ?? ""}
+																	onChange={(e) =>
+																		updateNestPartRow(row.id, "priority", e.target.value)
+																	}
+																/>
+															</div>
+															<div className="col-12 col-lg-2">
+																<Form.Check
+																	type="switch"
+																	id={`b7Filler_${row.id}`}
+																	label={t("is_filler")}
+																	checked={row.is_filler === true}
+																	onChange={(e) =>
+																		updateNestPartRow(row.id, "is_filler", e.target.checked)
+																	}
+																/>
+															</div>
+															<div className="col-12 col-lg-3">
+																<Form.Label className="small text-muted mb-1">
+																	{t("lead_in_outer_type")}
+																</Form.Label>
+																<Form.Select
+																	title={t("lead_in_outer_type")}
+																	value={row.lead_in?.outer?.lead_in_type ?? ""}
+																	onChange={(e) => {
+																		const next = {
+																			...(row.lead_in || {}),
+																			outer: {
+																				...(row.lead_in?.outer || {}),
+																				lead_in_type: e.target.value,
+																			},
+																		};
+																		updateNestPartRow(row.id, "lead_in", next);
+																	}}
+																>
+																	<option value="">{t("lead_in_none_outer")}</option>
+																	<option value="direct">{t("lead_in_type_direct")}</option>
+																	<option value="straight">{t("lead_in_type_straight")}</option>
+																	<option value="tangent">{t("lead_in_type_tangent")}</option>
+																</Form.Select>
+															</div>
+															<div className="col-12 col-lg-3">
+																<Form.Label className="small text-muted mb-1">
+																	{t("lead_in_outer_radius")}
+																</Form.Label>
+																<Form.Control
+																	type="number"
+																	min={0}
+																	step="0.1"
+																	title={t("lead_in_outer_radius")}
+																	placeholder={t("lead_in_outer_radius")}
+																	value={row.lead_in?.outer?.radius ?? ""}
+																	onChange={(e) => {
+																		const next = {
+																			...(row.lead_in || {}),
+																			outer: {
+																				...(row.lead_in?.outer || {}),
+																				radius: e.target.value,
+																			},
+																		};
+																		updateNestPartRow(row.id, "lead_in", next);
+																	}}
+																/>
+															</div>
+														</div>
+														<div className="row g-2 mt-1">
+															<div className="col-12 col-lg-3">
+																<Form.Label className="small text-muted mb-1">
+																	{t("lead_in_inner_type")}
+																</Form.Label>
+																<Form.Select
+																	title={t("lead_in_inner_type")}
+																	value={row.lead_in?.inner?.lead_in_type ?? ""}
+																	onChange={(e) => {
+																		const next = {
+																			...(row.lead_in || {}),
+																			inner: {
+																				...(row.lead_in?.inner || {}),
+																				lead_in_type: e.target.value,
+																			},
+																		};
+																		updateNestPartRow(row.id, "lead_in", next);
+																	}}
+																>
+																	<option value="">{t("lead_in_none_inner")}</option>
+																	<option value="direct">{t("lead_in_type_direct")}</option>
+																	<option value="straight">{t("lead_in_type_straight")}</option>
+																	<option value="tangent">{t("lead_in_type_tangent")}</option>
+																</Form.Select>
+															</div>
+															<div className="col-12 col-lg-3">
+																<Form.Label className="small text-muted mb-1">
+																	{t("lead_in_inner_length")}
+																</Form.Label>
+																<Form.Control
+																	type="number"
+																	min={0}
+																	step="0.1"
+																	title={t("lead_in_inner_length")}
+																	placeholder={t("lead_in_inner_length")}
+																	value={row.lead_in?.inner?.length ?? ""}
+																	onChange={(e) => {
+																		const next = {
+																			...(row.lead_in || {}),
+																			inner: {
+																				...(row.lead_in?.inner || {}),
+																				length: e.target.value,
+																			},
+																		};
+																		updateNestPartRow(row.id, "lead_in", next);
+																	}}
+																/>
+															</div>
+														</div>
+													</div>
+												</details>
+											)}
+										</div>
 									))}
 								</Form.Group>
 

@@ -146,7 +146,7 @@ export default function HoldStepperNumberInput(props = {}) {
 					zIndex: 2,
 				}}
 			>
-				<button
+			{/* 	<button
 					type="button"
 					className="btn btn-outline-secondary p-0"
 					title={buttonTitlePlus}
@@ -195,7 +195,7 @@ export default function HoldStepperNumberInput(props = {}) {
 					onLostPointerCapture={stopHold}
 				>
 					−
-				</button>
+				</button> */}
 			</div>
 		</div>
 	);
