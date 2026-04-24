@@ -659,6 +659,20 @@ const ru = {
     "child_first": "Сначала вложенные",
     "parent_first": "Сначала внешняя",
     "flat": "Как уложено",
+    "processing_sequence": "Последовательность обработки",
+    "processing_sequence_enabled": "Переставлять детали перед NCP (пост-процесс)",
+    "processing_sequence_mode": "Режим обхода",
+    "processing_sequence_step": "Величина шага (ширина полосы в bbox)",
+    "processing_sequence_group_by_sectors": "Обход по сетке секторов",
+    "processing_sequence_sector_size_x": "Ширина сектора (мм)",
+    "processing_sequence_sector_size_y": "Высота сектора (мм)",
+    "ps_mode_build_order": "Очередность построения (как вернул нестинг)",
+    "ps_mode_random": "Случайно (детерминировано по имени плана)",
+    "ps_mode_vertical_left_to_right": "Вертикально, слева направо",
+    "ps_mode_vertical_right_to_left": "Вертикально, справа налево",
+    "ps_mode_horizontal_bottom_to_top": "Горизонтально, снизу вверх",
+    "ps_mode_horizontal_top_to_bottom": "Горизонтально, сверху вниз",
+    "Priority must be an integer from 1 to 99": "Приоритет — целое число от 1 до 99",
     "Не удалось сохранить деталь": "Не удалось сохранить деталь"
 }
 export default ru;

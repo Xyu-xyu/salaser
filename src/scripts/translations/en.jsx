@@ -661,6 +661,20 @@ const en = {
     "child_first": "child_first",
     "parent_first": "parent_first",
     "flat": "flat",
+    "processing_sequence": "Processing sequence",
+    "processing_sequence_enabled": "Apply reordering (post-process)",
+    "processing_sequence_mode": "Traversal mode",
+    "processing_sequence_step": "Step (strip width in bbox units)",
+    "processing_sequence_group_by_sectors": "Group by sector grid",
+    "processing_sequence_sector_size_x": "Sector width (mm)",
+    "processing_sequence_sector_size_y": "Sector height (mm)",
+    "ps_mode_build_order": "Build order (as returned by nesting)",
+    "ps_mode_random": "Random (deterministic by plan name)",
+    "ps_mode_vertical_left_to_right": "Vertical, left to right",
+    "ps_mode_vertical_right_to_left": "Vertical, right to left",
+    "ps_mode_horizontal_bottom_to_top": "Horizontal, bottom to top",
+    "ps_mode_horizontal_top_to_bottom": "Horizontal, top to bottom",
+    "Priority must be an integer from 1 to 99": "Priority must be an integer from 1 to 99",
     "Не удалось сохранить деталь": "Не удалось сохранить деталь"
 }
 export default en;

@@ -610,6 +610,20 @@ const zh = {
     "bottom_to_top": "从下到上",
     "right_to_left": "从右到左",
     "flat": "平坦的",
+    "processing_sequence": "加工顺序",
+    "processing_sequence_enabled": "在写入NCP前重排（后处理）",
+    "processing_sequence_mode": "遍历模式",
+    "processing_sequence_step": "步进（条带宽度，bbox 单位）",
+    "processing_sequence_group_by_sectors": "按区域网格分组遍历",
+    "processing_sequence_sector_size_x": "区域宽度 (mm)",
+    "processing_sequence_sector_size_y": "区域高度 (mm)",
+    "ps_mode_build_order": "构建顺序（与嵌套返回一致）",
+    "ps_mode_random": "随机（由计划名确定）",
+    "ps_mode_vertical_left_to_right": "垂直，从左到右",
+    "ps_mode_vertical_right_to_left": "垂直，从右到左",
+    "ps_mode_horizontal_bottom_to_top": "水平，从下到上",
+    "ps_mode_horizontal_top_to_bottom": "水平，从上到下",
+    "Priority must be an integer from 1 to 99": "优先级必须是 1 到 99 的整数",
     "Не удалось сохранить деталь": "Не удалось сохранить деталь"
 }
 export default zh;

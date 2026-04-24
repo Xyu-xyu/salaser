@@ -48,10 +48,15 @@ const NewPlanButton = observer(() => {
 	const [nestingMinHoleArea, setNestingMinHoleArea] = useState("");
 	const [nestingInHoles, setNestingInHoles] = useState(true);
 	const [nestingDirection, setNestingDirection] = useState("bottom_to_top");
-	const [mirroringAllowed, setMirroringAllowed] = useState(false);
 	const [cutSequence, setCutSequence] = useState("child_first");
 	const [shakeCount, setShakeCount] = useState("0");
-	const [parallelCandidates, setParallelCandidates] = useState(false);
+	const [processingSequenceEnabled, setProcessingSequenceEnabled] = useState(false);
+	const [processingSequenceMode, setProcessingSequenceMode] = useState("build_order");
+	const [processingSequenceStep, setProcessingSequenceStep] = useState("1");
+	const [processingSequenceGroupBySectors, setProcessingSequenceGroupBySectors] =
+		useState(false);
+	const [processingSequenceSectorX, setProcessingSequenceSectorX] = useState("500");
+	const [processingSequenceSectorY, setProcessingSequenceSectorY] = useState("500");
 
 	/** Импорт деталей из БД в B7-раскрой */
 	const [showImportDb, setShowImportDb] = useState(false);
@@ -132,6 +137,16 @@ const NewPlanButton = observer(() => {
 					) {
 						newErrors[`nestRot_${idx}`] = t("Rotation allowance must be a non-negative number");
 					}
+					if (
+						row.priority !== "" &&
+						row.priority != null &&
+						String(row.priority).trim() !== ""
+					) {
+						const pri = parseInt(String(row.priority), 10);
+						if (!Number.isInteger(pri) || pri < 1 || pri > 99) {
+							newErrors[`nestPrio_${idx}`] = t("Priority must be an integer from 1 to 99");
+						}
+					}
 				});
 			}
 			if (!materialName.trim()) {
@@ -156,47 +171,24 @@ const NewPlanButton = observer(() => {
 		const parts = nestPartRows
 			.filter((row) => row.path.trim())
 			.map((row) => {
+				const prRaw = row.priority;
+				const prParsed =
+					prRaw === "" || prRaw == null ? 10 : parseInt(String(prRaw), 10);
+				const pr =
+					Number.isFinite(prParsed) && prParsed > 0
+						? Math.min(99, Math.max(1, prParsed))
+						: 10;
+
 				const base = {
 					path: row.path.trim(),
 					quantity: parseInt(row.quantity, 10) || 1,
 					rotation_allowance: row.rotation === "" || row.rotation == null
 						? null
 						: Number(row.rotation) || 0,
+					priority: pr,
 				};
 
-				if (showAdvancedB7) {
-					const micro = row.micro_joint_pos;
-					const microNum = micro === "" || micro == null ? null : Number(micro);
-					if (microNum != null && Number.isFinite(microNum)) {
-						base.micro_joint_pos = microNum;
-					} else if (micro === null) {
-						base.micro_joint_pos = null;
-					}
-
-					if (row.is_filler === true) base.is_filler = true;
-
-					const pr = row.priority;
-					const prNum = pr === "" || pr == null ? null : parseInt(pr, 10);
-					if (prNum != null && Number.isFinite(prNum)) base.priority = prNum;
-
-					const lead = row.lead_in || {};
-					const outerType = lead?.outer?.lead_in_type;
-					const innerType = lead?.inner?.lead_in_type;
-					const outerRadius = lead?.outer?.radius;
-					const innerLength = lead?.inner?.length;
-					const leadIn = {};
-					if (outerType) {
-						leadIn.outer = { lead_in_type: outerType };
-						const r = outerRadius === "" || outerRadius == null ? null : Number(outerRadius);
-						if (r != null && Number.isFinite(r)) leadIn.outer.radius = r;
-					}
-					if (innerType) {
-						leadIn.inner = { lead_in_type: innerType };
-						const l = innerLength === "" || innerLength == null ? null : Number(innerLength);
-						if (l != null && Number.isFinite(l)) leadIn.inner.length = l;
-					}
-					if (Object.keys(leadIn).length) base.lead_in = leadIn;
-				}
+				if (row.is_filler === true) base.is_filler = true;
 
 				return base;
 			});
@@ -245,12 +237,38 @@ const NewPlanButton = observer(() => {
 
 			config.nesting.nesting_in_holes = Boolean(nestingInHoles);
 			config.nesting.nesting_direction = nestingDirection || "bottom_to_top";
-			config.nesting.mirroring_allowed = Boolean(mirroringAllowed);
 			config.nesting.cut_sequence = cutSequence || "child_first";
 
 			const sc = shakeCount === "" ? null : parseInt(shakeCount, 10);
 			if (sc != null && Number.isFinite(sc)) config.nesting.shake_count = sc;
-			config.nesting.parallel = Boolean(parallelCandidates);
+
+			const stepPs = parseInt(processingSequenceStep, 10);
+			const stepVal =
+				processingSequenceStep === "" || processingSequenceStep == null
+					? 1
+					: Number.isFinite(stepPs) && stepPs > 0
+						? stepPs
+						: 1;
+			const sx = Number(processingSequenceSectorX);
+			const sy = Number(processingSequenceSectorY);
+			config.nesting.processing_sequence = {
+				enabled: Boolean(processingSequenceEnabled),
+				mode: processingSequenceMode || "build_order",
+				step: stepVal,
+				group_by_sectors: Boolean(processingSequenceGroupBySectors),
+				sector_size_x:
+					processingSequenceSectorX === "" || processingSequenceSectorX == null
+						? 500
+						: Number.isFinite(sx) && sx > 0
+							? sx
+							: 500,
+				sector_size_y:
+					processingSequenceSectorY === "" || processingSequenceSectorY == null
+						? 500
+						: Number.isFinite(sy) && sy > 0
+							? sy
+							: 500,
+			};
 		}
 
 		return config;
@@ -278,10 +296,14 @@ const NewPlanButton = observer(() => {
 			nestingMinHoleArea,
 			nestingInHoles,
 			nestingDirection,
-			mirroringAllowed,
 			cutSequence,
 			shakeCount,
-			parallelCandidates,
+			processingSequenceEnabled,
+			processingSequenceMode,
+			processingSequenceStep,
+			processingSequenceGroupBySectors,
+			processingSequenceSectorX,
+			processingSequenceSectorY,
 		]
 	);
 
@@ -420,10 +442,14 @@ const NewPlanButton = observer(() => {
 		setNestingMinHoleArea("");
 		setNestingInHoles(true);
 		setNestingDirection("bottom_to_top");
-		setMirroringAllowed(false);
 		setCutSequence("child_first");
 		setShakeCount("0");
-		setParallelCandidates(false);
+		setProcessingSequenceEnabled(false);
+		setProcessingSequenceMode("build_order");
+		setProcessingSequenceStep("1");
+		setProcessingSequenceGroupBySectors(false);
+		setProcessingSequenceSectorX("500");
+		setProcessingSequenceSectorY("500");
 		setErrors({
 			name: "",
 			width: "",
@@ -446,14 +472,8 @@ const NewPlanButton = observer(() => {
 				path: "",
 				quantity: "1",
 				rotation: "90",
-				// advanced (optional)
-				micro_joint_pos: "",
 				is_filler: false,
-				priority: "",
-				lead_in: {
-					outer: { lead_in_type: "" , radius: "" },
-					inner: { lead_in_type: "" , length: "" },
-				},
+				priority: "10",
 			},
 		]);
 	};
@@ -503,13 +523,8 @@ const NewPlanButton = observer(() => {
 				path: `${baseDir}/${uuid}/part.ncp${suffix}`,
 				quantity: "1",
 				rotation: "90",
-				micro_joint_pos: "",
 				is_filler: false,
-				priority: "",
-				lead_in: {
-					outer: { lead_in_type: "" , radius: "" },
-					inner: { lead_in_type: "" , length: "" },
-				},
+				priority: "10",
 			};
 		});
 
@@ -870,7 +885,7 @@ const NewPlanButton = observer(() => {
 										<Form.Group className="mb-3">
 											<Form.Label>{t("Nesting options")}</Form.Label>
 											<div className="row g-2">
-												<div className="col-6 col-lg-3">
+												<div className="col-6 col-lg-4">
 													<Form.Control
 														type="number"
 														min={0}
@@ -881,7 +896,7 @@ const NewPlanButton = observer(() => {
 														onChange={(e) => setNestingHoleClearance(e.target.value)}
 													/>
 												</div>
-												<div className="col-6 col-lg-3">
+												<div className="col-6 col-lg-4">
 													<Form.Control
 														type="number"
 														min={0}
@@ -892,7 +907,7 @@ const NewPlanButton = observer(() => {
 														onChange={(e) => setNestingMinHoleArea(e.target.value)}
 													/>
 												</div>
-												<div className="col-6 col-lg-3">
+												<div className="col-6 col-lg-4">
 													<Form.Control
 														type="number"
 														min={0}
@@ -901,15 +916,6 @@ const NewPlanButton = observer(() => {
 														title={t("shake_count")}
 														value={shakeCount}
 														onChange={(e) => setShakeCount(e.target.value)}
-													/>
-												</div>
-												<div className="col-6 col-lg-3 d-flex align-items-center">
-													<Form.Check
-														type="switch"
-														id="b7Parallel"
-														label={t("parallel")}
-														checked={parallelCandidates}
-														onChange={(e) => setParallelCandidates(e.target.checked)}
 													/>
 												</div>
 											</div>
@@ -952,12 +958,101 @@ const NewPlanButton = observer(() => {
 														checked={nestingInHoles}
 														onChange={(e) => setNestingInHoles(e.target.checked)}
 													/>
-													<Form.Check
-														type="switch"
-														id="b7MirrorAllowed"
-														label={t("mirroring_allowed")}
-														checked={mirroringAllowed}
-														onChange={(e) => setMirroringAllowed(e.target.checked)}
+												</div>
+											</div>
+										</Form.Group>
+
+										<Form.Group className="mb-3">
+											<Form.Label>{t("processing_sequence")}</Form.Label>
+											<div className="d-flex flex-wrap gap-3 mb-2">
+												<Form.Check
+													type="switch"
+													id="b7ProcessingSequenceEnabled"
+													label={t("processing_sequence_enabled")}
+													checked={processingSequenceEnabled}
+													onChange={(e) => setProcessingSequenceEnabled(e.target.checked)}
+												/>
+											</div>
+											<div className="row g-2">
+												<div className="col-12 col-lg-6">
+													<Form.Label className="small text-muted mb-1">
+														{t("processing_sequence_mode")}
+													</Form.Label>
+													<Form.Select
+														title={t("processing_sequence_mode")}
+														value={processingSequenceMode}
+														onChange={(e) => setProcessingSequenceMode(e.target.value)}
+													>
+														<option value="build_order">
+															{t("ps_mode_build_order")}
+														</option>
+														<option value="random">
+															{t("ps_mode_random")}
+														</option>
+														<option value="vertical_left_to_right">
+															{t("ps_mode_vertical_left_to_right")}
+														</option>
+														<option value="vertical_right_to_left">
+															{t("ps_mode_vertical_right_to_left")}
+														</option>
+														<option value="horizontal_bottom_to_top">
+															{t("ps_mode_horizontal_bottom_to_top")}
+														</option>
+														<option value="horizontal_top_to_bottom">
+															{t("ps_mode_horizontal_top_to_bottom")}
+														</option>
+													</Form.Select>
+												</div>
+												<div className="col-12 col-lg-3">
+													<Form.Label className="small text-muted mb-1">
+														{t("processing_sequence_step")}
+													</Form.Label>
+													<Form.Control
+														type="number"
+														min={1}
+														step={1}
+														title={t("processing_sequence_step")}
+														value={processingSequenceStep}
+														onChange={(e) => setProcessingSequenceStep(e.target.value)}
+													/>
+												</div>
+											</div>
+											<div className="d-flex flex-wrap gap-3 mt-2">
+												<Form.Check
+													type="switch"
+													id="b7PsGroupSectors"
+													label={t("processing_sequence_group_by_sectors")}
+													checked={processingSequenceGroupBySectors}
+													onChange={(e) =>
+														setProcessingSequenceGroupBySectors(e.target.checked)
+													}
+												/>
+											</div>
+											<div className="row g-2 mt-1">
+												<div className="col-6 col-lg-3">
+													<Form.Label className="small text-muted mb-1">
+														{t("processing_sequence_sector_size_x")}
+													</Form.Label>
+													<Form.Control
+														type="number"
+														min={0}
+														step="0.1"
+														title={t("processing_sequence_sector_size_x")}
+														value={processingSequenceSectorX}
+														onChange={(e) => setProcessingSequenceSectorX(e.target.value)}
+													/>
+												</div>
+												<div className="col-6 col-lg-3">
+													<Form.Label className="small text-muted mb-1">
+														{t("processing_sequence_sector_size_y")}
+													</Form.Label>
+													<Form.Control
+														type="number"
+														min={0}
+														step="0.1"
+														title={t("processing_sequence_sector_size_y")}
+														value={processingSequenceSectorY}
+														onChange={(e) => setProcessingSequenceSectorY(e.target.value)}
 													/>
 												</div>
 											</div>
@@ -980,15 +1075,13 @@ const NewPlanButton = observer(() => {
 									{errors.nestParts && (
 										<div className="text-danger small mb-2">{errors.nestParts}</div>
 									)}
-									{nestPartRows.map((row) => (
-										<div key={row.id} className="mb-2"
-										style={{										
-											height: "50px !important"
-										}}
-										>
+									{nestPartRows.map((row) => {
+										const rowIdx = nestPartRows.indexOf(row);
+										return (
+										<div key={row.id} className="mb-2">
 											<InputGroup
 												className="align-items-stretch row-part-inpu-group"
-												style={{ height: "50px !important" }}
+												style={{ minHeight: 48 }}
 											>
 												<div
 													className="form-control"
@@ -1001,7 +1094,7 @@ const NewPlanButton = observer(() => {
 														display: "flex",
 														alignItems: "center",
 														gap: 10,
-														height: "50px"
+														minHeight: 48,
 													}}
 												>
 													{row.uuid ? (
@@ -1040,7 +1133,7 @@ const NewPlanButton = observer(() => {
 													min={1}
 													step={1}
 													title={t("Quantity")}
-													isInvalid={!!errors[`nestQty_${nestPartRows.indexOf(row)}`]}
+													isInvalid={!!errors[`nestQty_${rowIdx}`]}
 													buttonTitlePlus={t("Increase")}
 													buttonTitleMinus={t("Decrease")}
 													style={{ height: "100%" }}
@@ -1056,8 +1149,53 @@ const NewPlanButton = observer(() => {
 													onChange={(e) =>
 														updateNestPartRow(row.id, "rotation", e.target.value)
 													}
-													isInvalid={!!errors[`nestRot_${nestPartRows.indexOf(row)}`]}
+													isInvalid={!!errors[`nestRot_${rowIdx}`]}
 												/>
+												<div
+													className="d-flex flex-column justify-content-center px-1"
+													style={{
+														background: "var(--bs-body-bg, #fff)",
+														borderLeft: "1px solid var(--bs-border-color, #dee2e6)",
+														minWidth: 84,
+													}}
+												>
+													<Form.Label className="small text-muted mb-0" style={{ fontSize: "0.7rem" }}>
+														{t("priority")}
+													</Form.Label>
+													<Form.Control
+														className="py-0"
+														size="sm"
+														type="number"
+														min={1}
+														max={99}
+														step={1}
+														title={t("priority")}
+														placeholder="10"
+														value={row.priority ?? "10"}
+														onChange={(e) =>
+															updateNestPartRow(row.id, "priority", e.target.value)
+														}
+														isInvalid={!!errors[`nestPrio_${rowIdx}`]}
+													/>
+												</div>
+												<div
+													className="d-flex align-items-center px-2"
+													style={{
+														background: "var(--bs-body-bg, #fff)",
+														borderLeft: "1px solid var(--bs-border-color, #dee2e6)",
+													}}
+												>
+													<Form.Check
+														type="switch"
+														id={`b7Filler_${row.id}`}
+														className="mb-0"
+														label={t("is_filler")}
+														checked={row.is_filler === true}
+														onChange={(e) =>
+															updateNestPartRow(row.id, "is_filler", e.target.checked)
+														}
+													/>
+												</div>
 												<Button
 													variant="outline-danger"
 													type="button"
@@ -1068,156 +1206,9 @@ const NewPlanButton = observer(() => {
 													×
 												</Button>
 											</InputGroup>
-
-											{showAdvancedB7 && (
-												<details className="mt-1 border rounded p-2">
-													<summary className="cursor-pointer user-select-none">
-														{t("Advanced part parameters")}
-													</summary>
-													<div className="mt-2">
-														<div className="row g-2 align-items-end">
-															<div className="col-6 col-lg-2">
-																<Form.Label className="small text-muted mb-1">{t("micro_joint_pos")}</Form.Label>
-																<Form.Control
-																	type="number"
-																	min={0}
-																	step="0.1"
-																	title={t("micro_joint_pos")}
-																	placeholder={t("micro_joint_pos")}
-																	value={row.micro_joint_pos ?? ""}
-																	onChange={(e) =>
-																		updateNestPartRow(row.id, "micro_joint_pos", e.target.value)
-																	}
-																/>
-															</div>
-															<div className="col-6 col-lg-2">
-																<Form.Label className="small text-muted mb-1">{t("priority")}</Form.Label>
-																<Form.Control
-																	type="number"
-																	min={1}
-																	max={99}
-																	step="1"
-																	title={t("priority")}
-																	placeholder={t("priority")}
-																	value={row.priority ?? ""}
-																	onChange={(e) =>
-																		updateNestPartRow(row.id, "priority", e.target.value)
-																	}
-																/>
-															</div>
-															<div className="col-12 col-lg-2">
-																<Form.Check
-																	type="switch"
-																	id={`b7Filler_${row.id}`}
-																	label={t("is_filler")}
-																	checked={row.is_filler === true}
-																	onChange={(e) =>
-																		updateNestPartRow(row.id, "is_filler", e.target.checked)
-																	}
-																/>
-															</div>
-															<div className="col-12 col-lg-3">
-																<Form.Label className="small text-muted mb-1">
-																	{t("lead_in_outer_type")}
-																</Form.Label>
-																<Form.Select
-																	title={t("lead_in_outer_type")}
-																	value={row.lead_in?.outer?.lead_in_type ?? ""}
-																	onChange={(e) => {
-																		const next = {
-																			...(row.lead_in || {}),
-																			outer: {
-																				...(row.lead_in?.outer || {}),
-																				lead_in_type: e.target.value,
-																			},
-																		};
-																		updateNestPartRow(row.id, "lead_in", next);
-																	}}
-																>
-																	<option value="">{t("lead_in_none_outer")}</option>
-																	<option value="direct">{t("lead_in_type_direct")}</option>
-																	<option value="straight">{t("lead_in_type_straight")}</option>
-																	<option value="tangent">{t("lead_in_type_tangent")}</option>
-																</Form.Select>
-															</div>
-															<div className="col-12 col-lg-3">
-																<Form.Label className="small text-muted mb-1">
-																	{t("lead_in_outer_radius")}
-																</Form.Label>
-																<Form.Control
-																	type="number"
-																	min={0}
-																	step="0.1"
-																	title={t("lead_in_outer_radius")}
-																	placeholder={t("lead_in_outer_radius")}
-																	value={row.lead_in?.outer?.radius ?? ""}
-																	onChange={(e) => {
-																		const next = {
-																			...(row.lead_in || {}),
-																			outer: {
-																				...(row.lead_in?.outer || {}),
-																				radius: e.target.value,
-																			},
-																		};
-																		updateNestPartRow(row.id, "lead_in", next);
-																	}}
-																/>
-															</div>
-														</div>
-														<div className="row g-2 mt-1">
-															<div className="col-12 col-lg-3">
-																<Form.Label className="small text-muted mb-1">
-																	{t("lead_in_inner_type")}
-																</Form.Label>
-																<Form.Select
-																	title={t("lead_in_inner_type")}
-																	value={row.lead_in?.inner?.lead_in_type ?? ""}
-																	onChange={(e) => {
-																		const next = {
-																			...(row.lead_in || {}),
-																			inner: {
-																				...(row.lead_in?.inner || {}),
-																				lead_in_type: e.target.value,
-																			},
-																		};
-																		updateNestPartRow(row.id, "lead_in", next);
-																	}}
-																>
-																	<option value="">{t("lead_in_none_inner")}</option>
-																	<option value="direct">{t("lead_in_type_direct")}</option>
-																	<option value="straight">{t("lead_in_type_straight")}</option>
-																	<option value="tangent">{t("lead_in_type_tangent")}</option>
-																</Form.Select>
-															</div>
-															<div className="col-12 col-lg-3">
-																<Form.Label className="small text-muted mb-1">
-																	{t("lead_in_inner_length")}
-																</Form.Label>
-																<Form.Control
-																	type="number"
-																	min={0}
-																	step="0.1"
-																	title={t("lead_in_inner_length")}
-																	placeholder={t("lead_in_inner_length")}
-																	value={row.lead_in?.inner?.length ?? ""}
-																	onChange={(e) => {
-																		const next = {
-																			...(row.lead_in || {}),
-																			inner: {
-																				...(row.lead_in?.inner || {}),
-																				length: e.target.value,
-																			},
-																		};
-																		updateNestPartRow(row.id, "lead_in", next);
-																	}}
-																/>
-															</div>
-														</div>
-													</div>
-												</details>
-											)}
 										</div>
-									))}
+									);
+									})}
 								</Form.Group>
 
 								<Form.Group className="mb-3">
