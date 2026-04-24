@@ -635,6 +635,7 @@ const ru = {
     "hole_clearance": "Зазор в отверстиях",
     "min_hole_area_for_nesting": "Мин. площадь отверстия для вложения",
     "shake_count": "Shake (итерации)",
+    "shake_count_help": "Shake_count_help",
     "parallel": "Параллельно (эксп.)",
     "nesting_direction": "Направление заполнения",
     "cut_sequence": "Порядок резки",
@@ -673,13 +674,14 @@ const ru = {
     "ps_mode_horizontal_bottom_to_top": "Горизонтально, снизу вверх",
     "ps_mode_horizontal_top_to_bottom": "Горизонтально, сверху вниз",
     "nest_part_quantity_label": "Кол-во",
-    "nest_part_rotation_label": "гнездо_part_rotation_label",
+    "nest_part_rotation_label": "Вращение",
     "Priority must be an integer from 1 to 99": "Приоритет — целое число от 1 до 99",
     "Не удалось сохранить деталь": "Не удалось сохранить деталь",
     "xxxxxx": "хххххх",
     "rotation": "вращение",
     "YYYY": "ГГГГ",
     "qnt": "qnt",
-    "quantity": "количество"
+    "quantity": "количество",
+    "Shake count": "Количество встряхиваний"
 }
 export default ru;

@@ -631,6 +631,9 @@ const zh = {
     "rotation": "旋转",
     "YYYY": "YYYY",
     "qnt": "qnt",
-    "quantity": "数量"
+    "quantity": "数量",
+    "shake_count": "Shake 迭代次数",
+    "shake_count_help": "Shake 迭代（压实与再放置）。0 为关闭。",
+    "Shake count": "摇动次数"
 }
 export default zh;

@@ -196,6 +196,11 @@ const NewPlanButton = observer(() => {
 		const h = parseFloat(height);
 		const sheetCount = parseInt(quantity, 10);
 		const th = parseFloat(thickness);
+		const scBase = shakeCount === "" || shakeCount == null
+			? 0
+			: parseInt(shakeCount, 10);
+		const shakeCountVal =
+			Number.isFinite(scBase) && scBase >= 0 ? scBase : 0;
 		const config = {
 			parts,
 			sheets: [{
@@ -210,6 +215,7 @@ const NewPlanButton = observer(() => {
 			nesting: {
 				part_protection_gap: Number(partProtectionGap) || 0,
 				plan_name: name.trim() || `PLAN_${w}x${h}`,
+				shake_count: shakeCountVal,
 			},
 		};
 
@@ -238,9 +244,6 @@ const NewPlanButton = observer(() => {
 			config.nesting.nesting_in_holes = Boolean(nestingInHoles);
 			config.nesting.nesting_direction = nestingDirection || "bottom_to_top";
 			config.nesting.cut_sequence = cutSequence || "child_first";
-
-			const sc = shakeCount === "" ? null : parseInt(shakeCount, 10);
-			if (sc != null && Number.isFinite(sc)) config.nesting.shake_count = sc;
 
 			const stepPs = parseInt(processingSequenceStep, 10);
 			const stepVal =
@@ -798,6 +801,19 @@ const NewPlanButton = observer(() => {
 									</Form.Control.Feedback>
 								</Form.Group>
 
+								<Form.Group className="mb-3">
+									<Form.Label>{t("Shake count")}</Form.Label>
+
+									<Form.Control
+										type="number"
+										min={0}
+										step={1}
+										value={shakeCount}
+										onChange={(e) => setShakeCount(e.target.value)}
+										title={t("shake_count_help")}
+									/>
+								</Form.Group>
+
 								{showAdvancedB7 && (
 									<>
 										<Form.Group className="mb-3">
@@ -885,7 +901,7 @@ const NewPlanButton = observer(() => {
 										<Form.Group className="mb-3">
 											<Form.Label>{t("Nesting options")}</Form.Label>
 											<div className="row g-2">
-												<div className="col-6 col-lg-4">
+												<div className="col-6 col-lg-6">
 													<Form.Control
 														type="number"
 														min={0}
@@ -896,7 +912,7 @@ const NewPlanButton = observer(() => {
 														onChange={(e) => setNestingHoleClearance(e.target.value)}
 													/>
 												</div>
-												<div className="col-6 col-lg-4">
+												<div className="col-6 col-lg-6">
 													<Form.Control
 														type="number"
 														min={0}
@@ -905,17 +921,6 @@ const NewPlanButton = observer(() => {
 														title={t("min_hole_area_for_nesting")}
 														value={nestingMinHoleArea}
 														onChange={(e) => setNestingMinHoleArea(e.target.value)}
-													/>
-												</div>
-												<div className="col-6 col-lg-4">
-													<Form.Control
-														type="number"
-														min={0}
-														step="1"
-														placeholder={t("shake_count")}
-														title={t("shake_count")}
-														value={shakeCount}
-														onChange={(e) => setShakeCount(e.target.value)}
 													/>
 												</div>
 											</div>

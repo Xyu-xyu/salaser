@@ -682,6 +682,9 @@ const en = {
     "rotation": "rotation",
     "YYYY": "YYYY",
     "qnt": "qnt",
-    "quantity": "quantity"
+    "quantity": "quantity",
+    "shake_count": "Shake iterations",
+    "shake_count_help": "Shake iterations (compaction + re-placement). 0 = off.",
+    "Shake count": "Shake count"
 }
 export default en;
