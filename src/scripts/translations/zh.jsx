@@ -624,6 +624,13 @@ const zh = {
     "ps_mode_horizontal_bottom_to_top": "水平，从下到上",
     "ps_mode_horizontal_top_to_bottom": "水平，从上到下",
     "Priority must be an integer from 1 to 99": "优先级必须是 1 到 99 的整数",
-    "Не удалось сохранить деталь": "Не удалось сохранить деталь"
+    "Не удалось сохранить деталь": "Не удалось сохранить деталь",
+    "nest_part_quantity_label": "嵌套部分数量标签",
+    "nest_part_rotation_label": "嵌套部分旋转标签",
+    "xxxxxx": "xxxxxx",
+    "rotation": "旋转",
+    "YYYY": "YYYY",
+    "qnt": "qnt",
+    "quantity": "数量"
 }
 export default zh;

@@ -1139,6 +1139,17 @@ const NewPlanButton = observer(() => {
 													style={{ height: "100%" }}
 													inputStyle={{ height: "100%" }}
 												/>
+												<div
+													className="d-flex flex-column justify-content-center px-1"
+													style={{
+														background: "var(--bs-body-bg, #fff)",
+														borderLeft: "1px solid var(--bs-border-color, #dee2e6)",
+														minWidth: 84,
+													}}
+												>
+												<Form.Label className="small text-muted mb-0" style={{ fontSize: "0.7rem" }}>
+														{t("rotation")}
+												</Form.Label>
 												<Form.Control
 													style={{ height: "100%", maxWidth: "88px" }}
 													type="number"
@@ -1151,6 +1162,7 @@ const NewPlanButton = observer(() => {
 													}
 													isInvalid={!!errors[`nestRot_${rowIdx}`]}
 												/>
+												</div> 
 												<div
 													className="d-flex flex-column justify-content-center px-1"
 													style={{

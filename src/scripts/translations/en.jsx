@@ -674,7 +674,14 @@ const en = {
     "ps_mode_vertical_right_to_left": "Vertical, right to left",
     "ps_mode_horizontal_bottom_to_top": "Horizontal, bottom to top",
     "ps_mode_horizontal_top_to_bottom": "Horizontal, top to bottom",
+    "nest_part_quantity_label": "nest_part_quantity_label",
+    "nest_part_rotation_label": "nest_part_rotation_label",
     "Priority must be an integer from 1 to 99": "Priority must be an integer from 1 to 99",
-    "Не удалось сохранить деталь": "Не удалось сохранить деталь"
+    "Не удалось сохранить деталь": "Не удалось сохранить деталь",
+    "xxxxxx": "xxxxxx",
+    "rotation": "rotation",
+    "YYYY": "YYYY",
+    "qnt": "qnt",
+    "quantity": "quantity"
 }
 export default en;

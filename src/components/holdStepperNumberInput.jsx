@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Form } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const clampInt = (value, min) => {
 	const n = parseInt(value, 10);
@@ -25,6 +26,9 @@ export default function HoldStepperNumberInput(props = {}) {
 		buttonTitlePlus = "Increase",
 		buttonTitleMinus = "Decrease",
 	} = props;
+
+	const { t } = useTranslation();
+
 
 	const timersRef = useRef({ timeoutId: null, intervalId: null });
 	const holdingRef = useRef({ pointerId: null, el: null });
@@ -104,22 +108,24 @@ export default function HoldStepperNumberInput(props = {}) {
 		if (!inside) stop();
 	}, [stop]);
 
-	const containerStyle = useMemo(() => ({
-		maxWidth: "88px",
-		position: "relative",
-		flex: "0 0 88px",
-		...(style || {}),
-	}), [style]);
+
 
 	return (
-		<div style={containerStyle}>
+		<div
+			className="d-flex flex-column justify-content-center px-1"
+			style={{
+				background: "var(--bs-body-bg, #fff)",
+				borderLeft: "1px solid var(--bs-border-color, #dee2e6)",
+				minWidth: 84,
+			}}
+		>
+			<Form.Label className="small text-muted mb-0" style={{ fontSize: "0.7rem" }}>
+				{t("quantity")}
+			</Form.Label>			
 			<Form.Control
-				style={{
-					paddingRight: "2.15rem",
-					boxSizing: "border-box",
-					height: "48px",
-					...(inputStyle || {}),
-				}}
+
+				style={{ height: "100%", maxWidth: "88px" }}
+
 				type="number"
 				min={min}
 				step={step}
@@ -133,7 +139,7 @@ export default function HoldStepperNumberInput(props = {}) {
 				}}
 			/>
 
-			<div
+			{/*<div
 				style={{
 					position: "absolute",
 					right: 4,
@@ -146,7 +152,7 @@ export default function HoldStepperNumberInput(props = {}) {
 					zIndex: 2,
 				}}
 			>
-			{/* 	<button
+				 	<button
 					type="button"
 					className="btn btn-outline-secondary p-0"
 					title={buttonTitlePlus}
@@ -195,8 +201,8 @@ export default function HoldStepperNumberInput(props = {}) {
 					onLostPointerCapture={stopHold}
 				>
 					−
-				</button> */}
-			</div>
+				</button> 
+			</div>*/}
 		</div>
 	);
 }
