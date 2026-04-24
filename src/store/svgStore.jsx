@@ -1593,6 +1593,10 @@ class SvgStore {
 	svgToGcode(contour, inlet, outlet, height) {
 		const res = []
 		const tol = 0.01
+		/** Пропуск G1/G2/G3, если конец сегмента совпадает с текущей позицией (нулевой шаг). */
+		const zeroMoveTol = 1e-4
+		const isZeroMoveTo = (x, y) =>
+			Number.isFinite(X) && Number.isFinite(Y) && utils.distance(x, y, X, Y) < zeroMoveTol
 		const c = contour?.path.length ? new SVGPathCommander(contour.path).toAbsolute() : {segments:[]}
 		const i = inlet?.path.length ? new SVGPathCommander(inlet.path).toAbsolute() : {segments:[]}
 		const o = outlet?.path.length ? new SVGPathCommander(outlet.path).toAbsolute() : {segments:[]}
@@ -1613,7 +1617,9 @@ class SvgStore {
 		let currentMacro = false
 		let currentCompensation = false
 
-		let X, Y, G, I, J = null
+		let X, Y, G;
+		let I = null;
+		let J = null;
 		let needLaserOn = true
 		let needLaserOff = false
 		let needStart = true
@@ -1644,6 +1650,7 @@ class SvgStore {
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
+				if (isZeroMoveTo(x, y)) return
 				if (!skipRadiusComp) needG40 = true
 				g = 'G1'
 				let line = ''
@@ -1675,6 +1682,7 @@ class SvgStore {
 			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
+				if (isZeroMoveTo(x, y)) return
 				if (!skipRadiusComp) needG40 = true
 				// старт и конец в координатах станка
 				const x1 = X
@@ -1692,21 +1700,38 @@ class SvgStore {
 				const dy = y2 - y1
 				const q = Math.hypot(dx, dy)
 			  
-				const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
-			  
-				const nx = -dy / q
-				const ny = dx / q
-			  
 				// ВАЖНО: инверсия sweep → G2 / G3
 				const isCCW = sweep === 0   // ← это ключ
 				const sign = isCCW ? 1 : -1
-			  
-				const cx = mx + sign * nx * h
-				const cy = my + sign * ny * h
-			  
-				// ❗ I / J — АБСОЛЮТНЫЕ
-				const i = utils.smartRound (cx) 
-				const j = utils.smartRound (cy)
+
+				let i, j
+				if (q < 1e-9) {
+					if (Number.isFinite(I) && Number.isFinite(J)) {
+						i = I
+						j = J
+					} else {
+						i = null
+						j = null
+					}
+				} else {
+					const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
+					const nx = -dy / q
+					const ny = dx / q
+					const cx = mx + sign * nx * h
+					const cy = my + sign * ny * h
+					// ❗ I / J — АБСОЛЮТНЫЕ
+					i = utils.smartRound(cx)
+					j = utils.smartRound(cy)
+					if (!Number.isFinite(i) || !Number.isFinite(j)) {
+						if (Number.isFinite(I) && Number.isFinite(J)) {
+							i = I
+							j = J
+						} else {
+							i = null
+							j = null
+						}
+					}
+				}
 			  
 				g = isCCW ? 'G3' : 'G2'
 				let line = ''
@@ -1714,16 +1739,19 @@ class SvgStore {
 				if (g !== G) line += g
 				if (x !== X) line += "X" + utils.smartRound (x2)
 				if (y !== Y) line += "Y" + utils.smartRound (y2)
-				if (i !== I) line += "I" + i
-				if (j !== J) line += "J" + j
+				if (i != null && j != null) {
+					if (i !== I) line += "I" + i
+					if (j !== J) line += "J" + j
+				}
 				  
 			  
 				G = g
 				X = x
 				Y = y
-				I = i
-				J = j
-			  
+				if (i != null && j != null) {
+					I = i
+					J = j
+				}
 
 				const inner = contour.class.includes("inner");
 				let neededComp;
@@ -1826,6 +1854,7 @@ class SvgStore {
 			if (cmd === 'L') {
 
 				const [, x2, y2] = seg
+				if (isZeroMoveTo(x2, y2)) return
 				g = 'G1'
 			
 			
@@ -1835,7 +1864,6 @@ class SvgStore {
 					line += "G1"
 					G = 'G1'
 				}
-			
 				if (X !== x2) line += "X" + utils.smartRound(x2)
 				if (Y !== y2) line += "Y" + utils.smartRound(height - y2)
 
@@ -1860,6 +1888,7 @@ class SvgStore {
 			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
+				if (isZeroMoveTo(x, y)) return
 				if (!skipRadiusComp) needG40 = true
 
 				const x1 = X
@@ -1878,19 +1907,44 @@ class SvgStore {
 				const dy = y2 - y1
 				const q = Math.hypot(dx, dy)
 			
-				const h = Math.sqrt(Math.max(0, r*r - (q*q)/4))
-			
-				const nx = -dy / q
-				const ny = dx / q
-			
 				const isCCW = sweep === 0
 				const sign = isCCW ? 1 : -1
-			
-				const cx = mx + sign * nx * h
-				const cy = my + sign * ny * h
-			
-				const i = utils.smartRound(cx)
-				const j = utils.smartRound(cy)
+
+				let i, j, cx, cy
+				if (q < 1e-9) {
+					if (Number.isFinite(I) && Number.isFinite(J)) {
+						i = I
+						j = J
+						cx = I
+						cy = J
+					} else {
+						i = null
+						j = null
+						cx = mx
+						cy = my
+					}
+				} else {
+					const h = Math.sqrt(Math.max(0, r*r - (q*q)/4))
+					const nx = -dy / q
+					const ny = dx / q
+					cx = mx + sign * nx * h
+					cy = my + sign * ny * h
+					i = utils.smartRound(cx)
+					j = utils.smartRound(cy)
+					if (!Number.isFinite(i) || !Number.isFinite(j)) {
+						if (Number.isFinite(I) && Number.isFinite(J)) {
+							i = I
+							j = J
+							cx = I
+							cy = J
+						} else {
+							i = null
+							j = null
+							cx = mx
+							cy = my
+						}
+					}
+				}
 			
 				g = isCCW ? "G3" : "G2"
 			
@@ -1907,8 +1961,10 @@ class SvgStore {
 				if (g !== G) line += g
 				if (x !== X) line += "X" + utils.smartRound(x2)
 				if (y !== Y) line += "Y" + utils.smartRound(y2)
-				if (i !== I) line += "I" + i
-				if (j !== J) line += "J" + j
+				if (i != null && j != null) {
+					if (i !== I) line += "I" + i
+					if (j !== J) line += "J" + j
+				}
 
 				if (needLaserOn && c.segments.length == 2 ) line +="M14M4M5M15";
 				if (needLaserOn && c.segments.length > 2) {
@@ -1925,8 +1981,10 @@ class SvgStore {
 				G = g
 				X = x
 				Y = y
-				I = i
-				J = j
+				if (i != null && j != null) {
+					I = i
+					J = j
+				}
 			}	
 						
 			if (i.segments.length === 0 && ind === 0) {
@@ -2002,6 +2060,7 @@ class SvgStore {
 			if (cmd === 'L') {
 
 				const [, x, y] = seg
+				if (isZeroMoveTo(x, y)) return
 				g = 'G1'
 				let line = ''
 
@@ -2031,6 +2090,7 @@ class SvgStore {
 			if (cmd === 'A') {
 
 				const [, rx, ry, xAxis, largeArc, sweep, x, y] = seg
+				if (isZeroMoveTo(x, y)) return
 				if (!skipRadiusComp) needG40 = true
 				// старт и конец в координатах станка
 				const x1 = X
@@ -2048,21 +2108,38 @@ class SvgStore {
 				const dy = y2 - y1
 				const q = Math.hypot(dx, dy)
 			  
-				const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
-			  
-				const nx = -dy / q
-				const ny = dx / q
-			  
 				// ВАЖНО: инверсия sweep → G2 / G3
 				const isCCW = sweep === 0   // ← это ключ
 				const sign = isCCW ? 1 : -1
-			  
-				const cx = mx + sign * nx * h
-				const cy = my + sign * ny * h
-			  
-				// ❗ I / J — АБСОЛЮТНЫЕ
-				const i = utils.smartRound (cx)
-				const j = utils.smartRound (cy)
+
+				let i, j
+				if (q < 1e-9) {
+					if (Number.isFinite(I) && Number.isFinite(J)) {
+						i = I
+						j = J
+					} else {
+						i = null
+						j = null
+					}
+				} else {
+					const h = Math.sqrt(Math.max(0, r * r - (q * q) / 4))
+					const nx = -dy / q
+					const ny = dx / q
+					const cx = mx + sign * nx * h
+					const cy = my + sign * ny * h
+					// ❗ I / J — АБСОЛЮТНЫЕ
+					i = utils.smartRound(cx)
+					j = utils.smartRound(cy)
+					if (!Number.isFinite(i) || !Number.isFinite(j)) {
+						if (Number.isFinite(I) && Number.isFinite(J)) {
+							i = I
+							j = J
+						} else {
+							i = null
+							j = null
+						}
+					}
+				}
 			  
 				g = isCCW ? 'G3' : 'G2'
 				let line = ''
@@ -2070,16 +2147,20 @@ class SvgStore {
 				if (g !== G) line += g
 				if (x !== X) line += "X" + utils.smartRound(x2)
 				if (y !== Y) line += "Y" + utils.smartRound(y2)
-				if (i !== I) line += "I" + i
-				if (j !== J) line += "J" + j
+				if (i != null && j != null) {
+					if (i !== I) line += "I" + i
+					if (j !== J) line += "J" + j
+				}
 				  
 				//line += `X${x2}Y${y2}I${i}J${j}`
 			  
 				G = g
 				X = x
 				Y = y
-				I = i
-				J = j
+				if (i != null && j != null) {
+					I = i
+					J = j
+				}
 
 				const macro = this.getMacro(inlet.class|| "")
 				if (macro !== null && macro !== currentMacro) {
@@ -2361,15 +2442,10 @@ class SvgStore {
 			let Y = utils.smartRound(XYC.Y)
 			let C = utils.smartRound(XYC.C)
 
-			let g52Line = `N${lineNumber}`;
-			if (g !== G) g52Line += `G${G}`
-			if (x !== X) g52Line += `X${X}`
-			if (y !== Y) g52Line += `Y${Y}`
-			if (l !== L) g52Line += `L${L}`
-			if (c !== C) g52Line += `C${C}`
+			const g52Line = `N${lineNumber}G${G}X${X}Y${Y}L${L}C${C}`;
 
 			res.push(g52Line);
-			g = G, l = L, x = X, y = Y, c = C;
+			g = G; l = L; x = X; y = Y; c = C;
 			lineNumber++;
 
 		}
