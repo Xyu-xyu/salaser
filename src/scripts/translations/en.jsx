@@ -685,6 +685,13 @@ const en = {
     "quantity": "quantity",
     "shake_count": "Shake iterations",
     "shake_count_help": "Shake iterations (compaction + re-placement). 0 = off.",
-    "Shake count": "Shake count"
+    "Shake count": "Shake count",
+    "Show Tips": "Show Tips",
+    "Hide Tips": "Hide Tips",
+    "Help": "Help",
+    "Changes preview cutting speed": "Changes preview cutting speed",
+    "Start cutting order preview": "Start cutting order preview",
+    "Changes selected text size": "Changes selected text size",
+    "Changes spacing between letters": "Changes spacing between letters"
 }
 export default en;

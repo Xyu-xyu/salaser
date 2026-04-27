@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import partStore from "./../../../store/partStore.jsx";
+import tipsStore from "./../../../store/tipsStore.jsx";
 import { useTranslation } from 'react-i18next';
 
 
@@ -130,6 +130,17 @@ const TooltipCreator = observer (({ element }) => {
 			text: '',
 			placement: 'bottom'
 		},
+		sheetSpeedPartShow: {
+			title: t("Cut speed"),
+			text: '',
+			placement: 'bottom'
+		},
+		playSheetCutPartOrder: {
+			title: t("Play"),
+			text: '',
+			placement: 'bottom'
+		}
+ 		
 		/* toolTipsSwitcher: {
 			title: t("Enables and disables hints"),
 			text: '',
@@ -138,14 +149,20 @@ const TooltipCreator = observer (({ element }) => {
 	}
 
 
+	const tooltipInfo = tooltipsInfo?.[id] ?? {
+		title: id,
+		text: "",
+		placement: "bottom",
+	};
+
 	return (
-		partStore.tooltips ?
+		tipsStore.tipsEnabled ?
 
 		<OverlayTrigger 
-			placement = { tooltipsInfo[id].placement } 
+			placement = { tooltipInfo.placement || "bottom" } 
 			overlay = {
 				<Tooltip >
-		  			<strong>{tooltipsInfo[id].title}</strong>{tooltipsInfo[id].secText}
+		  			<strong>{tooltipInfo.title}</strong>{tooltipInfo.text}
 				</Tooltip>
 			}>
 			{ element.info }

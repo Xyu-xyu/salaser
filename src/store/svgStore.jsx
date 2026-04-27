@@ -195,7 +195,6 @@ export const getLaserShowCompletedCount = (laserShow, totalParts = 0) => {
 
 
 class SvgStore {
-	tooltips = false;
 	Show_dangers = true;
 	laserShowPlayback = {
 		on: false,
@@ -471,10 +470,6 @@ class SvgStore {
 	setGridState(val) {
 		Object.assign(this.gridState, val);
 	}
-	setTooltips(val) {
-		this.tooltips = val
-	}
-
 	setLaserShow(val) {
 		if (!val || typeof val !== "object") {
 			return;

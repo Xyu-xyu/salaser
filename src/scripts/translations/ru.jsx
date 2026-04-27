@@ -682,6 +682,13 @@ const ru = {
     "YYYY": "ГГГГ",
     "qnt": "qnt",
     "quantity": "количество",
-    "Shake count": "Количество встряхиваний"
+    "Shake count": "Количество встряхиваний",
+    "Show Tips": "Показать советы",
+    "Hide Tips": "Скрыть советы",
+    "Help": "Помощь",
+    "Changes preview cutting speed": "Меняет скорость предпросмотра резки",
+    "Start cutting order preview": "Запустить предпросмотр порядка резки",
+    "Changes selected text size": "Меняет размер выделенного текста",
+    "Changes spacing between letters": "Меняет расстояние между буквами"
 }
 export default ru;

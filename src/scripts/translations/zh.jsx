@@ -634,6 +634,13 @@ const zh = {
     "quantity": "数量",
     "shake_count": "Shake 迭代次数",
     "shake_count_help": "Shake 迭代（压实与再放置）。0 为关闭。",
-    "Shake count": "摇动次数"
+    "Shake count": "摇动次数",
+    "Show Tips": "显示提示",
+    "Hide Tips": "隐藏提示",
+    "Help": "帮助",
+    "Changes preview cutting speed": "更改切割预览速度",
+    "Start cutting order preview": "开始切割顺序预览",
+    "Changes selected text size": "更改所选文本大小",
+    "Changes spacing between letters": "更改字母间距"
 }
 export default zh;

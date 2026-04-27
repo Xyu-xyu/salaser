@@ -48,7 +48,6 @@ class PartStore {
 	editingDbPartUuid = "";
 
 	partInEdit = false;
-	tooltips = false;
 	laserShow =  {};
 	highLighted= false;
 	svgParams = { width: 0, height: 0 };
@@ -232,10 +231,6 @@ class PartStore {
 		}
 	}
 
-
-	setTooltips (val) {
-		this.tooltips = val
-	}
 
 	reorderItems(newOrder, oldOrder) {
 		// Создаём копию оригинального массива
@@ -1146,7 +1141,6 @@ class PartStore {
 			editingDbPartUuid: "",
 			// 
 			partInEdit: false,
-			tooltips: false,
 			laserShow: {},
 			highLighted: false,
 			svgParams: { width: 0, height: 0 },
