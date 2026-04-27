@@ -62,7 +62,7 @@ const powerButton = observer(() => {
 						height="36"
 						style={{ color: show ? "white" : "black" }}
 						viewBox='0 0 20 20'
-						fill='black'
+						fill={show ? "white" : "black" }
 						strokeWidth={0}
 					/>
 				</div>

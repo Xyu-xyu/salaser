@@ -92,7 +92,7 @@ const FavoritesButton = observer(() => {
 						height="36"
 						style={{ color: show ? "white" : "black" }}
 						viewBox="0 0 16 16"
-						fill="black"
+						fill={show ? "white" : "black" }
 						strokeWidth={0.1}
 					/>
 				</div>

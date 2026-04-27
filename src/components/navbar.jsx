@@ -7,6 +7,7 @@ import SettingsButton from "./navbar/settingsButton";
 import { showToast } from "./toast";
 import FavoritesButton from "./navbar/favoritesButton";
 import LanguageButton from "./navbar/languageButton";
+import TipsButton from "./navbar/tipsButton";
 import { StartButton } from "./startButton";
 import { StartButtonWithDefSettings } from "./startButtonWithDefSettings";
 import CustomIcon from "../icons/customIcon";
@@ -137,20 +138,7 @@ const NavBar = observer(() => {
 				</div>
 
 				<FavoritesButton />
-				<div className="ms-2">
-					<button className="white_button navbar_button" onClick={ svgStore.fitToPage }>
-						<div className="d-flex align-items-center justify-content-center">
-							<CustomIcon icon="fluent:question-circle-12-regular"
-								width="36"
-								height="36"
-								style={{ color: 'black' }}
-								viewBox={'0 0 12 12'}
-								fill={'black'}
-								strokeWidth={0}
-							/>
-						</div>
-					</button>
-				</div>
+				<TipsButton color={"black"}/>
 				<SettingsButton />
 				<LanguageButton color={"black"}/>
 				<PowerButton />
