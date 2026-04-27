@@ -692,6 +692,24 @@ const en = {
     "Changes preview cutting speed": "Changes preview cutting speed",
     "Start cutting order preview": "Start cutting order preview",
     "Changes selected text size": "Changes selected text size",
-    "Changes spacing between letters": "Changes spacing between letters"
+    "Changes spacing between letters": "Changes spacing between letters",
+    "Clear cutting flags": "Clear cutting flags",
+    "Knob mode": "Knob mode",
+    "Start with defaults": "Start with defaults",
+    "Emergency stop": "Emergency stop",
+    "Favorites": "Favorites",
+    "Tips": "Tips",
+    "Settings": "Settings",
+    "Language": "Language",
+    "Power": "Power",
+    "Add to selection": "Add to selection",
+    "Invert selection": "Invert selection",
+    "Rotate left": "Rotate left",
+    "Remove from selection": "Remove from selection",
+    "Rotate right": "Rotate right",
+    "Delete selected": "Delete selected",
+    "Dock panels": "Dock panels",
+    "Select area": "Select area",
+    "Shapes": "Shapes"
 }
 export default en;

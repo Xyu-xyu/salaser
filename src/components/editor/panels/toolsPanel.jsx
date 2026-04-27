@@ -8,6 +8,7 @@ import { addToLog } from './../../../scripts/addToLog.jsx';
 import util from './../../../scripts/util.jsx';
 import CustomIcon from './../../../icons/customIcon.jsx';
 import panelStore from './../../../store/panelStore.jsx';
+import TooltipCreator from './tooltipCreator.jsx';
 
 
 const ToolsPanel = observer(() => {
@@ -94,230 +95,289 @@ const ToolsPanel = observer(() => {
 			),
 			content: (
 				<div className="d-flex align-items-center btn_block flex-wrap">
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
-						onMouseDown={() => {
-							setMode('resize')							
-							}
-						}
-					>
+					<TooltipCreator
+						element={{
+							id: "resizeMode",
+							info: (
+								<button
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
+									onMouseDown={() => {
+										setMode('resize')							
+										}
+									}
+								>
+									<CustomIcon
+										icon="fa-arrow-pointer"
+										width="24"
+										height="24"
+										color="white"
+										fill="black"
+										strokeWidth={10}
+										viewBox='0 0 640 640'
+									/>
+								</button>
+							)
+						}}
+					/>
+					<TooltipCreator
+						element={{
+							id: "dragMode",
+							info: (
+								<button
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_tool btn_drag_mode"
+									onMouseDown={() => {
+										setMode('drag')
+										//partStore.deselect ()
+									}
+									}
+								>
+									<CustomIcon
+										icon="hand"
+										width="24"
+										height="24"
+										color="black"
+										fill="black"
+										strokeWidth={0.2}
+										viewBox='0 0 20 20'
+									/>
+								</button>
+							)
+						}}
+					/>
 
-						<CustomIcon
-							icon="fa-arrow-pointer"
-							width="24"
-							height="24"
-							color="white"
-							fill="black"
-							strokeWidth={10}
-							viewBox='0 0 640 640'
+					{partStore.selectedPointOnPath ? (
+						<TooltipCreator
+							element={{
+								id: "addPointToPath",
+								info: (
+									<button
+										type="button"
+										className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+										onMouseDown={addPointToPath}>
+										<CustomIcon
+											icon="gridicons:add"
+											width="24"
+											height="24"
+											color="black"
+											fill="black"
+											strokeWidth={.5}
+										/>
+									</button>
+								)
+							}}
 						/>
-					</button>
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_tool btn_drag_mode"
-						onMouseDown={() => {
-							setMode('drag')
-							//partStore.deselect ()
-						}
-						}
-					>
-						<CustomIcon
-							icon="hand"
-							width="24"
-							height="24"
-							color="black"
-							fill="black"
-							strokeWidth={0.2}
-							viewBox='0 0 20 20'
+					) : (
+						<TooltipCreator
+							element={{
+								id: "addPoint",
+								info: (
+									<button
+										type="button"
+										className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+										onMouseDown={() => setMode('addPoint')}							>
+										<div className="d-flex flex-row align-items-center justify-content-center">
+											<CustomIcon
+												icon="fa-arrow-pointer"
+												width="24"
+												height="24"
+												color="white"
+												fill="black"
+												strokeWidth={10}
+												viewBox='0 0 640 640'
+											/>
+											<div style={{ marginLeft: -4, marginTop: 11, color: "black" }}>+</div>
+										</div>
+									</button>
+								)
+							}}
 						/>
-					</button>
+					)}
 
-					{partStore.selectedPointOnPath ?
-						<button
-							type="button"
-							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
-							onMouseDown={addPointToPath}>
-							<CustomIcon
-								icon="gridicons:add"
-								width="24"
-								height="24"
-								color="black"
-								fill="black"
-								strokeWidth={.5}
-							/>
-						</button>
-						:
-						<button
-							type="button"
-							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
-							onMouseDown={() => setMode('addPoint')}							>
-							<div className="d-flex flex-row align-items-center justify-content-center">
-								<CustomIcon
-									icon="fa-arrow-pointer"
-									width="24"
-									height="24"
-									color="white"
-									fill="black"
-									strokeWidth={10}
-									viewBox='0 0 640 640'
-								/>
-								<div style={{ marginLeft: -4, marginTop: 11, color: "black" }}>+</div>
-							</div>
-						</button>
-					}
-
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_copy btn_tool"
-						onMouseDown={copyContour}
-					>
-						<CustomIcon
-							icon="fa-regular:copy"
-							width="24"
-							height="24"
-							color="black"
-							fill="black"
-							strokeWidth={0}
-							viewBox='0 0 500 500'
-						/>
-					</button>
+					<TooltipCreator
+						element={{
+							id: "btn_copy",
+							info: (
+								<button
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_copy btn_tool"
+									onMouseDown={copyContour}
+								>
+									<CustomIcon
+										icon="fa-regular:copy"
+										width="24"
+										height="24"
+										color="black"
+										fill="black"
+										strokeWidth={0}
+										viewBox='0 0 500 500'
+									/>
+								</button>
+							)
+						}}
+					/>
 					{partStore.selectedPointOnEdge ?
 
-						<button
-							type="button"
-							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
-							onMouseDown={deletePoint}
-						>
-							<CustomIcon
-								icon="delete-point"
-								width="24"
-								height="24"
-								color="white"
-								fill="black"
-								strokeWidth={0.5}
-							/>
-						</button>
+						<TooltipCreator
+							element={{
+								id: "deletePoint",
+								info: (
+									<button
+										type="button"
+										className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+										onMouseDown={deletePoint}
+									>
+										<CustomIcon
+											icon="delete-point"
+											width="24"
+											height="24"
+											color="white"
+											fill="black"
+											strokeWidth={0.5}
+										/>
+									</button>
+								)
+							}}
+						/>
 						:
+						<TooltipCreator
+							element={{
+								id: "selectPoint",
+								info: (
+									<button
+										type="button"
+										className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+										onMouseDown={() => setMode('selectPoint')}
+									>
+										<CustomIcon
+											icon="fa-arrow-pointer"
+											width="24"
+											height="24"
+											color="black"
+											fill="white"
+											strokeWidth={20}
+											viewBox='0 0 640 640'
+										/>
+									</button>
+								)
+							}}
+						/>
+					}
+					<TooltipCreator element={{ id: "rounding", info: (
 						<button
 							type="button"
-							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
-							onMouseDown={() => setMode('selectPoint')}
+							className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
+							onMouseDown={roundEdge}
 						>
 							<CustomIcon
-								icon="fa-arrow-pointer"
+								icon="arc"
 								width="24"
 								height="24"
 								color="black"
-								fill="white"
-								strokeWidth={20}
+								fill="none"
+								strokeWidth={2}
+							/>
+						</button>
+					)}} />
+					<TooltipCreator element={{ id: "btn_paste", info: (
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_paste btn_tool"
+							onMouseDown={pasteContour}
+						>
+							<CustomIcon
+								icon="fa-import"
+								width="24"
+								height="24"
+								color="black"
+								fill="black"
+								strokeWidth={0}
 								viewBox='0 0 640 640'
 							/>
 						</button>
-					}
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
-						onMouseDown={roundEdge}
-					>
-						<CustomIcon
-							icon="arc"
-							width="24"
-							height="24"
-							color="black"
-							fill="none"
-							strokeWidth={2}
-						/>
-					</button>
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_paste btn_tool"
-						onMouseDown={pasteContour}
-					>
-						<CustomIcon
-							icon="fa-import"
-							width="24"
-							height="24"
-							color="black"
-							fill="black"
-							strokeWidth={0}
-							viewBox='0 0 640 640'
-						/>
-					</button>
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_reverse_path btn_tool"
-						onMouseDown={reverse}
-					>
+					)}} />
+					<TooltipCreator element={{ id: "btn_reverse", info: (
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_reverse_path btn_tool"
+							onMouseDown={reverse}
+						>
+							<CustomIcon
+								icon="fa-rotate"
+								width="20"
+								height="20"
+								fill='black'
+								strokeWidth={0}
+								viewBox='0 0 1536 1536'
+							/>
+						</button>
+					)}} />
+					<TooltipCreator element={{ id: "btn_shapes", info: (<span className="d-inline-flex"><ContourModalComponent /></span>) }} />
+					<TooltipCreator element={{ id: "btn_text", info: (
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_text btn_tool"
+							onMouseDown={() => setMode('text')}
+						>
+							<CustomIcon
+								icon="text-size"
+								width="24"
+								height="24"
+								fill='black'
+								strokeWidth={1}
+								color='black'
+							/>
+						</button>
+					)}} />
+					<TooltipCreator element={{ id: "btn_new_outer", info: (
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
+							onClick={() => partStore.setNewOuter()}
+						>
+							<CustomIcon
+								icon="settings-outline"
+								width="32"
+								height="32"
+								fill='black'
+								strokeWidth={0}
+								viewBox='0 0 24 24'
+							/>
+						</button>
+					)}} />
 
-						<CustomIcon
-							icon="fa-rotate"
-							width="20"
-							height="20"
-							fill='black'
-							strokeWidth={0}
-							viewBox='0 0 1536 1536'
-						/>
-					</button>
-					<ContourModalComponent />
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_text btn_tool"
-						onMouseDown={() => setMode('text')}
-					>
-						<CustomIcon
-							icon="text-size"
-							width="24"
-							height="24"
-							fill='black'
-							strokeWidth={1}
-							color='black'
-						/>
-
-					</button>
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
-						onClick={() => partStore.setNewOuter()}
-					>
-
-						<CustomIcon
-							icon="settings-outline"
-							width="32"
-							height="32"
-							fill='black'
-							strokeWidth={0}
-							viewBox='0 0 24 24'
-						/>
-					</button>
-
-					<button
-						type="button"
-						className="btn text-white mt-1 ms-2 btn_delete btn_tool" onMouseDown={deleteContour}
-					>
-						<CustomIcon
-							icon="ic:twotone-delete-outline"
-							width="24"
-							height="24"
-							fill='black'
-							strokeWidth={0.2}
-						/>
-					</button>
-					<button
-						type="button"
-						title={panelStore.dockMode ? "Floating panels" : "Dock panels"}
-						className={`btn text-white mt-1 ms-2 btn_tool`}
-						onMouseDown={() => panelStore.toggleDockMode()}
-					>
-						<CustomIcon
-							icon="panelSwitch"
-							width="24"
-							height="24"
-							color={"black"}
-							fill={"black"}
-							strokeWidth={0.2}
-						/>
-					</button>
+					<TooltipCreator element={{ id: "btn_delete", info: (
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_delete btn_tool" onMouseDown={deleteContour}
+						>
+							<CustomIcon
+								icon="ic:twotone-delete-outline"
+								width="24"
+								height="24"
+								fill='black'
+								strokeWidth={0.2}
+							/>
+						</button>
+					)}} />
+					<TooltipCreator element={{ id: "dockPanels", info: (
+						<button
+							type="button"
+							title={panelStore.dockMode ? "Floating panels" : "Dock panels"}
+							className={`btn text-white mt-1 ms-2 btn_tool`}
+							onMouseDown={() => panelStore.toggleDockMode()}
+						>
+							<CustomIcon
+								icon="panelSwitch"
+								width="24"
+								height="24"
+								color={"black"}
+								fill={"black"}
+								strokeWidth={0.2}
+							/>
+						</button>
+					)}} />
 				</div>
 			),
 		},

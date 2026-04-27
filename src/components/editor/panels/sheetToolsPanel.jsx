@@ -12,6 +12,7 @@ import { useState } from "react";
 import constants from '../../../store/constants.jsx';
 import { addToSheetLog } from '../../../scripts/addToSheetLog.jsx';
 import panelStore from '../../../store/panelStore.jsx';
+import TooltipCreator from './tooltipCreator.jsx';
 
 
 const SheetToolsPanel = observer(() => {
@@ -88,141 +89,196 @@ const SheetToolsPanel = observer(() => {
 			content: (
 				<div className="d-flex align-items-center btn_block flex-wrap">
 
-					<button
-						type="button"
-						className="btn text-white btn_tool btn_resize_mode"
-						onMouseDown={() => { 
-							if (editorStore.mode === "resize") {
-								svgStore.deselect()
-							}
-							editorStore.setMode("resize")
+					<TooltipCreator
+						element={{
+							id: "resizeMode",
+							info: (
+								<button
+									type="button"
+									className="btn text-white btn_tool btn_resize_mode"
+									onMouseDown={() => { 
+										if (editorStore.mode === "resize") {
+											svgStore.deselect()
+										}
+										editorStore.setMode("resize")
+									}}
+								>
+									<CustomIcon
+										icon="fa-arrow-pointer"
+										width="20"
+										height="20"
+										color={getModeIconStroke("resize", inactivePointerStrokeColor)}
+										fill={getModeIconFill("resize")}
+										strokeWidth={10}
+										viewBox='0 0 640 640'
+									/>
+								</button>
+							)
 						}}
-					>
+					/>
 
-						<CustomIcon
-							icon="fa-arrow-pointer"
-							width="20"
-							height="20"
-							color={getModeIconStroke("resize", inactivePointerStrokeColor)}
-							fill={getModeIconFill("resize")}
-							strokeWidth={10}
-							viewBox='0 0 640 640'
-						/>
-					</button>
-
-					<button
-						type="button"
-						className="btn text-white btn_tool btn_resize_mode"
-						onMouseDown={() => {
-							editorStore.setMode("selector")
+					<TooltipCreator
+						element={{
+							id: "selectorMode",
+							info: (
+								<button
+									type="button"
+									className="btn text-white btn_tool btn_resize_mode"
+									onMouseDown={() => {
+										editorStore.setMode("selector")
+									}}
+								>
+									<CustomIcon
+										icon="rect-dash"
+										width="20"
+										height="20"
+										color={getModeIconStroke("selector")}
+										fill={getModeIconFill("selector")}
+										strokeWidth={1.5}
+										viewBox='0 0 256 256'
+									/>
+								</button>
+							)
 						}}
-					>
-						<CustomIcon
-							icon="rect-dash"
-							width="20"
-							height="20"
-							color={getModeIconStroke("selector")}
-							fill={getModeIconFill("selector")}
-							strokeWidth={1.5}
-							viewBox='0 0 256 256'
-						/>
-					</button>
+					/>
 
 				
 
-					<button
-						type="button"
-						className="btn text-white btn_mode btn_tool btn_add_point"
-						onMouseDown={() => {
-							editorStore.setMode("selectionPlus")
-						}}							>
-						<div className="d-flex flex-row align-items-center justify-content-center">
-							<CustomIcon
-								icon="fa-arrow-pointer"
-								width="20"
-								height="20"
-								color={getModeIconStroke("selectionPlus", inactivePointerStrokeColor)}
-								fill={getModeIconFill("selectionPlus")}
-								strokeWidth={10}
-								viewBox='0 0 640 640'
-							/>
-							<div style={{ marginLeft: -4, marginTop: 11, color: getModeIconFill("selectionPlus") }}>+</div>
-						</div>
-					</button>
-
-
-					<button
-						type="button"
-						className="btn text-white btn_mode btn_tool btn_add_point"
-						onMouseDown={() => {
-							editorStore.setMode("selectionMinus")}
-							}							>
-						<div className="d-flex flex-row align-items-center justify-content-center">
-							<CustomIcon
-								icon="fa-arrow-pointer"
-								width="20"
-								height="20"
-								color={getModeIconStroke("selectionMinus", inactivePointerStrokeColor)}
-								fill={getModeIconFill("selectionMinus")}
-								strokeWidth={10}
-								viewBox='0 0 640 640'
-							/>
-							<div style={{ marginLeft: -4, marginTop: 11, color: getModeIconFill("selectionMinus") }}>-</div>
-						</div>
-					</button>
-
-					<button
-						type="button"
-						className="btn text-white btn_tool btn_resize_mode"
-						onMouseDown={() => { 
-							svgStore.inverSelection()
-							editorStore.setMode("resize")
+					<TooltipCreator
+						element={{
+							id: "selectionPlus",
+							info: (
+								<button
+									type="button"
+									className="btn text-white btn_mode btn_tool btn_add_point"
+									onMouseDown={() => {
+										editorStore.setMode("selectionPlus")
+									}}							>
+									<div className="d-flex flex-row align-items-center justify-content-center">
+										<CustomIcon
+											icon="fa-arrow-pointer"
+											width="20"
+											height="20"
+											color={getModeIconStroke("selectionPlus", inactivePointerStrokeColor)}
+											fill={getModeIconFill("selectionPlus")}
+											strokeWidth={10}
+											viewBox='0 0 640 640'
+										/>
+										<div style={{ marginLeft: -4, marginTop: 11, color: getModeIconFill("selectionPlus") }}>+</div>
+									</div>
+								</button>
+							)
 						}}
-					>
-						<CustomIcon
-							icon="invert"
-							width="20"
-							height="20"
-							color="black"
-							fill="black"
-							strokeWidth={1}
-							viewBox='0 0 16 16'
-						/>
-					</button>
+					/>
 
-					<ShapeModalComponent />
 
-					<button 
-						type="button"
-						className="btn text-white btn_tool"
-						onMouseDown={ ()=>rotateSelectedPosition (-angle)}
-					>
+					<TooltipCreator
+						element={{
+							id: "selectionMinus",
+							info: (
+								<button
+									type="button"
+									className="btn text-white btn_mode btn_tool btn_add_point"
+									onMouseDown={() => {
+										editorStore.setMode("selectionMinus")}
+										}							>
+									<div className="d-flex flex-row align-items-center justify-content-center">
+										<CustomIcon
+											icon="fa-arrow-pointer"
+											width="20"
+											height="20"
+											color={getModeIconStroke("selectionMinus", inactivePointerStrokeColor)}
+											fill={getModeIconFill("selectionMinus")}
+											strokeWidth={10}
+											viewBox='0 0 640 640'
+										/>
+										<div style={{ marginLeft: -4, marginTop: 11, color: getModeIconFill("selectionMinus") }}>-</div>
+									</div>
+								</button>
+							)
+						}}
+					/>
 
-						<CustomIcon
-							icon="fa-rotate"
-							width="20"
-							height="20"
-							fill={"black"}
-							strokeWidth={0}
-							viewBox='0 0 1536 1536'
-						/>
-					</button>
+					<TooltipCreator
+						element={{
+							id: "invertSelection",
+							info: (
+								<button
+									type="button"
+									className="btn text-white btn_tool btn_resize_mode"
+									onMouseDown={() => { 
+										svgStore.inverSelection()
+										editorStore.setMode("resize")
+									}}
+								>
+									<CustomIcon
+										icon="invert"
+										width="20"
+										height="20"
+										color="black"
+										fill="black"
+										strokeWidth={1}
+										viewBox='0 0 16 16'
+									/>
+								</button>
+							)
+						}}
+					/>
 
-					<button 
-						type="button"
-						className="btn text-white btn_tool"
-						onMouseDown={ ()=>rotateSelectedPosition (angle)}
-					>
+					<TooltipCreator
+						element={{
+							id: "sheetShapes",
+							info: (
+								<span className="d-inline-flex">
+									<ShapeModalComponent />
+								</span>
+							)
+						}}
+					/>
 
-						<CustomIcon
-							icon="fa-rotateR"
-							width="20"
-							height="20"
-							fill={"black"}
-							strokeWidth={0}
-							viewBox='0 0 1536 1536'
-						/>
-					</button>
+					<TooltipCreator
+						element={{
+							id: "rotateLeft",
+							info: (
+								<button 
+									type="button"
+									className="btn text-white btn_tool"
+									onMouseDown={ ()=>rotateSelectedPosition (-angle)}
+								>
+									<CustomIcon
+										icon="fa-rotate"
+										width="20"
+										height="20"
+										fill={"black"}
+										strokeWidth={0}
+										viewBox='0 0 1536 1536'
+									/>
+								</button>
+							)
+						}}
+					/>
+
+					<TooltipCreator
+						element={{
+							id: "rotateRight",
+							info: (
+								<button 
+									type="button"
+									className="btn text-white btn_tool"
+									onMouseDown={ ()=>rotateSelectedPosition (angle)}
+								>
+									<CustomIcon
+										icon="fa-rotateR"
+										width="20"
+										height="20"
+										fill={"black"}
+										strokeWidth={0}
+										viewBox='0 0 1536 1536'
+									/>
+								</button>
+							)
+						}}
+					/>
 					<input
 						type="number"
 						step="1"
@@ -242,34 +298,48 @@ const SheetToolsPanel = observer(() => {
 
  
 
-					<button 
-						type="button"
-						className="btn text-white btn_delete btn_tool" onMouseDown={deleteSelectedPosition}
-					>
-							<CustomIcon
-								icon="material-symbols:delete-outline-sharp"
-								width="24"
-								height="24"
-								fill= {"black"}
-								strokeWidth={0}
-								className="ms-1"
-							/>
-					</button>
-					<button
-						type="button"
-						title={panelStore.dockMode ? "Floating panels" : "Dock panels"}
-						className={`btn text-white btn_tool`}
-						onMouseDown={() => panelStore.toggleDockMode()}
-					>
-						<CustomIcon
-							icon="panelSwitch"
-							width="24"
-							height="24"
-							color={"black"}
-							fill={"black"}
-							strokeWidth={0.2}
-						/>
-					</button>
+					<TooltipCreator
+						element={{
+							id: "deleteSelected",
+							info: (
+								<button 
+									type="button"
+									className="btn text-white btn_delete btn_tool" onMouseDown={deleteSelectedPosition}
+								>
+									<CustomIcon
+										icon="material-symbols:delete-outline-sharp"
+										width="24"
+										height="24"
+										fill= {"black"}
+										strokeWidth={0}
+										className="ms-1"
+									/>
+								</button>
+							)
+						}}
+					/>
+					<TooltipCreator
+						element={{
+							id: "dockPanels",
+							info: (
+								<button
+									type="button"
+									title={panelStore.dockMode ? "Floating panels" : "Dock panels"}
+									className={`btn text-white btn_tool`}
+									onMouseDown={() => panelStore.toggleDockMode()}
+								>
+									<CustomIcon
+										icon="panelSwitch"
+										width="24"
+										height="24"
+										color={"black"}
+										fill={"black"}
+										strokeWidth={0.2}
+									/>
+								</button>
+							)
+						}}
+					/>
 				</div>
 			),
 		},

@@ -139,6 +139,132 @@ const TooltipCreator = observer (({ element }) => {
 			title: t("Play"),
 			text: '',
 			placement: 'bottom'
+		},
+
+		// NavBar
+		navPlans: {
+			title: t("Plans"),
+			text: '',
+			placement: 'bottom'
+		},
+		navService: {
+			title: t("Service"),
+			text: '',
+			placement: 'bottom'
+		},
+		navClearCuttingFlags: {
+			title: t("Clear cutting flags"),
+			text: '',
+			placement: 'bottom'
+		},
+		navKnobMode: {
+			title: t("Knob mode"),
+			text: '',
+			placement: 'bottom'
+		},
+		navStartWithDefaults: {
+			title: t("Start with defaults"),
+			text: '',
+			placement: 'bottom'
+		},
+		navStart: {
+			title: t("Start"),
+			text: '',
+			placement: 'bottom'
+		},
+		navEmergencyStop: {
+			title: t("Emergency stop"),
+			text: '',
+			placement: 'bottom'
+		},
+		navFavorites: {
+			title: t("Favorites"),
+			text: '',
+			placement: 'bottom'
+		},
+		navTips: {
+			title: t("Tips"),
+			text: '',
+			placement: 'bottom'
+		},
+		navSettings: {
+			title: t("Settings"),
+			text: '',
+			placement: 'bottom'
+		},
+		navLanguage: {
+			title: t("Language"),
+			text: '',
+			placement: 'bottom'
+		},
+		navPower: {
+			title: t("Power"),
+			text: '',
+			placement: 'bottom'
+		},
+
+		// LeftBar
+		leftBarPlan: {
+			title: t("Plan"),
+			text: '',
+			placement: 'right'
+		},
+		leftBarSheet: {
+			title: t("Sheet"),
+			text: '',
+			placement: 'right'
+		},
+		leftBarPart: {
+			title: t("Part"),
+			text: '',
+			placement: 'right'
+		},
+
+		// ToolsPopup / SheetToolsPopup
+		selectionPlus: {
+			title: t("Add to selection"),
+			text: '',
+			placement: 'bottom'
+		},
+		selectionMinus: {
+			title: t("Remove from selection"),
+			text: '',
+			placement: 'bottom'
+		},
+		invertSelection: {
+			title: t("Invert selection"),
+			text: '',
+			placement: 'bottom'
+		},
+		rotateLeft: {
+			title: t("Rotate left"),
+			text: '',
+			placement: 'bottom'
+		},
+		rotateRight: {
+			title: t("Rotate right"),
+			text: '',
+			placement: 'bottom'
+		},
+		deleteSelected: {
+			title: t("Delete selected"),
+			text: '',
+			placement: 'bottom'
+		},
+		dockPanels: {
+			title: t("Dock panels"),
+			text: '',
+			placement: 'bottom'
+		},
+		selectorMode: {
+			title: t("Select area"),
+			text: '',
+			placement: 'bottom'
+		},
+		sheetShapes: {
+			title: t("Shapes"),
+			text: '',
+			placement: 'bottom'
 		}
  		
 		/* toolTipsSwitcher: {

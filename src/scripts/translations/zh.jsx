@@ -641,6 +641,24 @@ const zh = {
     "Changes preview cutting speed": "更改切割预览速度",
     "Start cutting order preview": "开始切割顺序预览",
     "Changes selected text size": "更改所选文本大小",
-    "Changes spacing between letters": "更改字母间距"
+    "Changes spacing between letters": "更改字母间距",
+    "Start with defaults": "从默认值开始",
+    "Settings": "设置",
+    "Knob mode": "旋钮模式",
+    "Language": "语言",
+    "Clear cutting flags": "清除切割标志",
+    "Favorites": "收藏夹",
+    "Tips": "提示",
+    "Power": "电源",
+    "Emergency stop": "紧急停止",
+    "Rotate left": "向左旋转",
+    "Dock panels": "坞站面板",
+    "Delete selected": "删除所选内容",
+    "Invert selection": "反转选择",
+    "Rotate right": "向右旋转",
+    "Add to selection": "添加到选择",
+    "Remove from selection": "从选择中删除",
+    "Select area": "选择区域",
+    "Shapes": "形状"
 }
 export default zh;
