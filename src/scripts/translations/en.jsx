@@ -697,6 +697,15 @@ const en = {
     "Knob mode": "Knob mode",
     "Start with defaults": "Start with defaults",
     "Emergency stop": "Emergency stop",
+    "Connection": "Connection",
+    "Connection status": "Connection status",
+    "Connected": "Connected",
+    "Disconnected": "Disconnected",
+    "Laser IP": "Laser IP",
+    "Invalid IP address": "Invalid IP address",
+    "Unknown": "Unknown",
+    "Refresh": "Refresh",
+    "Current": "Current",
     "Favorites": "Favorites",
     "Tips": "Tips",
     "Settings": "Settings",
@@ -710,6 +719,7 @@ const en = {
     "Delete selected": "Delete selected",
     "Dock panels": "Dock panels",
     "Select area": "Select area",
-    "Shapes": "Shapes"
+    "Shapes": "Shapes",
+    "IP": "IP"
 }
 export default en;

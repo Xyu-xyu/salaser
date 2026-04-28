@@ -692,6 +692,15 @@ const ru = {
     "Changes spacing between letters": "Меняет расстояние между буквами",
     "Favorites": "Избранное",
     "Clear cutting flags": "Сброс текущего задания",
+    "Connection": "Подключение",
+    "Connection status": "Статус подключения",
+    "Connected": "Подключен",
+    "Disconnected": "Нет подключения",
+    "Laser IP": "IP лазера",
+    "Invalid IP address": "Неверный IP-адрес",
+    "Unknown": "Неизвестно",
+    "Refresh": "Обновить",
+    "Current": "Текущий",
     "Settings": "Настройки",
     "Knob mode": "Режим настроек",
     "Start with defaults": "Начните резку с параметрами по умолчанию",
@@ -707,6 +716,7 @@ const ru = {
     "Dock panels": "Док-панели",
     "Remove from selection": "Удалить из выбора",
     "Select area": "Выделение областью",
-    "Shapes": "Фигуры"
+    "Shapes": "Фигуры",
+    "IP": "ИП"
 }
 export default ru;

@@ -8,6 +8,7 @@ import { showToast } from "./toast";
 import FavoritesButton from "./navbar/favoritesButton";
 import LanguageButton from "./navbar/languageButton";
 import TipsButton from "./navbar/tipsButton";
+import ConnectionButton from "./navbar/connectionButton.jsx";
 import { StartButton } from "./startButton";
 import { StartButtonWithDefSettings } from "./startButtonWithDefSettings";
 import CustomIcon from "../icons/customIcon";
@@ -195,6 +196,7 @@ const NavBar = observer(() => {
 				<TooltipCreator element={{ id: "navTips", info: (<span className="d-inline-flex"><TipsButton color={"black"}/></span>) }} />
 				<TooltipCreator element={{ id: "navSettings", info: (<span className="d-inline-flex"><SettingsButton /></span>) }} />
 				<TooltipCreator element={{ id: "navLanguage", info: (<span className="d-inline-flex"><LanguageButton color={"black"}/></span>) }} />
+				<TooltipCreator element={{ id: "navConnection", info: (<span className="d-inline-flex"><ConnectionButton /></span>) }} />
 				<TooltipCreator element={{ id: "navPower", info: (<span className="d-inline-flex"><PowerButton /></span>) }} />
 			</div>
 		</div>

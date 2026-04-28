@@ -647,6 +647,15 @@ const zh = {
     "Knob mode": "旋钮模式",
     "Language": "语言",
     "Clear cutting flags": "清除切割标志",
+    "Connection": "连接",
+    "Connection status": "连接状态",
+    "Connected": "已连接",
+    "Disconnected": "未连接",
+    "Laser IP": "激光 IP",
+    "Invalid IP address": "无效的 IP 地址",
+    "Unknown": "未知",
+    "Refresh": "刷新",
+    "Current": "当前",
     "Favorites": "收藏夹",
     "Tips": "提示",
     "Power": "电源",
@@ -659,6 +668,7 @@ const zh = {
     "Add to selection": "添加到选择",
     "Remove from selection": "从选择中删除",
     "Select area": "选择区域",
-    "Shapes": "形状"
+    "Shapes": "形状",
+    "IP": "知识产权"
 }
 export default zh;
