@@ -241,6 +241,9 @@ class SvgStore {
 		"file":"",
 		"name": "undefined.ncp",
 		"thickness":1,
+		"material": "",
+		"materialLabel": "",
+		"material_id": null,
 		"jobcode":"",
 		"width": 500,
 		"height": 500,
@@ -3306,8 +3309,14 @@ class SvgStore {
 
 		if (selectedId === 'newSheet') {
 
-			let material = "Mild steel" 
-			let materialLabel = "S235JR"
+			const material =
+				typeof this.svgData?.material === "string" && this.svgData.material.trim() !== ""
+					? this.svgData.material.trim()
+					: "Mild steel";
+			const materialLabel =
+				typeof this.svgData?.materialLabel === "string" && this.svgData.materialLabel.trim() !== ""
+					? this.svgData.materialLabel.trim()
+					: "S235JR";
 
 			ncpStart = [
 				`%`,

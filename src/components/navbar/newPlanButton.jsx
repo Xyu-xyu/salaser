@@ -19,6 +19,7 @@ const NewPlanButton = observer(() => {
 	const { t } = useTranslation();
 	const [show, setShow] = useState(false);
 	const { presets } = macrosStore;
+	const MATERIAL_LS_KEY = "salaser.selectedMaterialId";
 
 	// Форма
 	const [name, setName] = useState("new_plan");
@@ -27,11 +28,11 @@ const NewPlanButton = observer(() => {
 	const [quantity, setQuantity] = useState("1");
 	const [thickness, setThickness] = useState("3");
 	const [selectedPreset, setSelectedPreset] = useState(null);
+	const [selectedMaterial, setSelectedMaterial] = useState(null);
 
 	/** Пустой лист | авто-раскрой через POST /jdb/b7/nest */
 	const [creationMode, setCreationMode] = useState("empty");
 	const [nestPartRows, setNestPartRows] = useState(() => []);
-	const [materialName, setMaterialName] = useState("DC01");
 	const [partProtectionGap, setPartProtectionGap] = useState("10");
 	const [nestLoading, setNestLoading] = useState(false);
 	const [showAdvancedB7, setShowAdvancedB7] = useState(false);
@@ -69,14 +70,33 @@ const NewPlanButton = observer(() => {
 		height: "",
 		quantity: "",
 		preset: "",
+		material: "",
 		thickness: "",
 		nestParts: "",
-		materialName: "",
 	});
 
 	useEffect(() => {
 		if (!presets.length) macrosStore.fetchPresets();
 	}, [/* presets */]);
+
+	useEffect(() => {
+		if (!show) return;
+		partStore.loadDbMaterials();
+	}, [show]);
+
+	useEffect(() => {
+		if (!show) return;
+		if (selectedMaterial) return;
+		let savedId = null;
+		try {
+			savedId = localStorage.getItem(MATERIAL_LS_KEY);
+		} catch {
+			savedId = null;
+		}
+		if (!savedId) return;
+		const found = (partStore.dbMaterials || []).find((m) => String(m?.id) === String(savedId));
+		if (found) setSelectedMaterial(found);
+	}, [show, partStore.dbMaterials, selectedMaterial]);
 
 	const validate = () => {
 		const newErrors = {};
@@ -118,6 +138,11 @@ const NewPlanButton = observer(() => {
 			newErrors.preset = t("Please select a preset");
 		}
 
+		// Material обязателен
+		if (!selectedMaterial) {
+			newErrors.material = t("Please select a material");
+		}
+
 		if (creationMode === "b7_nest") {
 			const filled = nestPartRows.filter((row) => row.path.trim());
 			if (!filled.length) {
@@ -148,9 +173,6 @@ const NewPlanButton = observer(() => {
 						}
 					}
 				});
-			}
-			if (!materialName.trim()) {
-				newErrors.materialName = t("Material name is required");
 			}
 			const gap = Number(partProtectionGap);
 			if (
@@ -201,6 +223,11 @@ const NewPlanButton = observer(() => {
 			: parseInt(shakeCount, 10);
 		const shakeCountVal =
 			Number.isFinite(scBase) && scBase >= 0 ? scBase : 0;
+		const mat = selectedMaterial && typeof selectedMaterial === "object" ? selectedMaterial : null;
+		const b7MaterialName =
+			String(mat?.name ?? "").trim() ||
+			String(mat?.label ?? "").trim() ||
+			"Steel";
 		const config = {
 			parts,
 			sheets: [{
@@ -210,7 +237,7 @@ const NewPlanButton = observer(() => {
 			}],
 			material: {
 				thickness: th,
-				name: materialName.trim() || "Steel",
+				name: b7MaterialName,
 			},
 			nesting: {
 				part_protection_gap: Number(partProtectionGap) || 0,
@@ -285,7 +312,7 @@ const NewPlanButton = observer(() => {
 			height,
 			quantity,
 			thickness,
-			materialName,
+			selectedMaterial,
 			partProtectionGap,
 			nestPartRows,
 			showAdvancedB7,
@@ -330,6 +357,7 @@ const NewPlanButton = observer(() => {
 
 	/** Пустой лист: данные в svgStore и переход в редактор плана */
 	const applyEmptySheetToStore = () => {
+		const mat = selectedMaterial && typeof selectedMaterial === "object" ? selectedMaterial : null;
 		const res = {
 			name: name.trim(),
 			width: parseFloat(width),
@@ -338,6 +366,10 @@ const NewPlanButton = observer(() => {
 			thickness: parseFloat(thickness),
 			presetId: selectedPreset.id,
 			presetName: selectedPreset.name,
+			// Для NCP (Sheet MaterialInfo): Label = material.label, MaterialCode = material.name
+			material: mat ? String(mat.label ?? "").trim() : "",
+			materialLabel: mat ? String(mat.name ?? "").trim() : "",
+			material_id: mat ? mat.id : null,
 			part_code: [],
 			positions: [],
 			b7NestMeta: null,
@@ -429,9 +461,9 @@ const NewPlanButton = observer(() => {
 		setQuantity("");
 		setThickness("");
 		setSelectedPreset(null);
+		setSelectedMaterial(null);
 		setCreationMode("empty");
 		setNestPartRows([]);
-		setMaterialName("DC01");
 		setPartProtectionGap("10");
 		setNestLoading(false);
 		setShowAdvancedB7(false);
@@ -459,9 +491,9 @@ const NewPlanButton = observer(() => {
 			height: "",
 			quantity: "",
 			preset: "",
+			material: "",
 			thickness: "",
 			nestParts: "",
-			materialName: "",
 			partProtectionGap: "",
 		});
 	};
@@ -653,34 +685,87 @@ const NewPlanButton = observer(() => {
 							</div>
 
 							<div className="col-md-6">
-							<Form.Group className="mb-3">
-							<Form.Label>{t("Material / Preset")} *</Form.Label>
-							<DropdownButton
-								variant={errors.preset ? "outline-danger" : "outline-primary"}
-								title={selectedPreset ? selectedPreset.name : t("Select preset")}
-								onSelect={(eventKey) => {
-									const preset = presets.find(p => p.id === Number(eventKey));
-									setSelectedPreset(preset || null);
-									if (preset) {
-										setErrors(prev => ({ ...prev, preset: "" }));
-									}
-								}}
-							>
-								{presets?.map((preset) => (
-									<Dropdown.Item
-										key={preset.id}
-										eventKey={preset.id}
-										active={selectedPreset?.id === preset.id}
-									>
-										{preset.name}  {preset.id }
-									</Dropdown.Item>
-								)) || <Dropdown.Item disabled>{t("Loading...")}</Dropdown.Item>}
-							</DropdownButton>
-							{errors.preset && (
-								<div className="text-danger mt-1 small">{errors.preset}</div>
-							)}
-						</Form.Group>
+								<div className="d-flex flex-wrap gap-2">
+									<Form.Group className="mb-3" style={{ minWidth: 220, flex: "1 1 12rem" }}>
+										<Form.Label>{t("Preset")} *</Form.Label>
+										<DropdownButton
+											variant={errors.preset ? "outline-danger" : "outline-primary"}
+											title={selectedPreset ? selectedPreset.name : t("Select preset")}
+											onSelect={(eventKey) => {
+												const preset = presets.find((p) => p.id === Number(eventKey));
+												setSelectedPreset(preset || null);
+												if (preset) {
+													setErrors((prev) => ({ ...prev, preset: "" }));
+												}
+											}}
+										>
+											{presets?.map((preset) => (
+												<Dropdown.Item
+													key={preset.id}
+													eventKey={preset.id}
+													active={selectedPreset?.id === preset.id}
+												>
+													{preset.name} {preset.id}
+												</Dropdown.Item>
+											)) || <Dropdown.Item disabled>{t("Loading...")}</Dropdown.Item>}
+										</DropdownButton>
+										{errors.preset && (
+											<div className="text-danger mt-1 small">{errors.preset}</div>
+										)}
+									</Form.Group>
 
+									<Form.Group className="mb-3" style={{ minWidth: 220, flex: "1 1 12rem" }}>
+										<Form.Label>{t("Material")} *</Form.Label>
+										<DropdownButton
+											variant={errors.material ? "outline-danger" : "outline-primary"}
+											title={
+												selectedMaterial
+													? (selectedMaterial?.name
+														? `${selectedMaterial.name} (${selectedMaterial.label})`
+														: String(selectedMaterial.label ?? ""))
+													: t("Select material")
+											}
+											onSelect={(eventKey) => {
+												const mat = (partStore.dbMaterials || []).find(
+													(m) => String(m?.id) === String(eventKey)
+												);
+												setSelectedMaterial(mat || null);
+												if (mat) {
+													setErrors((prev) => ({ ...prev, material: "" }));
+													try {
+														localStorage.setItem(MATERIAL_LS_KEY, String(mat.id));
+													} catch {
+														// ignore
+													}
+												}
+											}}
+										>
+											{(partStore.dbMaterials || []).map((m) => (
+												<Dropdown.Item
+													key={String(m.id)}
+													eventKey={String(m.id)}
+													active={String(selectedMaterial?.id) === String(m.id)}
+												>
+													{m?.name ? `${m.name} (${m.label})` : m.label}
+												</Dropdown.Item>
+											))}
+											{partStore.dbMaterialsLoading ? (
+												<Dropdown.Item disabled>{t("Loading...")}</Dropdown.Item>
+											) : null}
+											{partStore.dbMaterialsError ? (
+												<Dropdown.Item disabled>{String(partStore.dbMaterialsError)}</Dropdown.Item>
+											) : null}
+											{!partStore.dbMaterialsLoading &&
+											!partStore.dbMaterialsError &&
+											(partStore.dbMaterials || []).length === 0 ? (
+												<Dropdown.Item disabled>{t("No data")}</Dropdown.Item>
+											) : null}
+										</DropdownButton>
+										{errors.material && (
+											<div className="text-danger mt-1 small">{errors.material}</div>
+										)}
+									</Form.Group>
+								</div>
 
 							</div>
 						</div>
@@ -743,14 +828,34 @@ const NewPlanButton = observer(() => {
 							<div className="col-md-6">
 								<Form.Group className="mb-3">
 									<Form.Label>{t("Thickness")} *</Form.Label>
-									<Form.Control
-										type="number"
-										value={thickness}
-										onChange={(e) => setThickness(e.target.value)}
-										isInvalid={!!errors.thickness}
-										min="1"
-										step="0.1"
-									/>
+									<InputGroup>
+										<Form.Control
+											type="number"
+											value={thickness}
+											onChange={(e) => setThickness(e.target.value)}
+											isInvalid={!!errors.thickness}
+											min="0.1"
+											step="0.1"
+										/>
+										<Dropdown>
+											<Dropdown.Toggle
+												variant={errors.thickness ? "outline-danger" : "outline-secondary"}
+											>
+												{t("Select")}
+											</Dropdown.Toggle>
+											<Dropdown.Menu align="end">
+												{[0.5, 0.8, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20].map((v) => (
+													<Dropdown.Item
+														key={String(v)}
+														onClick={() => setThickness(String(v))}
+														active={Number(thickness) === Number(v)}
+													>
+														{v}
+													</Dropdown.Item>
+												))}
+											</Dropdown.Menu>
+										</Dropdown>
+									</InputGroup>
 									<Form.Control.Feedback type="invalid">
 										{errors.thickness}
 									</Form.Control.Feedback>
@@ -771,20 +876,6 @@ const NewPlanButton = observer(() => {
 										{showAdvancedB7 ? t("Hide advanced") : t("Advanced parameters")}
 									</Button>
 								</div>
-
-								<Form.Group className="mb-3">
-									<Form.Label>{t("Nest material name (b7)")} *</Form.Label>
-									<Form.Control
-										type="text"
-										value={materialName}
-										onChange={(e) => setMaterialName(e.target.value)}
-										isInvalid={!!errors.materialName}
-										placeholder={t("e.g. Steel")}
-									/>
-									<Form.Control.Feedback type="invalid">
-										{errors.materialName}
-									</Form.Control.Feedback>
-								</Form.Group>
 
 								<Form.Group className="mb-3">
 									<Form.Label>{t("Part protection gap (mm)")} *</Form.Label>

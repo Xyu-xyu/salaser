@@ -397,6 +397,7 @@ const zh = {
     "Sheet name": "图纸名称",
     "Select preset": "选择预设",
     "Please select a preset": "请选择预设",
+    "Please select a material": "请选择材料",
     "Ошибка обновления: BAD GATEWAY": "Ошибка обновления: BAD GATEWAY",
     "Name contains invalid characters (only letters, numbers, space, _, -)": "名称包含无效字符（仅限字母、数字、空格、_、-）",
     "No material info": "无材料信息",
@@ -682,6 +683,9 @@ const zh = {
     "Заполните наименование и лэйбл": "Заполните наименование и лэйбл",
     "Name must be unique": "名称必须是唯一的",
     "Имя должно быть уникальным": "Имя должно быть уникальным",
-    "Material saved": "节省材料"
+    "Material saved": "节省材料",
+    "Preset": "预设",
+    "Loading...": "加载中...",
+    "Steel": "钢"
 }
 export default zh;

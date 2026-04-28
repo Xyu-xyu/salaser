@@ -399,6 +399,8 @@ const ru = {
     "Width (mm)": "Ширина (мм)",
     "Sheet name": "Имя листа",
     "Select preset": "Выберите предустановку",
+    "Please select a preset": "Выберите предустановку",
+    "Please select a material": "Выберите материал",
     "Name is required": "Требуется имя",
     "Height must be a positive number": "Высота должна быть положительным числом",
     "Ошибка обновления: BAD GATEWAY": "Ошибка обновления: ПЛОХОЙ ШЛЮЗ",
@@ -731,6 +733,9 @@ const ru = {
     "No data": "Нет данных",
     "Заполните наименование и лэйбл": "Заполните наименование и лэйбл",
     "Name must be unique": "Имя должно быть уникальным",
-    "Material saved": "Материал сохранен."
+    "Material saved": "Материал сохранен.",
+    "Preset": "Предустановка",
+    "Loading...": "Загрузка...",
+    "Steel": "Сталь"
 }
 export default ru;

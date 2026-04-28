@@ -351,8 +351,14 @@ class JobStore {
 
 	async saveNcpAsNewSheet( ncpText ) {
 
-		const material = "Mild steel"
-		const materialLabel = "S235JR"
+		const material =
+			typeof svgStore.svgData?.material === "string" && svgStore.svgData.material.trim() !== ""
+				? svgStore.svgData.material.trim()
+				: "Mild steel";
+		const materialLabel =
+			typeof svgStore.svgData?.materialLabel === "string" && svgStore.svgData.materialLabel.trim() !== ""
+				? svgStore.svgData.materialLabel.trim()
+				: "S235JR";
 		const { name, thickness, quantity, width, height, presetId } = svgStore.svgData
 		
 		const fileData = {

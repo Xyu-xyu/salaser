@@ -404,6 +404,7 @@ const en = {
     "Select preset": "Select preset",
     "Name is required": "Name is required",
     "Please select a preset": "Please select a preset",
+    "Please select a material": "Please select a material",
     "Width must be a positive number": "Width must be a positive number",
     "Quantity must be a positive integer": "Quantity must be a positive integer",
     "Height must be a positive number": "Height must be a positive number",
@@ -736,6 +737,9 @@ const en = {
     "Заполните наименование и лэйбл": "Заполните наименование и лэйбл",
     "Name must be unique": "Name must be unique",
     "Имя должно быть уникальным": "Имя должно быть уникальным",
-    "Material saved": "Material saved"
+    "Material saved": "Material saved",
+    "Preset": "Preset",
+    "Loading...": "Loading...",
+    "Steel": "Steel"
 }
 export default en;
