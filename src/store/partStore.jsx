@@ -757,6 +757,26 @@ class PartStore {
 		}
 	}
 
+	/**
+	 * Добавить материал в БД: POST /jdb/add_material
+	 * Тело: { name, label }
+	 * После успеха обновляет список через loadDbMaterials().
+	 */
+	async addDbMaterial({ name, label }) {
+		const n = String(name ?? "").trim();
+		const l = String(label ?? "").trim();
+		if (!n || !l) throw new Error("name and label are required");
+		const resp = await fetch(`${CONSTANTS.SERVER_URL}/jdb/add_material`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ name: n, label: l }),
+		});
+		const data = await resp.json().catch(() => ({}));
+		if (!resp.ok) throw new Error(data?.error ?? `HTTP ${resp.status}`);
+		await partStore.loadDbMaterials();
+		return data;
+	}
+
 	selectPart(uuid) {
 		partStore.setVal('selectedPartUuid', uuid ?? "");
 	}

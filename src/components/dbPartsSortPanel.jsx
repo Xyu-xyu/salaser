@@ -113,7 +113,7 @@ const DbPartsSortPanel = observer((props = {}) => {
 					<option value="">{t("All materials")}</option>
 					{partStore.dbMaterials.map((m) => (
 						<option key={String(m.id)} value={String(m.id)}>
-							{m.label}
+							{m.label} ({m.name})
 						</option>
 					))}
 				</select>

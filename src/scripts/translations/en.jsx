@@ -720,6 +720,22 @@ const en = {
     "Dock panels": "Dock panels",
     "Select area": "Select area",
     "Shapes": "Shapes",
-    "IP": "IP"
+    "IP": "IP",
+    "Clicked on cutting head": "Clicked on cutting head",
+    "Clicked on pallet change": "Clicked on pallet change",
+    "Clicked on motion control": "Clicked on motion control",
+    "Clicked on manage": "Clicked on manage",
+    "Clicked on operation log": "Clicked on operation log",
+    "materials": "materials",
+    "Clicked on ": "Clicked on",
+    "Fill name and label": "Fill name and label",
+    "name": "name",
+    "label": "label",
+    "Add material": "Add material",
+    "No data": "No data",
+    "Заполните наименование и лэйбл": "Заполните наименование и лэйбл",
+    "Name must be unique": "Name must be unique",
+    "Имя должно быть уникальным": "Имя должно быть уникальным",
+    "Material saved": "Material saved"
 }
 export default en;

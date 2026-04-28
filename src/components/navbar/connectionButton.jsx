@@ -28,10 +28,12 @@ function normalizeLaserIpFromExternalApi(externalApi) {
 	}
 }
 
-function formatIpInput(value) {
+function formatIpInput(value, prevValue = "") {
 	// Allows typing dots manually (e.g. "11.") and also auto-adds a dot
 	// after a 3-digit octet ("192.") while keeping max 4 octets.
 	const raw = String(value ?? "");
+	const prevRaw = String(prevValue ?? "");
+	const isDeleting = raw.length < prevRaw.length;
 	const cleaned = raw.replace(/[^\d.]/g, "");
 	const endsWithDot = cleaned.endsWith(".");
 	const lastChar = cleaned.slice(-1);
@@ -52,7 +54,7 @@ function formatIpInput(value) {
 	if (endsWithDot && parts.length > 0 && parts.length < 4) out += ".";
 
 	// auto-add dot after 3 digits in the current octet (when user types digits)
-	if (!endsWithDot && lastChar >= "0" && lastChar <= "9" && parts.length > 0 && parts.length < 4) {
+	if (!isDeleting && !endsWithDot && lastChar >= "0" && lastChar <= "9" && parts.length > 0 && parts.length < 4) {
 		const lastPart = parts[parts.length - 1] ?? "";
 		if (lastPart.length === 3) out += ".";
 	}
@@ -230,7 +232,7 @@ const ConnectionButton = observer(() => {
 							<div className="d-flex align-items-stretch" style={{ gap: 0 }}>
 								<Form.Control
 									value={ipInput}
-									onChange={(e) => setIpInput(formatIpInput(e.target.value))}
+									onChange={(e) => setIpInput(formatIpInput(e.target.value, ipInput))}
 									placeholder="0.0.0.0"
 									disabled={loading || saving}
 									style={{

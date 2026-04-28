@@ -717,6 +717,20 @@ const ru = {
     "Remove from selection": "Удалить из выбора",
     "Select area": "Выделение областью",
     "Shapes": "Фигуры",
-    "IP": "ИП"
+    "IP": "ИП",
+    "Clicked on cutting head": "Нажал на режущую головку",
+    "Clicked on motion control": "Нажал на управление движением",
+    "Clicked on manage": "Нажал «управление»",
+    "Clicked on operation log": "Нажал на журнал операций",
+    "materials": "материалы",
+    "Clicked on ": "Нажал на",
+    "label": "лэйбл",
+    "name": "наименование",
+    "Fill name and label": "Заполните наименование и лэйбл",
+    "Add material": "Добавить материал",
+    "No data": "Нет данных",
+    "Заполните наименование и лэйбл": "Заполните наименование и лэйбл",
+    "Name must be unique": "Имя должно быть уникальным",
+    "Material saved": "Материал сохранен."
 }
 export default ru;

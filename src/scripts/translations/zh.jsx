@@ -669,6 +669,19 @@ const zh = {
     "Remove from selection": "从选择中删除",
     "Select area": "选择区域",
     "Shapes": "形状",
-    "IP": "知识产权"
+    "IP": "知识产权",
+    "Clicked on cutting head": "单击切割头",
+    "Clicked on manage": "点击管理",
+    "Clicked on operation log": "点击操作日志",
+    "materials": "材料",
+    "Clicked on ": "点击了",
+    "Fill name and label": "填写名称和标签",
+    "label": "标签",
+    "Add material": "添加材料",
+    "No data": "无数据",
+    "Заполните наименование и лэйбл": "Заполните наименование и лэйбл",
+    "Name must be unique": "名称必须是唯一的",
+    "Имя должно быть уникальным": "Имя должно быть уникальным",
+    "Material saved": "节省材料"
 }
 export default zh;

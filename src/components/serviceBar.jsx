@@ -1,11 +1,15 @@
 import CustomIcon from "../icons/customIcon";
-import { showToast } from "./toast";
 import { useTranslation } from "react-i18next";
+import { observer } from "mobx-react-lite";
+import { useState } from "react";
+import { showToast } from "./toast";
+import MaterialsModal from "./materialsModal";
 
 
-export default function serviceBar() {
+export default observer(function serviceBar() {
 	// группируем кнопки по рядам
 	const { t } = useTranslation()
+	const [showMaterials, setShowMaterials] = useState(false);
 	const items = [
 		{ name: "machine", icon: "fluent:hand-left-16-regular", color:"black", fill:"black", strokeWidth:0, viewBox:" 0 0 16 16", onClick: () => handleClick("machine") },
 		{ name: "laser module", icon: "game-icons:laser-warning", color:"black", fill:"black", strokeWidth:0, viewBox:" 0 0 512 512",onClick: () => handleClick("laser module") },
@@ -14,7 +18,8 @@ export default function serviceBar() {
 		{ name: "manage", icon: "streamline-plump:code-monitor-2", color:"black", fill:"none", strokeWidth: 2.5, viewBox:" 0 0 48 48", onClick: () => handleClick("manage") },
 		{ name: "operation log", icon: "hugeicons:book-edit", color:"black", fill:"white", strokeWidth:1.5, viewBox:" 0 0 36 36", onClick: () => handleClick("operation log") },
 		{ name: "pallet change", icon: "icon-park:switch-contrast", color:"black", fill:"white", strokeWidth: 2.5, viewBox:" 0 0 48 48", onClick: () => handleClick("pallet change") },
-		{ name: "motion control", icon: "streamline-plump:code-monitor-2", color:"black", fill:"none", strokeWidth: 2.5, viewBox:" 0 0 48 48", onClick: () => handleClick("motion control") }
+		{ name: "motion control", icon: "streamline-plump:code-monitor-2", color:"black", fill:"none", strokeWidth: 2.5, viewBox:" 0 0 48 48", onClick: () => handleClick("motion control") },
+		{ name: "materials", icon: "materials", color:"black", fill:"none", strokeWidth: 2.5, viewBox:" 0 0 48 48", onClick: () => setShowMaterials(true) }
 	];
 
 
@@ -31,7 +36,7 @@ export default function serviceBar() {
 	const rows = [
 		items.slice(0, 3),
 		items.slice(3, 6),
-		items.slice(6, 8)
+		items.slice(6, 9)
 	];
 
 
@@ -70,7 +75,9 @@ export default function serviceBar() {
 					</div>
 				))}
 			</div>
+
+			<MaterialsModal show={showMaterials} onHide={() => setShowMaterials(false)} />
 		</div>
 
 	);
-}
+});
