@@ -124,6 +124,33 @@ const PlanViewSwitcher = observer(() => {
 												</ListGroup>												
 {/* 											</ListGroup>
  */}										</div>
+										<div className="mt-2 px-2 pb-2 w-100">
+											<div className="small mb-1">{t("Sort jobs")}</div>
+											<div className="d-flex gap-2">
+												<Form.Select
+													size="sm"
+													value={jobStore.jobsSortBy}
+													onChange={(e) => {
+														jobStore.setJobsSort(e.target.value, jobStore.jobsSortOrder);
+														jobStore.loadJobs();
+													}}
+												>
+													<option value="array_id">{t("By order")}</option>
+													<option value="thickness">{t("By thickness")}</option>
+												</Form.Select>
+												<Form.Select
+													size="sm"
+													value={jobStore.jobsSortOrder}
+													onChange={(e) => {
+														jobStore.setJobsSort(jobStore.jobsSortBy, e.target.value);
+														jobStore.loadJobs();
+													}}
+												>
+													<option value="asc">{t("Ascending")}</option>
+													<option value="desc">{t("Descending")}</option>
+												</Form.Select>
+											</div>
+										</div>
 									</div>
 
 								)}

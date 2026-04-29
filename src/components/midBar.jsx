@@ -223,6 +223,9 @@ const MidBar = observer(() => {
 													
 												loadResult = false
 											}
+											
+											const materialLabel = card.materialLabel;
+											const thicknessValue = card.thickness;
 
 											return (
 												<SwiperSlide key={card.id}>
@@ -285,9 +288,9 @@ const MidBar = observer(() => {
 																	</div>
 																	<div className="cardMaterial">
 																	
-																	{loadResult?.result?.jobinfo?.attr ? (
+																	{materialLabel || thicknessValue != null ? (
 																		<div className="cardMaterial">
-																			• {t(loadResult.result.jobinfo.attr.label ? loadResult.result.jobinfo.attr.label : "No material info")} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+																			• {materialLabel ? t(materialLabel) : t('No material info')} {thicknessValue != null ? `${thicknessValue} ${t('mm')}` : ""}
 																		</div>
 																	) : (
 																		<div className="cardMaterial text-muted">

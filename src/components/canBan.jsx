@@ -97,6 +97,9 @@ const CanBan = observer(() => {
 											console.warn('Failed to parse loadResult for card:', card.id, e);
 											loadResult = null; // В случае ошибки — считаем, что данных нет
 										}
+										//const attr = loadResult?.result?.jobinfo?.attr;
+										const materialLabel = card.materialLabel;
+										const thicknessValue = card.thickness;
 
 										return (
 											<div key={card.id}
@@ -136,9 +139,9 @@ const CanBan = observer(() => {
 													</div>
 
 													{/* Безопасно отображаем данные из loadResult */}
-													{loadResult?.result?.jobinfo?.attr ? (
+													{materialLabel || thicknessValue != null ? (
 														<div className="cardMaterial">
-															• {t(loadResult.result.jobinfo.attr.label ? loadResult.result.jobinfo.attr.label  :"no label")} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+															• {materialLabel ? t(materialLabel) : t("No material info")} {thicknessValue != null ? `${thicknessValue} ${t('mm')}` : ""}
 														</div>
 													) : (
 														<div className="cardMaterial text-muted">

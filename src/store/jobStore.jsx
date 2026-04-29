@@ -24,6 +24,8 @@ interface JobInfoAttr {
 
 class JobStore {
 	selectedId = ""
+	jobsSortBy = "array_id"
+	jobsSortOrder = "asc"
 	mockCards= {
 		Loaded: [],
 		Cutting: [],
@@ -96,7 +98,17 @@ class JobStore {
 
 	async loadJobs() {
 		try {
-			let resp = await fetch(`${constants.SERVER_URL}/jdb/get_jobs?limit=20`, {
+			const allowedSortBy = ["array_id"/*, "thickness"*/];
+			const allowedOrder = ["asc", "desc"];
+			const sortBy = allowedSortBy.includes(this.jobsSortBy) ? this.jobsSortBy : "array_id";
+			const order = allowedOrder.includes(this.jobsSortOrder) ? this.jobsSortOrder : "asc";
+			const params = new URLSearchParams({
+				limit: "20",
+				sort_by: sortBy,
+				order,
+			});
+
+			let resp = await fetch(`${constants.SERVER_URL}/jdb/get_jobs?${params.toString()}`, {
 				method: "GET",
 				headers: {
 					// Если нужно, добавляй заголовки
@@ -152,6 +164,15 @@ class JobStore {
 				autoClose: 2500
 			});
 		}
+	}
+
+	setJobsSort(sortBy = this.jobsSortBy, order = this.jobsSortOrder) {
+		const allowedSortBy = ["array_id"/*, "thickness"*/];
+		const allowedOrder = ["asc", "desc"];
+		const nextSortBy = allowedSortBy.includes(sortBy) ? sortBy : "array_id";
+		const nextOrder = allowedOrder.includes(order) ? order : "asc";
+		this.jobsSortBy = nextSortBy;
+		this.jobsSortOrder = nextOrder;
 	}
 	
 	setVal (key, value) {
@@ -329,7 +350,8 @@ class JobStore {
 				params:JSON.stringify(
 					{
 					"dimX":svgStore.svgData.width,
-					"dimY":svgStore.svgData.height
+					"dimY":svgStore.svgData.height,
+					"thickness": Number(svgStore.svgData.thickness) || 1
 					}
 				)
 			})

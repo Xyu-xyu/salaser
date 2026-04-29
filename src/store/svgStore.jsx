@@ -3104,6 +3104,12 @@ class SvgStore {
 		svgStore.setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 		const result1 = this._buildPlanResultFromNcp(ncp);
+		const parsedThickness = Number(result1?.thickness);
+		if (!Number.isFinite(parsedThickness) || parsedThickness <= 0) {
+			const currentJob = jobStore.getJobById(jobStore.selectedId);
+			const jobThickness = Number(currentJob?.thickness);
+			result1.thickness = (Number.isFinite(jobThickness) && jobThickness > 0) ? jobThickness : 1;
+		}
 
 		svgStore.svgData = Object.assign({}, result1)
 		this.markLaserShowOrderDirty();

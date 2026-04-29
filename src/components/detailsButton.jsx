@@ -93,6 +93,9 @@ export const DetailsButton = observer(({ item }) => {
 								console.warn('Failed to parse loadResult for card:', card.id, e);
 								loadResult = null; // В случае ошибки — считаем, что данных нет
 							}
+							
+							const materialLabel = card.materialLabel;
+							const thicknessValue = card.thickness;
 
 							return (
 								<div key={card.id}
@@ -189,9 +192,9 @@ export const DetailsButton = observer(({ item }) => {
 											• {t('sheets')}: {card.quantity}
 										</div>
 
-										{loadResult?.result?.jobinfo?.attr ? (
+										{materialLabel || thicknessValue != null ? (
 											<div className="cardMaterial">
-												• {loadResult.result.jobinfo.attr.label ? t(loadResult.result.jobinfo.attr.label): "no label"} {card.materialLabel} {loadResult.result.jobinfo.attr.thickness} {t('mm')}
+												• {materialLabel ? t(materialLabel): t("No material info")} {thicknessValue != null ? `${thicknessValue} ${t('mm')}` : ""}
 											</div>
 										) : (
 											<div className="cardMaterial text-muted">
