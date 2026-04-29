@@ -100,7 +100,7 @@ class SheetLog {
 			if (!parsed) return;
 
 			runInAction(() => {
-				svgStore.svgData = parsed;
+				svgStore.svgData = svgStore.normalizeSvgData(parsed);
 			});
 
 			sheetLogStore.setCurrentTimeStamp(tpoint);

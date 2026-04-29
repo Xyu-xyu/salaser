@@ -57,6 +57,24 @@ const sortNumericIds = (values = []) => (
 		.sort((left, right) => left - right)
 );
 
+const createEmptySvgData = () => ({
+	file: "",
+	name: "undefined.ncp",
+	thickness: 1,
+	material: "",
+	materialLabel: "",
+	material_id: null,
+	jobcode: "",
+	width: 500,
+	height: 500,
+	quantity: 1,
+	presetId: 55,
+	presetName: "any_preset",
+	part_code: [],
+	positions: [],
+	b7NestMeta: null,
+});
+
 const normalizeSheetSafetyPairs = (pairs = []) => {
 	const pairKeySet = new Set();
 	const normalizedPairs = [];
@@ -355,6 +373,22 @@ class SvgStore {
 			fill: "none",
 		},
 	};
+
+	normalizeSvgData(input) {
+		const raw = (input && typeof input === "object") ? input : {};
+		const merged = {
+			...createEmptySvgData(),
+			...raw,
+		};
+
+		if (!Array.isArray(merged.positions)) merged.positions = [];
+		if (!Array.isArray(merged.part_code)) merged.part_code = [];
+
+		if (typeof merged.material !== "string") merged.material = "";
+		if (typeof merged.materialLabel !== "string") merged.materialLabel = "";
+
+		return merged;
+	}
 
 
 	constructor() {
@@ -3111,7 +3145,7 @@ class SvgStore {
 			result1.thickness = (Number.isFinite(jobThickness) && jobThickness > 0) ? jobThickness : 1;
 		}
 
-		svgStore.svgData = Object.assign({}, result1)
+		svgStore.svgData = this.normalizeSvgData(result1);
 		this.markLaserShowOrderDirty();
 		this.laserShowPartFlags.clear();
 		this.resetResidualCutDraft();
