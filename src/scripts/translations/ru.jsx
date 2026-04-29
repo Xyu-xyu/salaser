@@ -736,6 +736,9 @@ const ru = {
     "Material saved": "Материал сохранен.",
     "Preset": "Предустановка",
     "Loading...": "Загрузка...",
-    "Steel": "Сталь"
+    "Steel": "Сталь",
+    "AW5754": "AW5754",
+    "S235JR": "S235JR",
+    "DD11": "ДД11"
 }
 export default ru;

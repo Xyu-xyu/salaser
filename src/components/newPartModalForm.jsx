@@ -107,7 +107,7 @@ const NewPartModalForm = observer(({ onCancel }) => {
 					<option value="">{t("Select material")}</option>
 					{partStore.dbMaterials.map((m) => (
 						<option key={String(m.id)} value={String(m.id)}>
-							{m.label}
+							{m.label} ({m.name})
 						</option>
 					))}
 				</select>

@@ -740,6 +740,9 @@ const en = {
     "Material saved": "Material saved",
     "Preset": "Preset",
     "Loading...": "Loading...",
-    "Steel": "Steel"
+    "Steel": "Steel",
+    "S235JR": "S235JR",
+    "AW5754": "AW5754",
+    "DD11": "DD11"
 }
 export default en;

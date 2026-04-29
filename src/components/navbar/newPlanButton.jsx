@@ -837,7 +837,7 @@ const NewPlanButton = observer(() => {
 											min="0.1"
 											step="0.1"
 										/>
-										<Dropdown>
+										{/*<Dropdown>
 											<Dropdown.Toggle
 												variant={errors.thickness ? "outline-danger" : "outline-secondary"}
 											>
@@ -854,7 +854,7 @@ const NewPlanButton = observer(() => {
 													</Dropdown.Item>
 												))}
 											</Dropdown.Menu>
-										</Dropdown>
+										</Dropdown>*/}
 									</InputGroup>
 									<Form.Control.Feedback type="invalid">
 										{errors.thickness}

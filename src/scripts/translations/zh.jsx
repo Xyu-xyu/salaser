@@ -686,6 +686,9 @@ const zh = {
     "Material saved": "节省材料",
     "Preset": "预设",
     "Loading...": "加载中...",
-    "Steel": "钢"
+    "Steel": "钢",
+    "AW5754": "AW5754",
+    "S235JR": "S235JR",
+    "DD11": "DD11"
 }
 export default zh;
