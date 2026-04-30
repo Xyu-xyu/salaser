@@ -316,36 +316,20 @@ const PartSvgWrapper = observer(() => {
 			const clickCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
 			const draft = segmentDraftRef.current;
 
-			// 1) Первый клик — ставим стартовую точку (с прилипанием как selectPoint, но только если <= 2.5mm)
+			// 1) Первый клик — ставим стартовую точку (по guides/snap/округлению как для второй точки)
 			if (!draft.start) {
-				const nearest = util.findNearesPoint(e);
-				let start = { x: clickCoord.x, y: clickCoord.y };
-				let snapped = false;
+				let start = resolvePointFromGuidesOrSnap(e, clickCoord);
+				let snapped = false; // для сегмента нам важно только отображение и boundsList, "snap" как флаг не обязателен
 
 				if (segmentDraftRef.current.prevGuidesMode == null) {
 					segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
 				}
 				partStore.setGuidesMode(true)
 
-				if (nearest?.point) {
-					const dist = util.distance(clickCoord, nearest.point);
-					if (dist <= SEGMENT_SNAP_DISTANCE_MM) {
-						start = { x: nearest.point.x, y: nearest.point.y };
-						snapped = true;
-						// Чтобы направляющие работали как при перемещении точки — используем существующий механизм
-						partStore.setSelectedPointOnEdge(nearest)
-						partStore.setBoundsList(util.createBoundsList())
-					}
-				}
-
-				if (!snapped) {
-					// нет ближайшей точки → округляем до целого
-					start = { x: Math.round(start.x), y: Math.round(start.y) }
-					partStore.setSelectedPointOnEdge(false)
-					partStore.setBoundsList(util.createBoundsListGeneric())
-				}
-
-				partStore.setPointInMove(true) // включает отрисовку guides
+				// На первом клике всегда используем generic bounds (guides активны сразу при входе в режим)
+				partStore.setSelectedPointOnEdge(false)
+				partStore.setBoundsList(partStore.boundsList || util.createBoundsListGeneric())
+				partStore.setPointInMove(true) // guides уже активны, но на всякий
 				partStore.setSegmentDraftPoint(start) // показываем зеленую точку
 				segmentDraftRef.current = { start, startSnapped: snapped };
 				return;
@@ -459,18 +443,29 @@ const PartSvgWrapper = observer(() => {
  		let coords= util.convertScreenCoordsToSvgCoords  (e.clientX, e.clientY)
 		coordsStore.setCoords({ x: Math.round( coords.x*100) / 100, y: Math.round( coords.y*100) / 100 });
 
-		// Segment mode: после первой точки показываем и обновляем направляющие по курсору (как при перемещении точки)
-		if (editorStore.mode === 'segment' && segmentDraftRef.current.start) {
+		// Segment mode: guides активны сразу, обновляем их по курсору всегда
+		if (editorStore.mode === 'segment') {
+			// на всякий случай держим guides включенными, пока мы в режиме
+			if (segmentDraftRef.current.prevGuidesMode == null) {
+				segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
+			}
+			if (!partStore.guidesMode) partStore.setGuidesMode(true)
+			if (!partStore.pointInMove) partStore.setPointInMove(true)
+
 			const start = segmentDraftRef.current.start;
 			const boundsList = partStore.boundsList || util.createBoundsListGeneric();
-			// добавляем стартовую точку в направляющие
-			if (boundsList?.x && boundsList?.y) {
+
+			// Включаем стартовую точку в направляющие (если уже поставлена)
+			if (start && boundsList?.x && boundsList?.y) {
 				boundsList.x.add(start.x)
 				boundsList.y.add(start.y)
 			}
+
 			if (!partStore.boundsList) partStore.setBoundsList(boundsList)
 
-			const res = util.checkGuidesGeneric(coords, { boundsList, anchor: start, threshold: 1 })
+			// anchor: если есть первая точка — работаем как для второй точки (включая наклонные guides),
+			// иначе наклонные не показываем (только x/y).
+			const res = util.checkGuidesGeneric(coords, { boundsList, anchor: start || null, threshold: 1 })
 			if (res) {
 				if (typeof res.yy === 'number') {
 					partStore.updateXGuide({ x1: res.min.x, y1: res.yy, x2: res.max.x, y2: res.yy })
@@ -624,10 +619,22 @@ const PartSvgWrapper = observer(() => {
 	},
 	[editorStore.mode])
 
-	// Если ушли из segment режима до второго клика — отменяем первую точку
+	// Segment: при входе включаем guides сразу; при выходе — всё чистим (и отменяем черновик)
 	useEffect(() => {
-		if (editorStore.mode !== 'segment' && segmentDraftRef.current.start) {
-			clearSegmentDraft();
+		if (editorStore.mode === 'segment') {
+			if (segmentDraftRef.current.prevGuidesMode == null) {
+				segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
+			}
+			partStore.setGuidesMode(true)
+			partStore.setPointInMove(true)
+			if (!partStore.boundsList) {
+				partStore.setBoundsList(util.createBoundsListGeneric())
+			}
+			return;
+		}
+
+		if (segmentDraftRef.current.start || segmentDraftRef.current.prevGuidesMode != null) {
+			clearSegmentDraft()
 		}
 	}, [editorStore.mode])
 
