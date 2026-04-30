@@ -2124,6 +2124,7 @@ class Utils {
 	 * - Возвращает xx/yy/aa по аналогии с checkGuides().
 	 */
 	checkGuidesGeneric(coord, { boundsList = partStore.boundsList, anchor = null, threshold = 1 } = {}) {
+		if (!partStore.useGuides) return null;
 		if (!boundsList || !coord) return null;
 
 		let xx = false, yy = false, aa = false;
@@ -2181,6 +2182,7 @@ class Utils {
 
 	checkGuides(coord) {
 		//console.log ('checking guides')
+		if (!partStore.useGuides) return null;
 		if (partStore.boundsList) {
 			let threshold = 1
 			let xx = false, yy = false, aa = false;
@@ -2255,8 +2257,15 @@ class Utils {
 	}
 
 	setGuidesPositionForPoint (e) {
-	
+		if (!partStore.useGuides) {
+			partStore.setPointInMove(false)
+			return;
+		}
 			const { aGuide, xGuide, yGuide, selectedPointOnEdge } = partStore;
+			if (!selectedPointOnEdge?.point) {
+				partStore.setPointInMove(false)
+				return;
+			}
 			let x = selectedPointOnEdge.point.x;
 			let y = selectedPointOnEdge.point.y;
 			

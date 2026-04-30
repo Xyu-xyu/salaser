@@ -35,6 +35,7 @@ const PartSvgComponent = observer (() => {
         groupMatrix,
         rectParams,
         svgParams,
+        showAllMarkers,
     } = partStore
 
     const vbW = Math.max(
@@ -53,6 +54,7 @@ const PartSvgComponent = observer (() => {
         <svg
             id="svg"
             baseProfile="full"
+            className={showAllMarkers ? "showAllMarkers" : ""}
             viewBox={`0.00 0.00 ${vbW} ${vbH}`}
             width="100%"
             height="100%"

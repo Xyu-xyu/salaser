@@ -65,6 +65,10 @@ class PartStore {
     yGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
     aGuide = { x1: 0, y1: 0, x2: 0, y2: 0, angle:0 };
 	guidesMode = true;
+	/** Глобальный флаг: использовать направляющие (рендер + логика). */
+	useGuides = true;
+	/** Показать marker-start/mid/end для всех macro* путей. */
+	showAllMarkers = false;
 	selectedEdge = false;
 	textFocus =false;
 	/** Если true, трансформация внешнего контура применяется ко всем внутренним контурам. */
@@ -341,6 +345,20 @@ class PartStore {
 		this.guidesMode = val
 	}
 
+	setUseGuides(val) {
+		this.useGuides = val
+		// При выключении — очистим активные гайды, чтобы они не влияли на логику.
+		if (!val) {
+			this.updateXGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+			this.updateYGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+			this.updateAGuide({ x1: 0, y1: 0, x2: 0, y2: 0, angle: 0 })
+		}
+	}
+
+	setShowAllMarkers(val) {
+		this.showAllMarkers = val
+	}
+
 	setBoundsList (val) {
 		this.boundsList = val
 	}
@@ -363,6 +381,12 @@ class PartStore {
 
 	setSelectedPointOnEdge (val) {
 		this.selectedPointOnEdge = val
+		if (!this.useGuides) {
+			this.updateXGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+			this.updateYGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+			this.updateAGuide({ x1: 0, y1: 0, x2: 0, y2: 0, angle: 0 })
+			return;
+		}
 		if (partStore.boundsList && val) {
 			let res = Util.checkGuides( val.point )
 

@@ -106,13 +106,13 @@ const PartSvgWrapper = observer(() => {
 	};
 
 	const resolvePointFromGuidesOrSnap = (e, fallbackCoord) => {
-		const { aGuide, xGuide, yGuide } = partStore;
+		const { aGuide, xGuide, yGuide, useGuides } = partStore;
 		const isGuideVisible = (guide) => guide && !Object.values(guide).every(v => v === 0);
 		let coord = { x: fallbackCoord.x, y: fallbackCoord.y }
 
-		const xVisible = isGuideVisible(xGuide)
-		const yVisible = isGuideVisible(yGuide)
-		const aVisible = isGuideVisible(aGuide)
+		const xVisible = useGuides && isGuideVisible(xGuide)
+		const yVisible = useGuides && isGuideVisible(yGuide)
+		const aVisible = useGuides && isGuideVisible(aGuide)
 
 		if (xVisible || yVisible || aVisible) {
 			// Важно: логика совпадает с util.setGuidesPositionForPoint (в проекте xGuide/yGuide исторически названы наоборот)
@@ -321,17 +321,18 @@ const PartSvgWrapper = observer(() => {
 				let start = resolvePointFromGuidesOrSnap(e, clickCoord);
 				let snapped = false; // для сегмента нам важно только отображение и boundsList, "snap" как флаг не обязателен
 
-				if (segmentDraftRef.current.prevGuidesMode == null) {
-					segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
+				if (partStore.useGuides) {
+					if (segmentDraftRef.current.prevGuidesMode == null) {
+						segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
+					}
+					partStore.setGuidesMode(true)
+					// На первом клике всегда используем generic bounds (guides активны сразу при входе в режим)
+					partStore.setSelectedPointOnEdge(false)
+					partStore.setBoundsList(partStore.boundsList || util.createBoundsListGeneric())
+					partStore.setPointInMove(true) // guides уже активны, но на всякий
 				}
-				partStore.setGuidesMode(true)
-
-				// На первом клике всегда используем generic bounds (guides активны сразу при входе в режим)
-				partStore.setSelectedPointOnEdge(false)
-				partStore.setBoundsList(partStore.boundsList || util.createBoundsListGeneric())
-				partStore.setPointInMove(true) // guides уже активны, но на всякий
 				partStore.setSegmentDraftPoint(start) // показываем зеленую точку
-				segmentDraftRef.current = { start, startSnapped: snapped };
+				segmentDraftRef.current = { ...segmentDraftRef.current, start, startSnapped: snapped };
 				return;
 			}
 
@@ -417,7 +418,7 @@ const PartSvgWrapper = observer(() => {
 
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;	
-		if ( pointInMove ) {
+		if (pointInMove && partStore.useGuides) {
 			util.setGuidesPositionForPoint (e)
 			addToLog("Contour was changed")
 		}
@@ -445,42 +446,49 @@ const PartSvgWrapper = observer(() => {
 
 		// Segment mode: guides активны сразу, обновляем их по курсору всегда
 		if (editorStore.mode === 'segment') {
-			// на всякий случай держим guides включенными, пока мы в режиме
-			if (segmentDraftRef.current.prevGuidesMode == null) {
-				segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
-			}
-			if (!partStore.guidesMode) partStore.setGuidesMode(true)
-			if (!partStore.pointInMove) partStore.setPointInMove(true)
-
-			const start = segmentDraftRef.current.start;
-			const boundsList = partStore.boundsList || util.createBoundsListGeneric();
-
-			// Включаем стартовую точку в направляющие (если уже поставлена)
-			if (start && boundsList?.x && boundsList?.y) {
-				boundsList.x.add(start.x)
-				boundsList.y.add(start.y)
-			}
-
-			if (!partStore.boundsList) partStore.setBoundsList(boundsList)
-
-			// anchor: если есть первая точка — работаем как для второй точки (включая наклонные guides),
-			// иначе наклонные не показываем (только x/y).
-			const res = util.checkGuidesGeneric(coords, { boundsList, anchor: start || null, threshold: 1 })
-			if (res) {
-				if (typeof res.yy === 'number') {
-					partStore.updateXGuide({ x1: res.min.x, y1: res.yy, x2: res.max.x, y2: res.yy })
-				} else {
-					partStore.updateXGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+			if (!partStore.useGuides) {
+				// guides выключены глобально — убедимся что линии не висят
+				partStore.updateXGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+				partStore.updateYGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+				partStore.updateAGuide({ x1: 0, y1: 0, x2: 0, y2: 0, angle: 0 })
+			} else {
+				// на всякий случай держим guides включенными, пока мы в режиме
+				if (segmentDraftRef.current.prevGuidesMode == null) {
+					segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
 				}
-				if (typeof res.xx === 'number') {
-					partStore.updateYGuide({ x1: res.xx, y1: res.min.y, x2: res.xx, y2: res.max.y })
-				} else {
-					partStore.updateYGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+				if (!partStore.guidesMode) partStore.setGuidesMode(true)
+				if (!partStore.pointInMove) partStore.setPointInMove(true)
+
+				const start = segmentDraftRef.current.start;
+				const boundsList = partStore.boundsList || util.createBoundsListGeneric();
+
+				// Включаем стартовую точку в направляющие (если уже поставлена)
+				if (start && boundsList?.x && boundsList?.y) {
+					boundsList.x.add(start.x)
+					boundsList.y.add(start.y)
 				}
-				if (res.aa) {
-					partStore.updateAGuide({ x1: res.aa.x1, y1: res.aa.y1, x2: res.aa.x2, y2: res.aa.y2, angle: res.aa.a })
-				} else {
-					partStore.updateAGuide({ x1: 0, y1: 0, x2: 0, y2: 0, angle: 0 })
+
+				if (!partStore.boundsList) partStore.setBoundsList(boundsList)
+
+				// anchor: если есть первая точка — работаем как для второй точки (включая наклонные guides),
+				// иначе наклонные не показываем (только x/y).
+				const res = util.checkGuidesGeneric(coords, { boundsList, anchor: start || null, threshold: 1 })
+				if (res) {
+					if (typeof res.yy === 'number') {
+						partStore.updateXGuide({ x1: res.min.x, y1: res.yy, x2: res.max.x, y2: res.yy })
+					} else {
+						partStore.updateXGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+					}
+					if (typeof res.xx === 'number') {
+						partStore.updateYGuide({ x1: res.xx, y1: res.min.y, x2: res.xx, y2: res.max.y })
+					} else {
+						partStore.updateYGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+					}
+					if (res.aa) {
+						partStore.updateAGuide({ x1: res.aa.x1, y1: res.aa.y1, x2: res.aa.x2, y2: res.aa.y2, angle: res.aa.a })
+					} else {
+						partStore.updateAGuide({ x1: 0, y1: 0, x2: 0, y2: 0, angle: 0 })
+					}
 				}
 			}
 		}
@@ -622,13 +630,15 @@ const PartSvgWrapper = observer(() => {
 	// Segment: при входе включаем guides сразу; при выходе — всё чистим (и отменяем черновик)
 	useEffect(() => {
 		if (editorStore.mode === 'segment') {
-			if (segmentDraftRef.current.prevGuidesMode == null) {
-				segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
-			}
-			partStore.setGuidesMode(true)
-			partStore.setPointInMove(true)
-			if (!partStore.boundsList) {
-				partStore.setBoundsList(util.createBoundsListGeneric())
+			if (partStore.useGuides) {
+				if (segmentDraftRef.current.prevGuidesMode == null) {
+					segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
+				}
+				partStore.setGuidesMode(true)
+				partStore.setPointInMove(true)
+				if (!partStore.boundsList) {
+					partStore.setBoundsList(util.createBoundsListGeneric())
+				}
 			}
 			return;
 		}

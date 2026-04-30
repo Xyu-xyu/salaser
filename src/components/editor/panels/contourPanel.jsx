@@ -20,6 +20,8 @@ const ContourPanel = observer(() => {
 		selectedInletModeType,
 		selectedPiercingType,
 		InnerAndOuter,
+		useGuides,
+		showAllMarkers,
 	} = partStore;
 
 	const { activePoint, activeCoord, wh } = contourTransformSharedStore;
@@ -363,6 +365,30 @@ const ContourPanel = observer(() => {
 					/>
 					<label htmlFor="transformAll" className="ms-2">
 						{t('outer&inner')}
+					</label>
+				</div>
+				<div className="px-2 pb-2">
+					<input
+						id="useGuides"
+						type="checkbox"
+						className="form-check-input"
+						checked={useGuides}
+						onChange={(e) => partStore.setUseGuides(e.target.checked)}
+					/>
+					<label htmlFor="useGuides" className="ms-2">
+						{t('Use guides')}
+					</label>
+				</div>
+				<div className="px-2 pb-2">
+					<input
+						id="showAllMarkers"
+						type="checkbox"
+						className="form-check-input"
+						checked={showAllMarkers}
+						onChange={(e) => partStore.setShowAllMarkers(e.target.checked)}
+					/>
+					<label htmlFor="showAllMarkers" className="ms-2">
+						{t('Show all markers')}
 					</label>
 				</div>
 			</div>

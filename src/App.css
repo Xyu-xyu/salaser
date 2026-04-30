@@ -2640,6 +2640,16 @@ g.macro5 {
     marker-mid: url(#dotRed);   */
 } 
 
+svg.showAllMarkers g.macro0,
+svg.showAllMarkers g.macro1,
+svg.showAllMarkers g.macro2,
+svg.showAllMarkers g.macro3,
+svg.showAllMarkers g.macro4,
+svg.showAllMarkers g.macro5 {
+    marker-end: url(#dotRed);
+    marker-mid: url(#dotRed);
+}
+
 g.macro5 {
     stroke-width: var(--widthThick);
 } 

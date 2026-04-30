@@ -4,7 +4,11 @@ import { observer } from "mobx-react-lite";
  
 
 const Guides = observer(() => {
-	const { xGuide, yGuide, aGuide, pointInMove } = partStore
+	const { xGuide, yGuide, aGuide, pointInMove, useGuides } = partStore
+
+	if (!useGuides) {
+		return null;
+	}
 
 	if (!pointInMove) {
 		return null;
