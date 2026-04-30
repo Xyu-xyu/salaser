@@ -2060,6 +2060,124 @@ class Utils {
 		return { x: xcoords, y: ycoords, angles }
 	}
 
+	/**
+	 * boundsList для направляющих без привязки к selectedPointOnEdge.
+	 * Используется, когда нужно показать guides для произвольной точки (например, segment mode).
+	 */
+	createBoundsListGeneric() {
+		const xcoords = new Set()
+		const ycoords = new Set()
+		const angles = new Set([0, 45, 135, 315, 30, 60, 120, 150, 210, 240, 270])
+
+		const addPathBounds = (updPath) => {
+			if (!Array.isArray(updPath) || !updPath.length) return;
+			for (let c = 0; c < updPath.length; c += 1) {
+				const command = updPath[c];
+				if (!Array.isArray(command) || !command.length) continue;
+
+				let cx;
+				let cy;
+				if (command[0] === "M" || command[0] === "L") {
+					cx = command[1]
+					cy = command[2]
+				} else if (command[0] === "A") {
+					cx = command[6]
+					cy = command[7]
+				}
+				if (typeof cx === "number") xcoords.add(cx)
+				if (typeof cy === "number") ycoords.add(cy)
+			}
+		};
+
+		const addBBoxExtremes = (pathString) => {
+			if (!pathString) return;
+			const box = this.fakeBox(pathString);
+			if (!box) return;
+
+			const minX = box.x
+			const minY = box.y
+			const maxX = box.x2
+			const maxY = box.y2
+
+			if (typeof minX === "number") xcoords.add(minX)
+			if (typeof maxX === "number") xcoords.add(maxX)
+			if (typeof minY === "number") ycoords.add(minY)
+			if (typeof maxY === "number") ycoords.add(maxY)
+		};
+
+		const contours = partStore.getFiltered?.("contour") || []
+		contours.forEach((contour) => {
+			if (!contour?.path) return;
+			addPathBounds(SVGPathCommander.normalizePath(contour.path))
+			// добавим bbox extremes только для "реальных" контуров детали (outer+inner)
+			if (contour?.class && (contour.class.includes("outer") || contour.class.includes("inner"))) {
+				addBBoxExtremes(contour.path)
+			}
+		})
+
+		return { x: xcoords, y: ycoords, angles }
+	}
+
+	/**
+	 * Проверка направляющих для произвольной точки.
+	 * - anchor используется для наклонной направляющей: линия проходит через anchor под углом из boundsList.angles.
+	 * - Возвращает xx/yy/aa по аналогии с checkGuides().
+	 */
+	checkGuidesGeneric(coord, { boundsList = partStore.boundsList, anchor = null, threshold = 1 } = {}) {
+		if (!boundsList || !coord) return null;
+
+		let xx = false, yy = false, aa = false;
+		for (let x of boundsList.x) {
+			if (Math.abs(x - coord.x) < threshold) {
+				xx = x
+				break
+			}
+		}
+		for (let y of boundsList.y) {
+			if (Math.abs(y - coord.y) < threshold) {
+				yy = y
+				break
+			}
+		}
+
+		// Наклонные направляющие — только если есть anchor
+		if (anchor && boundsList.angles && boundsList.angles.size) {
+			const ap = this.angleBetweenPoints(anchor.x, anchor.y, coord.x, coord.y)
+			for (let a of boundsList.angles) {
+				if (a % 90 === 0) continue;
+				if (Math.abs((a - ap) % 180) < threshold) {
+					aa = { a: a, x: anchor.x, y: anchor.y }
+					break
+				}
+			}
+		}
+
+		let min = this.convertScreenCoordsToSvgCoords(0, 0);
+		let max = this.convertScreenCoordsToSvgCoords(window.screen.width, window.screen.height);
+
+		if (aa) {
+			const radians = aa.a * (Math.PI / 180);
+			const svg = document.querySelector('#svg')
+			const svgWidth = svg?.viewBox?.baseVal?.width ?? (max.x - min.x);
+			const svgHeight = svg?.viewBox?.baseVal?.height ?? (max.y - min.y);
+			let group = document.getElementById("group");
+			let matrix = group?.transform?.baseVal?.consolidate?.()?.matrix
+			const zoom = matrix?.a || 1;
+
+			const lineLength = Math.max(svgWidth / zoom, svgHeight / zoom);
+			const x1 = aa.x - lineLength * Math.cos(radians);
+			const y1 = aa.y - lineLength * Math.sin(radians);
+			const x2 = aa.x + lineLength * Math.cos(radians);
+			const y2 = aa.y + lineLength * Math.sin(radians);
+			aa.x1 = x1
+			aa.x2 = x2
+			aa.y1 = y1
+			aa.y2 = y2
+		}
+
+		return { xx, yy, aa, min, max }
+	}
+
 
 	checkGuides(coord) {
 		//console.log ('checking guides')

@@ -330,6 +330,23 @@ const ToolsPanel = observer(() => {
 							/>
 						</button>
 					)}} />
+					<TooltipCreator element={{ id: "btn_segment", info: (
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_segmnent btn_tool"
+							onMouseDown={() => setMode('segment')}
+						>
+							<CustomIcon
+								icon="segment"
+								width="48"
+								height="48"
+								viewBox='0 0 256 256'
+								fill='black'
+								strokeWidth={10}
+								color='black'
+							/>
+						</button>
+					)}} />
 					<TooltipCreator element={{ id: "btn_new_outer", info: (
 						<button
 							type="button"

@@ -57,6 +57,8 @@ class PartStore {
 	copiedCid = false
 	selectedPointOnPath = false
 	selectedPointOnEdge = false
+	/** Черновик первой точки для segment mode (показываем зеленой). */
+	segmentDraftPoint = null
 	pointInMove = false
 	boundsList = false
 	xGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
@@ -395,6 +397,10 @@ class PartStore {
 		this.selectedPointOnPath=val
 	}
 
+	setSegmentDraftPoint(val) {
+		this.segmentDraftPoint = val
+	}
+
 	setsafeMode (mode) {
 		//console.log(mode)
 		this.safeMode = mode
@@ -529,6 +535,45 @@ class PartStore {
 		this.svgData.code.push( inlet );
 		this.svgData.code.push( outlet);
 
+		this.setContourSelected(maxCid)
+	}
+
+	/**
+	 * Добавляет "контур из одной линии" (open path).
+	 * По структуре добавляется так же, как обычный контур (contour + inlet + outlet),
+	 * но contour помечается closed0.
+	 */
+	addSegmentPath(path = '') {
+		let maxCid = this.svgData.code.length > 0
+			? Math.max(...this.svgData.code.map(el => el.cid))
+			: 0;
+		maxCid += 1
+
+		let inlet = {
+			cid: maxCid,
+			class: "inlet inner macro0 closed0",
+			path: '',
+			stroke: 'red',
+			strokeWidth: 0.2,
+		}
+		let outlet = {
+			cid: maxCid,
+			class: "outlet inner macro0 closed0",
+			path: '',
+			stroke: 'lime',
+			strokeWidth: 0.2,
+		};
+		let contour = {
+			class: 'contour inner macro0 closed0',
+			cid: maxCid,
+			path: path,
+			stroke: 'red',
+			strokeWidth: 0.2,
+			selected: false
+		};
+		this.svgData.code.push(contour);
+		this.svgData.code.push(inlet);
+		this.svgData.code.push(outlet);
 		this.setContourSelected(maxCid)
 	}
 	

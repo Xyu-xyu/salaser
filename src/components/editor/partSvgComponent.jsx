@@ -12,6 +12,21 @@ import LaserShow from './laserShow';
 import PartSimpleReturnComponent from "./partSimpleReturnComponent"
 import PartSelector from './partSelector';
 
+const SegmentDraftPoint = observer(() => {
+    const p = partStore.segmentDraftPoint;
+    if (!p) return null;
+    return (
+        <circle
+            fill="lime"
+            r="1"
+            stroke="black"
+            strokeWidth="0.15"
+            pointerEvents="none"
+            cx={p.x}
+            cy={p.y}
+        />
+    );
+});
 
 const PartSvgComponent = observer (() => {
 
@@ -91,6 +106,7 @@ const PartSvgComponent = observer (() => {
                         
                        <PartSelector />
                        <Guides />
+                       <SegmentDraftPoint />
                        <SelectedPointOnEdge/>
                        <Joints />
                        <SelectedPointOnPath/>

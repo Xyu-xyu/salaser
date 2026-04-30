@@ -2239,7 +2239,7 @@ height: fit-content;}
 .editor-panels-root-docked {
   flex-basis: clamp(320px, 28vw, 420px);
   width: clamp(320px, 28vw, 420px);
-  min-width: 280px;
+  min-width: 400px;
   height: calc(100% - 8px);
   margin-top: 8px;
   background-color: var(--white);

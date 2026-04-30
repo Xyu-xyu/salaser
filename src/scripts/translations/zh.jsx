@@ -689,6 +689,7 @@ const zh = {
     "Steel": "钢",
     "AW5754": "AW5754",
     "S235JR": "S235JR",
-    "DD11": "DD11"
+    "DD11": "DD11",
+    "Segment added": "已添加段"
 }
 export default zh;

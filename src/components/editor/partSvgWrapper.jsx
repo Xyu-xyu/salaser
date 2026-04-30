@@ -12,6 +12,7 @@ import PartSvgComponent from './partSvgComponent.jsx';
 import { addToLog } from './../../scripts/addToLog.jsx';
 
 const NAVBAR_OFFSET = 58;
+const SEGMENT_SNAP_DISTANCE_MM = 2.5;
 
 /** Размеры viewBox и `rect` сетки: область холста `#wrapper_svg` в тех же единицах, что и после `groupMatrix` × `matrix`. */
 function calculateRectParamsFromPartStore() {
@@ -83,6 +84,72 @@ const PartSvgWrapper = observer(() => {
 	const inMoveRef = useRef(0); 
     const wrapperSVG = useRef(null);
 	const initialLayoutDoneRef = useRef(false);
+	const segmentDraftRef = useRef({
+		start: null,          // {x,y}
+		startSnapped: false,  // boolean
+		prevGuidesMode: null, // boolean|null
+	});
+
+	const clearSegmentDraft = () => {
+		const prevGuidesMode = segmentDraftRef.current.prevGuidesMode;
+		segmentDraftRef.current = { start: null, startSnapped: false, prevGuidesMode: null };
+		if (typeof prevGuidesMode === 'boolean') {
+			partStore.setGuidesMode(prevGuidesMode)
+		}
+		partStore.setSegmentDraftPoint(null)
+		partStore.setPointInMove(false)
+		partStore.setBoundsList(false)
+		partStore.setSelectedPointOnEdge(false)
+		partStore.updateXGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+		partStore.updateYGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+		partStore.updateAGuide({ x1: 0, y1: 0, x2: 0, y2: 0, angle: 0 })
+	};
+
+	const resolvePointFromGuidesOrSnap = (e, fallbackCoord) => {
+		const { aGuide, xGuide, yGuide } = partStore;
+		const isGuideVisible = (guide) => guide && !Object.values(guide).every(v => v === 0);
+		let coord = { x: fallbackCoord.x, y: fallbackCoord.y }
+
+		const xVisible = isGuideVisible(xGuide)
+		const yVisible = isGuideVisible(yGuide)
+		const aVisible = isGuideVisible(aGuide)
+
+		if (xVisible || yVisible || aVisible) {
+			// Важно: логика совпадает с util.setGuidesPositionForPoint (в проекте xGuide/yGuide исторически названы наоборот)
+			if (yVisible) coord.x = +yGuide.x1;
+			if (xVisible) coord.y = +xGuide.y1;
+
+			if (aVisible) {
+				const { x1, y1, x2, y2 } = aGuide;
+				// Нет вертик/горизонт — ставим на ближайшую точку на наклонной
+				if (!xVisible && !yVisible) {
+					const curPos = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+					const p = util.findNearestPointOnSegment(curPos.x, curPos.y, x1, y1, x2, y2);
+					if (p) coord = { x: p.x, y: p.y };
+				} else {
+					// есть хотя бы одна из осевых — ставим в пересечение с наклонной
+					let base = xVisible ? xGuide : yGuide;
+					const edge1 = [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+					const edge2 = [{ x: base.x1, y: base.y1 }, { x: base.x2, y: base.y2 }];
+					const p = util.intersects(edge1, edge2);
+					if (p) coord = { x: p.x, y: p.y };
+				}
+			}
+			return coord;
+		}
+
+		// Нет направляющих — пробуем прилипание к ближайшей вершине в радиусе 2.5mm
+		const clickCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+		const nearest = util.findNearesPoint(e);
+		if (nearest?.point) {
+			const dist = util.distance(clickCoord, nearest.point);
+			if (dist <= SEGMENT_SNAP_DISTANCE_MM) {
+				return { x: nearest.point.x, y: nearest.point.y };
+			}
+		}
+		// Нет snap и нет guides → округляем до целого
+		return { x: Math.round(coord.x), y: Math.round(coord.y) };
+	};
 
 	useLayoutEffect(() => {
 		const el = wrapperSVG.current;
@@ -245,6 +312,54 @@ const PartSvgWrapper = observer(() => {
 			partStore.setSelectedPointOnEdge(searchResult)
 	
 			
+		} else if (e.button === 0 && editorStore.mode === 'segment') {
+			const clickCoord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+			const draft = segmentDraftRef.current;
+
+			// 1) Первый клик — ставим стартовую точку (с прилипанием как selectPoint, но только если <= 2.5mm)
+			if (!draft.start) {
+				const nearest = util.findNearesPoint(e);
+				let start = { x: clickCoord.x, y: clickCoord.y };
+				let snapped = false;
+
+				if (segmentDraftRef.current.prevGuidesMode == null) {
+					segmentDraftRef.current.prevGuidesMode = partStore.guidesMode
+				}
+				partStore.setGuidesMode(true)
+
+				if (nearest?.point) {
+					const dist = util.distance(clickCoord, nearest.point);
+					if (dist <= SEGMENT_SNAP_DISTANCE_MM) {
+						start = { x: nearest.point.x, y: nearest.point.y };
+						snapped = true;
+						// Чтобы направляющие работали как при перемещении точки — используем существующий механизм
+						partStore.setSelectedPointOnEdge(nearest)
+						partStore.setBoundsList(util.createBoundsList())
+					}
+				}
+
+				if (!snapped) {
+					// нет ближайшей точки → округляем до целого
+					start = { x: Math.round(start.x), y: Math.round(start.y) }
+					partStore.setSelectedPointOnEdge(false)
+					partStore.setBoundsList(util.createBoundsListGeneric())
+				}
+
+				partStore.setPointInMove(true) // включает отрисовку guides
+				partStore.setSegmentDraftPoint(start) // показываем зеленую точку
+				segmentDraftRef.current = { start, startSnapped: snapped };
+				return;
+			}
+
+			// 2) Второй клик — вычисляем финальную точку по guides/липанию/клику
+			const end = resolvePointFromGuidesOrSnap(e, clickCoord);
+			const start = draft.start;
+			const path = `M${start.x} ${start.y} L${end.x} ${end.y}`;
+			partStore.addSegmentPath(path)
+			addToLog('Segment added')
+			clearSegmentDraft();
+			editorStore.setMode('resize')
+
 		} else if (e.button === 0 && editorStore.mode === 'addPoint') {
 			
 			//console.log ("editorStore.mode   "+editorStore.mode)
@@ -343,6 +458,38 @@ const PartSvgWrapper = observer(() => {
 
  		let coords= util.convertScreenCoordsToSvgCoords  (e.clientX, e.clientY)
 		coordsStore.setCoords({ x: Math.round( coords.x*100) / 100, y: Math.round( coords.y*100) / 100 });
+
+		// Segment mode: после первой точки показываем и обновляем направляющие по курсору (как при перемещении точки)
+		if (editorStore.mode === 'segment' && segmentDraftRef.current.start) {
+			const start = segmentDraftRef.current.start;
+			const boundsList = partStore.boundsList || util.createBoundsListGeneric();
+			// добавляем стартовую точку в направляющие
+			if (boundsList?.x && boundsList?.y) {
+				boundsList.x.add(start.x)
+				boundsList.y.add(start.y)
+			}
+			if (!partStore.boundsList) partStore.setBoundsList(boundsList)
+
+			const res = util.checkGuidesGeneric(coords, { boundsList, anchor: start, threshold: 1 })
+			if (res) {
+				if (typeof res.yy === 'number') {
+					partStore.updateXGuide({ x1: res.min.x, y1: res.yy, x2: res.max.x, y2: res.yy })
+				} else {
+					partStore.updateXGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+				}
+				if (typeof res.xx === 'number') {
+					partStore.updateYGuide({ x1: res.xx, y1: res.min.y, x2: res.xx, y2: res.max.y })
+				} else {
+					partStore.updateYGuide({ x1: 0, y1: 0, x2: 0, y2: 0 })
+				}
+				if (res.aa) {
+					partStore.updateAGuide({ x1: res.aa.x1, y1: res.aa.y1, x2: res.aa.x2, y2: res.aa.y2, angle: res.aa.a })
+				} else {
+					partStore.updateAGuide({ x1: 0, y1: 0, x2: 0, y2: 0, angle: 0 })
+				}
+			}
+		}
+
 		if (e.target && 
 				(
 					(e.buttons === 4)  || 
@@ -469,11 +616,20 @@ const PartSvgWrapper = observer(() => {
 			setWrapperClass('cursorAddJoint')
 		} else if (editorStore.mode === 'removeJoint') {
 			setWrapperClass('cursorRemoveJoint')
+		} else if (editorStore.mode === 'segment') {
+			setWrapperClass('cursorSelecPoint')
 		} else {
 			setWrapperClass('cursorArrow')
 		}
 	},
 	[editorStore.mode])
+
+	// Если ушли из segment режима до второго клика — отменяем первую точку
+	useEffect(() => {
+		if (editorStore.mode !== 'segment' && segmentDraftRef.current.start) {
+			clearSegmentDraft();
+		}
+	}, [editorStore.mode])
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">

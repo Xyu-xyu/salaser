@@ -739,6 +739,7 @@ const ru = {
     "Steel": "Сталь",
     "AW5754": "AW5754",
     "S235JR": "S235JR",
-    "DD11": "ДД11"
+    "DD11": "ДД11",
+    "Segment added": "Сегмент добавлен"
 }
 export default ru;
