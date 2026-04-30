@@ -140,6 +140,7 @@ const Main = observer(() => {
 					{/* PlanEditorr */}
 					<motion.div
 						key="planEditor"
+						data-testid="plan-editor"
 						initial={false}
 						animate={{
 							opacity: centralBarMode === "planEditor" ? 1 : 0,

@@ -743,6 +743,8 @@ const en = {
     "Steel": "Steel",
     "S235JR": "S235JR",
     "AW5754": "AW5754",
-    "DD11": "DD11"
+    "DD11": "DD11",
+    "Enter...": "Enter...",
+    "Auth success: ": "Auth success:"
 }
 export default en;

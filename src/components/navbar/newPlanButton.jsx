@@ -595,7 +595,7 @@ const NewPlanButton = observer(() => {
 
 	return (
 		<div>
-			<button className="w-100" onClick={showModal}>
+			<button className="w-100" onClick={showModal} data-testid="nav-create-plan">
 				<div className="d-flex align-items-center">
 					<CustomIcon
 						icon="fluent:tab-new-24-filled"
@@ -672,6 +672,7 @@ const NewPlanButton = observer(() => {
 								<Form.Label>{t("Sheet name")} *</Form.Label>
 								<Form.Control
 									type="text"
+									data-testid="plan-name"
 									value={name}
 									onChange={(e) => setName(e.target.value)}
 									isInvalid={!!errors.name}
@@ -690,6 +691,7 @@ const NewPlanButton = observer(() => {
 										<Form.Label>{t("Preset")} *</Form.Label>
 										<DropdownButton
 											variant={errors.preset ? "outline-danger" : "outline-primary"}
+											data-testid="plan-preset"
 											title={selectedPreset ? selectedPreset.name : t("Select preset")}
 											onSelect={(eventKey) => {
 												const preset = presets.find((p) => p.id === Number(eventKey));
@@ -718,6 +720,7 @@ const NewPlanButton = observer(() => {
 										<Form.Label>{t("Material")} *</Form.Label>
 										<DropdownButton
 											variant={errors.material ? "outline-danger" : "outline-primary"}
+											data-testid="plan-material"
 											title={
 												selectedMaterial
 													? (selectedMaterial?.name
@@ -776,6 +779,7 @@ const NewPlanButton = observer(() => {
 									<Form.Label>{t("Width (mm)")} *</Form.Label>
 									<Form.Control
 										type="number"
+										data-testid="plan-width"
 										value={width}
 										onChange={(e) => setWidth(e.target.value)}
 										isInvalid={!!errors.width}
@@ -793,6 +797,7 @@ const NewPlanButton = observer(() => {
 									<Form.Label>{t("Height (mm)")} *</Form.Label>
 									<Form.Control
 										type="number"
+										data-testid="plan-height"
 										value={height}
 										onChange={(e) => setHeight(e.target.value)}
 										isInvalid={!!errors.height}
@@ -813,6 +818,7 @@ const NewPlanButton = observer(() => {
 									<Form.Label>{t("Quantity")} *</Form.Label>
 									<Form.Control
 										type="number"
+										data-testid="plan-quantity"
 										value={quantity}
 										onChange={(e) => setQuantity(e.target.value)}
 										isInvalid={!!errors.quantity}
@@ -831,6 +837,7 @@ const NewPlanButton = observer(() => {
 									<InputGroup>
 										<Form.Control
 											type="number"
+											data-testid="plan-thickness"
 											value={thickness}
 											onChange={(e) => setThickness(e.target.value)}
 											isInvalid={!!errors.thickness}
@@ -1370,6 +1377,7 @@ const NewPlanButton = observer(() => {
 						type="button"
 						disabled={nestLoading}
 						onClick={handleSubmit}
+						data-testid="plan-submit"
 					>
 						<div className="d-flex align-items-center p-2">
 							<CustomIcon

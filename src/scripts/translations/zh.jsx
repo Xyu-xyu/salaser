@@ -689,6 +689,8 @@ const zh = {
     "Steel": "钢",
     "AW5754": "AW5754",
     "S235JR": "S235JR",
-    "DD11": "DD11"
+    "DD11": "DD11",
+    "Enter...": "进入...",
+    "Auth success: ": "授权成功："
 }
 export default zh;

@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test --config playwright.config.cjs",
+    "test:e2e:ui": "playwright test --config playwright.config.cjs --ui",
+    "test:e2e:debug": "playwright test --config playwright.config.cjs --headed --workers=1 --timeout=0"
   },
   "dependencies": {
     "@rjsf/core": "^5.24.8",
@@ -35,6 +38,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@playwright/test": "^1.59.1",
     "@types/hammerjs": "^2.0.46",
     "@types/react-svg-pan-zoom": "^3.3.9",
     "@types/sortablejs": "^1.15.9",

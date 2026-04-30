@@ -37,7 +37,7 @@ const LoginPage = () => {
 	return (
 		<>
 			<LaserBackground />
-			<div className="login-page">
+			<div className="login-page" data-testid="login-page">
 				<div className="login-card">
 					<div className="login-header" />
 
@@ -47,12 +47,14 @@ const LoginPage = () => {
 						<form onSubmit={handleSubmit}>
 							<input
 								type="text"
+								data-testid="login-username"
 								placeholder={t("Login")}
 								value={login}
 								onChange={(e) => setLogin(e.target.value)}
 							/>
 							<input
 								type="password"
+								data-testid="login-password"
 								placeholder={t("Password")}
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
@@ -60,7 +62,12 @@ const LoginPage = () => {
 
 							{error && <div className="login-error">{error}</div>}
 
-							<button type="submit" disabled={loading} className="mt-2 mb-4">
+							<button
+								type="submit"
+								disabled={loading}
+								className="mt-2 mb-4"
+								data-testid="login-submit"
+							>
 								{loading ? t("Enter...") : t("Sign in")}
 							</button>
 						</form>
