@@ -694,7 +694,7 @@ const ru = {
     "Changes spacing between letters": "Меняет расстояние между буквами",
     "Favorites": "Избранное",
     "Clear cutting flags": "Сброс текущего задания",
-    "Connection": "Подключение",
+    "Connection": "Подключен",
     "Connection status": "Статус подключения",
     "Connected": "Подключен",
     "Disconnected": "Нет подключения",

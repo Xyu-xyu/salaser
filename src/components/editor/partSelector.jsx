@@ -12,6 +12,8 @@ const PartSelector = observer(() => {
 	const { selectedPath, selectedCid, selectorCoords } = partStore;
 	const [visibility, setVisibility] = useState( false )
 	const [ inMove, setInmove] = useState( false ) 
+	const BBOX_EPS = 1e-4;
+	const DIM_EPS = 1e-3;
 	useEffect(()=>{
 		if (!selectedPath) {
 			partStore.setSelectorCoords({ x: 0, y: 0, width: 0, height: 0 })
@@ -32,13 +34,22 @@ const PartSelector = observer(() => {
 	circleSize = circleSize > 3 ? 3 : (circleSize < 0.5 ? 0.5 : circleSize)
 	let part = {};
 	part.svg = document.getElementById("svg")
+	const isVerticalLine = selectorCoords.width <= BBOX_EPS && selectorCoords.height > BBOX_EPS;
+	const isHorizontalLine = selectorCoords.height <= BBOX_EPS && selectorCoords.width > BBOX_EPS;
+	const isPointLike = selectorCoords.width <= BBOX_EPS && selectorCoords.height <= BBOX_EPS;
 
 	const handleMouseDown = (e) => {
 		//console.log (e.type)
 		setInmove(true)
 		if (editorStore.mode !== "resize") return;
 		part.resizingHandle = e.currentTarget.id;
-		part.start = Util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+		if (e.type === 'touchstart') {
+			const touch = e.touches?.[0];
+			if (!touch) return;
+			part.start = Util.convertScreenCoordsToSvgCoords(touch.clientX, touch.clientY);
+		} else {
+			part.start = Util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+		}
 		part.dif = {}
 		part.dif.x = selectorCoords.x +selectorCoords.width*0.5 - part.start.x
 		part.dif.y = selectorCoords.y - part.start.y
@@ -47,8 +58,8 @@ const PartSelector = observer(() => {
 		const cbox = Util.fakeBox(selectedPath);
 		part.initialRectLeft = cbox.x;
         part.initialRectTop = cbox.y;
-		part.initialHeight = cbox.height
-		part.initialWidth = cbox.width
+		part.initialHeight = Math.max(Number(cbox.height) || 0, DIM_EPS)
+		part.initialWidth = Math.max(Number(cbox.width) || 0, DIM_EPS)
 
 		document.addEventListener('mousemove', handleMouseMove);
 		document.addEventListener('mouseup', handleMouseUp);
@@ -232,11 +243,15 @@ const PartSelector = observer(() => {
 				break;
 		}
 
-		if (newCoords.height <= 0 || newCoords.width <= 0 ) return;
+		if (newCoords.height < 0 || newCoords.width < 0 ) return;
 		//partStore.setSelectorCoords(newCoords);
 
  		let scaleX = newCoords.width / part.initialWidth
         let scaleY = newCoords.height / part.initialHeight
+
+		// Для линий (bbox с нулевой толщиной) не применяем масштаб по "нулевой" оси.
+		if (part.initialWidth <= DIM_EPS && newCoords.width <= DIM_EPS) scaleX = 1;
+		if (part.initialHeight <= DIM_EPS && newCoords.height <= DIM_EPS) scaleY = 1;
         let translateX = newCoords.x - newCoords.x * scaleX
         let translateY = newCoords.y - newCoords.y * scaleY
 
@@ -325,111 +340,208 @@ const PartSelector = observer(() => {
 	return (
 		<>
 			<g id="selectorPart" className={visibility ? '' : ''}>
-				<rect
-					x={selectorCoords.x}
-					y={selectorCoords.y}
-					width={selectorCoords.width}
-					height={selectorCoords.height}
-					fill="none"
-					stroke="black"
-					strokeWidth={circleSize / 10}>
-				</rect>
-				<circle
-					onMouseDown={handleMouseDown}
-                    onTouchStart={ handleMouseDown }
-					id="selectorGrip_resize_nw"
-					fill="black" stroke="white"
-					r={circleSize}
-					style={{ cursor: "nwResize" }}
-					strokeWidth={circleSize / 10}
-					pointerEvents="all"
-					cx={selectorCoords.x}
-					cy={selectorCoords.y}>
-				</circle>
-				<circle
-					onMouseDown={handleMouseDown}
-                    onTouchStart={ handleMouseDown }
-					id="selectorGrip_resize_ne"
-					fill="black" stroke="white"
-					r={circleSize}
-					style={{ cursor: "neResize" }}
-					strokeWidth={circleSize / 10}
-					pointerEvents="all"
-					cx={selectorCoords.x + selectorCoords.width}
-					cy={selectorCoords.y}>
-				</circle>
-				<circle
-					onMouseDown={handleMouseDown}
-                    onTouchStart={ handleMouseDown }
-					id="selectorGrip_resize_sw"
-					fill="black" stroke="white"
-					r={circleSize}
-					style={{ cursor: "swResize" }}
-					strokeWidth={circleSize / 10}
-					pointerEvents="all"
-					cx={selectorCoords.x}
-					cy={selectorCoords.y + selectorCoords.height}>
-				</circle>
-				<circle
-					onMouseDown={handleMouseDown}
-                    onTouchStart={ handleMouseDown }
-					id="selectorGrip_resize_se"
-					fill="black" stroke="white"
-					r={circleSize}
-					style={{ cursor: "seResize" }}
-					strokeWidth={circleSize / 10}
-					pointerEvents="all"
-					cx={selectorCoords.x + selectorCoords.width}
-					cy={selectorCoords.y + selectorCoords.height}>
-				</circle>
-				<circle
-					onMouseDown={ handleMouseDown }
-					onTouchStart={ handleMouseDown }
-					id="selectorGrip_resize_n"
-					fill="black" stroke="white"
-					r={circleSize}
-					style={{ cursor: "nResize" }}
-					strokeWidth={circleSize / 10}
-					pointerEvents="all"
-					cx={selectorCoords.x + selectorCoords.width * 0.5}
-					cy={selectorCoords.y}>
-				</circle>
-				<circle
-					onMouseDown={handleMouseDown}
-					onTouchStart={ handleMouseDown }
-					id="selectorGrip_resize_w"
-					fill="black" stroke="white"
-					r={circleSize}
-					style={{ cursor: "wResize" }}
-					strokeWidth={circleSize / 10}
-					pointerEvents="all"
-					cx={selectorCoords.x}
-					cy={selectorCoords.y + selectorCoords.height * 0.5}>
-				</circle>
-				<circle
-					onMouseDown={handleMouseDown}
-					onTouchStart={ handleMouseDown }
-					id="selectorGrip_resize_s"
-					fill="black" stroke="white"
-					r={circleSize}
-					style={{ cursor: "sResize" }}
-					strokeWidth={circleSize / 10}
-					pointerEvents="all"
-					cx={selectorCoords.x + selectorCoords.width * 0.5}
-					cy={selectorCoords.y + selectorCoords.height}>
-				</circle>
-				<circle
-					onMouseDown={handleMouseDown}
-					onTouchStart={ handleMouseDown }
-					id="selectorGrip_resize_e"
-					fill="black" stroke="white"
-					r={circleSize}
-					style={{ cursor: "eResize" }}
-					strokeWidth={circleSize / 10}
-					pointerEvents="all"
-					cx={selectorCoords.x + selectorCoords.width}
-					cy={selectorCoords.y + selectorCoords.height * 0.5}>
-				</circle>
+				{(!isVerticalLine && !isHorizontalLine && !isPointLike) && (
+					<rect
+						x={selectorCoords.x}
+						y={selectorCoords.y}
+						width={selectorCoords.width}
+						height={selectorCoords.height}
+						fill="none"
+						stroke="black"
+						strokeWidth={circleSize / 10}>
+					</rect>
+				)}
+				{isVerticalLine && (
+					<line
+						x1={selectorCoords.x}
+						y1={selectorCoords.y}
+						x2={selectorCoords.x}
+						y2={selectorCoords.y + selectorCoords.height}
+						stroke="black"
+						strokeWidth={circleSize / 10}
+					/>
+				)}
+				{isHorizontalLine && (
+					<line
+						x1={selectorCoords.x}
+						y1={selectorCoords.y}
+						x2={selectorCoords.x + selectorCoords.width}
+						y2={selectorCoords.y}
+						stroke="black"
+						strokeWidth={circleSize / 10}
+					/>
+				)}
+				{isPointLike && (
+					<circle
+						cx={selectorCoords.x}
+						cy={selectorCoords.y}
+						r={circleSize / 3}
+						fill="none"
+						stroke="black"
+						strokeWidth={circleSize / 10}
+						pointerEvents="none"
+					/>
+				)}
+
+				{/* Full handles only for non-degenerate bbox */}
+				{(!isVerticalLine && !isHorizontalLine && !isPointLike) && (
+					<>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_nw"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "nwResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x}
+							cy={selectorCoords.y}>
+						</circle>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_ne"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "neResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x + selectorCoords.width}
+							cy={selectorCoords.y}>
+						</circle>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_sw"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "swResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x}
+							cy={selectorCoords.y + selectorCoords.height}>
+						</circle>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_se"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "seResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x + selectorCoords.width}
+							cy={selectorCoords.y + selectorCoords.height}>
+						</circle>
+						<circle
+							onMouseDown={ handleMouseDown }
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_n"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "nResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x + selectorCoords.width * 0.5}
+							cy={selectorCoords.y}>
+						</circle>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_w"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "wResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x}
+							cy={selectorCoords.y + selectorCoords.height * 0.5}>
+						</circle>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_s"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "sResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x + selectorCoords.width * 0.5}
+							cy={selectorCoords.y + selectorCoords.height}>
+						</circle>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_e"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "eResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x + selectorCoords.width}
+							cy={selectorCoords.y + selectorCoords.height * 0.5}>
+						</circle>
+					</>
+				)}
+
+				{/* Reduced handles for degenerate bbox */}
+				{isVerticalLine && (
+					<>
+						<circle
+							onMouseDown={ handleMouseDown }
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_n"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "nResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x}
+							cy={selectorCoords.y}>
+						</circle>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_s"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "sResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x}
+							cy={selectorCoords.y + selectorCoords.height}>
+						</circle>
+					</>
+				)}
+				{isHorizontalLine && (
+					<>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_w"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "wResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x}
+							cy={selectorCoords.y}>
+						</circle>
+						<circle
+							onMouseDown={handleMouseDown}
+							onTouchStart={ handleMouseDown }
+							id="selectorGrip_resize_e"
+							fill="black" stroke="white"
+							r={circleSize}
+							style={{ cursor: "eResize" }}
+							strokeWidth={circleSize / 10}
+							pointerEvents="all"
+							cx={selectorCoords.x + selectorCoords.width}
+							cy={selectorCoords.y}>
+						</circle>
+					</>
+				)}
 				<circle
 					onMouseDown={handleMouseDown}
 					onTouchStart={ handleMouseDown }
