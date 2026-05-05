@@ -154,47 +154,12 @@ const FunctionsForm = observer(() => {
 	return (
 
 		<div className="d-flex flex-column" id="FormFumction">
-			<div className="d-flex  align-items-center justify-content-between">
+			<div className="d-flex  align-items-center">
 				<div className="mt-2">
 					<h5>{t("Functions")}</h5>
-				</div>
-				<div>
-					<button className="white_button navbar_button"
-						onClick={() => {
-							setRotated(!rotated)
-							setTimeout(() => {
-								// здесь переключалка когда закрываем раздел функции								
-								laserStore.setVal(
-									'rightMode',
-									leftMode === "plan" ? "plan" : leftMode === "part" ? "part" : "parameter"
-								)
-							}, 500)
-						}
-						}
-						style={{
-							background: "none",
-							border: "none",
-							cursor: "pointer",
-							padding: "8px",
-						}}
-					>
-						<CustomIcon
-							icon="si:expand-more-alt-fill"
-							width="30"
-							height="30"
-							color="black"
-							fill="black"
-							strokeWidth={0}
-							style={{
- 								transformOrigin: `50% 50%`,
-								transform: `rotate(${rotated ? 0 : -90}deg)`,
-								transition: "transform 0.5s ease-in-out",
-							}}
-						/>
-					</button>
-				</div>
+				</div>				
 			</div>
-			<div className="d-flex  align-items-center justify-content-between">
+			<div className="d-flex  align-items-center m-0">
 				<div>
 					<button className="w-100" onClick={ unknown}>
 						<div className="d-flex align-items-center">
@@ -213,7 +178,7 @@ const FunctionsForm = observer(() => {
 				</div>
 
 				<div>
-					<button className="w-100 violet_button">
+					<button className="w-100 violet_button ms-2">
 						<div className="d-flex align-items-center">
 							<CustomIcon 
 								viewBox={'0 0 36 36'} 								
@@ -227,21 +192,7 @@ const FunctionsForm = observer(() => {
 						</div>
 					</button>
 				</div>
-
-				<div>
-					<button className="w-100" onClick={ unknown }>
-						<div className="d-flex align-items-center">
-							<CustomIcon
-								icon="si:expand-more-alt-fill"
-								width="24"
-								height="24"
-								color="black"
-								fill="black"
-								strokeWidth={0}
-							/>
-						</div>
-					</button>
-				</div>
+				
 			</div>
 			<div className="d-flex flex-column mt-2">
 				{Object.keys(vermatic).map((a) => {

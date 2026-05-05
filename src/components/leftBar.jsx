@@ -38,7 +38,7 @@ const LeftBar = observer(() => {
 					</div>
 					<div className="mx-2 mt-1"
 						onClick={()=> {
-							laserStore.setVal ('rightMode', 'plan')
+							laserStore.setVal ('rightMode', 'function')
 							laserStore.setVal ('leftMode', 'sheet')
 						}} 
 					>

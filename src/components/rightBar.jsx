@@ -147,39 +147,6 @@ const RightBar = observer(() => {
 							</div>
 
 							<div>
-								<button className="w-100" /*onClick={() => laserStore.setVal('rightMode', 'parameter')}*/ disabled>
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="tabler:chart-dots-3"
-											width="24"
-											height="24"
-											color="black"
-											fill="black"
-											strokeWidth={1}
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Parameters")}</div>
-									</div>
-								</button>
-							</div>
-
-							<div>
-								<button className="w-100" onClick={() => laserStore.setVal('rightMode', 'function')}>
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="hugeicons:function"
-											width="24"
-											height="24"
-											color="black"
-											strokeWidth={1.5}
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Functions")}</div>
-									</div>
-								</button>
-							</div>
-
-							<div>
 								<DetailsButton item={'selected'} />
 							</div>
 
@@ -205,145 +172,11 @@ const RightBar = observer(() => {
 						</div>
 					}
 
-					{rightMode === 'parameter' &&
 
-						<div>
-							<div className="mt-2">
-								<h5>{t("Parameters")}</h5>
-							</div>
- 							<div>
-								<button className="w-100" disabled>
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="fa7-solid:list-check"
-											width="24"
-											height="24"
-											color="black"
-											fill="black"
-											viewBox="0 0 512 512"
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Select")}</div>
-									</div>
-								</button>
-							</div>
-
-							<div>
-								<button className="w-100" disabled>
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="bytesize:edit"
-											width="24"
-											height="24"
-											color="black"
-											viewBox="0 0 32 32"
-											strokeWidth={2}
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Edit")}</div>
-									</div>
-								</button>
-							</div>
-
-							<div>
-								<button className="w-100 disabled" disabled>
-									<div className="d-flex align-items-center">
-									<CustomIcon
-											icon="fa7-solid:list-check"
-											width="24"
-											height="24"
-											color="black"
-											fill="black"
-											viewBox="0 0 512 512"
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Wizard")}</div>
-									</div>
-								</button>
-							</div>
-
-							<div className="mt-4">
-								<h5>{t("Functions")}</h5>
-							</div>
-
-							<div>
-								<button className="w-100" onClick={() => laserStore.setVal('rightMode', 'function')} >
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="hugeicons:function"
-											width="24"
-											height="24"
-											color="black"
-											strokeWidth={1.5}
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("Functions")}</div>
-									</div>
-								</button>
-							</div>
-
-							<div>
-								<button className="w-100" disabled>
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="solar:restart-bold"
-											width="24"
-											height="24"
-											color="black"
-											fill="black"
-											className="ms-1"
-											strokeWidth={0}
-										/>
-										<div className="flex-grow-1 text-center">{t("Restart")}</div>
-									</div>
-								</button>
-							</div>
-
-							<div className="mt-4">
-								<h5>{t("Display")}</h5>
-							</div>
-
-							<div>
-								<DetailsButton item={'is_cutting'} />
-							</div>
-
-							<div>
-								<button className="w-100" disabled>
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="carbon:view"
-											width="24"
-											height="24"
-											color="black"
-											fill="black"
-											viewBox="0 0 32 32"
-											className="ms-1"
-										/>
-										<div className="flex-grow-1 text-center">{t("View")}</div>
-									</div>
-								</button>
-							</div>
-
-							<div>
-								<button className="w-100" disabled>
-									<div className="d-flex align-items-center">
-										<CustomIcon
-											icon="flowbite:clipboard-list-outline"
-											width="24"
-											height="24"
-											color="black"
-											className="ms-1"											
-										/>
-										<div className="flex-grow-1 text-center">{t("Key")}</div>
-									</div>
-								</button>
-							</div>
-						</div>
-					}
 					{rightMode === 'function' &&
 						<FunctionsForm />
 					}
-                   {rightMode === 'part' &&
+                    {rightMode === 'part' &&
 						<PartForm />
 					}
 
