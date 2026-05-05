@@ -1,8 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Form, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import constants from "../../store/constants.jsx";
+import macrosStore from "../../store/macrosStore";
 import CustomIcon from "../../icons/customIcon";
 
 function isValidIpv4(ip) {
@@ -89,39 +90,54 @@ const ConnectionButton = observer(() => {
 	const [connection, setConnection] = useState(null); // null | boolean
 	const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
 
+	const ipRef = useRef(ip);
+	ipRef.current = ip;
+
 	const canSave = useMemo(() => isValidIpv4(ipInput) && ipInput !== ip && !saving, [ip, ipInput, saving]);
 
 	const handleClose = () => setShow(false);
 	const showModal = () => setShow(true);
 
-	async function refresh() {
-		if (!apiHost) {
-			setError(t("Server URL is not configured"));
-			return;
-		}
+	const refresh = useCallback(
+		async (options = {}) => {
+			const silent = options.silent === true;
+			if (!apiHost) {
+				if (!silent) setError(t("Server URL is not configured"));
+				return;
+			}
 
-		setError("");
-		setLoading(true);
-		try {
-			const ipResp = await fetch(`${apiHost}/api/laserIp/get`, { method: "GET" });
-			const ipData = ipResp.ok ? await safeJson(ipResp) : null;
-			const resolvedIp = normalizeLaserIpFromExternalApi(ipData?.external_api);
+			if (!silent) {
+				setError("");
+				setLoading(true);
+			}
+			try {
+				const ipResp = await fetch(`${apiHost}/api/laserIp/get`, { method: "GET" });
+				const ipData = ipResp.ok ? await safeJson(ipResp) : null;
+				const resolvedIp = normalizeLaserIpFromExternalApi(ipData?.external_api);
 
-			setIp(resolvedIp);
-			setIpInput(resolvedIp || "");
+				const prevCommittedIp = ipRef.current;
+				setIp(resolvedIp);
+				if (silent) {
+					setIpInput((input) => (input === prevCommittedIp ? resolvedIp || "" : input));
+				} else {
+					setIpInput(resolvedIp || "");
+				}
 
-			const connResp = await fetch(`${apiHost}/api/laserIp/connection`, { method: "GET" });
-			const connData = connResp.ok ? await safeJson(connResp) : null;
-			setConnection(typeof connData?.laser_connected === "boolean" ? connData.laser_connected : null);
+				const connResp = await fetch(`${apiHost}/api/laserIp/connection`, { method: "GET" });
+				const connData = connResp.ok ? await safeJson(connResp) : null;
+				setConnection(typeof connData?.laser_connected === "boolean" ? connData.laser_connected : null);
 
-			setLastUpdatedAt(Date.now());
-		} catch (e) {
-			console.error(e);
-			setError(t("Network error or server is down"));
-		} finally {
-			setLoading(false);
-		}
-	}
+				setLastUpdatedAt(Date.now());
+				void macrosStore.loadCutSettingsSchema(0);
+			} catch (e) {
+				console.error(e);
+				if (!silent) setError(t("Network error or server is down"));
+			} finally {
+				if (!silent) setLoading(false);
+			}
+		},
+		[apiHost, t],
+	);
 
 	async function saveIp() {
 		const nextIp = String(ipInput).trim();
@@ -141,6 +157,7 @@ const ConnectionButton = observer(() => {
 			if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 			setIp(nextIp);
 			await refresh();
+			void macrosStore.loadCutSettingsSchema(0);
 		} catch (e) {
 			console.error(e);
 			setError(t("Update error"));
@@ -150,8 +167,13 @@ const ConnectionButton = observer(() => {
 	}
 
 	useEffect(() => {
-		if (show) refresh();
-	}, [show]);
+		if (!show) return;
+		void refresh();
+		const id = setInterval(() => {
+			void refresh({ silent: true });
+		}, 5000);
+		return () => clearInterval(id);
+	}, [show, refresh]);
 
 	const connectionLabel = useMemo(() => {
 		if (connection === null || connection === undefined) return t("Unknown");
@@ -191,11 +213,11 @@ const ConnectionButton = observer(() => {
 				<div style={{ padding: "1.5rem" }}>
 					<div style={{ minWidth: "calc(100vw * 0.25)", overflowX: "hidden" }}>
 						<div className="d-flex align-items-center justify-content-between mb-2">
-							<div className="d-flex align-items-center" style={{ gap: ".5rem" }}>
+							{/* <div className="d-flex align-items-center" style={{ gap: ".5rem" }}>
 								<h4 className="ms-2 text-xs font-bold text-gray-500 uppercase mb-2">
 									{t("Connection")}
 								</h4>
-							</div>
+							</div> */}
 							<div className="d-flex" style={{ gap: ".5rem" }}>	
 								<button className="white_button navbar_button m-1"
 									onClick={refresh}

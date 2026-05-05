@@ -8,7 +8,7 @@ import { Modal, Form, Button } from 'react-bootstrap';
 
 
 
-const UniversalKnob = observer(({ param, keyParam, keyInd = false }) => {
+const UniversalKnobInner = observer(({ param, keyParam, keyInd = false }) => {
 
 	const svgRef = useRef(null);
 	const intervalRef = useRef(null);
@@ -345,6 +345,13 @@ const UniversalKnob = observer(({ param, keyParam, keyInd = false }) => {
 			</Modal>
 		</div>
 	);
+});
+
+const UniversalKnob = observer((props) => {
+	if (macrosStore.cutSettingsSchemaStatus !== 'ready') {
+		return null;
+	}
+	return <UniversalKnobInner {...props} />;
 });
 
 export default UniversalKnob;

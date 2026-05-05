@@ -22,6 +22,10 @@ const swiperModulationMacro = observer(() => {
 		macrosStore.setSelectedSlide(macrosStore.selectedModulationMacro)
 	}, [])
 
+	if (macrosStore.cutSettingsSchemaStatus !== 'ready') {
+		return null;
+	}
+
 	const handleMouseDown = (e) => {
 		e.stopPropagation(); 
 		macrosStore.setTecnologyValue(selectedSlide, 'modulationMacro', 'macros', 0, 15, false)

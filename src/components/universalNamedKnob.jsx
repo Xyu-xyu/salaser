@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import TextInCircle from './textInCircle';
 
 
-const UniversalNamedKnob = observer(({ param, keyParam, keyInd=false }) => {
+const UniversalNamedKnobInner = observer(({ param, keyParam, keyInd=false }) => {
 	
 	const svgRef = useRef(null);
 	const { t } = useTranslation()
@@ -233,6 +233,13 @@ const UniversalNamedKnob = observer(({ param, keyParam, keyInd=false }) => {
 			</div>
 		</div>
 	);
+});
+
+const UniversalNamedKnob = observer((props) => {
+	if (macrosStore.cutSettingsSchemaStatus !== 'ready') {
+		return null;
+	}
+	return <UniversalNamedKnobInner {...props} />;
 });
 
 export default UniversalNamedKnob;

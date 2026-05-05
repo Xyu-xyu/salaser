@@ -1,5 +1,4 @@
 import { makeAutoObservable, computed, action, runInAction } from "mobx";
-import cut_settings_schema from './cut_settings_schema'
 import cut_settings from "./cut_settings";
 import utils from "../scripts/util";
 import { showToast } from "../components/toast";
@@ -93,8 +92,12 @@ class MacrosStore {
 
     laserSettingsUnavailable = false;
 
+    /** 'pending' | 'ready' | 'unavailable' — схема JSON Schema для резки (загрузка с бэкенда) */
+    cutSettingsSchemaStatus = 'pending';
+    cutSettingsSchemaError = null;
+
     technology = cut_settings.technology
-    macrosProperties = cut_settings_schema.properties.technology.properties.macros.items.properties
+    macrosProperties = null
 
     async loadCutSettings() {
         this.loading = true;
@@ -132,45 +135,98 @@ class MacrosStore {
         }
     }
 
-    async loadCutSettingsSchema() {
+    async loadCutSettingsSchema(gcore = 0) {
         this.loading = true;
         this.error = null;
+        runInAction(() => {
+            this.cutSettingsSchemaStatus = 'pending';
+            this.cutSettingsSchemaError = null;
+        });
         try {
-            const resp = await fetch(`${constants.SERVER_URL}/api/cut-settings-schema`);
-            if (!resp.ok) throw new Error(`Ошибка загрузки: ${resp.statusText}`);
-
-            const data = await resp.json();
-            const schema = data?.result ?? data;
-            if (!schema?.properties?.technology?.properties?.macros?.items?.properties) {
-                throw new Error("Некорректный формат схемы cut-settings");
+            try {
+                const connResp = await fetch(`${constants.SERVER_URL}/api/laserIp/connection`, { method: "GET" });
+                if (connResp.ok) {
+                    const connData = await connResp.json();
+                    if (connData?.laser_connected === false) {
+                        runInAction(() => {
+                            this.schema = null;
+                            this.macrosProperties = null;
+                            this.cutSettingsSchemaStatus = 'unavailable';
+                            this.cutSettingsSchemaError = {
+                                code: 'LASER_DISCONNECTED',
+                                message: 'Нет соединения с лазером',
+                            };
+                        });
+                        return;
+                    }
+                }
+            } catch {
+                /* продолжаем — бэкенд схемы сам вернёт NO_EXTERNAL_API и т.д. */
             }
 
-            macrosStore.schema = schema;
-            macrosStore.macrosProperties =
-                schema.properties.technology.properties.macros.items.properties;
-          /*   showToast({
-                type: 'success',
-                message: "Upload  schema from core 0 success!",
-                position: 'bottom-right',
-                autoClose: 2500
-            }); */
-            //console.log (data)
-        } catch (err) {
-            this.error = err.message || "Неизвестная ошибка";
-            /* showToast({
-                type: 'error',
-                message: "Upload schema from core error",
-                position: 'bottom-right',
-                autoClose: 2500
-            }); */
-            console.log ("Upload schema from core error" + err.message)
+            const resp = await fetch(
+                `${constants.SERVER_URL}/api/cut-settings/schema?gcore=${encodeURIComponent(gcore)}`,
+                { method: "GET", headers: { Accept: "application/json" } }
+            );
+            let data = null;
+            try {
+                data = await resp.json();
+            } catch {
+                data = null;
+            }
 
-            macrosStore.schema = cut_settings_schema
-            macrosStore.macrosProperties =
-                cut_settings_schema?.properties?.technology?.properties?.macros?.items?.properties ?? {}
-            
+            if (!resp.ok) {
+                const code = data?.code ?? 'HTTP_ERROR';
+                const message =
+                    (typeof data?.error === 'string' && data.error) ||
+                    resp.statusText ||
+                    'Не удалось загрузить схему настроек резки';
+                runInAction(() => {
+                    this.schema = null;
+                    this.macrosProperties = null;
+                    this.cutSettingsSchemaStatus = 'unavailable';
+                    this.cutSettingsSchemaError = { code, message };
+                    this.error = message;
+                });
+                return;
+            }
+
+            const schema = data?.result ?? data;
+            if (!schema?.properties?.technology?.properties?.macros?.items?.properties) {
+                runInAction(() => {
+                    this.schema = null;
+                    this.macrosProperties = null;
+                    this.cutSettingsSchemaStatus = 'unavailable';
+                    this.cutSettingsSchemaError = {
+                        code: 'INVALID_SCHEMA',
+                        message: 'Некорректный формат схемы cut-settings',
+                    };
+                    this.error = this.cutSettingsSchemaError.message;
+                });
+                return;
+            }
+
+            runInAction(() => {
+                this.schema = schema;
+                this.macrosProperties = schema.properties.technology.properties.macros.items.properties;
+                this.cutSettingsSchemaStatus = 'ready';
+                this.cutSettingsSchemaError = null;
+                this.error = null;
+            });
+        } catch (err) {
+            const message = err?.message || 'Неизвестная ошибка';
+            console.log('Upload schema from core error ' + message);
+            runInAction(() => {
+                this.schema = null;
+                this.macrosProperties = null;
+                this.cutSettingsSchemaStatus = 'unavailable';
+                this.cutSettingsSchemaError = { code: 'NETWORK', message };
+                this.error = message;
+            });
         } finally {
-            this.loading = false;
+            runInAction(() => {
+                this.loading = false;
+            });
         }
     }
 
@@ -182,6 +238,14 @@ class MacrosStore {
         //yobaniy kostyl remove
         if ("id" in settings) {
             delete settings.id;
+        }
+
+        if (this.cutSettingsSchemaStatus !== 'ready' || !this.schema) {
+            showToast({
+                type: 'error',
+                message: 'Схема настроек не загружена — сохранение недоступно',
+            });
+            return false;
         }
 
         let result = utils.validateCuttingSettings( settings )

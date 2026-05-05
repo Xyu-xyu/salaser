@@ -5,6 +5,10 @@ import macrosStore from '../store/macrosStore';
   
 const MacrosEditList = observer(({ param, keyParam }) => {
 
+	if (macrosStore.cutSettingsSchemaStatus !== 'ready' || !macrosStore.macrosProperties) {
+		return null;
+	}
+
 	const { macrosProperties } = macrosStore
 	let val = macrosStore.getTecnologyValue(param, keyParam)
 	

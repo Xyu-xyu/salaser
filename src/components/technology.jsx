@@ -1,4 +1,5 @@
-import cut_settings_schema from "../store/cut_settings_schema";
+import { observer } from "mobx-react-lite";
+import macrosStore from "../store/macrosStore";
 import { useTranslation } from 'react-i18next';
   
 
@@ -24,10 +25,22 @@ const getAllEntries = (obj, parentKey = '') => {
     return entries;
 };
 
-const Technology = () => {
-    const entries = getAllEntries(cut_settings_schema.result);
+const Technology = observer(() => {
+    const { schema, cutSettingsSchemaStatus, cutSettingsSchemaError } = macrosStore;
     const {t} = useTranslation();
 
+    if (cutSettingsSchemaStatus === 'pending') {
+        return <p className="text-muted">{t("Загрузка схемы…")}</p>;
+    }
+    if (cutSettingsSchemaStatus === 'unavailable' || !schema) {
+        return (
+            <p className="text-warning" role="status">
+                {cutSettingsSchemaError?.message || t("Схема настроек недоступна")}
+            </p>
+        );
+    }
+
+    const entries = getAllEntries(schema);
     return (
         <>
             <h1>{ t( "Technology" ) }</h1>
@@ -40,6 +53,6 @@ const Technology = () => {
             </ul> 
         </>
     );
-};
+});
 
 export default Technology;

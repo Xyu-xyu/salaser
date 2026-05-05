@@ -4,6 +4,10 @@ import IosToggleGeneric from './iosToggleGeneric';
 
 const IosToggleBlowInMacros = observer(() => {
 
+	if (macrosStore.cutSettingsSchemaStatus !== 'ready' || !macrosStore.macrosProperties) {
+		return null;
+	}
+
 	const { selectedMacros, macrosProperties, isVertical, technology } = macrosStore
 	const param = "cross_blow"
 	const knob = technology.macros[selectedMacros]

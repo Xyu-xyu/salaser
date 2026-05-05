@@ -4,6 +4,9 @@ import macrosStore from '../../store/macrosStore';
 import IosToggleGeneric from './iosToggleGeneric';
  
 const iosToggleMacrosInMacros = observer(() => {
+	if (macrosStore.cutSettingsSchemaStatus !== 'ready' || !macrosStore.macrosProperties) {
+		return null;
+	}
 	const { selectedMacros, macrosProperties, isVertical, technology } = macrosStore
 	const param = "enabled"
 	const knob = technology.macros[selectedMacros]

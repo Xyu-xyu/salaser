@@ -22,10 +22,10 @@ import Panels from "./editor/panels/panels";
 const Main = observer(() => {
 	const { knobMode, centralBarMode } = laserStore;
 	const { t } = useTranslation()
-	const { laserSettingsUnavailable } = macrosStore
+	const { laserSettingsUnavailable, cutSettingsSchemaStatus, cutSettingsSchemaError } = macrosStore
 
 	useEffect(() => {
-		if (!macrosStore.schema) macrosStore.loadCutSettingsSchema()
+		macrosStore.loadCutSettingsSchema(0)
 		if (!macrosStore.cut_settings) macrosStore.loadCutSettings()
 		/* if (import.meta.env.DEV) {
 			alert ('DEV MODE')
@@ -61,8 +61,15 @@ const Main = observer(() => {
 										{t("Лазера недоступны")}
 									</div>
 								)}
+								{cutSettingsSchemaStatus === 'unavailable' && (
+									<div className="alert alert-warning py-2 px-2 mb-2" role="alert">
+										{cutSettingsSchemaError?.message || t("Схема настроек резки недоступна")}
+									</div>
+								)}
 								<h5>{t("Макрос")}</h5>
 
+								{cutSettingsSchemaStatus === 'ready' ? (
+									<>
 								<div key={0} className="h-125 col-12 vidget">
 									<MacrosSelector />
 								</div>
@@ -86,6 +93,10 @@ const Main = observer(() => {
 										</div>
 									)
 								)}
+									</>
+								) : cutSettingsSchemaStatus === 'pending' ? (
+									<div className="text-muted small py-2">{t("Загрузка схемы настроек…")}</div>
+								) : null}
 							</div>
 						</motion.div>
 					)}

@@ -5,6 +5,14 @@ import macrosStore from "../store/macrosStore";
 
 const CuttingSettingsForm = observer(() => {
 
+	if (macrosStore.cutSettingsSchemaStatus !== 'ready' || !macrosStore.schema) {
+		return (
+			<div className="text-muted p-2" role="status">
+				{macrosStore.cutSettingsSchemaError?.message || "Схема настроек не загружена"}
+			</div>
+		);
+	}
+
 	return (
 		<Form
 			schema={macrosStore.schema}                // схема JSON Schema

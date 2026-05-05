@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import utils from '../scripts/util';
 
 
-const UniversalNamedKnob = observer(({ param, keyParam }) => {
+const UniversalNamedKnobInner = observer(({ param, keyParam }) => {
     const svgRef = useRef(null);
     const { t } = useTranslation();
     const { isVertical, macrosProperties } = macrosStore;
@@ -193,6 +193,13 @@ const UniversalNamedKnob = observer(({ param, keyParam }) => {
             </div>
         </div>
     );
+});
+
+const UniversalNamedKnob = observer((props) => {
+    if (macrosStore.cutSettingsSchemaStatus !== 'ready' || !macrosStore.macrosProperties) {
+        return null;
+    }
+    return <UniversalNamedKnobInner {...props} />;
 });
 
 export default UniversalNamedKnob;

@@ -1,5 +1,4 @@
 import { showToast } from '../components/toast';
-import cutting_settings_schema from '../store/cut_settings_schema';
 import macrosStore from '../store/macrosStore';
 import partStore from '../store/partStore';
 import validator from "@rjsf/validator-ajv8";
@@ -261,7 +260,7 @@ class Utils {
 
 	deepFind(obj, keys) {
 		// If there are no keys to search or the object is empty, return false
-		if (!obj) obj = cutting_settings_schema;
+		if (!obj) obj = macrosStore.schema;
 		if (!keys.length || !obj) return false
 
 
@@ -512,6 +511,14 @@ class Utils {
 
 	validateCuttingSettings( technology ) {
 		const { schema } = macrosStore
+		if (!schema) {
+			showToast({
+				type: 'error',
+				message: 'Схема настроек не загружена',
+				position: 'bottom-right',
+			});
+			return { errors: [{ message: 'No cut settings schema' }], errorSchema: {} };
+		}
 		const result = validator.validateFormData(technology, schema);
 		//console.log(result)
 
