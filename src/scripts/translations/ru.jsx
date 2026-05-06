@@ -744,6 +744,7 @@ const ru = {
     "填写名称和标签": "填写名称 и 标签",
     "Vapor": "Выпаривание",
     "Pulse": "Пульс",
-    "Macro {{idx}}": "Макрос {{idx}}"
+    "Macro {{idx}}": "Макрос {{idx}}",
+    "Sort jobs": "Сортировать вакансии"
 }
 export default ru;

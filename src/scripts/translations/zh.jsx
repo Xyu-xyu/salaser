@@ -695,6 +695,7 @@ const zh = {
     "填写名称和标签": "填写名称和标签",
     "Engraving": "雕刻",
     "Vapor": "汽",
-    "Macro {{idx}}": "宏 {{idx}}"
+    "Macro {{idx}}": "宏 {{idx}}",
+    "By thickness": "按厚度分类"
 }
 export default zh;

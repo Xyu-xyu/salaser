@@ -748,6 +748,11 @@ const en = {
     "填写名称和标签": "填写名称和标签",
     "Pulse": "Pulse",
     "Vapor": "Vapor",
-    "Macro {{idx}}": "Macro {{idx}}"
+    "Macro {{idx}}": "Macro {{idx}}",
+    "Sort jobs": "Sort jobs",
+    "By order": "By order",
+    "By thickness": "By thickness",
+    "Ascending": "Ascending",
+    "Descending": "Descending"
 }
 export default en;

@@ -124,7 +124,7 @@ const PlanViewSwitcher = observer(() => {
 												</ListGroup>												
 {/* 											</ListGroup>
  */}										</div>
-										<div className="mt-2 px-2 pb-2 w-100">
+								{/* 		<div className="mt-2 px-2 pb-2 w-100">
 											<div className="small mb-1">{t("Sort jobs")}</div>
 											<div className="d-flex gap-2">
 												<Form.Select
@@ -150,7 +150,7 @@ const PlanViewSwitcher = observer(() => {
 													<option value="desc">{t("Descending")}</option>
 												</Form.Select>
 											</div>
-										</div>
+										</div> */}
 									</div>
 
 								)}
