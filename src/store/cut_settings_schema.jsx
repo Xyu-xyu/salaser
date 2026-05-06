@@ -157,6 +157,62 @@ const schema = JSON.parse(`{
 										"default": 0,
 										"minimum": 0
 									},
+									"fillMode": {
+										"enum": [
+											"FIXED_FILL",
+											"ENERGY_PER_MM",
+											"CURVE"
+										],
+										"type": "string",
+										"title": "Режим заполнения",
+										"default": "ENERGY_PER_MM"
+									},
+									"fillCurve": {
+										"$wvType": "paged",
+										"title": "Кривая заполнения",
+										"type": "array",
+										"items": {
+											"$wvFormat": {
+												"format": "{0} mm/s -> {1}%",
+												"variables": [
+													{
+														"type": "value",
+														"name": "speed_mm_s",
+														"default": "0"
+													},
+													{
+														"type": "value",
+														"name": "fill_percent",
+														"default": "0"
+													}
+												]
+											},
+											"required": [
+												"speed_mm_s",
+												"fill_percent"
+											],
+											"additionalProperties": false,
+											"type": "object",
+											"properties": {
+												"speed_mm_s": {
+													"type": "number",
+													"title": "Скорость, мм/с",
+													"minimum": 0,
+													"maximum": 200000,
+													"default": 0
+												},
+												"fill_percent": {
+													"type": "number",
+													"title": "Заполнение, %",
+													"minimum": 0,
+													"maximum": 100.0,
+													"default": 50.0
+												}
+											}
+										},
+										"additionalProperties": false,
+										"maxItems": 16
+									},
 									"height": {
 										"type": "number",
 										"title": "Высота, мм",
@@ -418,7 +474,7 @@ const schema = JSON.parse(`{
 							},
 							"pulseFill_percent_min": {
 								"type": "number",
-								"title": "Мин.Заполнение, %",
+								"title": "МЗаполнение, %",
 								"maximum": 100.0,
 								"default": 10.0,
 								"minimum": 0.1
@@ -446,9 +502,51 @@ const schema = JSON.parse(`{
 							"maximum": 200000,
 							"default": 50000,
 							"minimum": 10
+						},
+						"arcLimitsEnabled": {
+							"type": "boolean",
+							"title": "Дуги: ограничения по динамике",
+							"description": "Включает/выключает ограничения дуг (скорость по v^2/r и ограничение разгона по суммарному ускорению). Отключение может ухудшить качество/точность на малых радиусах.",
+							"default": false
+						},
+						"microBridgeLength_mm": {
+							"type": "number",
+							"title": "Длина микроперемычки, мм",
+							"maximum": 1000.0,
+							"default": 2.0,
+							"minimum": 0.01
+						},
+						"safeHeight_mm": {
+							"type": "number",
+							"title": "Безопасная высота, мм",
+							"maximum": 200.0,
+							"default": 20.0,
+							"minimum": 0.1
+						},
+						"toolCompensation": {
+							"type": "object",
+							"title": "Компенсация инструмента",
+							"description": "Компенсация (tool offset) по стороне: G41 — слева от траектории, G42 — справа. Значения задаются в мм, без знака.",
+							"properties": {
+								"g41Offset_mm": {
+									"type": "number",
+									"title": "G41 (слева), мм",
+									"maximum": 5.0,
+									"default": 0.0,
+									"minimum": 0.0
+								},
+								"g42Offset_mm": {
+									"type": "number",
+									"title": "G42 (справа), мм",
+									"maximum": 5.0,
+									"default": 0.0,
+									"minimum": 0.0
+								}
+							},
+							"additionalProperties": false
 						}
 					},
-					"title": "Холостые перемещения",
+					"title": "Прочее",
 					"required": [
 						"feedLimit_mm_s"
 					],
@@ -472,7 +570,6 @@ const schema = JSON.parse(`{
 	"additionalProperties": false,
 	"title": "SGNmotion settings"
 }
-    
 `)
 
 export default schema

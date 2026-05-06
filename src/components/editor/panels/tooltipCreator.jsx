@@ -192,6 +192,11 @@ const TooltipCreator = observer (({ element }) => {
 			text: '',
 			placement: 'bottom'
 		},
+		AltSettings: {
+			title: t("Settings"),
+			text: '',
+			placement: 'bottom'
+		},
 		navLanguage: {
 			title: t("Language"),
 			text: '',

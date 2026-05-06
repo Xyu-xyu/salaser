@@ -744,6 +744,10 @@ const en = {
     "S235JR": "S235JR",
     "AW5754": "AW5754",
     "DD11": "DD11",
-    "Segment added": "Segment added"
+    "Segment added": "Segment added",
+    "填写名称和标签": "填写名称和标签",
+    "Pulse": "Pulse",
+    "Vapor": "Vapor",
+    "Macro {{idx}}": "Macro {{idx}}"
 }
 export default en;

@@ -740,6 +740,10 @@ const ru = {
     "AW5754": "AW5754",
     "S235JR": "S235JR",
     "DD11": "ДД11",
-    "Segment added": "Сегмент добавлен"
+    "Segment added": "Сегмент добавлен",
+    "填写名称和标签": "填写名称 и 标签",
+    "Vapor": "Выпаривание",
+    "Pulse": "Пульс",
+    "Macro {{idx}}": "Макрос {{idx}}"
 }
 export default ru;

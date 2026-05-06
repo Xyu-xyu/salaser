@@ -1,9 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import PowerButton from "./navbar/powerButton";
 import laserStore from "../store/laserStore";
-//import utils from "../scripts/util";
 import SettingsButton from "./navbar/settingsButton";
-//import constants from "../store/constants";
+import SettingsAltButton from "./navbar/settingsAltButton.jsx";
 import { showToast } from "./toast";
 import FavoritesButton from "./navbar/favoritesButton";
 import LanguageButton from "./navbar/languageButton";
@@ -82,17 +81,8 @@ const NavBar = observer(() => {
 
 				{/* LONG button end */}
 
-{/* 				<div className="ms-2">
-					<button className="white_button navbar_button">
-						<div className="d-flex align-items-center justify-content-center">
-							<CustomIcon icon="fluent:play-circle-28-regular"
-								width="36"
-								height="36"
-								style={{ color: 'black' }}
-							/>
-						</div>
-					</button>
-				</div> */}
+				<TooltipCreator element={{ id: "AltSettings", info: (<span className="d-inline-flex"><SettingsAltButton /></span>) }} />
+
 				<div className="ms-2">
 					<TooltipCreator
 						element={{

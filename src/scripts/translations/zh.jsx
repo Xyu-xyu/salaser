@@ -251,6 +251,7 @@ const zh = {
     "Login": "登录",
     "Please fill all fields.": "请填写所有字段。",
     "Upload error:": "上传错误：",
+    "Pulse": "脉冲",
     "Cutting": "切割",
     "Automation": "自动化",
     "Microjoints": "微接头",
@@ -690,6 +691,10 @@ const zh = {
     "AW5754": "AW5754",
     "S235JR": "S235JR",
     "DD11": "DD11",
-    "Segment added": "已添加段"
+    "Segment added": "已添加段",
+    "填写名称和标签": "填写名称和标签",
+    "Engraving": "雕刻",
+    "Vapor": "汽",
+    "Macro {{idx}}": "宏 {{idx}}"
 }
 export default zh;
