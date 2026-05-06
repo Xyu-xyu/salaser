@@ -32,6 +32,7 @@ const SettingsAltButton = observer(() => {
 		{ key: "pressure", domId: "rt_tile_pressure", valId: "rt_pressure" },
 		{ key: "power_W_mm", domId: "rt_tile_energy", valId: "rt_energy" },
 		{ key: "focus", domId: "rt_tile_focus", valId: "rt_focus" },
+		{ key: "gas", domId: "rt_tile_gas", type: "enum" },
 		{ key: "feedLimit_mm_s", domId: "rt_tile_feed", valId: "rt_feed_limit" },
 		{ key: "modulationFrequency_Hz", domId: "rt_tile_freq", valId: "rt_freq" },
 		{ key: "height", domId: "rt_tile_height", valId: "rt_height" },
@@ -115,6 +116,39 @@ const SettingsAltButton = observer(() => {
 						const meta = getMeta(key);
 						const value = macrosStore.getTecnologyValue(key, "macros");
 						const isActive = activeParam === key;
+
+						if (type === "enum") {
+							const options = utils.deepFind(false, ["macros", key, "enum"]) ?? [];
+							const safeOptions = Array.isArray(options) ? options : [];
+							const current = typeof value === "string" ? value : String(value ?? "");
+
+							return (
+								<div
+									key={key}
+									title={meta.description || meta.title}
+									className={`rt-tile ${isActive ? "is-active" : ""}`}
+									id={domId}
+									data-param={key}
+									onClick={() => setActiveParam(key)}
+								>
+									<div className="rt-tile__label">{t(meta.title)}</div>
+									<div className="rt-tile__value">
+										<select
+											className="rt-tile__select"
+											value={current}
+											onClick={(e) => e.stopPropagation()}
+											onChange={(e) => macrosStore.setValString(key, e.target.value, "macros")}
+										>
+											{safeOptions.map((opt) => (
+												<option key={opt} value={opt}>
+													{t(opt)}
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+							);
+						}
 
 						if (type === "boolean") {
 							const checked = Boolean(value);
