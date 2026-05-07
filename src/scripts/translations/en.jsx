@@ -753,6 +753,15 @@ const en = {
     "By order": "By order",
     "By thickness": "By thickness",
     "Ascending": "Ascending",
-    "Descending": "Descending"
+    "Descending": "Descending",
+    "Expanded": "Expanded",
+    "Compact": "Compact",
+    "Coming soon": "Coming soon",
+    "Filling": "Filling",
+    "Cutting parameters": "Cutting parameters",
+    "Unsaved changes": "Unsaved changes",
+    "Cut parameters": "Cut parameters",
+    "Reserve": "Reserve",
+    "General": "General"
 }
 export default en;

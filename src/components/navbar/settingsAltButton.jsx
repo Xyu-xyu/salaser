@@ -11,6 +11,7 @@ const SettingsAltButton = observer(() => {
 	const [show, setShow] = useState(false);
 	const handleClose = () => setShow(false);
 	const showModal = () => setShow(true);
+	const [expanded, setExpanded] = useState(false);
 
 	const macros = macrosStore?.technology?.macros ?? [];
 	const selectedMacroIdx = macrosStore?.selectedMacros ?? 0;
@@ -87,9 +88,18 @@ const SettingsAltButton = observer(() => {
 				centered={false}
 			>
 				<div className="drawer-body pb-0">
+					<div className="rt-modal-topbar">
+						<button
+							type="button"
+							className="rt-mode-toggle"
+							onClick={() => setExpanded((v) => !v)}
+						>
+							{expanded ? t("Compact") : t("Expanded")}
+						</button>
+					</div>
 					<div className="rt-macros" aria-label="Макросы">
 						<div className="rt-macros__label">{t("Macros")}</div>
-						<div className="rt-macros__grid" id="rt_macros_grid">
+						<div className={`rt-macros__grid ${expanded ? "is-col" : ""}`} id="rt_macros_grid">
 							{macros.map((_, idx) => (
 								<button
 									key={idx}
@@ -109,122 +119,124 @@ const SettingsAltButton = observer(() => {
 						</div>
 					</div>
 				</div>
-				<div className="drawer-body pt-0">
-				<div className="rt-macros__label">{t("Parameters")}</div>
-				<div className="rt-grid" aria-label={t("Parameters")}>
-					{params.map(({ key, domId, valId, type }) => {
-						const meta = getMeta(key);
-						const value = macrosStore.getTecnologyValue(key, "macros");
-						const isActive = activeParam === key;
+				{!expanded && (
+					<div className="drawer-body pt-0">
+						<div className="rt-macros__label">{t("Parameters")}</div>
+						<div className="rt-grid" aria-label={t("Parameters")}>
+							{params.map(({ key, domId, valId, type }) => {
+								const meta = getMeta(key);
+								const value = macrosStore.getTecnologyValue(key, "macros");
+								const isActive = activeParam === key;
 
-						if (type === "enum") {
-							const options = utils.deepFind(false, ["macros", key, "enum"]) ?? [];
-							const safeOptions = Array.isArray(options) ? options : [];
-							const current = typeof value === "string" ? value : String(value ?? "");
+								if (type === "enum") {
+									const options = utils.deepFind(false, ["macros", key, "enum"]) ?? [];
+									const safeOptions = Array.isArray(options) ? options : [];
+									const current = typeof value === "string" ? value : String(value ?? "");
 
-							return (
-								<div
-									key={key}
-									title={meta.description || meta.title}
-									className={`rt-tile ${isActive ? "is-active" : ""}`}
-									id={domId}
-									data-param={key}
-									onClick={() => setActiveParam(key)}
-								>
-									<div className="rt-tile__label">{t(meta.title)}</div>
-									<div className="rt-tile__value">
-										<select
-											className="rt-tile__select"
-											value={current}
-											onClick={(e) => e.stopPropagation()}
-											onChange={(e) => macrosStore.setValString(key, e.target.value, "macros")}
+									return (
+										<div
+											key={key}
+											title={meta.description || meta.title}
+											className={`rt-tile ${isActive ? "is-active" : ""}`}
+											id={domId}
+											data-param={key}
+											onClick={() => setActiveParam(key)}
 										>
-											{safeOptions.map((opt) => (
-												<option key={opt} value={opt}>
-													{t(opt)}
-												</option>
-											))}
-										</select>
-									</div>
-								</div>
-							);
-						}
+											<div className="rt-tile__label">{t(meta.title)}</div>
+											<div className="rt-tile__value">
+												<select
+													className="rt-tile__select"
+													value={current}
+													onClick={(e) => e.stopPropagation()}
+													onChange={(e) => macrosStore.setValString(key, e.target.value, "macros")}
+												>
+													{safeOptions.map((opt) => (
+														<option key={opt} value={opt}>
+															{t(opt)}
+														</option>
+													))}
+												</select>
+											</div>
+										</div>
+									);
+								}
 
-						if (type === "boolean") {
-							const checked = Boolean(value);
-							return (
-								<div
-									key={key}
-									title={meta.description || meta.title}
-									className={`rt-tile rt-tile--checkbox ${isActive ? "is-active" : ""} ${checked ? "is-checked" : ""}`}
-									id={domId}
-									data-param={key}
-									onClick={() => setActiveParam(key)}
-								>
-									<div className="rt-tile__label">{t(meta.title)}</div>
-									<div className="rt-tile__value">
-										<input
-											type="checkbox"
-											className="rt-tile__checkbox"
-											checked={checked}
-											onChange={(e) => {
-												macrosStore.setValBoolean(key, e.target.checked);
-											}}
-										/>
-										<span
-											className="rt-tile__checkbox-indicator"
-											onClick={(e) => {
-												e.stopPropagation();
-												macrosStore.setValBoolean(key, !checked);
-											}}
-										/>
-									</div>
-								</div>
-							);
-						}
+								if (type === "boolean") {
+									const checked = Boolean(value);
+									return (
+										<div
+											key={key}
+											title={meta.description || meta.title}
+											className={`rt-tile rt-tile--checkbox ${isActive ? "is-active" : ""} ${checked ? "is-checked" : ""}`}
+											id={domId}
+											data-param={key}
+											onClick={() => setActiveParam(key)}
+										>
+											<div className="rt-tile__label">{t(meta.title)}</div>
+											<div className="rt-tile__value">
+												<input
+													type="checkbox"
+													className="rt-tile__checkbox"
+													checked={checked}
+													onChange={(e) => {
+														macrosStore.setValBoolean(key, e.target.checked);
+													}}
+												/>
+												<span
+													className="rt-tile__checkbox-indicator"
+													onClick={(e) => {
+														e.stopPropagation();
+														macrosStore.setValBoolean(key, !checked);
+													}}
+												/>
+											</div>
+										</div>
+									);
+								}
 
-						return (
-							<div
-								key={key}
-								title={meta.description || meta.title}
-								className={`rt-tile ${isActive ? "is-active" : ""}`}
-								id={domId}
-								data-param={key}
-								onClick={() => setActiveParam(key)}
-							>
-								<div className="rt-tile__label">{t(meta.title)}</div>
-								<div className="rt-tile__value">
-									<span id={valId}>{value}</span>
-								</div>
-								<div className="rt-tile__adjust">
-									<button
-										type="button"
-										className="rt-tile__stepbtn"
-										aria-label={t("Increase")}
-										onClick={(e) => {
-											e.stopPropagation();
-											bump(key, +1);
-										}}
+								return (
+									<div
+										key={key}
+										title={meta.description || meta.title}
+										className={`rt-tile ${isActive ? "is-active" : ""}`}
+										id={domId}
+										data-param={key}
+										onClick={() => setActiveParam(key)}
 									>
-										+
-									</button>
-									<button
-										type="button"
-										className="rt-tile__stepbtn"
-										aria-label={t("Decrease")}
-										onClick={(e) => {
-											e.stopPropagation();
-											bump(key, -1);
-										}}
-									>
-										−
-									</button>
-								</div>
-							</div>
-						);
-					})}
-				</div>
-				</div>
+										<div className="rt-tile__label">{t(meta.title)}</div>
+										<div className="rt-tile__value">
+											<span id={valId}>{value}</span>
+										</div>
+										<div className="rt-tile__adjust">
+											<button
+												type="button"
+												className="rt-tile__stepbtn"
+												aria-label={t("Increase")}
+												onClick={(e) => {
+													e.stopPropagation();
+													bump(key, +1);
+												}}
+											>
+												+
+											</button>
+											<button
+												type="button"
+												className="rt-tile__stepbtn"
+												aria-label={t("Decrease")}
+												onClick={(e) => {
+													e.stopPropagation();
+													bump(key, -1);
+												}}
+											>
+												−
+											</button>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					</div>
+				)}
 			</Modal>
 		</div>
 	);

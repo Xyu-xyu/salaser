@@ -745,6 +745,12 @@ const ru = {
     "Vapor": "Выпаривание",
     "Pulse": "Пульс",
     "Macro {{idx}}": "Макрос {{idx}}",
-    "Sort jobs": "Сортировать вакансии"
+    "Sort jobs": "Сортировать вакансии",
+    "Expanded": "Расширенный",
+    "Filling": "Наполнение",
+    "General": "Общий",
+    "Unsaved changes": "Несохраненные изменения",
+    "Compact": "Компактный",
+    "Cut parameters": "Параметры резки"
 }
 export default ru;
