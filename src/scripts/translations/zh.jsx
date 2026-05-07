@@ -696,6 +696,11 @@ const zh = {
     "Engraving": "雕刻",
     "Vapor": "汽",
     "Macro {{idx}}": "宏 {{idx}}",
-    "By thickness": "按厚度分类"
+    "By thickness": "按厚度分类",
+    "Modulation selection": "调制选择",
+    "Edit selected modulation": "编辑选定的调制",
+    "Macro enabled": "启用宏",
+    "Delete selected modulation": "删除选定的调制",
+    "ENGRAVEING": "雕刻"
 }
 export default zh;

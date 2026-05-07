@@ -3,7 +3,7 @@ const ru = {
     "Part protection gap must be a non-negative number": "Отступ должен быть неотрицательным числом",
     "Technology": "Технология",
     "Охлаждение": "Охлаждение",
-    "Разрешено": "Разрешено",
+    "Разрешено": "Макрос разрешен",
     "On": "Вкл",
     "Off": "Выкл",
     "Close": "Закрыть",
@@ -78,7 +78,7 @@ const ru = {
     "Частота": "Частота",
     "Name": "Имя",
     "cross_blow": "Обдув",
-    "Enabled": "Включен",
+    "Enabled": "Макрос включен",
     "Do you want to copy and add this macro?": "Хотите скопировать добавить этот макрос?",
     "Do you want to delete this macro?": "Хотите удалить этот макрос?",
     "Do you want to copy and add this piercing macro?": "Хотите скопировать и добавить этот макрос врезки?",
@@ -751,6 +751,13 @@ const ru = {
     "General": "Общий",
     "Unsaved changes": "Несохраненные изменения",
     "Compact": "Компактный",
-    "Cut parameters": "Параметры резки"
+    "Cut parameters": "Параметры резки",
+    "false": "ЛОЖЬ",
+    "Edit selected modulation": "Редактировать выбранную модуляцию",
+    "Create new modulation macro": "Создать новый макрос модуляции",
+    "Macro enabled": "Макрос включен",
+    "Delete selected modulation": "Удалить выбранную модуляцию",
+    "ENGRAVEING": "гравировка",
+    "Type": "Тип",
 }
 export default ru;

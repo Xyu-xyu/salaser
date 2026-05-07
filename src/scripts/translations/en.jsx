@@ -762,6 +762,14 @@ const en = {
     "Unsaved changes": "Unsaved changes",
     "Cut parameters": "Cut parameters",
     "Reserve": "Reserve",
-    "General": "General"
+    "General": "General",
+    "Macro enabled": "Macro enabled",
+    "false": "false",
+    "Modulation": "Modulation",
+    "Modulation selection": "Modulation selection",
+    "Create new modulation macro": "Create new modulation macro",
+    "Edit selected modulation": "Edit selected modulation",
+    "Delete selected modulation": "Delete selected modulation",
+    "ENGRAVEING": "ENGRAVEING"
 }
 export default en;

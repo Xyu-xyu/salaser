@@ -56,6 +56,38 @@ const SettingsAltButton = observer(() => {
 		return range / 50 > 50 ? 50 : knobStp;
 	};
 
+	const setNumberValue = (paramKey, nextRaw) => {
+		const meta = getMeta(paramKey);
+		const next = Number(nextRaw);
+		if (!Number.isFinite(next)) return;
+		macrosStore.setTecnologyValue(next, paramKey, "macros", meta.minimum, meta.maximum);
+	};
+
+	const enumOptions = (paramKey) => {
+		// For string enums like gas/type
+		const options = utils.deepFind(false, ["macros", paramKey, "enum"]);
+		if (Array.isArray(options)) return options;
+		return [];
+	};
+
+	const getEnumRefMax = (paramKey) => {
+		const ref = utils.deepFind(false, ["macros", paramKey, "$wvEnumRef"]);
+		if (typeof ref !== "string") return null;
+		const paramName = ref.split("/").filter(Boolean).slice(-1)[0];
+		const arr = macrosStore?.technology?.[paramName];
+		if (!Array.isArray(arr)) return null;
+		return Math.max(0, arr.length - 1);
+	};
+
+	const setEnumIndex = (paramKey, nextRaw) => {
+		const maxRef = getEnumRefMax(paramKey);
+		const min = 0;
+		const max = typeof maxRef === "number" ? maxRef : (getMeta(paramKey).maximum ?? 0);
+		const next = Number(nextRaw);
+		if (!Number.isFinite(next)) return;
+		macrosStore.setTecnologyValue(next, paramKey, "macros", min, max);
+	};
+
 	const bump = (paramKey, delta) => {
 		const meta = getMeta(paramKey);
 		const step = stepFor(paramKey, meta.minimum, meta.maximum);
@@ -119,6 +151,147 @@ const SettingsAltButton = observer(() => {
 						</div>
 					</div>
 				</div>
+				{expanded && (
+					<div className="drawer-body pt-0">
+						<div className="cp-section">
+							<div className="rt-macros__label">{t("Cutting parameters")}</div>
+							<div className="cp-section__body cp-cols3">
+								{/* enabled */}
+								<div className="cp-field cp-field--toggle">
+									<label className="cp-field__label">{t("Macro enabled")}</label>
+									<label className="cp-toggle">
+										<input
+											type="checkbox"
+											checked={Boolean(macrosStore.getTecnologyValue("enabled", "macros"))}
+											onChange={(e) => macrosStore.setValBoolean("enabled", e.target.checked)}
+										/>
+										<span className="cp-toggle__track"></span>
+									</label>
+								</div>
+
+
+								{/* type */}
+								<div className="cp-field cp-field--enum">
+									<label className="cp-field__label">{t("Type")}</label>
+									<select
+										className="cp-input"
+										value={String(macrosStore.getTecnologyValue("type", "macros") ?? "")}
+										onChange={(e) => macrosStore.setValString("type", e.target.value, "macros")}
+									>
+										{//enumOptions("type")
+										["CW", "PULSE", "ENGRAVEING", "VAPOR", "EDGING"]
+										.map((opt) => (
+											<option key={opt} value={opt}>
+												{t(opt)}
+											</option>
+										))}
+									</select>
+								</div>
+
+								{/* cross_blow */}
+								<div className="cp-field cp-field--toggle">
+									<label className="cp-field__label">{t(getMeta("cross_blow").title)}</label>
+									<label className="cp-toggle">
+										<input
+											type="checkbox"
+											checked={Boolean(macrosStore.getTecnologyValue("cross_blow", "macros"))}
+											onChange={(e) => macrosStore.setValBoolean("cross_blow", e.target.checked)}
+										/>
+										<span className="cp-toggle__track"></span>
+									</label>
+								</div>
+
+								{/* gas */}
+								<div className="cp-field cp-field--enum">
+									<label className="cp-field__label">{t(getMeta("gas").title)}</label>
+									<select
+										className="cp-input"
+										value={String(macrosStore.getTecnologyValue("gas", "macros") ?? "")}
+										onChange={(e) => macrosStore.setValString("gas", e.target.value, "macros")}
+									>
+										{enumOptions("gas").map((opt) => (
+											<option key={opt} value={opt}>
+												{t(opt)}
+											</option>
+										))}
+									</select>
+								</div>
+
+								{/* numbers */}
+								{[
+									"pressure",
+									"power_W_mm",
+									"feedLimit_mm_s",
+									"height",
+									"focus",
+								].map((k) => {
+									const meta = getMeta(k);
+									const value = macrosStore.getTecnologyValue(k, "macros");
+									const step = Number(macrosStore?.knobStep?.[k] ?? 1);
+
+									return (
+										<div key={k} className="cp-field cp-field--number">
+											<label className="cp-field__label">{t(meta.title)}</label>
+											<input
+												type="number"
+												className="cp-input"
+												min={meta.minimum}
+												max={meta.maximum}
+												step={step}
+												value={Number(value)}
+												onChange={(e) => setNumberValue(k, e.target.value)}
+											/>
+										</div>
+									);
+								})}
+							</div>
+						</div>
+
+						<div className="cp-section">
+							<div className="cp-section__header">{t("Modulation")}</div>
+							<div className="cp-section__body">
+								<div className="cp-field cp-field--number">
+									<label className="cp-field__label">{t(getMeta("modulationFrequency_Hz").title)}</label>
+									<input
+										type="number"
+										className="cp-input"
+										min={getMeta("modulationFrequency_Hz").minimum}
+										max={getMeta("modulationFrequency_Hz").maximum}
+										step={Number(macrosStore?.knobStep?.["modulationFrequency_Hz"] ?? 1)}
+										value={Number(macrosStore.getTecnologyValue("modulationFrequency_Hz", "macros"))}
+										onChange={(e) => setNumberValue("modulationFrequency_Hz", e.target.value)}
+									/>
+								</div>
+
+								<div className="cp-select-with-actions">
+									<div className="cp-field cp-field--enum">
+										<label className="cp-field__label">{t("Modulation selection")}</label>
+										<select
+											className="cp-input"
+											value={String(macrosStore.getTecnologyValue("modulationMacro", "macros") ?? 0)}
+											onChange={(e) => setEnumIndex("modulationMacro", e.target.value)}
+										>
+											{(macrosStore?.technology?.modulationMacros ?? []).map((m, idx) => (
+												<option key={idx} value={idx}>
+													#{idx} · {m?.name ?? "Unknown modulation macro"}
+												</option>
+											))}
+										</select>
+									</div>
+									<button type="button" className="cp-btn cp-btn--primary" title={t("Create new modulation macro")} disabled>
+										+
+									</button>
+									<button type="button" className="cp-btn" title={t("Edit selected modulation")} disabled>
+										✎
+									</button>
+									<button type="button" className="cp-btn cp-btn--danger" title={t("Delete selected modulation")} disabled>
+										🗑
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
 				{!expanded && (
 					<div className="drawer-body pt-0">
 						<div className="rt-macros__label">{t("Parameters")}</div>
