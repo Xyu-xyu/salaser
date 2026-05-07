@@ -755,6 +755,12 @@ height: fit-content;}
   background-color: rgb(244, 244, 247);
 }
 
+
+.auto-width-modal .modal-content {
+  width: fit-content;
+}
+
+
 .modulatiomNacroName {
   font-size: 25px;
 }
@@ -855,8 +861,8 @@ height: fit-content;}
 
 .settingsAltButton-navbar-modal .drawer-body {
   padding: 16px;
-  min-width: min(560px, 92vw);
-  max-width: min(720px, 96vw);
+  min-width: min(860px, 92vw);
+  max-width: min(860px, 96vw);
 }
 
 .rt-macros {

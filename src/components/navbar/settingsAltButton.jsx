@@ -116,8 +116,8 @@ const SettingsAltButton = observer(() => {
 				show={show}
 				onHide={handleClose}
 				id="settingsAltButtonModal"
-				className="with-inner-backdrop powerButton-navbar-modal favoritesButton-navbar-modal settingsAltButton-navbar-modal"
-				centered={false}
+				className="with-inner-backdrop powerButton-navbar-modal favoritesButton-navbar-modal settingsAltButton-navbar-modal "
+				centered={false}				
 			>
 				<div className="drawer-body pb-0">
 					<div className="rt-modal-topbar">
@@ -129,7 +129,7 @@ const SettingsAltButton = observer(() => {
 							{expanded ? t("Compact") : t("Expanded")}
 						</button>
 					</div>
-					<div className="rt-macros" aria-label="Макросы">
+					{!expanded && <div className="rt-macros" aria-label="Макросы">
 						<div className="rt-macros__label">{t("Macros")}</div>
 						<div className={`rt-macros__grid ${expanded ? "is-col" : ""}`} id="rt_macros_grid">
 							{macros.map((_, idx) => (
@@ -149,11 +149,33 @@ const SettingsAltButton = observer(() => {
 								</button>
 							))}
 						</div>
-					</div>
-				</div>
+					</div>}
+				</div> 
 				{expanded && (
-					<div className="drawer-body pt-0">
-						<div className="cp-section">
+					<div className="drawer-body pt-0 d-flex">
+
+						<div className="cp-section"	style={{width:"150px"}}						>
+							<div className="">
+								<div className="rt-macros__label">{t("Macros")}</div>							
+								{macros.map((_, idx) => (
+										<button
+											key={idx}
+											type="button"
+											className={`rt-macro-tile ${idx === selectedMacroIdx ? "is-active" : ""}`}
+											id={`rt_macro_tile_${idx}`}
+											data-macro={idx}
+											onClick={() => macrosStore.setVal("selector", idx, minimum, maximum)}
+										>
+											<div className="rt-macro-tile__top">
+												<span className={`rt-macro__dot is-m${idx}`} aria-hidden="true"></span>
+												<span className="rt-macro-tile__idx">{idx}</span>
+											</div>
+											<div className="rt-macro-tile__name">{macroName(idx)}</div>
+										</button>
+									))}
+								</div>
+						</div>
+						<div className="cp-section"	style={{width:"750px"}}						> 
 							<div className="rt-macros__label">{t("Cutting parameters")}</div>
 							<div className="cp-section__body cp-cols3">
 								{/* enabled */}
@@ -248,7 +270,7 @@ const SettingsAltButton = observer(() => {
 						</div>
 
 						<div className="cp-section">
-							<div className="cp-section__header">{t("Modulation")}</div>
+							<div  className="rt-macros__label">{t("Modulation")}</div>
 							<div className="cp-section__body">
 								<div className="cp-field cp-field--number">
 									<label className="cp-field__label">{t(getMeta("modulationFrequency_Hz").title)}</label>
@@ -288,6 +310,12 @@ const SettingsAltButton = observer(() => {
 										🗑
 									</button>
 								</div>
+							</div>
+						</div>
+						<div className="cp-section">
+							<div  className="rt-macros__label">{t("Filling")}</div>
+							<div className="cp-section__body">
+								
 							</div>
 						</div>
 					</div>

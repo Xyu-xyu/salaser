@@ -747,7 +747,7 @@ const ru = {
     "Macro {{idx}}": "Макрос {{idx}}",
     "Sort jobs": "Сортировать вакансии",
     "Expanded": "Расширенный",
-    "Filling": "Наполнение",
+    "Filling": "Заполнение",
     "General": "Общий",
     "Unsaved changes": "Несохраненные изменения",
     "Compact": "Компактный",
@@ -759,5 +759,7 @@ const ru = {
     "Delete selected modulation": "Удалить выбранную модуляцию",
     "ENGRAVEING": "гравировка",
     "Type": "Тип",
+    "Cutting parameters": "Параметры резки",
+    "Modulation":"Модуляция",
 }
 export default ru;
