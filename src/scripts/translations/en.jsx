@@ -770,6 +770,12 @@ const en = {
     "Create new modulation macro": "Create new modulation macro",
     "Edit selected modulation": "Edit selected modulation",
     "Delete selected modulation": "Delete selected modulation",
-    "ENGRAVEING": "ENGRAVEING"
+    "ENGRAVEING": "ENGRAVEING",
+    "Режим заполнения": "Режим заполнения",
+    "FIXED_FILL": "FIXED_FILL",
+    "ENERGY_PER_MM": "ENERGY_PER_MM",
+    "CURVE": "CURVE",
+    "Curve": "Curve",
+    "Table": "Table"
 }
 export default en;

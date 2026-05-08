@@ -760,6 +760,12 @@ const ru = {
     "ENGRAVEING": "гравировка",
     "Type": "Тип",
     "Cutting parameters": "Параметры резки",
-    "Modulation":"Модуляция",
+    "Modulation": "Модуляция",
+    "CURVE": "Кривая",
+    "Режим заполнения": "Режим",
+    "FIXED_FILL": "Фиксирванное",
+    "ENERGY_PER_MM": "Энергия на мм",
+    "Curve": "Изгиб",
+    "Table": "Таблица"
 }
 export default ru;

@@ -9,6 +9,7 @@ import utils from "../../scripts/util.jsx";
 const SettingsAltButton = observer(() => {
 	const { t } = useTranslation();
 	const [show, setShow] = useState(false);
+	const [fillMode, setFillMode] = useState('table')
 	const handleClose = () => setShow(false);
 	const showModal = () => setShow(true);
 	const [expanded, setExpanded] = useState(false);
@@ -116,10 +117,11 @@ const SettingsAltButton = observer(() => {
 				show={show}
 				onHide={handleClose}
 				id="settingsAltButtonModal"
-				className="with-inner-backdrop powerButton-navbar-modal favoritesButton-navbar-modal settingsAltButton-navbar-modal "
+				className={`with-inner-backdrop settingsAltButton-navbar-modal ${expanded ? " expanded" :""}`}
 				centered={false}				
 			>
-				<div className="drawer-body pb-0">
+				<div className="p-2">
+				<div className="drawer-body">
 					<div className="rt-modal-topbar">
 						<button
 							type="button"
@@ -152,7 +154,7 @@ const SettingsAltButton = observer(() => {
 					</div>}
 				</div> 
 				{expanded && (
-					<div className="drawer-body pt-0 d-flex">
+					<div className="drawer-body d-flex">
 
 						<div className="cp-section"	style={{width:"150px"}}						>
 							<div className="">
@@ -261,7 +263,7 @@ const SettingsAltButton = observer(() => {
 												max={meta.maximum}
 												step={step}
 												value={Number(value)}
-												onChange={(e) => setNumberValue(k, e.target.value)}
+												onChange={(e) => setNucurvemberValue(k, e.target.value)}
 											/>
 										</div>
 									);
@@ -269,6 +271,107 @@ const SettingsAltButton = observer(() => {
 							</div>
 						</div>
 
+
+						<div className="cp-section">
+							<div  className="rt-macros__label">{t("Cutting parameters")}:{t("Filling")}</div>
+							<div className="cp-section__body">
+
+									{/* fillMode */}
+								<div className="cp-field cp-field--enum">
+									<label className="cp-field__label">{t(getMeta("fillMode").title)}</label>
+									<select
+										className="cp-input"
+										value={String(macrosStore.getTecnologyValue("fillMode", "macros") ?? "")}
+										onChange={(e) => macrosStore.setValString("fillMode", e.target.value, "macros")}
+									>
+										{enumOptions("fillMode").map((opt) => (
+											<option key={opt} value={opt}>
+												{t(opt)}
+											</option>
+										))}
+									</select>
+								</div>
+								{macrosStore.getTecnologyValue("fillMode", "macros") === 'CURVE' &&
+									<div className="">
+										<div className="cp-curve__tabs">
+
+											<button type="button" className={`cp-curve__tab ${ fillMode=== "table" ? "is-active" : ""}`}
+												onMouseDown={()=>{ setFillMode("table") }}	
+											>
+												{t("Table")}
+											</button>
+
+											<button type="button" className={`cp-curve__tab ${ fillMode=== "curve" ? "is-active" : ""}`}
+												onMouseDown={()=>{ setFillMode("curve") }}	
+											>
+												{t("CURVE")}
+											</button>
+
+										</div>
+										<div className="cp-section__body">
+											{ fillMode=== "table" && 
+												<div className="cp-curve__points" style={{}}>
+													<div className="d-flex w-100 justify-content-evenly">
+														<div className="cp-field__label">Скорость, мм/с</div>
+														<div className="cp-field__label">Заполнение, %</div>
+													</div>
+													
+												{
+													
+													macrosStore.getTecnologyValue("fillCurve", "macros")
+													.map((a)=>{
+														return (
+														
+															<div className="cp-curve__points__head d-flex m-1">
+
+																<input type="number" 
+																	className="cp-input" 
+																	min={0} 
+																	max={200000} 
+																	step={1} 
+																	value={a.speed_mm_s}
+																	/>
+																	
+																<input 
+																	type="number" 
+																	className="cp-input ms-1" 
+																	min={0} max={100} 
+																	step="0.1" 
+																	value={a.fill_percent}
+																	/>
+																<button
+																type="button"
+																className="cp-btn cp-btn--danger ms-1"
+																>
+																×
+																</button>
+															</div>)
+
+													})
+											
+												}
+
+											</div>
+											}
+
+										{ fillMode=== "curve" && 'GBPLF'}
+										</div>
+										<div className="cp-curve__controls">
+											<button type="button" className="cp-btn cp-btn--primary">
+												+ {t("Point")}
+											</button>
+											<button type="button" className="cp-btn">
+												{t("Sort")}
+											</button>
+											<button type="button" className="cp-btn cp-btn--danger">
+												{t("Clear")}
+											</button>
+										</div>
+									</div>
+
+								}							
+							</div>
+						</div>
 						<div className="cp-section">
 							<div  className="rt-macros__label">{t("Modulation")}</div>
 							<div className="cp-section__body">
@@ -310,12 +413,6 @@ const SettingsAltButton = observer(() => {
 										🗑
 									</button>
 								</div>
-							</div>
-						</div>
-						<div className="cp-section">
-							<div  className="rt-macros__label">{t("Filling")}</div>
-							<div className="cp-section__body">
-								
 							</div>
 						</div>
 					</div>
@@ -438,6 +535,9 @@ const SettingsAltButton = observer(() => {
 						</div>
 					</div>
 				)}
+
+				</div>
+
 			</Modal>
 		</div>
 	);

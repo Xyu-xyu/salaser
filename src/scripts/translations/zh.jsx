@@ -701,6 +701,11 @@ const zh = {
     "Edit selected modulation": "编辑选定的调制",
     "Macro enabled": "启用宏",
     "Delete selected modulation": "删除选定的调制",
-    "ENGRAVEING": "雕刻"
+    "ENGRAVEING": "雕刻",
+    "Режим заполнения": "Режим заполнения",
+    "CURVE": "曲线",
+    "ENERGY_PER_MM": "ENERGY_PER_MM",
+    "Curve": "曲线",
+    "Table": "桌子"
 }
 export default zh;
