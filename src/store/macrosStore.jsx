@@ -524,6 +524,82 @@ class MacrosStore {
         }
     }
 
+    setTecnologyValueForFillCurve(
+        mode,
+        keyParam = "speed_mm_s",
+        index = 0,
+        value = 0
+    ) {
+    
+        const param = "fillCurve";
+        const def = {
+            speed_mm_s: 25000,
+            fill_percent: 50
+        };
+    
+        let arr = [
+            ...this.technology.macros[this.selectedMacros].cutting[param]
+        ];
+    
+        if (mode === "clear") {
+    
+            arr = [];
+    
+        } else if (mode === "add") {
+    
+            arr.push(def);
+            // unique
+            arr = [
+                ...new Map(
+                    arr.map(item => [
+                        `${item.speed_mm_s}_${item.fill_percent}`,
+                        item
+                    ])
+                ).values()
+            ];
+    
+        } else if (mode === "delete") {
+    
+            arr.splice(index, 1);
+    
+        } else if (mode === "update") {
+    
+            let minimum = utils.deepFind(false, [param, keyParam, 'minimum'])
+            let maximum = utils.deepFind(false, [param, keyParam, 'maximum'])
+            if (arr[index] &&  (value >= minimum  &&  value <= maximum)
+                ) {
+                arr[index] = {
+                    ...arr[index],
+                    [keyParam]: value
+                };
+            }
+        } else if (mode === 'sort') {
+
+            // unique
+            arr = [
+                ...new Map(
+                    arr.map(item => [
+                        `${item.speed_mm_s}_${item.fill_percent}`,
+                        item
+                    ])
+                ).values()
+            ];
+            arr.sort((a, b) => {
+                if (a.speed_mm_s !== b.speed_mm_s) {
+                    return a.speed_mm_s - b.speed_mm_s;
+                }
+        
+                return a.fill_percent - b.fill_percent;
+            });
+        }
+    
+ 
+    
+    
+        // save back
+        this.technology.macros[this.selectedMacros].cutting[param] = arr;
+    }
+
     setCarouselMode(val) {
         console.log('setCarouselMode  to ' + val)
         this.carouselMode = val

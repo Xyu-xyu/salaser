@@ -319,10 +319,12 @@ const SettingsAltButton = observer(() => {
 												{
 													
 													macrosStore.getTecnologyValue("fillCurve", "macros")
-													.map((a)=>{
+													.map((a, i)=>{
 														return (
 														
-															<div className="cp-curve__points__head d-flex m-1">
+															<div className="cp-curve__points__head d-flex m-1"
+															key={i}
+															>
 
 																<input type="number" 
 																	className="cp-input" 
@@ -330,6 +332,13 @@ const SettingsAltButton = observer(() => {
 																	max={200000} 
 																	step={1} 
 																	value={a.speed_mm_s}
+																	onChange={(e)=>{ 
+																		macrosStore.setTecnologyValueForFillCurve(
+																			'update', 
+																			'speed_mm_s', 
+																			i,
+																			e.target.value
+																		)}}
 																	/>
 																	
 																<input 
@@ -338,10 +347,18 @@ const SettingsAltButton = observer(() => {
 																	min={0} max={100} 
 																	step="0.1" 
 																	value={a.fill_percent}
+																	onChange={(e)=>{ 
+																		macrosStore.setTecnologyValueForFillCurve(
+																			'update', 
+																			'fill_percent', 
+																			i,
+																			e.target.value
+																		)}}
 																	/>
 																<button
-																type="button"
-																className="cp-btn cp-btn--danger ms-1"
+																	type="button"
+																	className="cp-btn cp-btn--danger ms-1"
+																	onClick={ ()=> macrosStore.setTecnologyValueForFillCurve("delete", false, i) }
 																>
 																×
 																</button>
@@ -357,13 +374,19 @@ const SettingsAltButton = observer(() => {
 										{ fillMode=== "curve" && 'GBPLF'}
 										</div>
 										<div className="cp-curve__controls">
-											<button type="button" className="cp-btn cp-btn--primary">
+											<button type="button" className="cp-btn cp-btn--primary"
+												onClick={ ()=> macrosStore.setTecnologyValueForFillCurve("add") }
+											>
 												+ {t("Point")}
 											</button>
-											<button type="button" className="cp-btn">
+											<button type="button" className="cp-btn"
+												onClick={ ()=> macrosStore.setTecnologyValueForFillCurve("sort") }
+											>
 												{t("Sort")}
 											</button>
-											<button type="button" className="cp-btn cp-btn--danger">
+											<button type="button" className="cp-btn cp-btn--danger"
+												onClick={ ()=> macrosStore.setTecnologyValueForFillCurve("clear") }
+											>
 												{t("Clear")}
 											</button>
 										</div>
