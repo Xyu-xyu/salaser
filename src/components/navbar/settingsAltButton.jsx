@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import CustomIcon from "../../icons/customIcon.jsx";
 import macrosStore from "../../store/macrosStore.jsx";
 import utils from "../../scripts/util.jsx";
+import CustomChartinFill from "../chart/customChartInFill.jsx"
 
 const SettingsAltButton = observer(() => {
 	const { t } = useTranslation();
@@ -371,7 +372,7 @@ const SettingsAltButton = observer(() => {
 											</div>
 											}
 
-										{ fillMode=== "curve" && 'GBPLF'}
+										{ fillMode=== "curve" &&  <CustomChartinFill />}
 										</div>
 										<div className="cp-curve__controls">
 											<button type="button" className="cp-btn cp-btn--primary"
