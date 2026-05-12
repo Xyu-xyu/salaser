@@ -573,7 +573,7 @@ class MacrosStore {
                     [keyParam]: value
                 };
             }
-        } else if (mode === 'sort') {
+        } else if (mode === "sort") {
 
             // unique
             arr = [
@@ -591,12 +591,28 @@ class MacrosStore {
         
                 return a.fill_percent - b.fill_percent;
             });
+        } else if (mode === "update_both") {
+            let newSpeed = value[0]
+            let newPerCent = value[1]
+            let minSpeed = utils.deepFind(false, [param, "speed_mm_s", 'minimum'])
+            let maxSpeed = utils.deepFind(false, [param, "speed_mm_s", 'maximum'])
+            if (arr[index] &&  (newSpeed >= minSpeed  &&  newSpeed <= maxSpeed)
+            ) {
+                arr[index] = {
+                    ...arr[index],
+                    ['speed_mm_s']: newSpeed
+                };
+            }
+
+            if (arr[index] &&  (newPerCent >= 0  &&  newPerCent <= 100)
+            ) {
+                arr[index] = {
+                    ...arr[index],
+                    ['fill_percent']: newPerCent
+                };
+            }
         }
     
- 
-    
-    
-        // save back
         this.technology.macros[this.selectedMacros].cutting[param] = arr;
     }
 

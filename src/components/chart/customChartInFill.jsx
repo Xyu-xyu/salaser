@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import macrosStore from '../../store/macrosStore';
+import { useState, useRef } from 'react'
 
 
 export const CustomChartinFill = observer(({}) => {
@@ -9,6 +10,54 @@ export const CustomChartinFill = observer(({}) => {
 	const {t} = useTranslation()
 	const chartWidth = 280;
 	const chartHeight = 200;
+	const [dragIndex, setDragIndex] = useState(null)
+
+	const svgRef = useRef(null)
+
+	const fromX = (svgX) => {
+		const value = ((svgX - GRAPH.left) / width) * maxX
+		return Math.max(0, Math.min(maxX, value))
+	}
+	
+	const fromY = (svgY) => {
+		const value = ((GRAPH.bottom - svgY) / height) * maxY
+		return Math.max(0, Math.min(maxY, value))
+	}
+
+	const handleMouseMove = (e) => {
+
+		if (dragIndex === null) return
+	
+		const svg = svgRef.current
+	
+		const rect = svg.getBoundingClientRect()
+	
+		const mouseX = e.clientX - rect.left
+		const mouseY = e.clientY - rect.top
+	
+		const nextData = [...data]
+	
+		nextData[dragIndex] = {
+			...nextData[dragIndex],
+	
+			speed_mm_s: Math.round(fromX(mouseX)),
+	
+			fill_percent: Math.round(fromY(mouseY))
+		}
+	
+
+		macrosStore.setTecnologyValueForFillCurve(
+			'update_both', 
+			false, 
+			dragIndex,
+			[nextData[dragIndex].speed_mm_s, nextData[dragIndex].fill_percent]
+		) 	
+
+	}
+
+	const handleMouseUp = () => {
+		setDragIndex(null)
+	}
 
 	const GRAPH = {
 		left: 35,
@@ -24,7 +73,7 @@ export const CustomChartinFill = observer(({}) => {
 	const maxY = 100;   // fill_percent
 	
 	const toX = (value) => GRAPH.left + (value / maxX) * width;
-	const toY = (value) =>	GRAPH.bottom - (value / maxY) * height;
+	const toY = (value) => GRAPH.bottom - (value / maxY) * height;
 
 	/*  smooth path */
 
@@ -147,7 +196,17 @@ export const CustomChartinFill = observer(({}) => {
 				>
 				</div>
 
-				<svg role="application" className="recharts-surface" width={chartWidth} height={chartHeight} viewBox={`0 0 ${chartWidth} ${chartHeight}`} style={{ width: '100%', height: '100%' }}>
+				<svg role="application" 
+					className="recharts-surface" 
+					width={chartWidth} 
+					height={chartHeight} 
+					viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+					style={{ width: '100%', height: '100%' }}
+					ref={svgRef}
+					onMouseMove={handleMouseMove}
+					onMouseUp={handleMouseUp}
+					onMouseLeave={handleMouseUp}
+					>
 					<rect 
 						x="0" 
 						y="0" 
@@ -206,14 +265,14 @@ export const CustomChartinFill = observer(({}) => {
 					
 					<text orientation="left" 
 						stroke="none" 
-						font-size="10" 
+						fontSize="10" 
 						className="recharts-text recharts-cartesian-axis-tick-value" textAnchor="end" fill="#333">
 						<tspan x="30" y="180">0</tspan>
 					</text>
 
 					<text orientation="left" 
 						stroke="none" 
-						font-size="10" 
+						fontSize="10" 
 						className="recharts-text recharts-cartesian-axis-tick-value" textAnchor="end" fill="#333">
 						<tspan x="250" y="180">50000</tspan>
 					</text>
@@ -245,29 +304,34 @@ export const CustomChartinFill = observer(({}) => {
 						strokeWidth={2}
 					/>
 
-					{
-						data.map((a,i)=>{
+				{
+					data.map((a, i) => {
 
-							let x = toX(a.speed_mm_s)
-							let y = toY(a.fill_percent)
+						let x = toX(a.speed_mm_s)
+						let y = toY(a.fill_percent)
 
-							return(
-								<g onMouseDown={ ()=>{}} 
-									key={i}>
-									<circle
-										r={5}
-										stroke={'black'}
-										fill={'orangered'}
-										strokeWidth="1"
-										cx={x}
-										cy={y}
-										className={`recharts-dot recharts-line-dot dot-glow`}
-									/>
-								</g>
-							)
-
-						})
-					}
+						return (
+							<g
+								key={i}
+								onMouseDown={() => {
+									setDragIndex(i)
+								}}
+								style={{
+									cursor: 'grab'
+								}}
+							>
+								<circle
+									r={5}
+									stroke="black"
+									fill="orangered"
+									strokeWidth="1"
+									cx={x}
+									cy={y}
+								/>
+							</g>
+						)
+					})
+				}
 					
 				</svg>
 		</div>
