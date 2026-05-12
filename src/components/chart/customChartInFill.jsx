@@ -26,6 +26,71 @@ export const CustomChartinFill = observer(({}) => {
 	const toX = (value) => GRAPH.left + (value / maxX) * width;
 	const toY = (value) =>	GRAPH.bottom - (value / maxY) * height;
 
+	/*  smooth path */
+
+
+	const sorted = [...data].sort(
+		(a, b) => a.speed_mm_s - b.speed_mm_s
+	)
+	
+	// стартовая точка
+	const firstPoint = sorted[0]
+	
+	// конечная точка
+	const lastPoint = sorted[sorted.length - 1]
+	
+	// формируем полный набор точек пути
+	const points = [
+		{
+			x: 0,
+			y: firstPoint.fill_percent
+		},
+	
+		...sorted.map((p) => ({
+			x: p.speed_mm_s,
+			y: p.fill_percent
+		})),
+	
+		{
+			x: 50000,
+			y: lastPoint.fill_percent
+		}
+	]
+
+	const makeSmoothPath = (points) => {
+
+		if (!points.length) return ''
+	
+		const svgPoints = points.map((p) => ({
+			x: toX(p.x),
+			y: toY(p.y)
+		}))
+	
+		let d = `M ${svgPoints[0].x} ${svgPoints[0].y}`
+	
+		for (let i = 0; i < svgPoints.length - 1; i++) {
+	
+			const current = svgPoints[i]
+			const next = svgPoints[i + 1]
+	
+			// midpoint по x
+			const controlX = (current.x + next.x) / 2
+	
+			d += `
+				C
+				${controlX} ${current.y},
+				${controlX} ${next.y},
+				${next.x} ${next.y}
+			`
+		}
+	
+		return d
+	}
+	
+	const pathD = makeSmoothPath(points)
+
+	/*  smooth path */
+
  
 
 
@@ -134,7 +199,7 @@ export const CustomChartinFill = observer(({}) => {
 					})}
 					<text orientation="left" 
 						stroke="none" 
-						font-size="10" 
+						fontSize="10" 
 						className="recharts-text recharts-cartesian-axis-tick-value" textAnchor="end" fill="#333">
 							<tspan x="30" y="25">100%</tspan>
 					</text>
@@ -171,6 +236,13 @@ export const CustomChartinFill = observer(({}) => {
 						x2={35}
 						y2={165}
 						strokeWidth={0.2}
+					/>
+
+					<path
+						d={pathD}
+						fill="none"
+						stroke="var(--violet)"
+						strokeWidth={2}
 					/>
 
 					{
