@@ -468,7 +468,7 @@ class MacrosStore {
 
     setTecnologyValue(newVal, param, keyParam, minimum, maximum, keyInd = false) {
         //console.log ('setTecnologyValue')
-        //console.log ( arguments )
+        console.log ( arguments )
 
         if (newVal < minimum) newVal = minimum
         if (newVal > maximum) newVal = maximum
@@ -482,7 +482,14 @@ class MacrosStore {
                 }
 
             } else if (keyParam === 'modulationMacros') {
-                this.technology.modulationMacros[this.selectedModulationMacro][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
+                
+                const precision = this.knobRound?.[param] ?? 0;
+                this.technology.modulationMacros[
+                    this.selectedModulationMacro
+                ][param] =
+                    Math.round(newVal * (10 ** precision)) /
+                    (10 ** precision);
+
             } else if (keyParam === 'piercingMacros') {
                 this.technology.piercingMacros[this.selectedPiercingMacro][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             } else if (keyParam === 'stages') {
@@ -499,7 +506,16 @@ class MacrosStore {
                     this.technology.macros[keyInd].cutting[param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
                 }
             } else if (keyParam === 'modulationMacros') {
-                this.technology.modulationMacros[keyInd][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
+
+                const precision = this.knobRound?.[param] ?? 0;
+                this.technology.modulationMacros[
+                    keyInd
+                ][param] =
+                    Math.round(newVal * (10 ** precision)) /
+                    (10 ** precision);
+                
+
+
             } else if (keyParam === 'piercingMacros') {
                 this.technology.piercingMacros[keyInd][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             } else if (keyParam === 'stages') {

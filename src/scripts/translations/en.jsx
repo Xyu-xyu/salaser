@@ -778,6 +778,18 @@ const en = {
     "Curve": "Curve",
     "Table": "Table",
     "Do you want to delete this modulation?": "Do you want to delete this modulation?",
-    "Do you want to copy and add this modulation?": "Do you want to copy and add this modulation?"
+    "Do you want to copy and add this modulation?": "Do you want to copy and add this modulation?",
+    "Speed": "Speed",
+    "Min. filling": "Min. filling",
+    "Мин. заполнение, %": "Мин. заполнение, %",
+    "Field is required": "Field is required",
+    "Minimum length": "Minimum length",
+    "Maximum value": "Maximum value",
+    "Поле обязательно": "Поле обязательно",
+    "Minimum value": "Minimum value",
+    "Minimum value: 0.1": "Minimum value: 0.1",
+    "Minimum value: 0": "Minimum value: 0",
+    "МЗаполнение, %": "МЗаполнение, %",
+    "Минимальная длина: 1": "Минимальная длина: 1"
 }
 export default en;

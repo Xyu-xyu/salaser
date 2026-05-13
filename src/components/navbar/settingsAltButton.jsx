@@ -6,6 +6,8 @@ import CustomIcon from "../../icons/customIcon.jsx";
 import macrosStore from "../../store/macrosStore.jsx";
 import utils from "../../scripts/util.jsx";
 import CustomChartinFill from "../chart/customChartInFill.jsx"
+import ModMacroEditBtnInAltSett from "./modMacroEditBtnInAltSett.jsx"
+
 
 const SettingsAltButton = observer(() => {
 	const { t } = useTranslation();
@@ -345,8 +347,8 @@ const SettingsAltButton = observer(() => {
 											{ fillMode=== "table" && 
 												<div className="cp-curve__points" style={{}}>
 													<div className="d-flex w-100 justify-content-evenly">
-														<div className="cp-field__label">Скорость, мм/с</div>
-														<div className="cp-field__label">Заполнение, %</div>
+														<div className="cp-field__label">{t("Speed")}, {t("мм/с")}</div>
+														<div className="cp-field__label">{t("Filling")}, %</div>
 													</div>
 													
 												{
@@ -472,9 +474,7 @@ const SettingsAltButton = observer(() => {
 									>
 										+
 									</button>
-									<button type="button" className="cp-btn" title={t("Edit selected modulation")}>
-										✎
-									</button>
+									<ModMacroEditBtnInAltSett />
 									<button 
 										type="button" className="cp-btn cp-btn--danger" 
 										onMouseDown={ (e)=> deleteThisModulation(e) }

@@ -768,5 +768,18 @@ const ru = {
     "Curve": "Изгиб",
     "Table": "Таблица",
     "Modulation selection": "Выбор модуляции",
+    "Do you want to delete this modulation?": "Удалить эту модуляцию?",
+    "Do you want to copy and add this modulation?": "Копировать эту модуляцию?",
+    "Speed": "Скорость",
+    "Min. filling": "Мин. заполнение",
+    "Мин. заполнение, %": "Мин. заполнение, %",
+    "Field is required": "Поле обязательно",
+    "Minimum length": "Минимальная длина",
+    "Maximum value": "Максимальное значение",
+    "Поле обязательно": "Поле обязательно",
+    "Minimum value: 0.1": "Минимальное значение: 0,1",
+    "Minimum value: 0": "Минимальное значение: 0",
+    "МЗаполнение, %": "Мин. заполнение, %",
+    "Минимальная длина: 1": "Минимальная длина: 1"
 }
 export default ru;

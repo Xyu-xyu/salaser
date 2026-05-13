@@ -706,6 +706,17 @@ const zh = {
     "CURVE": "曲线",
     "ENERGY_PER_MM": "ENERGY_PER_MM",
     "Curve": "曲线",
-    "Table": "桌子"
+    "Table": "桌子",
+    "Speed": "速度",
+    "Min. filling": "分钟。",
+    "Мин. заполнение, %": "米恩。",
+    "Field is required": "字段为必填项",
+    "Minimum length": "最小长度",
+    "Maximum value": "最大值",
+    "Поле обязательно": "Поле обязательно",
+    "Minimum value: 0.1": "最小值：0.1",
+    "Minimum value: 0": "最小值：0",
+    "МЗаполнение, %": "市场份额, %",
+    "Минимальная длина: 1": "最小数量: 1"
 }
 export default zh;
