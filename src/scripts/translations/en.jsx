@@ -770,12 +770,14 @@ const en = {
     "Create new modulation macro": "Create new modulation macro",
     "Edit selected modulation": "Edit selected modulation",
     "Delete selected modulation": "Delete selected modulation",
-    "ENGRAVEING": "ENGRAVEING",
+    "ENGRAVEING": "ENGRAVING",
     "Режим заполнения": "Режим заполнения",
     "FIXED_FILL": "FIXED_FILL",
     "ENERGY_PER_MM": "ENERGY_PER_MM",
     "CURVE": "CURVE",
     "Curve": "Curve",
-    "Table": "Table"
+    "Table": "Table",
+    "Do you want to delete this modulation?": "Do you want to delete this modulation?",
+    "Do you want to copy and add this modulation?": "Do you want to copy and add this modulation?"
 }
 export default en;

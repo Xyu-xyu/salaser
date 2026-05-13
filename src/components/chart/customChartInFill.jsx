@@ -92,7 +92,7 @@ export const CustomChartinFill = observer(({}) => {
 	const points = [
 		{
 			x: 0,
-			y: firstPoint.fill_percent
+			y: firstPoint?.fill_percent||0
 		},
 	
 		...sorted.map((p) => ({
@@ -102,7 +102,7 @@ export const CustomChartinFill = observer(({}) => {
 	
 		{
 			x: 50000,
-			y: lastPoint.fill_percent
+			y: lastPoint?.fill_percent||0
 		}
 	]
 

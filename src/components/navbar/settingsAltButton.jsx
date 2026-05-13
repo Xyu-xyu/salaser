@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import CustomIcon from "../../icons/customIcon.jsx";
@@ -15,10 +15,42 @@ const SettingsAltButton = observer(() => {
 	const showModal = () => setShow(true);
 	const [expanded, setExpanded] = useState(false);
 
+	const { modulationMacroinUse, selectedModulationMacro } = macrosStore
+
+	const deleteThisModulation = (e) => {
+		e.stopPropagation();
+		macrosStore.setModalProps ({
+			show:true,
+			modalBody: 'Do you want to delete this modulation?',
+			confirmText: 'Delete',
+			cancelText:'Cancel',
+			func: macrosStore.deleteAndUpdate,
+			args:['modulationMacros', selectedModulationMacro, 'modulationMacro']
+	   })
+   }
+
+
+   const cloneThisModulation = (e) => {
+		e.stopPropagation();
+		macrosStore.setModalProps ({
+			show:true,
+			modalBody: 'Do you want to copy and add this modulation?',
+			confirmText: 'Copy',
+			cancelText:'Cancel',
+			func: macrosStore.AddAndUpdate,
+			args:['modulationMacros', selectedModulationMacro, 'modulationMacro']
+	})
+	}
+
+	useEffect(()=>{
+		macrosStore.loadCutSettings()
+	},[])
+
 	const macros = macrosStore?.technology?.macros ?? [];
 	const selectedMacroIdx = macrosStore?.selectedMacros ?? 0;
 	const minimum = 0;
 	const maximum = Math.max(0, macros.length - 1);
+	const modMacroMax = utils.deepFind(false, ["modulationMacros", "maxItems"])
 
 	const [activeParam, setActiveParam] = useState("pressure");
 
@@ -264,7 +296,7 @@ const SettingsAltButton = observer(() => {
 												max={meta.maximum}
 												step={step}
 												value={Number(value)}
-												onChange={(e) => setNucurvemberValue(k, e.target.value)}
+												onChange={(e) => setNumberValue(k, e.target.value)}
 											/>
 										</div>
 									);
@@ -273,7 +305,7 @@ const SettingsAltButton = observer(() => {
 						</div>
 
 
-						<div className="cp-section">
+						<div className="cp-section" style={{width:"330px"}}		>
 							<div  className="rt-macros__label">{t("Cutting parameters")}:{t("Filling")}</div>
 							<div className="cp-section__body">
 
@@ -421,19 +453,36 @@ const SettingsAltButton = observer(() => {
 											onChange={(e) => setEnumIndex("modulationMacro", e.target.value)}
 										>
 											{(macrosStore?.technology?.modulationMacros ?? []).map((m, idx) => (
-												<option key={idx} value={idx}>
+												<option key={idx} value={idx}
+													className={(modulationMacroinUse.includes(idx) ? (idx === selectedModulationMacro ? "currentMacrosInOption" : "") : "notInUseInOption")} 
+												>
 													#{idx} · {m?.name ?? "Unknown modulation macro"}
 												</option>
 											))}
 										</select>
 									</div>
-									<button type="button" className="cp-btn cp-btn--primary" title={t("Create new modulation macro")} disabled>
+									<button
+										type="button"
+										className="cp-btn cp-btn--primary"
+										title={t("Create new modulation macro")}
+										onMouseDown={ (e)=> cloneThisModulation(e) }
+										disabled={
+											modMacroMax === macrosStore?.technology?.modulationMacros.length
+										}
+									>
 										+
 									</button>
-									<button type="button" className="cp-btn" title={t("Edit selected modulation")} disabled>
+									<button type="button" className="cp-btn" title={t("Edit selected modulation")}>
 										✎
 									</button>
-									<button type="button" className="cp-btn cp-btn--danger" title={t("Delete selected modulation")} disabled>
+									<button 
+										type="button" className="cp-btn cp-btn--danger" 
+										onMouseDown={ (e)=> deleteThisModulation(e) }
+										title={t("Delete selected modulation")}
+									 	disabled={
+											macrosStore?.technology?.modulationMacros.length === 1
+										}
+									 >
 										🗑
 									</button>
 								</div>

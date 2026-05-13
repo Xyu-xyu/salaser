@@ -766,6 +766,7 @@ const ru = {
     "FIXED_FILL": "Фиксирванное",
     "ENERGY_PER_MM": "Энергия на мм",
     "Curve": "Изгиб",
-    "Table": "Таблица"
+    "Table": "Таблица",
+    "Modulation selection": "Выбор модуляции",
 }
 export default ru;

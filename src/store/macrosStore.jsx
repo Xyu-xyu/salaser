@@ -116,17 +116,25 @@ class MacrosStore {
             console.log (data)
         } catch (err) {
             this.error = err.message || "Неизвестная ошибка";
-           /*  showToast({
+            /*  showToast({
                 type: 'error',
                 message: "Upload settings from core error",
                 position: 'bottom-right',
                 autoClose: 2500
             }); */
-        console.log ( "Upload settings from core error" + err.message)
+            //console.log ( "Upload settings from core error" + err.message)
+            //alert("OOOOPS")
             // remove in production
             //macrosStore.cut_settings = cut_settings;
             //macrosStore.technology = cut_settings.technology
-            macrosStore.setCutSettings(cut_settings)
+            //macrosStore.setCutSettings(cut_settings)
+            showToast({
+                type: 'error',
+                message: "Upload settings form core error!",
+                position: 'bottom-right',
+                autoClose: 2500
+            }); 
+
         } finally {
             this.loading = false;
         }
@@ -374,6 +382,7 @@ class MacrosStore {
     }
 
     setValString(param, newVal, keyParam, ind = false) {
+        //console.log (arguments+" ")
         if (keyParam === 'macros') {
             const macro = this.technology.macros[this.selectedMacros];
             if (param in macro.cutting) {
@@ -537,6 +546,8 @@ class MacrosStore {
             fill_percent: 50
         };
     
+        //console.log (arguments)
+
         let arr = [
             ...this.technology.macros[this.selectedMacros].cutting[param]
         ];
@@ -546,6 +557,18 @@ class MacrosStore {
             arr = [];
     
         } else if (mode === "add") {
+
+            let maxItems = utils.deepFind(false, ["fillCurve", "maxItems"])
+            if (arr.length >= maxItems) {
+               
+                showToast({
+                    type: 'warning',
+                    message: "Maximum value reached!",
+                    position: 'bottom-right',
+                    autoClose: 2500
+                });
+                return
+            }
     
             arr.push(def);
             // unique

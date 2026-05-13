@@ -750,6 +750,15 @@ height: fit-content;}
   color: white;
 }
 
+.notInUseInOption {
+  color: var(--grey-nav);  
+}
+
+.currentMacrosInOption {
+  color:  rgba(19,191,17,1);
+ 
+}
+
 .modal-content {
   /* background-color: rgb(244, 244, 247); */
   background-color: rgb(244, 244, 247);
