@@ -717,6 +717,10 @@ const zh = {
     "Minimum value: 0.1": "最小值：0.1",
     "Minimum value: 0": "最小值：0",
     "МЗаполнение, %": "市场份额, %",
-    "Минимальная длина: 1": "最小数量: 1"
+    "Минимальная длина: 1": "最小数量: 1",
+    "Incut": "切入",
+    "Piercing macro selection": "穿孔宏选择",
+    "Stages": "阶段",
+    "Initial parameters": "初始参数"
 }
 export default zh;

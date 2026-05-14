@@ -17,36 +17,36 @@ const SettingsAltButton = observer(() => {
 	const showModal = () => setShow(true);
 	const [expanded, setExpanded] = useState(false);
 
-	const { modulationMacroinUse, selectedModulationMacro } = macrosStore
+	const { modulationMacroinUse, selectedModulationMacro, piercingMacroinUse, selectedPiercingMacro } = macrosStore
 
 	const deleteThisModulation = (e) => {
 		e.stopPropagation();
-		macrosStore.setModalProps ({
-			show:true,
+		macrosStore.setModalProps({
+			show: true,
 			modalBody: 'Do you want to delete this modulation?',
 			confirmText: 'Delete',
-			cancelText:'Cancel',
+			cancelText: 'Cancel',
 			func: macrosStore.deleteAndUpdate,
-			args:['modulationMacros', selectedModulationMacro, 'modulationMacro']
-	   })
-   }
-
-
-   const cloneThisModulation = (e) => {
-		e.stopPropagation();
-		macrosStore.setModalProps ({
-			show:true,
-			modalBody: 'Do you want to copy and add this modulation?',
-			confirmText: 'Copy',
-			cancelText:'Cancel',
-			func: macrosStore.AddAndUpdate,
-			args:['modulationMacros', selectedModulationMacro, 'modulationMacro']
-	})
+			args: ['modulationMacros', selectedModulationMacro, 'modulationMacro']
+		})
 	}
 
-	useEffect(()=>{
+
+	const cloneThisModulation = (e) => {
+		e.stopPropagation();
+		macrosStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to copy and add this modulation?',
+			confirmText: 'Copy',
+			cancelText: 'Cancel',
+			func: macrosStore.AddAndUpdate,
+			args: ['modulationMacros', selectedModulationMacro, 'modulationMacro']
+		})
+	}
+
+	useEffect(() => {
 		macrosStore.loadCutSettings()
-	},[])
+	}, [])
 
 	const macros = macrosStore?.technology?.macros ?? [];
 	const selectedMacroIdx = macrosStore?.selectedMacros ?? 0;
@@ -152,49 +152,376 @@ const SettingsAltButton = observer(() => {
 				show={show}
 				onHide={handleClose}
 				id="settingsAltButtonModal"
-				className={`with-inner-backdrop settingsAltButton-navbar-modal ${expanded ? " expanded" :""}`}
-				centered={false}				
+				className={`with-inner-backdrop settingsAltButton-navbar-modal ${expanded ? " expanded" : ""}`}
+				centered={false}
 			>
 				<div className="p-2">
-				<div className="drawer-body">
-					<div className="rt-modal-topbar">
-						<button
-							type="button"
-							className="rt-mode-toggle"
-							onClick={() => setExpanded((v) => !v)}
-						>
-							{expanded ? t("Compact") : t("Expanded")}
-						</button>
-					</div>
-					{!expanded && <div className="rt-macros" aria-label="Макросы">
-						<div className="rt-macros__label">{t("Macros")}</div>
-						<div className={`rt-macros__grid ${expanded ? "is-col" : ""}`} id="rt_macros_grid">
-							{macros.map((_, idx) => (
-								<button
-									key={idx}
-									type="button"
-									className={`rt-macro-tile ${idx === selectedMacroIdx ? "is-active" : ""}`}
-									id={`rt_macro_tile_${idx}`}
-									data-macro={idx}
-									onClick={() => macrosStore.setVal("selector", idx, minimum, maximum)}
-								>
-									<div className="rt-macro-tile__top">
-										<span className={`rt-macro__dot is-m${idx}`} aria-hidden="true"></span>
-										<span className="rt-macro-tile__idx">{idx}</span>
-									</div>
-									<div className="rt-macro-tile__name">{macroName(idx)}</div>
-								</button>
-							))}
+					<div className="drawer-body">
+						<div className="rt-modal-topbar">
+							<button
+								type="button"
+								className="rt-mode-toggle"
+								onClick={() => setExpanded((v) => !v)}
+							>
+								{expanded ? t("Compact") : t("Expanded")}
+							</button>
 						</div>
-					</div>}
-				</div> 
-				{expanded && (
-					<div className="drawer-body d-flex">
+						{expanded && (
+							<div>
+								<div className="drawer-body d-flex">
+									<div className="cp-section" style={{ width: "150px" }}						>
+										<div className="">
+											<div className="rt-macros__label">{t("Macros")}</div>
+											{macros.map((_, idx) => (
+												<button
+													key={idx}
+													type="button"
+													className={`rt-macro-tile ${idx === selectedMacroIdx ? "is-active" : ""}`}
+													id={`rt_macro_tile_${idx}`}
+													data-macro={idx}
+													onClick={() => macrosStore.setVal("selector", idx, minimum, maximum)}
+												>
+													<div className="rt-macro-tile__top">
+														<span className={`rt-macro__dot is-m${idx}`} aria-hidden="true"></span>
+														<span className="rt-macro-tile__idx">{idx}</span>
+													</div>
+													<div className="rt-macro-tile__name">{macroName(idx)}</div>
+												</button>
+											))}
+										</div>
+									</div>
+									<div className="d-flex flex-column">
+										<div className="d-flex">
+											<div className="cp-section" style={{ width: "750px" }}						>
+												<div className="rt-macros__label">{t("Cutting parameters")}</div>
+												<div className="cp-section__body cp-cols3">
+													{/* enabled */}
+													<div className="cp-field cp-field--toggle">
+														<label className="cp-field__label">{t("Macro enabled")}</label>
+														<label className="cp-toggle">
+															<input
+																type="checkbox"
+																checked={Boolean(macrosStore.getTecnologyValue("enabled", "macros"))}
+																onChange={(e) => macrosStore.setValBoolean("enabled", e.target.checked)}
+															/>
+															<span className="cp-toggle__track"></span>
+														</label>
+													</div>
 
-						<div className="cp-section"	style={{width:"150px"}}						>
-							<div className="">
-								<div className="rt-macros__label">{t("Macros")}</div>							
-								{macros.map((_, idx) => (
+
+													{/* type */}
+													<div className="cp-field cp-field--enum">
+														<label className="cp-field__label">{t("Type")}</label>
+														<select
+															className="cp-input"
+															value={String(macrosStore.getTecnologyValue("type", "macros") ?? "")}
+															onChange={(e) => macrosStore.setValString("type", e.target.value, "macros")}
+														>
+															{//enumOptions("type")
+																["CW", "PULSE", "ENGRAVEING", "VAPOR", "EDGING"]
+																	.map((opt) => (
+																		<option key={opt} value={opt}>
+																			{t(opt)}
+																		</option>
+																	))}
+														</select>
+													</div>
+
+													{/* cross_blow */}
+													<div className="cp-field cp-field--toggle">
+														<label className="cp-field__label">{t(getMeta("cross_blow").title)}</label>
+														<label className="cp-toggle">
+															<input
+																type="checkbox"
+																checked={Boolean(macrosStore.getTecnologyValue("cross_blow", "macros"))}
+																onChange={(e) => macrosStore.setValBoolean("cross_blow", e.target.checked)}
+															/>
+															<span className="cp-toggle__track"></span>
+														</label>
+													</div>
+
+													{/* gas */}
+													<div className="cp-field cp-field--enum">
+														<label className="cp-field__label">{t(getMeta("gas").title)}</label>
+														<select
+															className="cp-input"
+															value={String(macrosStore.getTecnologyValue("gas", "macros") ?? "")}
+															onChange={(e) => macrosStore.setValString("gas", e.target.value, "macros")}
+														>
+															{enumOptions("gas").map((opt) => (
+																<option key={opt} value={opt}>
+																	{t(opt)}
+																</option>
+															))}
+														</select>
+													</div>
+
+													{/* numbers */}
+													{[
+														"pressure",
+														"power_W_mm",
+														"feedLimit_mm_s",
+														"height",
+														"focus",
+													].map((k) => {
+														const meta = getMeta(k);
+														const value = macrosStore.getTecnologyValue(k, "macros");
+														const step = Number(macrosStore?.knobStep?.[k] ?? 1);
+
+														return (
+															<div key={k} className="cp-field cp-field--number">
+																<label className="cp-field__label">{t(meta.title)}</label>
+																<input
+																	type="number"
+																	className="cp-input"
+																	min={meta.minimum}
+																	max={meta.maximum}
+																	step={step}
+																	value={Number(value)}
+																	onChange={(e) => setNumberValue(k, e.target.value)}
+																/>
+															</div>
+														);
+													})}
+												</div>
+											</div>
+											<div className="cp-section" style={{ width: "330px" }}		>
+												<div className="rt-macros__label">{t("Cutting parameters")}:{t("Filling")}</div>
+												<div className="cp-section__body">
+
+													{/* fillMode */}
+													<div className="cp-field cp-field--enum">
+														<label className="cp-field__label">{t(getMeta("fillMode").title)}</label>
+														<select
+															className="cp-input"
+															value={String(macrosStore.getTecnologyValue("fillMode", "macros") ?? "")}
+															onChange={(e) => macrosStore.setValString("fillMode", e.target.value, "macros")}
+														>
+															{enumOptions("fillMode").map((opt) => (
+																<option key={opt} value={opt}>
+																	{t(opt)}
+																</option>
+															))}
+														</select>
+													</div>
+													{macrosStore.getTecnologyValue("fillMode", "macros") === 'CURVE' &&
+														<div className="">
+															<div className="cp-curve__tabs">
+
+																<button type="button" className={`cp-curve__tab ${fillMode === "table" ? "is-active" : ""}`}
+																	onMouseDown={() => { setFillMode("table") }}
+																>
+																	{t("Table")}
+																</button>
+
+																<button type="button" className={`cp-curve__tab ${fillMode === "curve" ? "is-active" : ""}`}
+																	onMouseDown={() => { setFillMode("curve") }}
+																>
+																	{t("CURVE")}
+																</button>
+
+															</div>
+															<div className="cp-section__body">
+																{fillMode === "table" &&
+																	<div className="cp-curve__points" style={{}}>
+																		<div className="d-flex w-100 justify-content-evenly">
+																			<div className="cp-field__label">{t("Speed")}, {t("мм/с")}</div>
+																			<div className="cp-field__label">{t("Filling")}, %</div>
+																		</div>
+
+																		{
+
+																			macrosStore.getTecnologyValue("fillCurve", "macros")
+																				.map((a, i) => {
+																					return (
+
+																						<div className="cp-curve__points__head d-flex m-1"
+																							key={i}
+																						>
+
+																							<input type="number"
+																								className="cp-input"
+																								min={0}
+																								max={200000}
+																								step={1}
+																								value={a.speed_mm_s}
+																								onChange={(e) => {
+																									macrosStore.setTecnologyValueForFillCurve(
+																										'update',
+																										'speed_mm_s',
+																										i,
+																										e.target.value
+																									)
+																								}}
+																							/>
+
+																							<input
+																								type="number"
+																								className="cp-input ms-1"
+																								min={0} max={100}
+																								step="0.1"
+																								value={a.fill_percent}
+																								onChange={(e) => {
+																									macrosStore.setTecnologyValueForFillCurve(
+																										'update',
+																										'fill_percent',
+																										i,
+																										e.target.value
+																									)
+																								}}
+																							/>
+																							<button
+																								type="button"
+																								className="cp-btn cp-btn--danger ms-1"
+																								onClick={() => macrosStore.setTecnologyValueForFillCurve("delete", false, i)}
+																							>
+																								×
+																							</button>
+																						</div>)
+
+																				})
+
+																		}
+
+																	</div>
+																}
+
+																{fillMode === "curve" && <CustomChartinFill />}
+															</div>
+															<div className="cp-curve__controls">
+																<button type="button" className="cp-btn cp-btn--primary"
+																	onClick={() => macrosStore.setTecnologyValueForFillCurve("add")}
+																>
+																	+ {t("Point")}
+																</button>
+																<button type="button" className="cp-btn"
+																	onClick={() => macrosStore.setTecnologyValueForFillCurve("sort")}
+																>
+																	{t("Sort")}
+																</button>
+																<button type="button" className="cp-btn cp-btn--danger"
+																	onClick={() => macrosStore.setTecnologyValueForFillCurve("clear")}
+																>
+																	{t("Clear")}
+																</button>
+															</div>
+														</div>
+
+													}
+												</div>
+											</div>
+											<div className="cp-section">
+												<div className="rt-macros__label">{t("Modulation")}</div>
+												<div className="cp-section__body">
+													<div className="cp-field cp-field--number">
+														<label className="cp-field__label">{t(getMeta("modulationFrequency_Hz").title)}</label>
+														<input
+															type="number"
+															className="cp-input"
+															min={getMeta("modulationFrequency_Hz").minimum}
+															max={getMeta("modulationFrequency_Hz").maximum}
+															step={Number(macrosStore?.knobStep?.["modulationFrequency_Hz"] ?? 1)}
+															value={Number(macrosStore.getTecnologyValue("modulationFrequency_Hz", "macros"))}
+															onChange={(e) => setNumberValue("modulationFrequency_Hz", e.target.value)}
+														/>
+													</div>
+
+													<div className="cp-select-with-actions">
+														<div className="cp-field cp-field--enum">
+															<label className="cp-field__label">{t("Modulation selection")}</label>
+															<select
+																className="cp-input"
+																value={String(macrosStore.getTecnologyValue("modulationMacro", "macros") ?? 0)}
+																onChange={(e) => setEnumIndex("modulationMacro", e.target.value)}
+															>
+																{(macrosStore?.technology?.modulationMacros ?? []).map((m, idx) => (
+																	<option key={idx} value={idx}
+																		className={(modulationMacroinUse.includes(idx) ? (idx === selectedPiercingMacro ? "currentMacrosInOption" : "") : "notInUseInOption")}
+																	>
+																		#{idx} · {m?.name ?? "Unknown piercing macro"}
+																	</option>
+																))}
+															</select>
+														</div>
+														<button
+															type="button"
+															className="cp-btn cp-btn--primary"
+															title={t("Create new modulation macro")}
+															onMouseDown={(e) => cloneThisModulation(e)}
+															disabled={
+																modMacroMax === macrosStore?.technology?.modulationMacros.length
+															}
+														>
+															+
+														</button>
+														<ModMacroEditBtnInAltSett />
+														<button
+															type="button" className="cp-btn cp-btn--danger"
+															onMouseDown={(e) => deleteThisModulation(e)}
+															title={t("Delete selected modulation")}
+															disabled={
+																macrosStore?.technology?.modulationMacros.length === 1
+															}
+														>
+															🗑
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div div className="d-flex">
+											<div className="cp-section" style={{ width: "750px" }}						>
+												<div className="">
+													<div className="rt-macros__label">{t("Incut")}</div>
+													<div className="cp-section__body">
+														<div className="cp-field cp-field--number">
+															<div className="d-flex flex-column">
+																<div className="cp-select-with-actions">
+																	<div className="cp-field cp-field--enum">
+																		<label className="cp-field__label">{t("Piercing macro selection")}</label>
+																		<select
+																			className="cp-input"
+																			value={String(macrosStore.getTecnologyValue("piercingMacro", "macros") ?? 0)}
+																			onChange={(e) => setEnumIndex("piercingMacro", e.target.value)}
+																		>
+																			{(macrosStore?.technology?.piercingMacros ?? []).map((m, idx) => (
+																				<option key={idx} value={idx}
+																					className={(piercingMacroinUse.includes(idx) ? (idx === selectedPiercingMacro ? "currentMacrosInOption" : "") : "notInUseInOption")}
+																				>
+																					#{idx} · {m?.name ?? "Unknown modulation macro"}
+																				</option>
+																			))}
+																		</select>
+																	</div>
+																</div>
+																<div className="d-flex mt-2">
+																	<div>
+																		<div className="cp-section" style={{ width: "250px" }}						>
+																			<div className="rt-macros__label">{t("Initial parameters")}</div>																			
+																		</div>
+																	</div>
+																	<div>
+																		<div className="cp-section" style={{ width: "750px" }}						>
+																			<div className="rt-macros__label">{t("Stages")}</div>																			
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						)}
+						<div className="d-flex">
+							{!expanded && <div className="rt-macros" aria-label="Макросы" style={{ width: "300px" }}>
+								<div className="rt-macros__label">{t("Macros")}</div>
+								<div className={`rt-macros__grid ${expanded ? "is-col" : ""}`} id="rt_macros_grid">
+									{macros.map((_, idx) => (
 										<button
 											key={idx}
 											type="button"
@@ -211,406 +538,151 @@ const SettingsAltButton = observer(() => {
 										</button>
 									))}
 								</div>
-						</div>
-						<div className="cp-section"	style={{width:"750px"}}						> 
-							<div className="rt-macros__label">{t("Cutting parameters")}</div>
-							<div className="cp-section__body cp-cols3">
-								{/* enabled */}
-								<div className="cp-field cp-field--toggle">
-									<label className="cp-field__label">{t("Macro enabled")}</label>
-									<label className="cp-toggle">
-										<input
-											type="checkbox"
-											checked={Boolean(macrosStore.getTecnologyValue("enabled", "macros"))}
-											onChange={(e) => macrosStore.setValBoolean("enabled", e.target.checked)}
-										/>
-										<span className="cp-toggle__track"></span>
-									</label>
-								</div>
-
-
-								{/* type */}
-								<div className="cp-field cp-field--enum">
-									<label className="cp-field__label">{t("Type")}</label>
-									<select
-										className="cp-input"
-										value={String(macrosStore.getTecnologyValue("type", "macros") ?? "")}
-										onChange={(e) => macrosStore.setValString("type", e.target.value, "macros")}
-									>
-										{//enumOptions("type")
-										["CW", "PULSE", "ENGRAVEING", "VAPOR", "EDGING"]
-										.map((opt) => (
-											<option key={opt} value={opt}>
-												{t(opt)}
-											</option>
-										))}
-									</select>
-								</div>
-
-								{/* cross_blow */}
-								<div className="cp-field cp-field--toggle">
-									<label className="cp-field__label">{t(getMeta("cross_blow").title)}</label>
-									<label className="cp-toggle">
-										<input
-											type="checkbox"
-											checked={Boolean(macrosStore.getTecnologyValue("cross_blow", "macros"))}
-											onChange={(e) => macrosStore.setValBoolean("cross_blow", e.target.checked)}
-										/>
-										<span className="cp-toggle__track"></span>
-									</label>
-								</div>
-
-								{/* gas */}
-								<div className="cp-field cp-field--enum">
-									<label className="cp-field__label">{t(getMeta("gas").title)}</label>
-									<select
-										className="cp-input"
-										value={String(macrosStore.getTecnologyValue("gas", "macros") ?? "")}
-										onChange={(e) => macrosStore.setValString("gas", e.target.value, "macros")}
-									>
-										{enumOptions("gas").map((opt) => (
-											<option key={opt} value={opt}>
-												{t(opt)}
-											</option>
-										))}
-									</select>
-								</div>
-
-								{/* numbers */}
-								{[
-									"pressure",
-									"power_W_mm",
-									"feedLimit_mm_s",
-									"height",
-									"focus",
-								].map((k) => {
-									const meta = getMeta(k);
-									const value = macrosStore.getTecnologyValue(k, "macros");
-									const step = Number(macrosStore?.knobStep?.[k] ?? 1);
-
-									return (
-										<div key={k} className="cp-field cp-field--number">
-											<label className="cp-field__label">{t(meta.title)}</label>
-											<input
-												type="number"
-												className="cp-input"
-												min={meta.minimum}
-												max={meta.maximum}
-												step={step}
-												value={Number(value)}
-												onChange={(e) => setNumberValue(k, e.target.value)}
-											/>
-										</div>
-									);
-								})}
-							</div>
-						</div>
-
-
-						<div className="cp-section" style={{width:"330px"}}		>
-							<div  className="rt-macros__label">{t("Cutting parameters")}:{t("Filling")}</div>
-							<div className="cp-section__body">
-
-									{/* fillMode */}
-								<div className="cp-field cp-field--enum">
-									<label className="cp-field__label">{t(getMeta("fillMode").title)}</label>
-									<select
-										className="cp-input"
-										value={String(macrosStore.getTecnologyValue("fillMode", "macros") ?? "")}
-										onChange={(e) => macrosStore.setValString("fillMode", e.target.value, "macros")}
-									>
-										{enumOptions("fillMode").map((opt) => (
-											<option key={opt} value={opt}>
-												{t(opt)}
-											</option>
-										))}
-									</select>
-								</div>
-								{macrosStore.getTecnologyValue("fillMode", "macros") === 'CURVE' &&
-									<div className="">
-										<div className="cp-curve__tabs">
-
-											<button type="button" className={`cp-curve__tab ${ fillMode=== "table" ? "is-active" : ""}`}
-												onMouseDown={()=>{ setFillMode("table") }}	
-											>
-												{t("Table")}
-											</button>
-
-											<button type="button" className={`cp-curve__tab ${ fillMode=== "curve" ? "is-active" : ""}`}
-												onMouseDown={()=>{ setFillMode("curve") }}	
-											>
-												{t("CURVE")}
-											</button>
-
-										</div>
-										<div className="cp-section__body">
-											{ fillMode=== "table" && 
-												<div className="cp-curve__points" style={{}}>
-													<div className="d-flex w-100 justify-content-evenly">
-														<div className="cp-field__label">{t("Speed")}, {t("мм/с")}</div>
-														<div className="cp-field__label">{t("Filling")}, %</div>
-													</div>
-													
-												{
-													
-													macrosStore.getTecnologyValue("fillCurve", "macros")
-													.map((a, i)=>{
-														return (
-														
-															<div className="cp-curve__points__head d-flex m-1"
-															key={i}
+							</div>}
+							{!expanded && (
+								<div className="rt-macros">
+									<div className="rt-macros__label">{t("Parameters")}</div>
+									<div className="rt-grid" aria-label={t("Parameters")}>
+										{params.map(({ key, domId, valId, type }) => {
+											const meta = getMeta(key);
+											const value = macrosStore.getTecnologyValue(key, "macros");
+											const isActive = activeParam === key;
+											{
+												!expanded && <div className="rt-macros" aria-label="Макросы">
+													<div className="rt-macros__label">{t("Macros")}</div>
+													<div className={`rt-macros__grid ${expanded ? "is-col" : ""}`} id="rt_macros_grid">
+														{macros.map((_, idx) => (
+															<button
+																key={idx}
+																type="button"
+																className={`rt-macro-tile ${idx === selectedMacroIdx ? "is-active" : ""}`}
+																id={`rt_macro_tile_${idx}`}
+																data-macro={idx}
+																onClick={() => macrosStore.setVal("selector", idx, minimum, maximum)}
 															>
+																<div className="rt-macro-tile__top">
+																	<span className={`rt-macro__dot is-m${idx}`} aria-hidden="true"></span>
+																	<span className="rt-macro-tile__idx">{idx}</span>
+																</div>
+																<div className="rt-macro-tile__name">{macroName(idx)}</div>
+															</button>
+														))}
+													</div>
+												</div>
+											}
+											if (type === "enum") {
+												const options = utils.deepFind(false, ["macros", key, "enum"]) ?? [];
+												const safeOptions = Array.isArray(options) ? options : [];
+												const current = typeof value === "string" ? value : String(value ?? "");
 
-																<input type="number" 
-																	className="cp-input" 
-																	min={0} 
-																	max={200000} 
-																	step={1} 
-																	value={a.speed_mm_s}
-																	onChange={(e)=>{ 
-																		macrosStore.setTecnologyValueForFillCurve(
-																			'update', 
-																			'speed_mm_s', 
-																			i,
-																			e.target.value
-																		)}}
-																	/>
-																	
-																<input 
-																	type="number" 
-																	className="cp-input ms-1" 
-																	min={0} max={100} 
-																	step="0.1" 
-																	value={a.fill_percent}
-																	onChange={(e)=>{ 
-																		macrosStore.setTecnologyValueForFillCurve(
-																			'update', 
-																			'fill_percent', 
-																			i,
-																			e.target.value
-																		)}}
-																	/>
-																<button
-																	type="button"
-																	className="cp-btn cp-btn--danger ms-1"
-																	onClick={ ()=> macrosStore.setTecnologyValueForFillCurve("delete", false, i) }
-																>
-																×
-																</button>
-															</div>)
-
-													})
-											
-												}
-
-											</div>
+												return (
+													<div
+														key={key}
+														title={meta.description || meta.title}
+														className={`rt-tile ${isActive ? "is-active" : ""}`}
+														id={domId}
+														data-param={key}
+														onClick={() => setActiveParam(key)}
+													>
+														<div className="rt-tile__label">{t(meta.title)}</div>
+														<div className="rt-tile__value">
+															<select
+																className="rt-tile__select"
+																value={current}
+																onClick={(e) => e.stopPropagation()}
+																onChange={(e) => macrosStore.setValString(key, e.target.value, "macros")}
+															>
+																{safeOptions.map((opt) => (
+																	<option key={opt} value={opt}>
+																		{t(opt)}
+																	</option>
+																))}
+															</select>
+														</div>
+													</div>
+												);
 											}
 
-										{ fillMode=== "curve" &&  <CustomChartinFill />}
-										</div>
-										<div className="cp-curve__controls">
-											<button type="button" className="cp-btn cp-btn--primary"
-												onClick={ ()=> macrosStore.setTecnologyValueForFillCurve("add") }
-											>
-												+ {t("Point")}
-											</button>
-											<button type="button" className="cp-btn"
-												onClick={ ()=> macrosStore.setTecnologyValueForFillCurve("sort") }
-											>
-												{t("Sort")}
-											</button>
-											<button type="button" className="cp-btn cp-btn--danger"
-												onClick={ ()=> macrosStore.setTecnologyValueForFillCurve("clear") }
-											>
-												{t("Clear")}
-											</button>
-										</div>
-									</div>
+											if (type === "boolean") {
+												const checked = Boolean(value);
+												return (
+													<div
+														key={key}
+														title={meta.description || meta.title}
+														className={`rt-tile rt-tile--checkbox ${isActive ? "is-active" : ""} ${checked ? "is-checked" : ""}`}
+														id={domId}
+														data-param={key}
+														onClick={() => setActiveParam(key)}
+													>
+														<div className="rt-tile__label">{t(meta.title)}</div>
+														<div className="rt-tile__value">
+															<input
+																type="checkbox"
+																className="rt-tile__checkbox"
+																checked={checked}
+																onChange={(e) => {
+																	macrosStore.setValBoolean(key, e.target.checked);
+																}}
+															/>
+															<span
+																className="rt-tile__checkbox-indicator"
+																onClick={(e) => {
+																	e.stopPropagation();
+																	macrosStore.setValBoolean(key, !checked);
+																}}
+															/>
+														</div>
+													</div>
+												);
+											}
 
-								}							
-							</div>
-						</div>
-						<div className="cp-section">
-							<div  className="rt-macros__label">{t("Modulation")}</div>
-							<div className="cp-section__body">
-								<div className="cp-field cp-field--number">
-									<label className="cp-field__label">{t(getMeta("modulationFrequency_Hz").title)}</label>
-									<input
-										type="number"
-										className="cp-input"
-										min={getMeta("modulationFrequency_Hz").minimum}
-										max={getMeta("modulationFrequency_Hz").maximum}
-										step={Number(macrosStore?.knobStep?.["modulationFrequency_Hz"] ?? 1)}
-										value={Number(macrosStore.getTecnologyValue("modulationFrequency_Hz", "macros"))}
-										onChange={(e) => setNumberValue("modulationFrequency_Hz", e.target.value)}
-									/>
-								</div>
-
-								<div className="cp-select-with-actions">
-									<div className="cp-field cp-field--enum">
-										<label className="cp-field__label">{t("Modulation selection")}</label>
-										<select
-											className="cp-input"
-											value={String(macrosStore.getTecnologyValue("modulationMacro", "macros") ?? 0)}
-											onChange={(e) => setEnumIndex("modulationMacro", e.target.value)}
-										>
-											{(macrosStore?.technology?.modulationMacros ?? []).map((m, idx) => (
-												<option key={idx} value={idx}
-													className={(modulationMacroinUse.includes(idx) ? (idx === selectedModulationMacro ? "currentMacrosInOption" : "") : "notInUseInOption")} 
+											return (
+												<div
+													key={key}
+													title={meta.description || meta.title}
+													className={`rt-tile ${isActive ? "is-active" : ""}`}
+													id={domId}
+													data-param={key}
+													onClick={() => setActiveParam(key)}
 												>
-													#{idx} · {m?.name ?? "Unknown modulation macro"}
-												</option>
-											))}
-										</select>
+													<div className="rt-tile__label">{t(meta.title)}</div>
+													<div className="rt-tile__value">
+														<span id={valId}>{value}</span>
+													</div>
+													<div className="rt-tile__adjust">
+														<button
+															type="button"
+															className="rt-tile__stepbtn"
+															aria-label={t("Increase")}
+															onClick={(e) => {
+																e.stopPropagation();
+																bump(key, +1);
+															}}
+														>
+															+
+														</button>
+														<button
+															type="button"
+															className="rt-tile__stepbtn"
+															aria-label={t("Decrease")}
+															onClick={(e) => {
+																e.stopPropagation();
+																bump(key, -1);
+															}}
+														>
+															−
+														</button>
+													</div>
+												</div>
+											);
+										})}
 									</div>
-									<button
-										type="button"
-										className="cp-btn cp-btn--primary"
-										title={t("Create new modulation macro")}
-										onMouseDown={ (e)=> cloneThisModulation(e) }
-										disabled={
-											modMacroMax === macrosStore?.technology?.modulationMacros.length
-										}
-									>
-										+
-									</button>
-									<ModMacroEditBtnInAltSett />
-									<button 
-										type="button" className="cp-btn cp-btn--danger" 
-										onMouseDown={ (e)=> deleteThisModulation(e) }
-										title={t("Delete selected modulation")}
-									 	disabled={
-											macrosStore?.technology?.modulationMacros.length === 1
-										}
-									 >
-										🗑
-									</button>
 								</div>
-							</div>
+							)}
+
 						</div>
 					</div>
-				)}
-				{!expanded && (
-					<div className="drawer-body pt-0">
-						<div className="rt-macros__label">{t("Parameters")}</div>
-						<div className="rt-grid" aria-label={t("Parameters")}>
-							{params.map(({ key, domId, valId, type }) => {
-								const meta = getMeta(key);
-								const value = macrosStore.getTecnologyValue(key, "macros");
-								const isActive = activeParam === key;
-
-								if (type === "enum") {
-									const options = utils.deepFind(false, ["macros", key, "enum"]) ?? [];
-									const safeOptions = Array.isArray(options) ? options : [];
-									const current = typeof value === "string" ? value : String(value ?? "");
-
-									return (
-										<div
-											key={key}
-											title={meta.description || meta.title}
-											className={`rt-tile ${isActive ? "is-active" : ""}`}
-											id={domId}
-											data-param={key}
-											onClick={() => setActiveParam(key)}
-										>
-											<div className="rt-tile__label">{t(meta.title)}</div>
-											<div className="rt-tile__value">
-												<select
-													className="rt-tile__select"
-													value={current}
-													onClick={(e) => e.stopPropagation()}
-													onChange={(e) => macrosStore.setValString(key, e.target.value, "macros")}
-												>
-													{safeOptions.map((opt) => (
-														<option key={opt} value={opt}>
-															{t(opt)}
-														</option>
-													))}
-												</select>
-											</div>
-										</div>
-									);
-								}
-
-								if (type === "boolean") {
-									const checked = Boolean(value);
-									return (
-										<div
-											key={key}
-											title={meta.description || meta.title}
-											className={`rt-tile rt-tile--checkbox ${isActive ? "is-active" : ""} ${checked ? "is-checked" : ""}`}
-											id={domId}
-											data-param={key}
-											onClick={() => setActiveParam(key)}
-										>
-											<div className="rt-tile__label">{t(meta.title)}</div>
-											<div className="rt-tile__value">
-												<input
-													type="checkbox"
-													className="rt-tile__checkbox"
-													checked={checked}
-													onChange={(e) => {
-														macrosStore.setValBoolean(key, e.target.checked);
-													}}
-												/>
-												<span
-													className="rt-tile__checkbox-indicator"
-													onClick={(e) => {
-														e.stopPropagation();
-														macrosStore.setValBoolean(key, !checked);
-													}}
-												/>
-											</div>
-										</div>
-									);
-								}
-
-								return (
-									<div
-										key={key}
-										title={meta.description || meta.title}
-										className={`rt-tile ${isActive ? "is-active" : ""}`}
-										id={domId}
-										data-param={key}
-										onClick={() => setActiveParam(key)}
-									>
-										<div className="rt-tile__label">{t(meta.title)}</div>
-										<div className="rt-tile__value">
-											<span id={valId}>{value}</span>
-										</div>
-										<div className="rt-tile__adjust">
-											<button
-												type="button"
-												className="rt-tile__stepbtn"
-												aria-label={t("Increase")}
-												onClick={(e) => {
-													e.stopPropagation();
-													bump(key, +1);
-												}}
-											>
-												+
-											</button>
-											<button
-												type="button"
-												className="rt-tile__stepbtn"
-												aria-label={t("Decrease")}
-												onClick={(e) => {
-													e.stopPropagation();
-													bump(key, -1);
-												}}
-											>
-												−
-											</button>
-										</div>
-									</div>
-								);
-							})}
-						</div>
-					</div>
-				)}
-
 				</div>
-
 			</Modal>
 		</div>
 	);

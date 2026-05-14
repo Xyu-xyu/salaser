@@ -790,6 +790,11 @@ const en = {
     "Minimum value: 0.1": "Minimum value: 0.1",
     "Minimum value: 0": "Minimum value: 0",
     "МЗаполнение, %": "МЗаполнение, %",
-    "Минимальная длина: 1": "Минимальная длина: 1"
+    "Минимальная длина: 1": "Минимальная длина: 1",
+    "Incut": "Incut",
+    "Piercing macro selection": "Piercing macro selection",
+    "Initial stage": "Initial stage",
+    "Stages": "Stages",
+    "Initial parameters": "Initial parameters"
 }
 export default en;
