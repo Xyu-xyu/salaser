@@ -7,6 +7,7 @@ import macrosStore from "../../store/macrosStore.jsx";
 import utils from "../../scripts/util.jsx";
 import CustomChartinFill from "../chart/customChartInFill.jsx"
 import ModMacroEditBtnInAltSett from "./modMacroEditBtnInAltSett.jsx"
+import IncutEditBtn from "./IncutEditBtn.jsx"
 
 
 const SettingsAltButton = observer(() => {
@@ -32,6 +33,19 @@ const SettingsAltButton = observer(() => {
 	}
 
 
+	const deleteThisPiercing = (e) => {
+		e.stopPropagation();
+		macrosStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to delete this piercing?',
+			confirmText: 'Delete',
+			cancelText: 'Cancel',
+			func: macrosStore.deleteAndUpdate,
+			args: ['piercingMacros', selectedPiercingMacro, 'piercingMacro']
+		})
+	}
+
+
 	const cloneThisModulation = (e) => {
 		e.stopPropagation();
 		macrosStore.setModalProps({
@@ -44,6 +58,18 @@ const SettingsAltButton = observer(() => {
 		})
 	}
 
+	const cloneThisPiercing = (e) => {
+		e.stopPropagation();
+		macrosStore.setModalProps({
+			show: true,
+			modalBody: 'Do you want to copy and add this piercing?',
+			confirmText: 'Copy',
+			cancelText: 'Cancel',
+			func: macrosStore.AddAndUpdate,
+			args: ['piercingMacros', selectedPiercingMacro, 'piercingMacro']
+		})
+	}
+
 	useEffect(() => {
 		macrosStore.loadCutSettings()
 	}, [])
@@ -53,6 +79,8 @@ const SettingsAltButton = observer(() => {
 	const minimum = 0;
 	const maximum = Math.max(0, macros.length - 1);
 	const modMacroMax = utils.deepFind(false, ["modulationMacros", "maxItems"])
+	const pierMacroMax = utils.deepFind(false, ["piercingMacros", "maxItems"])
+
 
 	const [activeParam, setActiveParam] = useState("pressure");
 
@@ -410,109 +438,125 @@ const SettingsAltButton = observer(() => {
 													}
 												</div>
 											</div>
-											<div className="cp-section">
-												<div className="rt-macros__label">{t("Modulation")}</div>
-												<div className="cp-section__body">
-													<div className="cp-field cp-field--number">
-														<label className="cp-field__label">{t(getMeta("modulationFrequency_Hz").title)}</label>
-														<input
-															type="number"
-															className="cp-input"
-															min={getMeta("modulationFrequency_Hz").minimum}
-															max={getMeta("modulationFrequency_Hz").maximum}
-															step={Number(macrosStore?.knobStep?.["modulationFrequency_Hz"] ?? 1)}
-															value={Number(macrosStore.getTecnologyValue("modulationFrequency_Hz", "macros"))}
-															onChange={(e) => setNumberValue("modulationFrequency_Hz", e.target.value)}
-														/>
-													</div>
 
-													<div className="cp-select-with-actions">
-														<div className="cp-field cp-field--enum">
-															<label className="cp-field__label">{t("Modulation selection")}</label>
-															<select
-																className="cp-input"
-																value={String(macrosStore.getTecnologyValue("modulationMacro", "macros") ?? 0)}
-																onChange={(e) => setEnumIndex("modulationMacro", e.target.value)}
-															>
-																{(macrosStore?.technology?.modulationMacros ?? []).map((m, idx) => (
-																	<option key={idx} value={idx}
-																		className={(modulationMacroinUse.includes(idx) ? (idx === selectedPiercingMacro ? "currentMacrosInOption" : "") : "notInUseInOption")}
-																	>
-																		#{idx} · {m?.name ?? "Unknown piercing macro"}
-																	</option>
-																))}
-															</select>
-														</div>
-														<button
-															type="button"
-															className="cp-btn cp-btn--primary"
-															title={t("Create new modulation macro")}
-															onMouseDown={(e) => cloneThisModulation(e)}
-															disabled={
-																modMacroMax === macrosStore?.technology?.modulationMacros.length
-															}
-														>
-															+
-														</button>
-														<ModMacroEditBtnInAltSett />
-														<button
-															type="button" className="cp-btn cp-btn--danger"
-															onMouseDown={(e) => deleteThisModulation(e)}
-															title={t("Delete selected modulation")}
-															disabled={
-																macrosStore?.technology?.modulationMacros.length === 1
-															}
-														>
-															🗑
-														</button>
-													</div>
-												</div>
-											</div>
-										</div>
+											
 
-										<div div className="d-flex">
-											<div className="cp-section" style={{ width: "750px" }}						>
-												<div className="">
-													<div className="rt-macros__label">{t("Incut")}</div>
+											<div className="d-flex flex-column">
+												<div className="cp-section">
+													<div className="rt-macros__label">{t("Modulation")}</div>
 													<div className="cp-section__body">
 														<div className="cp-field cp-field--number">
-															<div className="d-flex flex-column">
-																<div className="cp-select-with-actions">
-																	<div className="cp-field cp-field--enum">
-																		<label className="cp-field__label">{t("Piercing macro selection")}</label>
-																		<select
-																			className="cp-input"
-																			value={String(macrosStore.getTecnologyValue("piercingMacro", "macros") ?? 0)}
-																			onChange={(e) => setEnumIndex("piercingMacro", e.target.value)}
+															<label className="cp-field__label">{t(getMeta("modulationFrequency_Hz").title)}</label>
+															<input
+																type="number"
+																className="cp-input"
+																min={getMeta("modulationFrequency_Hz").minimum}
+																max={getMeta("modulationFrequency_Hz").maximum}
+																step={Number(macrosStore?.knobStep?.["modulationFrequency_Hz"] ?? 1)}
+																value={Number(macrosStore.getTecnologyValue("modulationFrequency_Hz", "macros"))}
+																onChange={(e) => setNumberValue("modulationFrequency_Hz", e.target.value)}
+															/>
+														</div>
+
+														<div className="cp-select-with-actions">
+															<div className="cp-field cp-field--enum">
+																<label className="cp-field__label">{t("Modulation selection")}</label>
+																<select
+																	className="cp-input"
+																	value={String(macrosStore.getTecnologyValue("modulationMacro", "macros") ?? 0)}
+																	onChange={(e) => setEnumIndex("modulationMacro", e.target.value)}
+																>
+																	{(macrosStore?.technology?.modulationMacros ?? []).map((m, idx) => (
+																		<option key={idx} value={idx}
+																			className={(modulationMacroinUse.includes(idx) ? (idx === selectedPiercingMacro ? "currentMacrosInOption" : "") : "notInUseInOption")}
 																		>
-																			{(macrosStore?.technology?.piercingMacros ?? []).map((m, idx) => (
-																				<option key={idx} value={idx}
-																					className={(piercingMacroinUse.includes(idx) ? (idx === selectedPiercingMacro ? "currentMacrosInOption" : "") : "notInUseInOption")}
-																				>
-																					#{idx} · {m?.name ?? "Unknown modulation macro"}
-																				</option>
-																			))}
-																		</select>
-																	</div>
-																</div>
-																<div className="d-flex mt-2">
-																	<div>
-																		<div className="cp-section" style={{ width: "250px" }}						>
-																			<div className="rt-macros__label">{t("Initial parameters")}</div>																			
+																			#{idx} · {m?.name ?? "Unknown piercing macro"}
+																		</option>
+																	))}
+																</select>
+															</div>
+															<button
+																type="button"
+																className="cp-btn cp-btn--primary"
+																title={t("Create new modulation macro")}
+																onMouseDown={(e) => cloneThisModulation(e)}
+																disabled={
+																	modMacroMax === macrosStore?.technology?.modulationMacros.length
+																}
+															>
+																+
+															</button>
+															<ModMacroEditBtnInAltSett />
+															<button
+																type="button" className="cp-btn cp-btn--danger"
+																onMouseDown={(e) => deleteThisModulation(e)}
+																title={t("Delete selected modulation")}
+																disabled={
+																	macrosStore?.technology?.modulationMacros.length === 1
+																}
+															>
+																🗑
+															</button>
+														</div>
+													</div>
+												</div>
+
+												<div className="cp-section" 					>
+													<div className="">
+														<div className="rt-macros__label">{t("Incut")}</div>
+														<div className="cp-section__body">
+															<div className="cp-field cp-field--number">
+																<div className="d-flex flex-column">
+																	<div className="cp-select-with-actions">
+																		<div className="cp-field cp-field--enum">
+																			<label className="cp-field__label">{t("Piercing macro selection")}</label>
+																			<select
+																				className="cp-input"
+																				value={String(macrosStore.getTecnologyValue("piercingMacro", "macros") ?? 0)}
+																				onChange={(e) => setEnumIndex("piercingMacro", e.target.value)}
+																			>
+																				{(macrosStore?.technology?.piercingMacros ?? []).map((m, idx) => (
+																					<option key={idx} value={idx}
+																						className={(piercingMacroinUse.includes(idx) ? (idx === selectedPiercingMacro ? "currentMacrosInOption" : "") : "notInUseInOption")}
+																					>
+																						#{idx} · {m?.name ?? "Unknown modulation macro"}
+																					</option>
+																				))}
+																			</select>
 																		</div>
-																	</div>
-																	<div>
-																		<div className="cp-section" style={{ width: "750px" }}						>
-																			<div className="rt-macros__label">{t("Stages")}</div>																			
-																		</div>
-																	</div>
+																		<button
+																			type="button"
+																			className="cp-btn cp-btn--primary"
+																			title={t("Create new modulation macro")}
+																			onMouseDown={(e) => cloneThisPiercing(e)}
+																			disabled={
+																				pierMacroMax === macrosStore?.technology?.piercingMacros.length
+																			}
+																		>
+																			+
+																		</button>
+																		<IncutEditBtn/>																			
+																		<button
+																			type="button" className="cp-btn cp-btn--danger"
+																			onMouseDown={(e) => deleteThisPiercing(e)}
+																			title={t("Delete selected ?")}
+																			disabled={
+																				macrosStore?.technology?.piercingMacros.length === 1
+																			}
+																		>
+																			🗑
+																		</button>
+
+																	</div>																
 																</div>
 															</div>
 														</div>
 													</div>
 												</div>
+
 											</div>
 										</div>
+										
 									</div>
 								</div>
 							</div>

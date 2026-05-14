@@ -53,6 +53,8 @@
   --accent:rgba(46, 46, 209, 0.7);
   --accent-contrast: #fff;
   --surface: #fff;
+  --surface2:#f2f2f4;
+  --border: rgba(0,0,0,0.12);
   
 }
 
@@ -762,6 +764,7 @@ height: fit-content;}
 .modal-content {
   /* background-color: rgb(244, 244, 247); */
   background-color: rgb(244, 244, 247);
+  padding: 6px;
 }
 
 
@@ -3651,7 +3654,8 @@ html[data-theme=dark] .cp-overlay {
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 6px;
-  margin-bottom: 12px;
+  margin: 6px;
+  padding: 6px;
   overflow: hidden
 }
 

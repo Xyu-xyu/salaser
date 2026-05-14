@@ -721,6 +721,10 @@ const zh = {
     "Incut": "切入",
     "Piercing macro selection": "穿孔宏选择",
     "Stages": "阶段",
-    "Initial parameters": "初始参数"
+    "Initial parameters": "初始参数",
+    "Delete selected ?": "删除选定的 ?",
+    "Do you want to delete this piercing?": "您想删除这个穿孔吗？",
+    "stages": "阶段",
+    "stg.": "stg。"
 }
 export default zh;

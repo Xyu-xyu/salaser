@@ -795,6 +795,10 @@ const en = {
     "Piercing macro selection": "Piercing macro selection",
     "Initial stage": "Initial stage",
     "Stages": "Stages",
-    "Initial parameters": "Initial parameters"
+    "Initial parameters": "Initial parameters",
+    "Delete selected ?": "Delete selected ?",
+    "Do you want to delete this piercing?": "Do you want to delete this piercing?",
+    "stages": "stages",
+    "stg.": "stg."
 }
 export default en;

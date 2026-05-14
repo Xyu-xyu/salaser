@@ -784,6 +784,10 @@ const ru = {
     "Incut": "Врезка",
     "Piercing macro selection": "Выбор макроса врезки",
     "Stages": "Этапы",
-    "Initial parameters": "Начальные параметры"
+    "Initial parameters": "Начальные параметры",
+    "Delete selected ?": "Удалить выбранное?",
+    "Do you want to delete this piercing?": "Вы хотите удалить этот тип врезки?",
+    "stages": "этапы",
+    "stg.": "эт."
 }
 export default ru;
