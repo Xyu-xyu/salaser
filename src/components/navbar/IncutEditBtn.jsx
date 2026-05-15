@@ -29,7 +29,7 @@ const IncutEditBtn = observer(() => {
 	}
 
 	const move = (direction, idx) => {
-		console.log(args)
+		macrosStore.moveStage(direction, idx)
 	}
 
 	const updateStageField = (
@@ -38,16 +38,81 @@ const IncutEditBtn = observer(() => {
 		value,
 		field,
 	) => {
-
- 		macrosStore.setselectedPiercingStage(stageIdx)
-
-		if (field?.type === 'number' || field?.type === 'integer') {
-
-			macrosStore.setTecnologyValue(Number(value), key, 'stages', field.minimum, field.maximum, stageIdx)
-		} else if (field?.type === 'boolean') {
-			macrosStore.setTecnologyValueBoolean(value, key, 'stages', stageIdx);
+	
+		macrosStore.setselectedPiercingStage(stageIdx)
+	
+		let normalizedValue = value
+		// normalize
+		if (
+			field?.type === 'number' ||
+			field?.type === 'integer'
+		) {
+	
+			normalizedValue =
+				value === ''
+					? ''
+					: Number(value)
 		}
-
+	
+		if (field?.type === 'boolean') {
+	
+			normalizedValue =
+				Boolean(value)
+		}
+	
+		// validate
+		const error = validateField(
+			key,
+			normalizedValue,
+			field
+		)
+	
+		const errorKey =
+			`${stageIdx}_${key}`
+	
+		// update errors state
+		setErrors(prev => {
+	
+			const next = { ...prev }
+	
+			if (error) {
+				next[errorKey] = error
+			}
+			else {
+				delete next[errorKey]
+			}
+	
+			return next
+		})
+	
+		// prevent invalid values from saving
+		if (error) return
+	
+		// save to mobx store
+		if (
+			field?.type === 'number' ||
+			field?.type === 'integer'
+		) {
+	
+			macrosStore.setTecnologyValue(
+				normalizedValue,
+				key,
+				'stages',
+				field.minimum,
+				field.maximum,
+				stageIdx
+			)
+	
+		}
+		else if (field?.type === 'boolean') {
+	
+			macrosStore.setTecnologyValueBoolean(
+				normalizedValue,
+				key,
+				'stages',
+				stageIdx
+			)
+		}
 	}
 
 
@@ -495,14 +560,14 @@ const IncutEditBtn = observer(() => {
 																		<button
 																			type="button"
 																			className="cp-btn cp-btn--danger"
-																			onMouseDown={(idx) => deleteStage(stageIdx)}
+																			onMouseDown={(idx) => deleteStage(stageIdx+1)}
 																		>
 																			×
 																		</button>
 																		<button
 																			type="button"
 																			className="cp-btn cp-btn--primary"
-																			onMouseDown={(idx) => copyStage(stageIdx)}
+																			onMouseDown={(idx) => copyStage(stageIdx+1)}
 																		>
 																			+
 																		</button>

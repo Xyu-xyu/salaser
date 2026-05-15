@@ -520,7 +520,8 @@ class MacrosStore {
                 this.technology.piercingMacros[keyInd][param] = Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             } else if (keyParam === 'stages') {
                 let index = this.selectedPiercingStage - 1 < 0 ? 0 : this.selectedPiercingStage - 1
-                this.technology.piercingMacros[keyInd].stages[index][param] =
+                if (typeof keyInd === 'number') index = keyInd;
+                this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] =
                     Math.round(newVal * (10 ** this.knobRound[param])) / (10 ** this.knobRound[param]);
             }
         }
@@ -541,7 +542,8 @@ class MacrosStore {
 
             if (keyParam === 'stages') {
                 let index = this.selectedPiercingStage - 1 < 0 ? 0 : this.selectedPiercingStage - 1
-                this.technology.piercingMacros[keyInd].stages[index][param] = newVal
+                if (typeof keyInd === 'number') index= keyInd;
+                this.technology.piercingMacros[this.selectedPiercingMacro].stages[index][param] = newVal
             } else if (keyParam === 'piercingMacros') {
                 this.technology.piercingMacros[keyInd][param] = newVal
             }
@@ -754,12 +756,16 @@ class MacrosStore {
         }
     }
 
-    deleteStage(arg) {
+    deleteStage(arg, byIndex = false) {
 
         if (arg === 'all') {
             macrosStore.setselectedPiercingStage(0)
             macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages = []
             return
+        }
+
+        if (byIndex) {
+            this.setselectedPiercingStage( arg )
         }
 
         if (macrosStore.selectedPiercingStage === 0) {
@@ -791,8 +797,13 @@ class MacrosStore {
         }
     }
 
-    addStage() {
-        const max = 16
+    addStage( index = false) {
+        const max = utils.deepFind(false, ["piercingMacros", "maxItems"])
+
+        if (typeof index === 'number') {
+            this.setselectedPiercingStage( index )
+        }
+        
         if (macrosStore.technology.piercingMacros[macrosStore.selectedPiercingMacro].stages.length >= max) {
             showToast({
                 type: 'warning',
@@ -836,6 +847,82 @@ class MacrosStore {
         });
     }
 
+    moveStage(direction, index) {
+
+        const stages =
+            macrosStore.technology.piercingMacros[
+                macrosStore.selectedPiercingMacro
+            ].stages;
+    
+        // invalid
+        if (
+            !Array.isArray(stages) ||
+            stages.length < 2
+        ) {
+            return;
+        }
+    
+        // LEFT
+        if (direction === 'left') {
+    
+            // already first
+            if (index <= 0) {
+                return;
+            }
+    
+            // swap
+            [
+                stages[index - 1],
+                stages[index]
+            ] = [
+                stages[index],
+                stages[index - 1]
+            ];
+    
+            this.setselectedPiercingStage(index);
+    
+/*             showToast({
+                type: 'success',
+                message: 'Step moved left!',
+                position: 'bottom-right',
+                autoClose: 2500
+            });
+     */
+            return;
+        }
+    
+        // RIGHT
+        if (direction === 'right') {
+    
+            // already last
+            if (
+                index >= stages.length - 1
+            ) {
+                return;
+            }
+    
+            // swap
+            [
+                stages[index + 1],
+                stages[index]
+            ] = [
+                stages[index],
+                stages[index + 1]
+            ];
+    
+            this.setselectedPiercingStage(index + 2);
+    
+            /* showToast({
+                type: 'success',
+                message: 'Step moved right!',
+                position: 'bottom-right',
+                autoClose: 2500
+            }); */
+    
+            return;
+        }
+    }
+
     setAnimProgress(stage, progress) {
         this.animProgress.stage = stage
         this.animProgress.progress = progress
@@ -843,7 +930,6 @@ class MacrosStore {
 
     setDiagActive(val) {
         this.diagActive = val;
-
     }
 
     setIsAnimating(val) {
