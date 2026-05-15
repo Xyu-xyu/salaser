@@ -788,6 +788,7 @@ const ru = {
     "Delete selected ?": "Удалить выбранное?",
     "Do you want to delete this piercing?": "Вы хотите удалить этот тип врезки?",
     "stages": "этапы",
-    "stg.": "эт."
+    "stg.": "эт.",
+    "Upload settings form core error!": "Ошибка загрузки настроек из ядра!"
 }
 export default ru;

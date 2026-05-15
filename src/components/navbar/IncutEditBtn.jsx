@@ -18,7 +18,7 @@ const IncutEditBtn = observer(() => {
 
 	const incut =
 		macrosStore?.technology?.piercingMacros?.[
-			selectedPiercingMacro
+		selectedPiercingMacro
 		];
 
 	// ------------------------------------------------
@@ -95,6 +95,86 @@ const IncutEditBtn = observer(() => {
 			minimum: 0
 		}
 	};
+
+
+	const  stages_schema = {
+		"title": "Шаги врезки",
+		"items": {
+			"required": [
+				"enabled",
+				"cross_blow"
+			],
+			"additionalProperties": false,
+			"type": "object",
+			"properties": {
+				"power": {
+					"type": "integer",
+					"title": "Максимальная разрешенная мощность, Вт",
+					"maximum": 100000,
+					"default": 1000,
+					"minimum": 10
+				},
+				"power_W_s": {
+					"type": "integer",
+					"title": "Энергия шага, Вт/с",
+					"maximum": 1000000,
+					"default": 1000,
+					"minimum": 10
+				},
+				"enabled": {
+					"type": "boolean",
+					"title": "Используется",
+					"default": false
+				},
+				"delay_s": {
+					"type": "number",
+					"title": "Задержка перед шагом, с",
+					"default": 0
+				},
+				"pressure": {
+					"type": "number",
+					"title": "Давление, бар",
+					"maximum": 35.0,
+					"default": 8.0,
+					"minimum": 0.1
+				},
+				"focus": {
+					"type": "number",
+					"title": "Фокус, мм",
+					"maximum": 15.0,
+					"default": 1.0,
+					"minimum": -15.0
+				},
+				"height": {
+					"type": "number",
+					"title": "Высота, мм",
+					"maximum": 20.0,
+					"default": 1.0,
+					"minimum": 0.1
+				},
+				"cross_blow": {
+					"type": "boolean",
+					"title": "Охлаждение",
+					"default": false
+				},
+				"modulationFrequency_Hz": {
+					"type": "number",
+					"title": "Несущая частота, Hz",
+					"maximum": 100000,
+					"default": 10000.0,
+					"minimum": 100
+				},
+				"modulationMacro": {
+					"$wvEnumRef": "#/technology/modulationMacros",
+					"type": "integer",
+					"title": "Индекс импульсного режима",
+					"maximum": 15,
+					"default": 0,
+					"minimum": 0
+				}
+			}
+		}
+	}
 
 	// ------------------------------------------------
 	// open
@@ -314,6 +394,7 @@ const IncutEditBtn = observer(() => {
 		handleClose();
 	};
 
+
 	return (
 		<div id="IncutEditBtn">
 
@@ -328,18 +409,21 @@ const IncutEditBtn = observer(() => {
 			<Modal
 				show={show}
 				onHide={handleClose}
-				centered
-				size="xl"
-				className="with-inner-backdrop"
+				id="settingsAltButtonModal"
+				className={`with-inner-backdrop settingsAltButton-navbar-modal expanded`}
+				centered={false}
 			>
 
-				<div className="cp-submodal__header">
+				<div className="cp-submodal__header"
+									style={{width:"1900px"}}
+
+				>
 
 					<span>
 						{t("Edit")} · #
-						{ selectedPiercingMacro }
+						{selectedPiercingMacro}
 
-						{t("Edit")}: #{selectedPiercingMacro} { incut.initial_modulationFrequency_Hz} Hz, { incut.stages.length } {t('stg.')}
+						{t("Edit")}: #{selectedPiercingMacro} {incut.initial_modulationFrequency_Hz} Hz, {incut.stages.length} {t('stg.')}
 					</span>
 
 					<button
@@ -355,7 +439,7 @@ const IncutEditBtn = observer(() => {
 				<div className="cp-submodal__body">
 					<div className="d-flex">
 						<div className="drawer-body d-flex">
-							<div className="cp-section" style={{width: "300px"}}>
+							<div className="cp-section" style={{ width: "300px" }}>
 								<div className="rt-macros__label">{t("Initial parameters")}</div>
 
 								{
@@ -484,9 +568,42 @@ const IncutEditBtn = observer(() => {
 								}
 							</div>
 						</div>
-						<div>
-							<div className="cp-section" style={{ width: "300px" }}						>
+						<div className="drawer-body d-flex">
+							<div className="cp-section" style={{ width: '1550px', overflowX:"scroll"}}>
 								<div className="rt-macros__label">{t("Stages")}</div>
+								<div className="cp-section__body">
+
+									<div className="d-flex flex-column">
+										<div className="d-flex cp-stages-table">
+											{
+												incut.stages.map((a, idx) => {
+													return (
+
+														<div className="cp-cell cp-cell--stage-head">
+															<span>Шаг {idx + 1}</span>
+															<span className="cp-stage-actions">
+																<button
+																	type="button"
+																	className="cp-btn cp-btn--ghost"
+																	title="Влево"
+																	disabled=""
+																>
+																	◀
+																</button>
+																<button type="button" className="cp-btn cp-btn--ghost" title="Вправо">
+																	▶
+																</button>
+																<button type="button" className="cp-btn cp-btn--danger" title="Удалить шаг">
+																	×
+																</button>
+															</span>
+														</div>
+													)
+												})
+											}
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

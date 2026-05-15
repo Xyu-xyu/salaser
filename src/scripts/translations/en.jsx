@@ -799,6 +799,7 @@ const en = {
     "Delete selected ?": "Delete selected ?",
     "Do you want to delete this piercing?": "Do you want to delete this piercing?",
     "stages": "stages",
-    "stg.": "stg."
+    "stg.": "stg.",
+    "Upload settings form core error!": "Upload settings form core error!"
 }
 export default en;

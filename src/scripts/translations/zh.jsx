@@ -725,6 +725,7 @@ const zh = {
     "Delete selected ?": "删除选定的 ?",
     "Do you want to delete this piercing?": "您想删除这个穿孔吗？",
     "stages": "阶段",
-    "stg.": "stg。"
+    "stg.": "stg。",
+    "Upload settings form core error!": "上传设置表单核心错误！"
 }
 export default zh;
