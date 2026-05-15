@@ -3,182 +3,53 @@ import { useState } from "react";
 import { Modal, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import macrosStore from "../../store/macrosStore";
+import utils from "../../scripts/util";
 
 const IncutEditBtn = observer(() => {
 
 	const { t } = useTranslation();
-
 	const [show, setShow] = useState(false);
-
 	const [formData, setFormData] = useState({});
-
 	const [errors, setErrors] = useState({});
-
 	const { selectedPiercingMacro } = macrosStore
-
 	const incut =
 		macrosStore?.technology?.piercingMacros?.[
 		selectedPiercingMacro
 		];
 
-	// ------------------------------------------------
-	// schema
-	// ------------------------------------------------
+	const schema =  utils.deepFind(false, ['piercingMacros', 'items', 'properties'])
+	const stages_schema = utils.deepFind(false, ['piercingMacros', 'items', 'properties', 'stages', 'items', 'properties'])
 
-	const schema = {
-		name: {
-			title: "Название",
-			minLength: 1,
-			maxLength: 32,
-			default: "Unknown incut",
-			type: "string"
-		},
-
-		initial_modulationFrequency_Hz: {
-			type: "number",
-			title: "Начальная несущая частота, Hz",
-			maximum: 100000,
-			default: 10000,
-			minimum: 100
-		},
-
-		initial_pressure: {
-			type: "number",
-			title: "Начальное давление, бар",
-			maximum: 35,
-			default: 8,
-			minimum: 0.1
-		},
-
-		gas: {
-			enum: ["AIR", "O2", "N2"],
-			type: "string",
-			title: "Газ",
-			default: "AIR"
-		},
-
-		initial_power: {
-			type: "integer",
-			title: "Начальная мощность, Вт",
-			maximum: 100000,
-			default: 1000,
-			minimum: 10
-		},
-
-		initial_height: {
-			type: "number",
-			title: "Начальная высота, мм",
-			maximum: 20,
-			default: 1,
-			minimum: 0.1
-		},
-
-		initial_cross_blow: {
-			type: "boolean",
-			title: "Охлаждение",
-			default: false
-		},
-
-		initial_focus: {
-			type: "number",
-			title: "Начальный фокус, мм",
-			maximum: 15,
-			default: 1,
-			minimum: -15
-		},
-
-		initial_modulationMacro: {
-			type: "integer",
-			title: "Индекс начального импульсного режима",
-			maximum: 15,
-			default: 0,
-			minimum: 0
-		}
-	};
-
-
-	const stages_schema = {
-		"title": "Шаги врезки",
-		"items": {
-			"required": [
-				"enabled",
-				"cross_blow"
-			],
-			"additionalProperties": false,
-			"type": "object",
-			"properties": {
-				"power": {
-					"type": "integer",
-					"title": "Максимальная разрешенная мощность, Вт",
-					"maximum": 100000,
-					"default": 1000,
-					"minimum": 10
-				},
-				"power_W_s": {
-					"type": "integer",
-					"title": "Энергия шага, Вт/с",
-					"maximum": 1000000,
-					"default": 1000,
-					"minimum": 10
-				},
-				"enabled": {
-					"type": "boolean",
-					"title": "Используется",
-					"default": false
-				},
-				"delay_s": {
-					"type": "number",
-					"title": "Задержка перед шагом, с",
-					"default": 0
-				},
-				"pressure": {
-					"type": "number",
-					"title": "Давление, бар",
-					"maximum": 35.0,
-					"default": 8.0,
-					"minimum": 0.1
-				},
-				"focus": {
-					"type": "number",
-					"title": "Фокус, мм",
-					"maximum": 15.0,
-					"default": 1.0,
-					"minimum": -15.0
-				},
-				"height": {
-					"type": "number",
-					"title": "Высота, мм",
-					"maximum": 20.0,
-					"default": 1.0,
-					"minimum": 0.1
-				},
-				"cross_blow": {
-					"type": "boolean",
-					"title": "Охлаждение",
-					"default": false
-				},
-				"modulationFrequency_Hz": {
-					"type": "number",
-					"title": "Несущая частота, Hz",
-					"maximum": 100000,
-					"default": 10000.0,
-					"minimum": 100
-				},
-				"modulationMacro": {
-					"$wvEnumRef": "#/technology/modulationMacros",
-					"type": "integer",
-					"title": "Индекс импульсного режима",
-					"maximum": 15,
-					"default": 0,
-					"minimum": 0
-				}
-			}
-		}
+	const deleteStage = (idx) => {
+		macrosStore.deleteStage(idx, true)
 	}
 
-	// ------------------------------------------------
-	// open
-	// ------------------------------------------------
+	const copyStage = (idx) => {
+		macrosStore.addStage(idx)
+	}
+
+	const move = (direction, idx) => {
+		console.log(args)
+	}
+
+	const updateStageField = (
+		stageIdx,
+		key,
+		value,
+		field,
+	) => {
+
+ 		macrosStore.setselectedPiercingStage(stageIdx)
+
+		if (field?.type === 'number' || field?.type === 'integer') {
+
+			macrosStore.setTecnologyValue(Number(value), key, 'stages', field.minimum, field.maximum, stageIdx)
+		} else if (field?.type === 'boolean') {
+			macrosStore.setTecnologyValueBoolean(value, key, 'stages', stageIdx);
+		}
+
+	}
+
 
 	const showModal = () => {
 
@@ -191,9 +62,6 @@ const IncutEditBtn = observer(() => {
 		setShow(true);
 	};
 
-	// ------------------------------------------------
-	// close
-	// ------------------------------------------------
 
 	const handleClose = () => {
 
@@ -574,229 +442,239 @@ const IncutEditBtn = observer(() => {
 								<div className="cp-section__body">
 
 									<div className="d-flex flex-column">
-									<div className="cp-stages-table-wrapper">
+										<div className="cp-stages-table-wrapper">
 
-<table className="cp-stages-table">
+											<table className="cp-stages-table">
 
-	<tbody>
+												<tbody>
 
-		{/* ---------------------------------- */}
-		{/* header row INSIDE table body */}
-		{/* ---------------------------------- */}
+													{/* ---------------------------------- */}
+													{/* header row INSIDE table body */}
+													{/* ---------------------------------- */}
 
-		<tr>
+													<tr>
 
-			<td className="cp-sticky-col cp-param-name cp-stage-corner">
-				{t("Parameter")}
-			</td>
+														<td className="cp-sticky-col cp-param-name cp-stage-corner">
+															{t("Parameter")}
+														</td>
 
-			{
-				incut.stages.map((stage, stageIdx) => (
+														{
+															incut.stages.map((stage, stageIdx) => (
 
-					<td
-						key={stageIdx}
-						className="cp-stage-head"
-					>
+																<td
+																	key={stageIdx}
+																	className="cp-stage-head"
+																>
 
-						<div className="cp-stage-head-title">
-							{t("Step")} {stageIdx + 1}
-						</div>
+																	<div className="cp-stage-head-title">
+																		{t("Step")} {stageIdx + 1}
+																	</div>
 
-						<div className="cp-stage-actions">
+																	<div className="cp-stage-actions">
 
-							<button
-								type="button"
-								className="cp-btn cp-btn--ghost"
-								disabled={stageIdx === 0}
-							>
-								◀
-							</button>
+																		<button
+																			type="button"
+																			className="cp-btn cp-btn--ghost"
+																			disabled={stageIdx === 0}
+																			onMouseDown={(idx) => move('left', stageIdx)}
+																		>
+																			◀
+																		</button>
 
-							<button
-								type="button"
-								className="cp-btn cp-btn--ghost"
-								disabled={
-									stageIdx === incut.stages.length - 1
-								}
-							>
-								▶
-							</button>
+																		<button
+																			type="button"
+																			className="cp-btn cp-btn--ghost"
+																			disabled={
+																				stageIdx === incut.stages.length - 1
+																			}
+																			onMouseDown={(idx) => move('right', stageIdx)}
+																		>
+																			▶
+																		</button>
 
-							<button
-								type="button"
-								className="cp-btn cp-btn--danger"
-							>
-								×
-							</button>
+																		<button
+																			type="button"
+																			className="cp-btn cp-btn--danger"
+																			onMouseDown={(idx) => deleteStage(stageIdx)}
+																		>
+																			×
+																		</button>
+																		<button
+																			type="button"
+																			className="cp-btn cp-btn--primary"
+																			onMouseDown={(idx) => copyStage(stageIdx)}
+																		>
+																			+
+																		</button>
 
-						</div>
+																	</div>
 
-					</td>
-				))
-			}
+																</td>
+															))
+														}
 
-		</tr>
+													</tr>
 
-		{/* ---------------------------------- */}
-		{/* fields */}
-		{/* ---------------------------------- */}
-
-		{
-			Object.entries(
-				stages_schema.items.properties
-			).map(([key, field]) => (
-
-				<tr key={key}>
-
-					{/* left sticky param name */}
-					<td className="cp-sticky-col cp-param-name">
-
-						{t(field.title)}
-
-					</td>
-
-					{/* values */}
-					{
-						incut.stages.map(
-							(stage, stageIdx) => {
-
-								const value =
-									stage?.[key];
-
-								const error =
-									errors?.[
-										`${stageIdx}_${key}`
-									];
-
-								return (
-
-									<td
-										key={stageIdx}
-										className="cp-stage-value"
-									>
-
-										{/* boolean */}
-										{
-											field.type === "boolean" && (
-
-												<Form.Check
-													type="switch"
-													checked={!!value}
-													onChange={(e) =>
-														updateStageField(
-															stageIdx,
-															key,
-															e.target.checked,
-															field
-														)
-													}
-												/>
-											)
-										}
-
-										{/* enum */}
-										{
-											field.enum && (
-
-												<Form.Select
-													size="sm"
-													value={value}
-													isInvalid={!!error}
-													onChange={(e) =>
-														updateStageField(
-															stageIdx,
-															key,
-															e.target.value,
-															field
-														)
-													}
-												>
+													{/* ---------------------------------- */}
+													{/* fields */}
+													{/* ---------------------------------- */}
 
 													{
-														field.enum.map(item => (
-															<option
-																key={item}
-																value={item}
-															>
-																{item}
-															</option>
+														Object.entries(
+															stages_schema
+															).map(([key, field]) => (
+
+															<tr key={key}>
+
+																{/* left sticky param name */}
+																<td className="cp-sticky-col cp-param-name">
+
+																	{t(field.title)}
+
+																</td>
+
+																{/* values */}
+																{
+																	incut.stages.map(
+																		(stage, stageIdx) => {
+
+																			const value =
+																				stage?.[key];
+
+																			const error =
+																				errors?.[
+																				`${stageIdx}_${key}`
+																				];
+
+																			return (
+
+																				<td
+																					key={stageIdx}
+																					className="cp-stage-value"
+																				>
+
+																					{/* boolean */}
+																					{
+																						field.type === "boolean" && (
+
+																							<Form.Check
+																								type="switch"
+																								checked={!!value}
+																								onChange={(e) =>
+																									updateStageField(
+																										stageIdx,
+																										key,
+																										e.target.checked,
+																										field
+																									)
+																								}
+																							/>
+																						)
+																					}
+
+																					{/* enum */}
+																					{
+																						field.enum && (
+
+																							<Form.Select
+																								size="sm"
+																								value={value}
+																								isInvalid={!!error}
+																								onChange={(e) =>
+																									updateStageField(
+																										stageIdx,
+																										key,
+																										e.target.value,
+																										field
+																									)
+																								}
+																							>
+
+																								{
+																									field.enum.map(item => (
+																										<option
+																											key={item}
+																											value={item}
+																										>
+																											{item}
+																										</option>
+																									))
+																								}
+
+																							</Form.Select>
+																						)
+																					}
+
+																					{/* text / number */}
+																					{
+																						!field.enum &&
+																						field.type !== "boolean" && (
+
+																							<Form.Control
+																								size="sm"
+
+																								type={
+																									field.type === "number" ||
+																										field.type === "integer"
+																										? "number"
+																										: "text"
+																								}
+
+																								value={
+																									value ?? ""
+																								}
+
+																								isInvalid={
+																									!!error
+																								}
+
+																								min={field.minimum}
+
+																								max={field.maximum}
+
+																								step={
+																									field.type === "integer"
+																										? 1
+																										: 0.1
+																								}
+
+																								maxLength={
+																									field.maxLength
+																								}
+
+																								onChange={(e) =>
+																									updateStageField(
+																										stageIdx,
+																										key,
+																										e.target.value,
+																										field,
+																									)
+																								}
+																							/>
+																						)
+																					}
+
+																					<Form.Control.Feedback
+																						type="invalid"
+																					>
+																						{error}
+																					</Form.Control.Feedback>
+
+																				</td>
+																			)
+																		}
+																	)
+																}
+
+															</tr>
 														))
 													}
 
-												</Form.Select>
-											)
-										}
+												</tbody>
 
-										{/* text / number */}
-										{
-											!field.enum &&
-											field.type !== "boolean" && (
+											</table>
 
-												<Form.Control
-													size="sm"
-
-													type={
-														field.type === "number" ||
-														field.type === "integer"
-															? "number"
-															: "text"
-													}
-
-													value={
-														value ?? ""
-													}
-
-													isInvalid={
-														!!error
-													}
-
-													min={field.minimum}
-
-													max={field.maximum}
-
-													step={
-														field.type === "integer"
-															? 1
-															: 0.1
-													}
-
-													maxLength={
-														field.maxLength
-													}
-
-													onChange={(e) =>
-														updateStageField(
-															stageIdx,
-															key,
-															e.target.value,
-															field
-														)
-													}
-												/>
-											)
-										}
-
-										<Form.Control.Feedback
-											type="invalid"
-										>
-											{error}
-										</Form.Control.Feedback>
-
-									</td>
-								)
-							}
-						)
-					}
-
-				</tr>
-			))
-		}
-
-	</tbody>
-
-</table>
-
-</div>
+										</div>
 									</div>
 								</div>
 							</div>
