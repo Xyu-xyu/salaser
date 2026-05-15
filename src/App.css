@@ -4198,3 +4198,44 @@ input.cp-input[type=number] {
 .cp-dialog__box[data-dirty="1"] .cp-dirty-dot {
   visibility: visible
 }
+
+/*  */
+
+.cp-stages-table-wrapper {
+	overflow-x: auto;
+	width: 100%;
+}
+
+.cp-stages-table {
+	border-collapse: collapse;
+	min-width: max-content;
+}
+
+.cp-stages-table th,
+.cp-stages-table td {
+	border: 1px solid #ccc;
+	padding: 8px;
+	background: white;
+	white-space: nowrap;
+}
+
+.cp-sticky-col {
+	position: sticky;
+	left: 0;
+	z-index: 2;
+	background: #f7f7f7 !important;
+	min-width: 240px;
+}
+
+.cp-stage-head {
+	min-width: 220px;
+	vertical-align: top;
+}
+
+.cp-stage-actions {
+	display: flex;
+	gap: 4px;
+	margin-top: 8px;
+}
+
+/*   */

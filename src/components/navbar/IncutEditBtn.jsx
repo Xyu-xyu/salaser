@@ -97,7 +97,7 @@ const IncutEditBtn = observer(() => {
 	};
 
 
-	const  stages_schema = {
+	const stages_schema = {
 		"title": "Шаги врезки",
 		"items": {
 			"required": [
@@ -415,7 +415,7 @@ const IncutEditBtn = observer(() => {
 			>
 
 				<div className="cp-submodal__header"
-									style={{width:"1900px"}}
+					style={{ width: "1900px" }}
 
 				>
 
@@ -569,39 +569,234 @@ const IncutEditBtn = observer(() => {
 							</div>
 						</div>
 						<div className="drawer-body d-flex">
-							<div className="cp-section" style={{ width: '1550px', overflowX:"scroll"}}>
+							<div className="cp-section" style={{ width: '1550px' }}>
 								<div className="rt-macros__label">{t("Stages")}</div>
 								<div className="cp-section__body">
 
 									<div className="d-flex flex-column">
-										<div className="d-flex cp-stages-table">
-											{
-												incut.stages.map((a, idx) => {
-													return (
+									<div className="cp-stages-table-wrapper">
 
-														<div className="cp-cell cp-cell--stage-head">
-															<span>Шаг {idx + 1}</span>
-															<span className="cp-stage-actions">
-																<button
-																	type="button"
-																	className="cp-btn cp-btn--ghost"
-																	title="Влево"
-																	disabled=""
-																>
-																	◀
-																</button>
-																<button type="button" className="cp-btn cp-btn--ghost" title="Вправо">
-																	▶
-																</button>
-																<button type="button" className="cp-btn cp-btn--danger" title="Удалить шаг">
-																	×
-																</button>
-															</span>
-														</div>
-													)
-												})
-											}
-										</div>
+<table className="cp-stages-table">
+
+	<tbody>
+
+		{/* ---------------------------------- */}
+		{/* header row INSIDE table body */}
+		{/* ---------------------------------- */}
+
+		<tr>
+
+			<td className="cp-sticky-col cp-param-name cp-stage-corner">
+				{t("Parameter")}
+			</td>
+
+			{
+				incut.stages.map((stage, stageIdx) => (
+
+					<td
+						key={stageIdx}
+						className="cp-stage-head"
+					>
+
+						<div className="cp-stage-head-title">
+							{t("Step")} {stageIdx + 1}
+						</div>
+
+						<div className="cp-stage-actions">
+
+							<button
+								type="button"
+								className="cp-btn cp-btn--ghost"
+								disabled={stageIdx === 0}
+							>
+								◀
+							</button>
+
+							<button
+								type="button"
+								className="cp-btn cp-btn--ghost"
+								disabled={
+									stageIdx === incut.stages.length - 1
+								}
+							>
+								▶
+							</button>
+
+							<button
+								type="button"
+								className="cp-btn cp-btn--danger"
+							>
+								×
+							</button>
+
+						</div>
+
+					</td>
+				))
+			}
+
+		</tr>
+
+		{/* ---------------------------------- */}
+		{/* fields */}
+		{/* ---------------------------------- */}
+
+		{
+			Object.entries(
+				stages_schema.items.properties
+			).map(([key, field]) => (
+
+				<tr key={key}>
+
+					{/* left sticky param name */}
+					<td className="cp-sticky-col cp-param-name">
+
+						{t(field.title)}
+
+					</td>
+
+					{/* values */}
+					{
+						incut.stages.map(
+							(stage, stageIdx) => {
+
+								const value =
+									stage?.[key];
+
+								const error =
+									errors?.[
+										`${stageIdx}_${key}`
+									];
+
+								return (
+
+									<td
+										key={stageIdx}
+										className="cp-stage-value"
+									>
+
+										{/* boolean */}
+										{
+											field.type === "boolean" && (
+
+												<Form.Check
+													type="switch"
+													checked={!!value}
+													onChange={(e) =>
+														updateStageField(
+															stageIdx,
+															key,
+															e.target.checked,
+															field
+														)
+													}
+												/>
+											)
+										}
+
+										{/* enum */}
+										{
+											field.enum && (
+
+												<Form.Select
+													size="sm"
+													value={value}
+													isInvalid={!!error}
+													onChange={(e) =>
+														updateStageField(
+															stageIdx,
+															key,
+															e.target.value,
+															field
+														)
+													}
+												>
+
+													{
+														field.enum.map(item => (
+															<option
+																key={item}
+																value={item}
+															>
+																{item}
+															</option>
+														))
+													}
+
+												</Form.Select>
+											)
+										}
+
+										{/* text / number */}
+										{
+											!field.enum &&
+											field.type !== "boolean" && (
+
+												<Form.Control
+													size="sm"
+
+													type={
+														field.type === "number" ||
+														field.type === "integer"
+															? "number"
+															: "text"
+													}
+
+													value={
+														value ?? ""
+													}
+
+													isInvalid={
+														!!error
+													}
+
+													min={field.minimum}
+
+													max={field.maximum}
+
+													step={
+														field.type === "integer"
+															? 1
+															: 0.1
+													}
+
+													maxLength={
+														field.maxLength
+													}
+
+													onChange={(e) =>
+														updateStageField(
+															stageIdx,
+															key,
+															e.target.value,
+															field
+														)
+													}
+												/>
+											)
+										}
+
+										<Form.Control.Feedback
+											type="invalid"
+										>
+											{error}
+										</Form.Control.Feedback>
+
+									</td>
+								)
+							}
+						)
+					}
+
+				</tr>
+			))
+		}
+
+	</tbody>
+
+</table>
+
+</div>
 									</div>
 								</div>
 							</div>
