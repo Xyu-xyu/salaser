@@ -727,6 +727,7 @@ const zh = {
     "stages": "阶段",
     "stg.": "stg。",
     "Upload settings form core error!": "上传设置表单核心错误！",
-    "Parameter": "范围"
+    "Parameter": "范围",
+    "Demo": "演示"
 }
 export default zh;

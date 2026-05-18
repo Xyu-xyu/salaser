@@ -4,6 +4,7 @@ import { Modal, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import macrosStore from "../../store/macrosStore";
 import utils from "../../scripts/util";
+import Demo from "./demo";
 
 const IncutEditBtn = observer(() => {
 
@@ -758,8 +759,8 @@ const IncutEditBtn = observer(() => {
 					>
 						{t("Cancel")}
 					</button>
-
-					<button
+ 					<Demo />
+			 		<button
 						type="button"
 						className="cp-btn cp-btn--primary"
 						onMouseDown={save}

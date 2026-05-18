@@ -801,6 +801,7 @@ const en = {
     "stages": "stages",
     "stg.": "stg.",
     "Upload settings form core error!": "Upload settings form core error!",
-    "Parameter": "Parameter"
+    "Parameter": "Parameter",
+    "Demo": "Demo"
 }
 export default en;

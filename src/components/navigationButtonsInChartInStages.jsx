@@ -5,7 +5,7 @@ import Timer from "./timer";
 import CustomIcon from "../icons/customIcon";
  
 
-const NavigationButtonsInChartInStages = observer(() => {
+const NavigationButtonsInChartInStages = observer(({timerOnly=false}) => {
 	const { t } = useTranslation()
  	const {  isAnimating,  isPaused, atEnd } = macrosStore;
 
@@ -74,7 +74,8 @@ const NavigationButtonsInChartInStages = observer(() => {
 
 	return (
 		<>
-			<div className="d-flex align-items-center justify-content-center mt-5">
+			{false && <div className="d-flex align-items-center justify-content-center mt-5">
+				
 				<button className="carousel_btn mx-1"
 					onMouseDown={(e) => { deleteStage(e) }}
 				>
@@ -129,7 +130,7 @@ const NavigationButtonsInChartInStages = observer(() => {
 							<p className="text-white mb-0">{t('Copy step')}</p>
 						</div>
 					</div>
-				</button>
+				</button>				
 				<button className="carousel_btn mx-1"
 					onPointerDown={toggleAnimation}
 				>
@@ -154,7 +155,35 @@ const NavigationButtonsInChartInStages = observer(() => {
 						</div>
 					</div>
 				</button>
-			</div>
+			</div>}
+
+			{timerOnly && <div className="d-flex align-items-center justify-content-center w-100">
+				
+				<button className="carousel_btn m-2 p-2"
+					onPointerDown={toggleAnimation}
+				>
+					<div className="d-flex align-items-center justify-content-center">
+						{!isAnimating ?
+							<CustomIcon icon="fluent:play-24-filled" width="16" height="16"
+								 color='white'
+								 fill='white'
+							/> :
+							<CustomIcon icon="fluent:pause-24-filled" width="16" height="16"
+								color='white'
+								fill='white'
+								strokeWidth={0}
+							/>
+
+						}
+						<div className="mx-1 d-flex align-items-center">
+							<div>
+								<p className="text-white mb-0">{t('Play demo')}</p> 
+							</div>
+							<Timer/>
+						</div>
+					</div>
+				</button>
+			</div>}
 		</>
 	)
 })

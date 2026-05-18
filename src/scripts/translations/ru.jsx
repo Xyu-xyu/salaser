@@ -790,6 +790,7 @@ const ru = {
     "stages": "этапы",
     "stg.": "эт.",
     "Upload settings form core error!": "Ошибка загрузки настроек из ядра!",
-    "Parameter": "Параметр"
+    "Parameter": "Параметр",
+    "Demo": "Демо"
 }
 export default ru;

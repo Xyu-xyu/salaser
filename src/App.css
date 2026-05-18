@@ -4238,4 +4238,8 @@ input.cp-input[type=number] {
 	margin-top: 8px;
 }
 
+
+.demo-modal .modal-content {
+  padding: 30px;
+}
 /*   */
