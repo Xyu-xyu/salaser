@@ -343,14 +343,12 @@ const IncutEditBtn = observer(() => {
 			<Modal
 				show={show}
 				onHide={handleClose}
-				id="settingsAltButtonModal"
 				className={`with-inner-backdrop settingsAltButton-navbar-modal expanded`}
 				centered={false}
 			>
 
 				<div className="cp-submodal__header"
-					style={{ width: "1900px" }}
-
+					
 				>
 
 					<span>
@@ -373,11 +371,12 @@ const IncutEditBtn = observer(() => {
 				<div className="cp-submodal__body">
 					<div className="d-flex">
 						<div className="drawer-body d-flex">
-							<div className="cp-section" style={{ width: "300px" }}>
+							<div className="cp-section" style={{ minWidth: "300px" }}>
 								<div className="rt-macros__label">{t("Initial parameters")}</div>
 
 								{
-									Object.entries(schema).map(
+									Object.entries(schema)
+									.map(
 										([key, field]) => {
 
 											const value =
@@ -386,11 +385,12 @@ const IncutEditBtn = observer(() => {
 											return (
 
 												<Form.Group
-													className="mb-0"
+													className="m-1 p-0"
 													key={key}
 												>
 
-													<Form.Label>
+													<Form.Label
+													className="m-0 p-0">
 														{t(field.title)}
 													</Form.Label>
 
@@ -436,7 +436,7 @@ const IncutEditBtn = observer(() => {
 																			key={item}
 																			value={item}
 																		>
-																			{item}
+																			{t(item)}
 																		</option>
 																	))
 																}
@@ -448,6 +448,7 @@ const IncutEditBtn = observer(() => {
 													{/* text/number */}
 													{
 														!field.enum &&
+														field.type !== "array" &&
 														field.type !== "boolean" && (
 
 															<Form.Control
@@ -501,9 +502,7 @@ const IncutEditBtn = observer(() => {
 									)
 								}
 							</div>
-						</div>
-						<div className="drawer-body d-flex">
-							<div className="cp-section" style={{ width: '1550px' }}>
+							<div className="cp-section" style={{ maxWidth: '1400px' }}>
 								<div className="rt-macros__label">{t("Stages")}</div>
 								<div className="cp-section__body">
 
@@ -760,7 +759,7 @@ const IncutEditBtn = observer(() => {
 						{t("Cancel")}
 					</button>
  					<Demo />
-			 		<button
+			 		{/* <button
 						type="button"
 						className="cp-btn cp-btn--primary"
 						onMouseDown={save}
@@ -769,7 +768,7 @@ const IncutEditBtn = observer(() => {
 						}
 					>
 						{t("Save")}
-					</button>
+					</button> */}
 
 				</div>
 

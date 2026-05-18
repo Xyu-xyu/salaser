@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
-import { Modal } from "react-bootstrap";
+import { Modal, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import CustomIcon from "../../icons/customIcon.jsx";
 import macrosStore from "../../store/macrosStore.jsx";
@@ -13,12 +13,180 @@ import IncutEditBtn from "./IncutEditBtn.jsx"
 const SettingsAltButton = observer(() => {
 	const { t } = useTranslation();
 	const [show, setShow] = useState(false);
+	const [paramsViewMode, setParamsViewMode] = useState(false)
 	const [fillMode, setFillMode] = useState('table')
 	const handleClose = () => setShow(false);
 	const showModal = () => setShow(true);
 	const [expanded, setExpanded] = useState(false);
-
 	const { modulationMacroinUse, selectedModulationMacro, piercingMacroinUse, selectedPiercingMacro } = macrosStore
+	const [formData, setFormData] = useState({});
+
+	const [errors, setErrors] = useState({});
+	const validateField = (
+		value,
+		field
+	) => {
+
+		if (
+			field.type === "number" ||
+			field.type === "integer"
+		) {
+
+			if (
+				value === "" ||
+				value === undefined ||
+				value === null
+			) {
+				return t("Field is required");
+			}
+
+			const num = Number(value);
+
+			if (Number.isNaN(num)) {
+				return t("Invalid number");
+			}
+
+			if (
+				field.type === "integer" &&
+				!Number.isInteger(num)
+			) {
+				return t("Must be integer");
+			}
+
+			if (
+				field.minimum !== undefined &&
+				num < field.minimum
+			) {
+				return `${t("Minimum value")}: ${field.minimum}`;
+			}
+
+			if (
+				field.maximum !== undefined &&
+				num > field.maximum
+			) {
+				return `${t("Maximum value")}: ${field.maximum}`;
+			}
+		}
+
+		return null;
+	};
+
+	// ------------------------------------------------
+	// update root field
+	// ------------------------------------------------
+
+	const updateField = (
+		key,
+		value,
+		field
+	) => {
+
+		let normalizedValue = value;
+
+		if (
+			field.type === "number" ||
+			field.type === "integer"
+		) {
+			normalizedValue =
+				value === ""
+					? ""
+					: Number(value);
+		}
+
+		if (field.type === "boolean") {
+			normalizedValue =
+				Boolean(value);
+		}
+
+		setFormData(prev => ({
+			...prev,
+			[key]: normalizedValue
+		}));
+
+		const error = validateField(
+			normalizedValue,
+			field
+		);
+
+		setErrors(prev => {
+
+			const next = { ...prev };
+
+			if (error) {
+				next[key] = error;
+			}
+			else {
+				delete next[key];
+			}
+
+			return next;
+		});
+	};
+
+	// ------------------------------------------------
+	// update nested object field
+	// ------------------------------------------------
+
+	const updateNestedField = (
+		parentKey,
+		key,
+		value,
+		field
+	) => {
+
+		let normalizedValue = value;
+
+		if (
+			field.type === "number" ||
+			field.type === "integer"
+		) {
+			normalizedValue =
+				value === ""
+					? ""
+					: Number(value);
+		}
+
+		setFormData(prev => ({
+
+			...prev,
+
+			[parentKey]: {
+
+				...prev[parentKey],
+
+				[key]: normalizedValue
+			}
+		}));
+
+		const error = validateField(
+			normalizedValue,
+			field
+		);
+
+		const errorKey =
+			`${parentKey}.${key}`;
+
+		setErrors(prev => {
+
+			const next = { ...prev };
+
+			if (error) {
+				next[errorKey] = error;
+			}
+			else {
+				delete next[errorKey];
+			}
+
+			return next;
+		});
+	};
+
+	// ------------------------------------------------
+	// save
+	// ------------------------------------------------
+
+
+
 
 	const deleteThisModulation = (e) => {
 		e.stopPropagation();
@@ -160,6 +328,117 @@ const SettingsAltButton = observer(() => {
 		macrosStore.setTecnologyValue(newValue, paramKey, "macros", meta.minimum, meta.maximum);
 	};
 
+
+	const feeding_schema = {
+
+		"feedLimit_mm_s": {
+			"type": "number",
+			"title": "Ограничение подачи, мм/с",
+			"maximum": 200000,
+			"default": 50000,
+			"minimum": 10
+		},
+		"arcLimitsEnabled": {
+			"type": "boolean",
+			"title": "Дуги: ограничения по динамике",
+			"description": "Включает/выключает ограничения дуг (скорость по v^2/r и ограничение разгона по суммарному ускорению). Отключение может ухудшить качество/точность на малых радиусах.",
+			"default": false
+		},
+		"microBridgeLength_mm": {
+			"type": "number",
+			"title": "Длина микроперемычки, мм",
+			"maximum": 1000.0,
+			"default": 2.0,
+			"minimum": 0.01
+		},
+		"safeHeight_mm": {
+			"type": "number",
+			"title": "Безопасная высота, мм",
+			"maximum": 200.0,
+			"default": 20.0,
+			"minimum": 0.1
+		},
+		"toolCompensation": {
+			"type": "object",
+			"title": "Компенсация инструмента",
+			"description": "Компенсация (tool offset) по стороне: G41 — слева от траектории, G42 — справа. Значения задаются в мм, без знака.",
+			"properties": {
+				"g41Offset_mm": {
+					"type": "number",
+					"title": "G41 (слева), мм",
+					"maximum": 5.0,
+					"default": 0.0,
+					"minimum": 0.0
+				},
+				"g42Offset_mm": {
+					"type": "number",
+					"title": "G42 (справа), мм",
+					"maximum": 5.0,
+					"default": 0.0,
+					"minimum": 0.0
+				}
+			},
+			"additionalProperties": false
+		}
+	}
+
+
+	const material_schema = {
+		"properties": {
+			"code": {
+				"title": "Код",
+				"minLength": 2,
+				"maxLength": 64,
+				"default": "STEEL",
+				"type": "string"
+			},
+			"name": {
+				"maxLength": 256,
+				"type": "string",
+				"title": "Название",
+				"default": "Steel"
+			},
+			"thickness": {
+				"type": "number",
+				"title": "Толщина, мм",
+				"maximum": 60.0,
+				"default": 1.5,
+				"minimum": 0.1
+			}
+		},
+		"title": "Материал",
+		"required": [
+			"name",
+			"code",
+			"thickness"
+		],
+		"additionalProperties": false,
+		"type": "object"
+	}
+	
+
+
+	const machine_schema = {
+		"type": "object",
+		"description": "Current Machine",
+		"properties": {
+			"name": {
+				"title": "Название",
+				"minLength": 1,
+				"maxLength": 128,
+				"default": "SGNlaser",
+				"type": "string"
+			},
+			"sourcePower_w": {
+				"type": "integer",
+				"title": "Мощность, Вт",
+				"maximum": 100000,
+				"default": 12000,
+				"minimum": 100
+			}
+		}
+	}
+
 	return (
 		<div className="ms-2" id="settingsAltButton">
 			<button className={`navbar_button me-1 ${show ? "violet_button" : "white_button"}`} onClick={showModal}>
@@ -199,6 +478,18 @@ const SettingsAltButton = observer(() => {
 								<div className="drawer-body d-flex">
 									<div className="cp-section" style={{ width: "150px" }}						>
 										<div className="">
+											<button
+												key={-1}
+												type="button"
+												className={`rt-macro-tile mb-3 ${paramsViewMode ? "is-active" : ""}`}
+												id={`paramsViewMode`}
+												onClick={() => { setParamsViewMode(!paramsViewMode) }}
+											>
+												<div className="rt-macro-tile__top">
+													<span className={`rt-macro__dot is-m8`} aria-hidden="true"></span>
+												</div>
+												<div className="rt-macro-tile__name">{t("Common")}</div>
+											</button>
 											<div className="rt-macros__label">{t("Macros")}</div>
 											{macros.map((_, idx) => (
 												<button
@@ -207,7 +498,11 @@ const SettingsAltButton = observer(() => {
 													className={`rt-macro-tile ${idx === selectedMacroIdx ? "is-active" : ""}`}
 													id={`rt_macro_tile_${idx}`}
 													data-macro={idx}
-													onClick={() => macrosStore.setVal("selector", idx, minimum, maximum)}
+													onClick={() => {
+														macrosStore.setVal("selector", idx, minimum, maximum)
+														setParamsViewMode(false)
+													}
+													}
 												>
 													<div className="rt-macro-tile__top">
 														<span className={`rt-macro__dot is-m${idx}`} aria-hidden="true"></span>
@@ -218,7 +513,7 @@ const SettingsAltButton = observer(() => {
 											))}
 										</div>
 									</div>
-									<div className="d-flex flex-column">
+									{!paramsViewMode && <div className="d-flex flex-column">
 										<div className="d-flex">
 											<div className="cp-section" style={{ width: "750px" }}						>
 												<div className="rt-macros__label">{t("Cutting parameters")}</div>
@@ -439,7 +734,7 @@ const SettingsAltButton = observer(() => {
 												</div>
 											</div>
 
-											
+
 
 											<div className="d-flex flex-column">
 												<div className="cp-section">
@@ -535,7 +830,7 @@ const SettingsAltButton = observer(() => {
 																		>
 																			+
 																		</button>
-																		<IncutEditBtn/>																			
+																		<IncutEditBtn />
 																		<button
 																			type="button" className="cp-btn cp-btn--danger"
 																			onMouseDown={(e) => deleteThisPiercing(e)}
@@ -547,17 +842,253 @@ const SettingsAltButton = observer(() => {
 																			🗑
 																		</button>
 
-																	</div>																
+																	</div>
 																</div>
 															</div>
 														</div>
 													</div>
 												</div>
-
 											</div>
 										</div>
-										
+
 									</div>
+									}
+
+									{paramsViewMode &&
+
+										<div className="d-flex">
+											<div className="cp-section" 						>
+												<div className="rt-macros__label">{t("Feeding and Moving")}</div>
+												<div className="cp-section">
+													{
+														Object.entries(
+															feeding_schema
+														).map(([key, field]) => {
+
+															// OBJECT
+															if (
+																field.type === "object"
+															) {
+
+																return (
+
+																	<div
+																		key={key}
+																		className="cp-subgroup"
+																	>
+
+																		<h5 className="mb-3">
+																			{t(field.title)}
+																		</h5>
+
+																		{
+																			Object.entries(
+																				field.properties
+																			).map(
+																				([nestedKey, nestedField]) => {
+
+																					const value =
+																						formData?.[
+																						key
+																						]?.[
+																						nestedKey
+																						];
+
+																					const error =
+																						errors?.[
+																						`${key}.${nestedKey}`
+																						];
+
+																					return (
+
+																						<Form.Group
+																							className="mb-3"
+																							key={nestedKey}
+																						>
+
+																							<Form.Label>
+																								{t(nestedField.title)}
+																							</Form.Label>
+
+																							<Form.Control
+																								type="number"
+
+																								value={
+																									value ?? ""
+																								}
+
+																								min={
+																									nestedField.minimum
+																								}
+
+																								max={
+																									nestedField.maximum
+																								}
+
+																								step={0.01}
+
+																								isInvalid={
+																									!!error
+																								}
+
+																								onChange={(e) =>
+																									updateNestedField(
+																										key,
+																										nestedKey,
+																										e.target.value,
+																										nestedField
+																									)
+																								}
+																							/>
+
+																							<Form.Control.Feedback type="invalid">
+																								{error}
+																							</Form.Control.Feedback>
+
+																						</Form.Group>
+																					);
+																				}
+																			)
+																		}
+
+																	</div>
+																);
+															}
+
+															// BOOLEAN
+															if (
+																field.type === "boolean"
+															) {
+
+																return (
+
+																	<Form.Group
+																		className="mb-3"
+																		key={key}
+																	>
+
+																		<Form.Check
+																			type="switch"
+
+																			label={t(field.title)}
+
+																			checked={
+																				!!formData?.[key]
+																			}
+
+																			onChange={(e) =>
+																				updateField(
+																					key,
+																					e.target.checked,
+																					field
+																				)
+																			}
+																		/>
+
+																	</Form.Group>
+																);
+															}
+
+															// NUMBER / TEXT
+															const error =
+																errors?.[key];
+
+															return (
+
+																<Form.Group
+																	className="mb-3"
+																	key={key}
+																>
+
+																	<Form.Label>
+																		{t(field.title)}
+																	</Form.Label>
+
+																	<Form.Control
+
+																		type={
+																			field.type === "number" ||
+																				field.type === "integer"
+																				? "number"
+																				: "text"
+																		}
+
+																		value={
+																			formData?.[key] ?? ""
+																		}
+
+																		min={field.minimum}
+
+																		max={field.maximum}
+
+																		step={
+																			field.type === "integer"
+																				? 1
+																				: 0.01
+																		}
+
+																		isInvalid={!!error}
+
+																		onChange={(e) =>
+																			updateField(
+																				key,
+																				e.target.value,
+																				field
+																			)
+																		}
+																	/>
+
+																	<Form.Control.Feedback type="invalid">
+																		{error}
+																	</Form.Control.Feedback>
+
+																</Form.Group>
+															);
+														})
+													}
+
+
+
+
+												</div>
+											</div>
+											<div className="cp-section">
+												<div className="rt-macros__label">{t("Material")}</div>
+
+												<div className="d-flex flex-column">
+													<div className="cp-field cp-field--string m-1">
+														<label className="cp-field__label">{t('Code')}</label>
+														<input type="text" className="cp-input" disabled="" />
+													</div>
+
+													<div className="cp-field cp-field--string m-1">
+														<label className="cp-field__label">{t('Material')}</label>
+														<input type="text" className="cp-input" disabled="" />
+													</div>
+
+													<div className="cp-field cp-field--number m-1">
+														<label className="cp-field__label">{t('Thickness')}</label>
+														<input type="number" className="cp-input" step={1} disabled="" />
+													</div>
+												</div>
+											</div>
+											<div className="cp-section">
+												<div className="rt-macros__label">{t("Machine")}</div>
+												<div className="d-flex flex-column">
+													<div className="cp-field cp-field--string m-1">
+														<label className="cp-field__label">{t('Machine name')}</label>
+														<input type="text" className="cp-input" disabled="" />
+													</div>
+
+													<div className="cp-field cp-field--number m-1">
+														<label className="cp-field__label">{t('Мощность источника, Вт')}</label>
+														<input type="number" className="cp-input" step={1} disabled="" />
+													</div>
+												</div>
+											</div>
+										</div>
+									}
+
 								</div>
 							</div>
 						)}

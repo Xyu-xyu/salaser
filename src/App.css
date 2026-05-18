@@ -974,6 +974,7 @@ height: fit-content;}
 .rt-macro__dot.is-m5 { background: #3833ac; }
 .rt-macro__dot.is-m6 { background: olive; }
 .rt-macro__dot.is-m7 { background: #fff; }
+.rt-macro__dot.is-m8 { background: orange; }
 
 .rt-modal-topbar {
   display: flex;

@@ -802,6 +802,16 @@ const en = {
     "stg.": "stg.",
     "Upload settings form core error!": "Upload settings form core error!",
     "Parameter": "Parameter",
-    "Demo": "Demo"
+    "Demo": "Demo",
+    "Common": "Common",
+    "Feeding and Moving": "Feeding and Moving",
+    "Machine name": "Machine name",
+    "Мощность источника, Вт": "Мощность источника, Вт",
+    "Дуги: ограничения по динамике": "Дуги: ограничения по динамике",
+    "Длина микроперемычки, мм": "Длина микроперемычки, мм",
+    "G42 (справа), мм": "G42 (справа), мм",
+    "Безопасная высота, мм": "Безопасная высота, мм",
+    "Компенсация инструмента": "Компенсация инструмента",
+    "G41 (слева), мм": "G41 (слева), мм"
 }
 export default en;
