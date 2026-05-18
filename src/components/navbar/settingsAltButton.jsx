@@ -185,9 +185,6 @@ const SettingsAltButton = observer(() => {
 	// save
 	// ------------------------------------------------
 
-
-
-
 	const deleteThisModulation = (e) => {
 		e.stopPropagation();
 		macrosStore.setModalProps({
@@ -384,8 +381,7 @@ const SettingsAltButton = observer(() => {
 
 
 	const material_schema = {
-		"properties": {
-			"code": {
+ 			"code": {
 				"title": "Код",
 				"minLength": 2,
 				"maxLength": 64,
@@ -405,36 +401,28 @@ const SettingsAltButton = observer(() => {
 				"default": 1.5,
 				"minimum": 0.1
 			}
-		},
-		"title": "Материал",
-		"required": [
-			"name",
-			"code",
-			"thickness"
-		],
-		"additionalProperties": false,
-		"type": "object"
-	}
+		}
 	
 
-
 	const machine_schema = {
-		"type": "object",
-		"description": "Current Machine",
-		"properties": {
-			"name": {
-				"title": "Название",
-				"minLength": 1,
-				"maxLength": 128,
-				"default": "SGNlaser",
-				"type": "string"
-			},
-			"sourcePower_w": {
-				"type": "integer",
-				"title": "Мощность, Вт",
-				"maximum": 100000,
-				"default": 12000,
-				"minimum": 100
+		"properties":{
+			"type": "object",
+			"description": "Current Machine",
+			"properties": {
+				"name": {
+					"title": "Название",
+					"minLength": 1,
+					"maxLength": 128,
+					"default": "SGNlaser",
+					"type": "string"
+				},
+				"sourcePower_w": {
+					"type": "integer",
+					"title": "Мощность, Вт",
+					"maximum": 100000,
+					"default": 12000,
+					"minimum": 100
+				}
 			}
 		}
 	}
@@ -1054,37 +1042,383 @@ const SettingsAltButton = observer(() => {
 											</div>
 											<div className="cp-section">
 												<div className="rt-macros__label">{t("Material")}</div>
+												{
+														Object.entries(
+															material_schema
+														).map(([key, field]) => {
 
-												<div className="d-flex flex-column">
-													<div className="cp-field cp-field--string m-1">
-														<label className="cp-field__label">{t('Code')}</label>
-														<input type="text" className="cp-input" disabled="" />
-													</div>
+															// OBJECT
+															if (
+																field.type === "object"
+															) {
 
-													<div className="cp-field cp-field--string m-1">
-														<label className="cp-field__label">{t('Material')}</label>
-														<input type="text" className="cp-input" disabled="" />
-													</div>
+																return (
 
-													<div className="cp-field cp-field--number m-1">
-														<label className="cp-field__label">{t('Thickness')}</label>
-														<input type="number" className="cp-input" step={1} disabled="" />
-													</div>
-												</div>
+																	<div
+																		key={key}
+																		className="cp-subgroup"
+																	>
+
+																		<h5 className="mb-3">
+																			{t(field.title)}
+																		</h5>
+
+																		{
+																			Object.entries(
+																				field.properties
+																			).map(
+																				([nestedKey, nestedField]) => {
+
+																					const value =
+																						formData?.[
+																						key
+																						]?.[
+																						nestedKey
+																						];
+
+																					const error =
+																						errors?.[
+																						`${key}.${nestedKey}`
+																						];
+
+																					return (
+
+																						<Form.Group
+																							className="mb-3"
+																							key={nestedKey}
+																						>
+
+																							<Form.Label>
+																								{t(nestedField.title)}
+																							</Form.Label>
+
+																							<Form.Control
+																								type="number"
+
+																								value={
+																									value ?? ""
+																								}
+
+																								min={
+																									nestedField.minimum
+																								}
+
+																								max={
+																									nestedField.maximum
+																								}
+
+																								step={0.01}
+
+																								isInvalid={
+																									!!error
+																								}
+
+																								onChange={(e) =>
+																									updateNestedField(
+																										key,
+																										nestedKey,
+																										e.target.value,
+																										nestedField
+																									)
+																								}
+																							/>
+
+																							<Form.Control.Feedback type="invalid">
+																								{error}
+																							</Form.Control.Feedback>
+
+																						</Form.Group>
+																					);
+																				}
+																			)
+																		}
+
+																	</div>
+																);
+															}
+
+															// BOOLEAN
+															if (
+																field.type === "boolean"
+															) {
+
+																return (
+
+																	<Form.Group
+																		className="mb-3"
+																		key={key}
+																	>
+
+																		<Form.Check
+																			type="switch"
+
+																			label={t(field.title)}
+
+																			checked={
+																				!!formData?.[key]
+																			}
+
+																			onChange={(e) =>
+																				updateField(
+																					key,
+																					e.target.checked,
+																					field
+																				)
+																			}
+																		/>
+
+																	</Form.Group>
+																);
+															}
+
+															// NUMBER / TEXT
+															const error =
+																errors?.[key];
+
+															return (
+
+																<Form.Group
+																	className="mb-3"
+																	key={key}
+																>
+
+																	<Form.Label>
+																		{t(field.title)}
+																	</Form.Label>
+
+																	<Form.Control
+
+																		type={
+																			field.type === "number" ||
+																				field.type === "integer"
+																				? "number"
+																				: "text"
+																		}
+
+																		value={
+																			formData?.[key] ?? ""
+																		}
+
+																		min={field.minimum}
+
+																		max={field.maximum}
+
+																		step={
+																			field.type === "integer"
+																				? 1
+																				: 0.01
+																		}
+
+																		isInvalid={!!error}
+
+																		onChange={(e) =>
+																			updateField(
+																				key,
+																				e.target.value,
+																				field
+																			)
+																		}
+																	/>
+
+																	<Form.Control.Feedback type="invalid">
+																		{error}
+																	</Form.Control.Feedback>
+
+																</Form.Group>
+															);
+														})
+													}
+
+												
 											</div>
 											<div className="cp-section">
-												<div className="rt-macros__label">{t("Machine")}</div>
-												<div className="d-flex flex-column">
-													<div className="cp-field cp-field--string m-1">
-														<label className="cp-field__label">{t('Machine name')}</label>
-														<input type="text" className="cp-input" disabled="" />
-													</div>
+											<div className="rt-macros__label">{t("Machine")}</div>
+											{
+														Object.entries(
+															machine_schema
+														).map(([key, field]) => {
 
-													<div className="cp-field cp-field--number m-1">
-														<label className="cp-field__label">{t('Мощность источника, Вт')}</label>
-														<input type="number" className="cp-input" step={1} disabled="" />
-													</div>
-												</div>
+															// OBJECT
+															if (
+																field.type === "object"
+															) {
+
+																return (
+
+																	<div
+																		key={key}
+																		className="cp-subgroup"
+																	>
+
+																		<h5 className="mb-3">
+																			{t(field.title)}
+																		</h5>
+
+																		{
+																			Object.entries(
+																				field.properties
+																			).map(
+																				([nestedKey, nestedField]) => {
+
+																					const value =
+																						formData?.[
+																						key
+																						]?.[
+																						nestedKey
+																						];
+
+																					const error =
+																						errors?.[
+																						`${key}.${nestedKey}`
+																						];
+
+																					return (
+
+																						<Form.Group
+																							className="mb-3"
+																							key={nestedKey}
+																						>
+
+																							<Form.Label>
+																								{t(nestedField.title)}
+																							</Form.Label>
+
+																							<Form.Control
+																								type="number"
+
+																								value={
+																									value ?? ""
+																								}
+
+																								min={
+																									nestedField.minimum
+																								}
+
+																								max={
+																									nestedField.maximum
+																								}
+
+																								step={0.01}
+
+																								isInvalid={
+																									!!error
+																								}
+
+																								onChange={(e) =>
+																									updateNestedField(
+																										key,
+																										nestedKey,
+																										e.target.value,
+																										nestedField
+																									)
+																								}
+																							/>
+
+																							<Form.Control.Feedback type="invalid">
+																								{error}
+																							</Form.Control.Feedback>
+
+																						</Form.Group>
+																					);
+																				}
+																			)
+																		}
+
+																	</div>
+																);
+															}
+
+															// BOOLEAN
+															if (
+																field.type === "boolean"
+															) {
+
+																return (
+
+																	<Form.Group
+																		className="mb-3"
+																		key={key}
+																	>
+
+																		<Form.Check
+																			type="switch"
+
+																			label={t(field.title)}
+
+																			checked={
+																				!!formData?.[key]
+																			}
+
+																			onChange={(e) =>
+																				updateField(
+																					key,
+																					e.target.checked,
+																					field
+																				)
+																			}
+																		/>
+
+																	</Form.Group>
+																);
+															}
+
+															// NUMBER / TEXT
+															const error =
+																errors?.[key];
+
+															return (
+
+																<Form.Group
+																	className="mb-3"
+																	key={key}
+																>
+
+																	<Form.Label>
+																		{t(field.title)}
+																	</Form.Label>
+
+																	<Form.Control
+
+																		type={
+																			field.type === "number" ||
+																				field.type === "integer"
+																				? "number"
+																				: "text"
+																		}
+
+																		value={
+																			formData?.[key] ?? ""
+																		}
+
+																		min={field.minimum}
+
+																		max={field.maximum}
+
+																		step={
+																			field.type === "integer"
+																				? 1
+																				: 0.01
+																		}
+
+																		isInvalid={!!error}
+
+																		onChange={(e) =>
+																			updateField(
+																				key,
+																				e.target.value,
+																				field
+																			)
+																		}
+																	/>
+
+																	<Form.Control.Feedback type="invalid">
+																		{error}
+																	</Form.Control.Feedback>
+
+																</Form.Group>
+															);
+														})
+													}
 											</div>
 										</div>
 									}
