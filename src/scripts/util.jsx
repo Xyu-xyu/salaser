@@ -10,6 +10,7 @@ import arc from './arc'
 import inside from 'point-in-polygon-hao'
 import ClipperLib from 'clipper-lib'
 import inlet from './inlet';
+import cut_settings_schema from "../store/cut_settings_schema";
 
 class Utils {
 	// Метод для преобразования полярных координат в декартовы
@@ -554,7 +555,7 @@ class Utils {
 	}
 
 	getDefaultsFromSchema() {
-		const { schema } = macrosStore;
+		const  schema  = cut_settings_schema
 		if (!schema) return {};
 		const safeSchema = this.ensureMinItems(schema);
 		const defaults = getDefaultFormState(validator, safeSchema, undefined);
