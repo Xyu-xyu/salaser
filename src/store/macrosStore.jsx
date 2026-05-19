@@ -460,7 +460,7 @@ class MacrosStore {
                 }
 
             } else if (keyParam === 'preset') {
-                return this.cut_settings.material[param]
+                return this?.cut_settings?.material[param]|| ""
             }
         }
 

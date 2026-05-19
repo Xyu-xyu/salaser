@@ -890,8 +890,8 @@ height: fit-content;}
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 10px;
-}
+/*   margin-top: 10px;
+ */}
 
 @media (max-width: 560px) {
   .rt-macros__grid {
@@ -4244,3 +4244,19 @@ input.cp-input[type=number] {
   padding: 30px;
 }
 /*   */
+
+
+/* для горизонтальных экранов */
+@media (orientation: landscape) {
+  #stagesSection {
+    max-width: 1400px !important;
+  }
+}
+
+/* для горизонтальных экранов */
+@media (orientation: portrait) {
+  #stagesSection {
+    max-width: 700px !important;
+  }
+}
+ 

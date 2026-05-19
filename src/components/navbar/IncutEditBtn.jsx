@@ -319,7 +319,7 @@ const IncutEditBtn = observer(() => {
 
 		if (!valid) return;
 
-		macrosStore.technology.incuts[
+		macrosStore.technology.piercingMacros[
 			selectedPiercingMacro
 		] = {
 			...formData
@@ -502,7 +502,7 @@ const IncutEditBtn = observer(() => {
 									)
 								}
 							</div>
-							<div className="cp-section" style={{ maxWidth: '1400px' }}>
+							<div className="cp-section" id="stagesSection">
 								<div className="rt-macros__label">{t("Stages")}</div>
 								<div className="cp-section__body">
 
@@ -759,7 +759,7 @@ const IncutEditBtn = observer(() => {
 						{t("Cancel")}
 					</button>
  					<Demo />
-			 		{/* <button
+			 		<button
 						type="button"
 						className="cp-btn cp-btn--primary"
 						onMouseDown={save}
@@ -768,7 +768,7 @@ const IncutEditBtn = observer(() => {
 						}
 					>
 						{t("Save")}
-					</button> */}
+					</button>
 
 				</div>
 
