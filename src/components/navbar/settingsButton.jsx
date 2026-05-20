@@ -165,6 +165,8 @@ const SettingsButton = observer(() => {
 			const data = await resp.json();
 			//console.log("📦 Получен пресет:", data);
 			macrosStore.setCutSettings( data.preset);
+			macrosStore.setValue('settingsSource', {source:"Data base", id:id});
+
 			handleClose()
 			macrosStore.setModal(true, 'macros')
 
@@ -182,6 +184,7 @@ const SettingsButton = observer(() => {
 		
 		const data = await resp.json();
 		macrosStore.setCutSettings( data.preset );
+
 		handleClose()
 		macrosStore.setModalProps({
 			show: true,

@@ -95,6 +95,16 @@ class MacrosStore {
 
     technology = cut_settings.technology
     macrosProperties = cut_settings_schema.properties.technology.properties.macros.items.properties
+    settingsSource= {
+        source:"default",// string - core0, core1, default, dataBase
+        id:false,
+    }
+
+    setValue (key, value) {
+		if (key in this) {
+			this[key] = value;
+		}
+	}
 
     async loadCutSettings() {
         this.loading = true;
@@ -105,6 +115,10 @@ class MacrosStore {
 
             const data = await resp.json();
             macrosStore.setCutSettings(data.result)
+            macrosStore.setValue("settingsSource", {
+                source:'core0', 
+                id:false
+            })
             //macrosStore.cut_settings = data.result;
             //macrosStore.technology = data.result.technology
             /* showToast({

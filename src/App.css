@@ -978,7 +978,7 @@ height: fit-content;}
 
 .rt-modal-topbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-bottom: 8px;
 }
 
