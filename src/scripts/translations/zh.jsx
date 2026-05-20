@@ -738,6 +738,7 @@ const zh = {
     "Show all markers": "显示所有标记",
     "Maximum value: 100": "最大值：100",
     "Minimum length: 1": "最小长度：1",
-    "Power, W": "功率，W"
+    "Power, W": "功率，W",
+    "Minimum length: 2": "最小长度：2"
 }
 export default zh;

@@ -41,8 +41,6 @@ const SettingsAltButton = observer(() => {
 	);
 
 
-
-
 	const feeding_schema = {
 
 		"feedLimit_mm_s": {
@@ -96,7 +94,6 @@ const SettingsAltButton = observer(() => {
 		}
 	}
 
-
 	const material_schema = {
  			"code": {
 				"title": "Код",
@@ -125,6 +122,27 @@ const SettingsAltButton = observer(() => {
 		value,
 		field
 	) => {
+
+		if (field.type === "string") {
+
+			const str = String(value || "");
+
+			if (
+				field.minLength &&
+				str.length < field.minLength
+			) {
+				return t("Minimum length") +
+					`: ${field.minLength}`;
+			}
+
+			if (
+				field.maxLength &&
+				str.length > field.maxLength
+			) {
+				return t("Maximum length") +
+					`: ${field.maxLength}`;
+			}
+		}
 
 		if (
 			field.type === "number" ||
@@ -225,16 +243,15 @@ const SettingsAltButton = observer(() => {
 	// ------------------------------------------------
 	// update nested object field
 	// ------------------------------------------------
-
 	const updateNestedField = (
 		parentKey,
 		key,
 		value,
 		field
 	) => {
-
+	
 		let normalizedValue = value;
-
+	
 		if (
 			field.type === "number" ||
 			field.type === "integer"
@@ -244,38 +261,57 @@ const SettingsAltButton = observer(() => {
 					? ""
 					: Number(value);
 		}
-
-		setFormData(prev => ({
-
-			...prev,
-
-			[parentKey]: {
-
-				...prev[parentKey],
-
-				[key]: normalizedValue
+	
+		if (field.type === "boolean") {
+			normalizedValue = Boolean(value);
+		}
+	
+		setFeedingFormData(prev => {
+	
+			// Обычное поле (не object)
+			if (!parentKey) {
+	
+				return {
+					...prev,
+					[key]: normalizedValue
+				};
 			}
-		}));
-
+	
+			// Вложенный object
+			return {
+	
+				...prev,
+	
+				[parentKey]: {
+	
+					...(prev[parentKey] || {}),
+	
+					[key]: normalizedValue
+				}
+			};
+		});
+	
 		const error = validateField(
 			normalizedValue,
 			field
 		);
-
+	
 		const errorKey =
-			`${parentKey}.${key}`;
-
+			parentKey
+				? `${parentKey}.${key}`
+				: key;
+	
 		setErrors(prev => {
-
+	
 			const next = { ...prev };
-
+	
 			if (error) {
 				next[errorKey] = error;
 			}
 			else {
 				delete next[errorKey];
 			}
-
+	
 			return next;
 		});
 	};
@@ -967,7 +1003,8 @@ const SettingsAltButton = observer(() => {
 																			}
 
 																			onChange={(e) =>
-																				updateField(
+																				updateNestedField(
+																					false,
 																					key,
 																					e.target.checked,
 																					field
@@ -1020,7 +1057,8 @@ const SettingsAltButton = observer(() => {
 																		isInvalid={!!error}
 
 																		onChange={(e) =>
-																			updateField(
+																			updateNestedField(
+																				false,
 																				key,
 																				e.target.value,
 																				field
@@ -1041,192 +1079,70 @@ const SettingsAltButton = observer(() => {
 											</div>
 											<div className="cp-section">
 												<div className="rt-macros__label">{t("Material")}</div>
-												{
-														Object.entries(
-															material_schema
-														).map(([key, field]) => {
-
-															// OBJECT
-															if (
-																field.type === "object"
-															) {
-
+											
+													{
+														Object.entries(material_schema).map(
+															([key, field]) => {
+								
+																const value =
+																	formData?.[key] ?? "";
+								
 																return (
-
-																	<div
-																		key={key}
-																		className="cp-subgroup"
-																	>
-
-																		<h5 className="mb-3">
-																			{t(field.title)}
-																		</h5>
-
-																		{
-																			Object.entries(
-																				field.properties
-																			).map(
-																				([nestedKey, nestedField]) => {
-
-																					const value =
-																						formData?.[
-																						key
-																						]?.[
-																						nestedKey
-																						];
-
-																					const error =
-																						errors?.[
-																						`${key}.${nestedKey}`
-																						];
-
-																					return (
-
-																						<Form.Group
-																							className="mb-3"
-																							key={nestedKey}
-																						>
-
-																							<Form.Label>
-																								{t(nestedField.title)}
-																							</Form.Label>
-
-																							<Form.Control
-																								type="number"
-
-																								value={
-																									value ?? ""
-																								}
-
-																								min={
-																									nestedField.minimum
-																								}
-
-																								max={
-																									nestedField.maximum
-																								}
-
-																								step={0.01}
-
-																								isInvalid={
-																									!!error
-																								}
-
-																								onChange={(e) =>
-																									updateNestedField(
-																										key,
-																										nestedKey,
-																										e.target.value,
-																										nestedField
-																									)
-																								}
-																							/>
-
-																							<Form.Control.Feedback type="invalid">
-																								{error}
-																							</Form.Control.Feedback>
-
-																						</Form.Group>
-																					);
-																				}
-																			)
-																		}
-
-																	</div>
-																);
-															}
-
-															// BOOLEAN
-															if (
-																field.type === "boolean"
-															) {
-
-																return (
-
 																	<Form.Group
 																		className="mb-3"
 																		key={key}
 																	>
-
-																		<Form.Check
-																			type="switch"
-
-																			label={t(field.title)}
-
-																			checked={
-																				!!formData?.[key]
+								
+																		<Form.Label>
+																			{t(field.title)}
+																		</Form.Label>
+								
+																		<Form.Control
+																			type={
+																				field.type === "number"
+																					? "number"
+																					: "text"
 																			}
-
+								
+																			value={value}
+								
 																			onChange={(e) =>
 																				updateField(
 																					key,
-																					e.target.checked,
+																					e.target.value,
 																					field
 																				)
 																			}
+								
+																			isInvalid={
+																				!!errors[key]
+																			}
+								
+																			placeholder={
+																				t(field.title)
+																			}
+								
+																			min={field.minimum}
+								
+																			max={field.maximum}
+								
+																			step={field.step}
+								
+																			maxLength={
+																				field.maxLength
+																			}
 																		/>
-
+								
+																		<Form.Control.Feedback type="invalid">
+																			{t(errors[key])}
+																		</Form.Control.Feedback>
+								
 																	</Form.Group>
 																);
 															}
-
-															// NUMBER / TEXT
-															const error =
-																errors?.[key];
-
-															return (
-
-																<Form.Group
-																	className="mb-3"
-																	key={key}
-																>
-
-																	<Form.Label>
-																		{t(field.title)}
-																	</Form.Label>
-
-																	<Form.Control
-
-																		type={
-																			field.type === "number" ||
-																				field.type === "integer"
-																				? "number"
-																				: "text"
-																		}
-
-																		value={
-																			formData?.[key] ?? ""
-																		}
-
-																		min={field.minimum}
-
-																		max={field.maximum}
-
-																		step={
-																			field.type === "integer"
-																				? 1
-																				: 0.01
-																		}
-
-																		isInvalid={!!error}
-
-																		onChange={(e) =>
-																			updateField(
-																				key,
-																				e.target.value,
-																				field
-																			)
-																		}
-																	/>
-
-																	<Form.Control.Feedback type="invalid">
-																		{error}
-																	</Form.Control.Feedback>
-
-																</Form.Group>
-															);
-														})
+														)
 													}
+													
 
 												
 											</div>

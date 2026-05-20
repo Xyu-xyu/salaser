@@ -801,6 +801,7 @@ const ru = {
     "Show all markers": "Показать все маркеры",
     "Maximum value: 100": "Максимальное значение: 100",
     "Minimum length: 1": "Минимальная длина: 1",
-    "Power, W": "Мощность, Вт"
+    "Power, W": "Мощность, Вт",
+    "Minimum length: 2": "Минимальная длина: 2"
 }
 export default ru;

@@ -817,6 +817,7 @@ const en = {
     "Show all markers": "Show all markers",
     "Maximum value: 100": "Maximum value: 100",
     "Minimum length: 1": "Minimum length: 1",
-    "Power, W": "Power, W"
+    "Power, W": "Power, W",
+    "Minimum length: 2": "Minimum length: 2"
 }
 export default en;
