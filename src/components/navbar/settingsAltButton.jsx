@@ -19,7 +19,106 @@ const SettingsAltButton = observer(() => {
 	const showModal = () => setShow(true);
 	const [expanded, setExpanded] = useState(false);
 	const { modulationMacroinUse, selectedModulationMacro, piercingMacroinUse, selectedPiercingMacro } = macrosStore
-	const [formData, setFormData] = useState({});
+	const [formData, setFormData] = useState(
+		{
+			"code":"STEEL",
+			"name":"Steel",
+			"thickness":1.5
+		 },
+	);
+
+
+	const [feedingFormData, setFeedingFormData] = useState(
+		{
+			"arcLimitsEnabled": false,
+			"feedLimit_mm_s": 50000,
+			"microBridgeLength_mm": 2,
+			"safeHeight_mm": 20,
+			"toolCompensation":
+				{ "g41Offset_mm": 0, 
+				  "g42Offset_mm": 0 }
+		},
+	);
+
+
+
+
+	const feeding_schema = {
+
+		"feedLimit_mm_s": {
+			"type": "number",
+			"title": "Ограничение подачи, мм/с",
+			"maximum": 200000,
+			"default": 50000,
+			"minimum": 10
+		},
+		"arcLimitsEnabled": {
+			"type": "boolean",
+			"title": "Дуги: ограничения по динамике",
+			"description": "Включает/выключает ограничения дуг (скорость по v^2/r и ограничение разгона по суммарному ускорению). Отключение может ухудшить качество/точность на малых радиусах.",
+			"default": false
+		},
+		"microBridgeLength_mm": {
+			"type": "number",
+			"title": "Длина микроперемычки, мм",
+			"maximum": 1000.0,
+			"default": 2.0,
+			"minimum": 0.01
+		},
+		"safeHeight_mm": {
+			"type": "number",
+			"title": "Безопасная высота, мм",
+			"maximum": 200.0,
+			"default": 20.0,
+			"minimum": 0.1
+		},
+		"toolCompensation": {
+			"type": "object",
+			"title": "Компенсация инструмента",
+			"description": "Компенсация (tool offset) по стороне: G41 — слева от траектории, G42 — справа. Значения задаются в мм, без знака.",
+			"properties": {
+				"g41Offset_mm": {
+					"type": "number",
+					"title": "G41 (слева), мм",
+					"maximum": 5.0,
+					"default": 0.0,
+					"minimum": 0.0
+				},
+				"g42Offset_mm": {
+					"type": "number",
+					"title": "G42 (справа), мм",
+					"maximum": 5.0,
+					"default": 0.0,
+					"minimum": 0.0
+				}
+			},
+			"additionalProperties": false
+		}
+	}
+
+
+	const material_schema = {
+ 			"code": {
+				"title": "Код",
+				"minLength": 2,
+				"maxLength": 64,
+				"default": "STEEL",
+				"type": "string"
+			},
+			"name": {
+				"maxLength": 256,
+				"type": "string",
+				"title": "Название",
+				"default": "Steel"
+			},
+			"thickness": {
+				"type": "number",
+				"title": "Толщина, мм",
+				"maximum": 60.0,
+				"default": 1.5,
+				"minimum": 0.1
+			}
+	}
 
 	const [errors, setErrors] = useState({});
 	const validateField = (
@@ -326,106 +425,6 @@ const SettingsAltButton = observer(() => {
 	};
 
 
-	const feeding_schema = {
-
-		"feedLimit_mm_s": {
-			"type": "number",
-			"title": "Ограничение подачи, мм/с",
-			"maximum": 200000,
-			"default": 50000,
-			"minimum": 10
-		},
-		"arcLimitsEnabled": {
-			"type": "boolean",
-			"title": "Дуги: ограничения по динамике",
-			"description": "Включает/выключает ограничения дуг (скорость по v^2/r и ограничение разгона по суммарному ускорению). Отключение может ухудшить качество/точность на малых радиусах.",
-			"default": false
-		},
-		"microBridgeLength_mm": {
-			"type": "number",
-			"title": "Длина микроперемычки, мм",
-			"maximum": 1000.0,
-			"default": 2.0,
-			"minimum": 0.01
-		},
-		"safeHeight_mm": {
-			"type": "number",
-			"title": "Безопасная высота, мм",
-			"maximum": 200.0,
-			"default": 20.0,
-			"minimum": 0.1
-		},
-		"toolCompensation": {
-			"type": "object",
-			"title": "Компенсация инструмента",
-			"description": "Компенсация (tool offset) по стороне: G41 — слева от траектории, G42 — справа. Значения задаются в мм, без знака.",
-			"properties": {
-				"g41Offset_mm": {
-					"type": "number",
-					"title": "G41 (слева), мм",
-					"maximum": 5.0,
-					"default": 0.0,
-					"minimum": 0.0
-				},
-				"g42Offset_mm": {
-					"type": "number",
-					"title": "G42 (справа), мм",
-					"maximum": 5.0,
-					"default": 0.0,
-					"minimum": 0.0
-				}
-			},
-			"additionalProperties": false
-		}
-	}
-
-
-	const material_schema = {
- 			"code": {
-				"title": "Код",
-				"minLength": 2,
-				"maxLength": 64,
-				"default": "STEEL",
-				"type": "string"
-			},
-			"name": {
-				"maxLength": 256,
-				"type": "string",
-				"title": "Название",
-				"default": "Steel"
-			},
-			"thickness": {
-				"type": "number",
-				"title": "Толщина, мм",
-				"maximum": 60.0,
-				"default": 1.5,
-				"minimum": 0.1
-			}
-		}
-	
-
-	const machine_schema = {
-		"properties":{
-			"type": "object",
-			"description": "Current Machine",
-			"properties": {
-				"name": {
-					"title": "Название",
-					"minLength": 1,
-					"maxLength": 128,
-					"default": "SGNlaser",
-					"type": "string"
-				},
-				"sourcePower_w": {
-					"type": "integer",
-					"title": "Мощность, Вт",
-					"maximum": 100000,
-					"default": 12000,
-					"minimum": 100
-				}
-			}
-		}
-	}
 
 	return (
 		<div className="ms-2" id="settingsAltButton">
@@ -453,6 +452,7 @@ const SettingsAltButton = observer(() => {
 				<div className="p-2">
 					<div className="drawer-body">
 						<div className="rt-modal-topbar">
+							<div className="rt-macros__label">{t('Settings')} :{ macrosStore.settingsSource.source }</div>
 							<button
 								type="button"
 								className="rt-mode-toggle"
@@ -476,7 +476,7 @@ const SettingsAltButton = observer(() => {
 												<div className="rt-macro-tile__top">
 													<span className={`rt-macro__dot is-m8`} aria-hidden="true"></span>
 												</div>
-												<div className="rt-macro-tile__name">{t("Common")}</div>
+												<div className="rt-macro-tile__name">{!paramsViewMode ? t("Common") : t("Macros")}</div>
 											</button>
 											<div className="rt-macros__label">{t("Macros")}</div>
 											{macros.map((_, idx) => (
@@ -502,7 +502,7 @@ const SettingsAltButton = observer(() => {
 										</div>
 									</div>
 									{!paramsViewMode && <div className="d-flex flex-column">
-										<div className="d-flex">
+										<div className="d-flex flex-column">
 											<div className="cp-section" style={{ width: "750px" }}						>
 												<div className="rt-macros__label">{t("Cutting parameters")}</div>
 												<div className="cp-section__body cp-cols3">
@@ -596,7 +596,9 @@ const SettingsAltButton = observer(() => {
 													})}
 												</div>
 											</div>
-											<div className="cp-section" style={{ width: "330px" }}		>
+
+										<div className="d-flex">
+										<div className="cp-section" style={{ width: "330px" }}		>
 												<div className="rt-macros__label">{t("Cutting parameters")}:{t("Filling")}</div>
 												<div className="cp-section__body">
 
@@ -722,8 +724,6 @@ const SettingsAltButton = observer(() => {
 												</div>
 											</div>
 
-
-
 											<div className="d-flex flex-column">
 												<div className="cp-section">
 													<div className="rt-macros__label">{t("Modulation")}</div>
@@ -837,6 +837,8 @@ const SettingsAltButton = observer(() => {
 													</div>
 												</div>
 											</div>
+										</div>	
+											
 										</div>
 
 									</div>
@@ -876,7 +878,7 @@ const SettingsAltButton = observer(() => {
 																				([nestedKey, nestedField]) => {
 
 																					const value =
-																						formData?.[
+																						feedingFormData?.[
 																						key
 																						]?.[
 																						nestedKey
@@ -961,7 +963,7 @@ const SettingsAltButton = observer(() => {
 																			label={t(field.title)}
 
 																			checked={
-																				!!formData?.[key]
+																				!!feedingFormData?.[key]
 																			}
 
 																			onChange={(e) =>
@@ -1002,7 +1004,7 @@ const SettingsAltButton = observer(() => {
 																		}
 
 																		value={
-																			formData?.[key] ?? ""
+																			feedingFormData?.[key] ?? ""
 																		}
 
 																		min={field.minimum}
@@ -1034,9 +1036,6 @@ const SettingsAltButton = observer(() => {
 															);
 														})
 													}
-
-
-
 
 												</div>
 											</div>
@@ -1232,194 +1231,35 @@ const SettingsAltButton = observer(() => {
 												
 											</div>
 											<div className="cp-section">
-											<div className="rt-macros__label">{t("Machine")}</div>
-											{
-														Object.entries(
-															machine_schema
-														).map(([key, field]) => {
-
-															// OBJECT
-															if (
-																field.type === "object"
-															) {
-
-																return (
-
-																	<div
-																		key={key}
-																		className="cp-subgroup"
-																	>
-
-																		<h5 className="mb-3">
-																			{t(field.title)}
-																		</h5>
-
-																		{
-																			Object.entries(
-																				field.properties
-																			).map(
-																				([nestedKey, nestedField]) => {
-
-																					const value =
-																						formData?.[
-																						key
-																						]?.[
-																						nestedKey
-																						];
-
-																					const error =
-																						errors?.[
-																						`${key}.${nestedKey}`
-																						];
-
-																					return (
-
-																						<Form.Group
-																							className="mb-3"
-																							key={nestedKey}
-																						>
-
-																							<Form.Label>
-																								{t(nestedField.title)}
-																							</Form.Label>
-
-																							<Form.Control
-																								type="number"
-
-																								value={
-																									value ?? ""
-																								}
-
-																								min={
-																									nestedField.minimum
-																								}
-
-																								max={
-																									nestedField.maximum
-																								}
-
-																								step={0.01}
-
-																								isInvalid={
-																									!!error
-																								}
-
-																								onChange={(e) =>
-																									updateNestedField(
-																										key,
-																										nestedKey,
-																										e.target.value,
-																										nestedField
-																									)
-																								}
-																							/>
-
-																							<Form.Control.Feedback type="invalid">
-																								{error}
-																							</Form.Control.Feedback>
-
-																						</Form.Group>
-																					);
-																				}
-																			)
-																		}
-
-																	</div>
-																);
-															}
-
-															// BOOLEAN
-															if (
-																field.type === "boolean"
-															) {
-
-																return (
-
-																	<Form.Group
-																		className="mb-3"
-																		key={key}
-																	>
-
-																		<Form.Check
-																			type="switch"
-
-																			label={t(field.title)}
-
-																			checked={
-																				!!formData?.[key]
-																			}
-
-																			onChange={(e) =>
-																				updateField(
-																					key,
-																					e.target.checked,
-																					field
-																				)
-																			}
-																		/>
-
-																	</Form.Group>
-																);
-															}
-
-															// NUMBER / TEXT
-															const error =
-																errors?.[key];
-
-															return (
-
-																<Form.Group
-																	className="mb-3"
-																	key={key}
-																>
-
-																	<Form.Label>
-																		{t(field.title)}
-																	</Form.Label>
-
-																	<Form.Control
-
-																		type={
-																			field.type === "number" ||
-																				field.type === "integer"
-																				? "number"
-																				: "text"
-																		}
-
-																		value={
-																			formData?.[key] ?? ""
-																		}
-
-																		min={field.minimum}
-
-																		max={field.maximum}
-
-																		step={
-																			field.type === "integer"
-																				? 1
-																				: 0.01
-																		}
-
-																		isInvalid={!!error}
-
-																		onChange={(e) =>
-																			updateField(
-																				key,
-																				e.target.value,
-																				field
-																			)
-																		}
-																	/>
-
-																	<Form.Control.Feedback type="invalid">
-																		{error}
-																	</Form.Control.Feedback>
-
-																</Form.Group>
-															);
-														})
-													}
+												<div className="rt-macros__label">Machine</div>
+												<div className="cp-subgroup">
+													<h5 className="mb-3" />
+													<div className="mb-3">
+													<label className="form-label">{t('Name')}</label>
+													<input
+ 														className="form-control"
+														disabled=""
+														onChange={()=>{}}
+														value={ macrosStore.cut_settings ? macrosStore.cut_settings.machine.name :"SGNLaser"}
+													/>
+													<div className="invalid-feedback" />
+													</div>
+													<div className="mb-3">
+													<label className="form-label">{t('Power, W')}</label>
+													<input
+														min={100}
+														max={100000}
+														step="0.01"
+														className="form-control"
+														type="number"
+														onChange={()=>{}}
+														value={ macrosStore.cut_settings ? macrosStore.cut_settings.sourcePower_w : 10000}
+													/>
+													<div className="invalid-feedback" />
+													</div>
+												</div>
 											</div>
+
 										</div>
 									}
 
@@ -1427,7 +1267,8 @@ const SettingsAltButton = observer(() => {
 							</div>
 						)}
 						<div className="d-flex">
-							{!expanded && <div className="rt-macros" aria-label="Макросы" style={{ width: "300px" }}>
+							{!expanded && 
+							<div className="rt-macros me-2" aria-label="Макросы" style={{ width: "300px" }}>
 								<div className="rt-macros__label">{t("Macros")}</div>
 								<div className={`rt-macros__grid ${expanded ? "is-col" : ""}`} id="rt_macros_grid">
 									{macros.map((_, idx) => (

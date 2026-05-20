@@ -96,9 +96,6 @@ const SettingsButton = observer(() => {
 		})	
 	}
 
-
-
-
 	async function copyPreset(id) {
 		await fetch(api_host + `/db/copy_preset`, {
 			method: "POST",
